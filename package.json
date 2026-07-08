@@ -1,0 +1,9 @@
+{
+  "name": "mddcalc-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "mysql2": "^3.15.0",
+    "resend": "^6.17.1"
+  }
+}

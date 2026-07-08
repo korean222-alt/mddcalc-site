@@ -1,0 +1,2612 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>문의하기 | MDD 분석기</title>
+<meta name="description" content="서비스 개선 제안, 버그 신고, 기타 문의사항을 남겨주세요.">
+<meta name="robots" content="index, follow">
+<meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
+<link rel="canonical" href="https://mddcalc.com/contact.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="문의하기 | MDD 분석기">
+<meta property="og:description" content="서비스 개선 제안, 버그 신고, 기타 문의사항을 남겨주세요.">
+<meta property="og:url" content="https://mddcalc.com/contact.html">
+<meta property="og:site_name" content="MDD 분석기">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="문의하기 | MDD 분석기">
+<meta name="twitter:description" content="서비스 개선 제안, 버그 신고, 기타 문의사항을 남겨주세요.">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.5; padding: 16px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 28px; margin-bottom: 6px; color: #2d3748; }
+  .subtitle { color: #718096; margin-bottom: 20px; font-size: 14px; }
+
+  .card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+  .api-panel { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
+  .api-panel h2 { font-size: 18px; margin-bottom: 12px; }
+  .api-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .api-row label { font-size: 13px; min-width: 90px; font-weight: 600; }
+  .api-row input { flex: 1; min-width: 180px; padding: 10px 12px; border: none; border-radius: 8px;
+                   font-size: 14px; font-family: monospace; }
+  .btn { padding: 10px 20px; background: #fff; color: #2d3748; border: none; border-radius: 8px;
+         font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+  .btn-primary { background: #2d3748; color: #fff; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .api-help { font-size: 12px; opacity: 0.95; margin-top: 8px; }
+  .api-help a { color: #fff; text-decoration: underline; }
+  .status { margin-top: 10px; padding: 12px 14px; border-radius: 6px; font-size: 13px;
+            background: rgba(255,255,255,0.2); display: none; white-space: pre-wrap; line-height: 1.6; }
+  .status.show { display: block; }
+  .status.error { background: rgba(254, 178, 178, 0.9); color: #742a2a; }
+  .status.success { background: rgba(198, 246, 213, 0.9); color: #22543d; }
+
+  /* 관심종목 */
+  .favorites-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fav-chip { display: inline-flex; align-items: center; gap: 4px; background: #ebf8ff; color: #2b6cb0;
+              border-radius: 20px; padding: 6px 6px 6px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+              transition: background 0.2s; }
+  .fav-chip:hover { background: #bee3f8; }
+  .fav-chip .fav-remove { background: none; border: none; color: #63b3ed; font-size: 15px; cursor: pointer;
+                           padding: 2px 6px; line-height: 1; border-radius: 50%; }
+  .fav-chip .fav-remove:hover { color: #e53e3e; background: rgba(255,255,255,0.6); }
+  .fav-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #cbd5e0; padding: 0 4px;
+             line-height: 1; transition: color 0.2s, transform 0.15s; vertical-align: middle; }
+  .fav-btn:hover { transform: scale(1.15); }
+  .fav-btn.active { color: #f6ad55; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .controls label { font-size: 13px; font-weight: 600; color: #4a5568; }
+  .controls input[type=date] { padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; }
+  .preset-btn { padding: 6px 12px; background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 6px;
+                cursor: pointer; font-size: 12px; }
+  .preset-btn.active { background: #4299e1; color: #fff; border-color: #4299e1; }
+  .mode-toggle { display: inline-flex; background: #edf2f7; border-radius: 8px; padding: 3px; }
+  .mode-toggle button { padding: 6px 14px; border: none; background: transparent; cursor: pointer;
+                        border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .mode-toggle button.active { background: #4299e1; color: #fff; }
+
+  .hero { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center;
+          text-align: center; padding: 24px 16px; }
+  .hero-box h3 { font-size: 12px; color: #718096; font-weight: 600; margin-bottom: 6px; }
+  .hero-box .big { font-size: 28px; font-weight: 800; color: #2d3748; }
+  .hero-box .sub { font-size: 12px; color: #718096; margin-top: 4px; }
+  .hero .arrow { font-size: 24px; color: #a0aec0; }
+  .hero-dd { color: #e53e3e !important; }
+  .hero-dd.mild { color: #d69e2e !important; }
+  .hero-dd.small { color: #38a169 !important; }
+
+  .signal-card { padding: 20px; border-radius: 12px; text-align: center; margin-top: 14px; }
+  .signal-strong { background: #fed7d7; border: 2px solid #e53e3e; }
+  .signal-mid { background: #fefcbf; border: 2px solid #d69e2e; }
+  .signal-mild { background: #feebc8; border: 2px solid #dd6b20; }
+  .signal-none { background: #e2e8f0; border: 2px solid #a0aec0; }
+  .signal-emoji { font-size: 40px; margin-bottom: 6px; }
+  .signal-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .signal-desc { font-size: 14px; color: #4a5568; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .stat-box { background: #f7fafc; padding: 14px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
+  .stat-box .label { font-size: 11px; color: #718096; margin-bottom: 4px; font-weight: 600; }
+  .stat-box .value { font-size: 18px; font-weight: 700; color: #2d3748; }
+
+  .target-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
+  .target-box { padding: 12px; border-radius: 10px; border-left: 4px solid; }
+  .t-15 { background: #c6f6d5; border-color: #38a169; }
+  .t-20 { background: #fefcbf; border-color: #d69e2e; }
+  .t-30 { background: #feebc8; border-color: #dd6b20; }
+  .target-box .pct { font-size: 13px; font-weight: 700; }
+  .target-box .price { font-size: 20px; font-weight: 800; margin: 4px 0; }
+  .target-box .note { font-size: 11px; color: #4a5568; }
+  .reached { background: #2d3748; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 6px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 10px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+  th { background: #f7fafc; font-size: 12px; color: #4a5568; font-weight: 700; }
+  tr.current { background: #fefcbf !important; font-weight: 700; }
+  tr.never { color: #a0aec0; }
+  .bar-container { background: #edf2f7; height: 14px; border-radius: 7px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, #4299e1, #3182ce); }
+  .bar-fill.zero { background: #cbd5e0; }
+
+  .info-banner { padding: 12px 16px; background: #bee3f8; color: #2a4365; border-radius: 8px;
+                 font-size: 13px; margin-bottom: 10px; }
+
+  details { background: #f7fafc; border-radius: 8px; padding: 12px 16px; margin-top: 10px; border: 1px solid #e2e8f0; }
+  summary { cursor: pointer; font-weight: 600; color: #2d3748; }
+  details .body { margin-top: 10px; font-size: 13px; color: #4a5568; line-height: 1.7; }
+
+  h2.section { font-size: 18px; margin-bottom: 12px; color: #2d3748; }
+  .chart-wrap { position: relative; height: 320px; }
+  .loading { display: none; text-align: center; padding: 30px; color: #718096; }
+  .loading.show { display: block; }
+  .hidden { display: none !important; }
+
+  /* 페이지 표시/숨김 - CSS 클래스 기반 */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  @media (max-width: 640px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero .arrow { display: none; }
+    .hero-box .big { font-size: 22px; }
+  }
+
+  /* 헤더 네비게이션 */
+  .site-header { background: #2d3748; color: #fff; padding: 0; margin: -16px -16px 20px -16px; }
+  .site-header .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .site-logo { font-size: 18px; font-weight: 800; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .site-logo:hover { color: #90cdf4; }
+  .site-nav { display: flex; gap: 4px; align-items: center; }
+  .site-nav a { color: #cbd5e0; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+  .site-nav a:hover, .site-nav a.active { background: rgba(255,255,255,0.15); color: #fff; }
+  .nav-hamburger { display: none; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 8px; }
+  @media (max-width: 768px) {
+    .nav-hamburger { display: block; }
+    .site-nav { display: none; position: absolute; top: 56px; left: 0; right: 0; background: #2d3748; flex-direction: column; padding: 8px 16px 16px; z-index: 100; }
+    .site-nav.open { display: flex; }
+    .site-nav a { padding: 10px 12px; border-radius: 6px; }
+    .site-header { position: relative; }
+  }
+
+  /* 푸터 */
+  .site-footer { background: #2d3748; color: #a0aec0; margin: 40px -16px -16px -16px; padding: 32px 16px 24px; }
+  .site-footer .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 24px; }
+  .footer-col h4 { color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+  .footer-col a { display: block; color: #a0aec0; text-decoration: none; font-size: 13px; margin-bottom: 6px; }
+  .footer-col a:hover { color: #fff; }
+  .footer-col p { font-size: 12px; line-height: 1.6; }
+  .footer-bottom { border-top: 1px solid #4a5568; padding-top: 16px; font-size: 12px; text-align: center; }
+  .footer-disclaimer { font-size: 11px; color: #718096; margin-top: 8px; line-height: 1.5; }
+
+  /* 페이지 콘텐츠 */
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-hero { background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); color: #fff; padding: 48px 0 40px; margin: -20px -16px 24px -16px; }
+  .page-hero .inner { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+  .page-hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; color: #fff; }
+  .page-hero p { font-size: 16px; opacity: 0.85; }
+
+  /* 블로그 */
+  .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 16px; }
+  .blog-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+  .blog-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .blog-card-img { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+  .blog-card-body { padding: 16px; }
+  .blog-card-tag { font-size: 11px; font-weight: 700; color: #4299e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .blog-card-title { font-size: 15px; font-weight: 700; color: #2d3748; margin-bottom: 8px; line-height: 1.4; }
+  .blog-card-excerpt { font-size: 12px; color: #718096; line-height: 1.6; }
+  .blog-card-meta { font-size: 11px; color: #a0aec0; margin-top: 10px; }
+
+  /* 블로그 상세 */
+  .blog-article { max-width: 780px; margin: 0 auto; }
+  .blog-article h1 { font-size: 28px; font-weight: 800; color: #2d3748; margin-bottom: 12px; line-height: 1.3; }
+  .blog-article h2 { font-size: 20px; font-weight: 700; color: #2d3748; margin: 28px 0 12px; }
+  .blog-article h3 { font-size: 16px; font-weight: 700; color: #4a5568; margin: 20px 0 8px; }
+  .blog-article p { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 16px; }
+  .blog-article ul, .blog-article ol { margin: 12px 0 16px 20px; }
+  .blog-article li { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 6px; }
+  .blog-article .highlight-box { background: #ebf8ff; border-left: 4px solid #4299e1; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+  .blog-article .highlight-box p { margin: 0; }
+  .blog-article .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #4299e1; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+  .blog-article .back-btn:hover { color: #2b6cb0; }
+  .blog-article table { margin: 16px 0; }
+  .blog-article .article-meta { font-size: 13px; color: #a0aec0; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+
+  /* 관련 글 & CTA */
+  .related-posts { max-width: 780px; margin: 40px auto 0; padding-top: 28px; border-top: 1px solid #e2e8f0; }
+  .related-posts h3 { font-size: 16px; font-weight: 700; color: #2d3748; margin-bottom: 14px; }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .related-card { background: #f7fafc; border-radius: 10px; padding: 14px; cursor: pointer; transition: background 0.2s; }
+  .related-card:hover { background: #edf2f7; }
+  .related-card-tag { font-size: 10px; font-weight: 700; color: #4299e1; text-transform: uppercase; margin-bottom: 6px; }
+  .related-card-title { font-size: 13px; font-weight: 600; color: #2d3748; line-height: 1.5; }
+  .blog-cta { max-width: 780px; margin: 24px auto 0; background: linear-gradient(135deg, #4299e1, #3182ce); border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .blog-cta-text { color: #fff; font-size: 14px; font-weight: 600; }
+  .blog-cta-btn { background: #fff; color: #2b6cb0; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .blog-cta-btn:hover { background: #ebf8ff; }
+
+  /* 도구 페이지 */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 16px; }
+  .tool-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); cursor: pointer; transition: transform 0.2s; }
+  .tool-card:hover { transform: translateY(-2px); }
+  .tool-card .tool-icon { font-size: 36px; margin-bottom: 12px; }
+  .tool-card h3 { font-size: 16px; font-weight: 700; color: #2d3748; margin-bottom: 8px; }
+  .tool-card p { font-size: 13px; color: #718096; line-height: 1.6; }
+  .tool-badge { display: inline-block; background: #c6f6d5; color: #276749; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-top: 10px; }
+
+  /* About/Contact/Policy 페이지 */
+  .prose { max-width: 780px; margin: 0 auto; }
+  .prose h2 { font-size: 22px; font-weight: 700; color: #2d3748; margin: 28px 0 12px; }
+  .prose h3 { font-size: 17px; font-weight: 700; color: #4a5568; margin: 20px 0 8px; }
+  .prose p { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 14px; }
+  .prose ul { margin: 10px 0 14px 20px; }
+  .prose li { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 4px; }
+  .contact-form input, .contact-form textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
+  .contact-form textarea { height: 120px; resize: vertical; }
+  .contact-form .submit-btn { background: #4299e1; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .contact-form .submit-btn:hover { background: #3182ce; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="#" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="#" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
+      <a href="#" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
+      <a href="#" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
+      <a href="#" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
+      <a href="#" onclick="navigate('contact'); return false;" id="nav-contact">✉️ 문의</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+
+<div id="page-contact" class="page active">
+  <div class="page-hero">
+    <div class="inner">
+      <h1>✉️ 문의하기</h1>
+      <p>서비스 개선 제안, 버그 신고, 기타 문의를 남겨주세요</p>
+    </div>
+  </div>
+  <div class="prose">
+    <div class="card">
+      <h2>📬 문의 양식</h2>
+      <div class="contact-form">
+        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">이름</label>
+        <input type="text" id="contactName" placeholder="이름을 입력하세요">
+        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">이메일</label>
+        <input type="email" id="contactEmail" placeholder="답변받을 이메일 주소">
+        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">제목</label>
+        <input type="text" id="contactSubject" placeholder="문의 제목">
+        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">내용</label>
+        <textarea id="contactMessage" placeholder="문의 내용을 입력하세요"></textarea>
+        <button class="submit-btn" onclick="submitContact()">문의 보내기</button>
+        <div id="contactResult" style="margin-top:12px; font-size:13px;"></div>
+      </div>
+    </div>
+    <div class="card" style="background:#f7fafc;">
+      <h2>💡 자주 묻는 질문</h2>
+      <details style="margin-bottom:10px;">
+        <summary>우리 서비스는 무료인가요?</summary>
+        <div class="body">네, MDD 분석기의 모든 기본 기능은 완전 무료로 제공됩니다.</div>
+      </details>
+      <details style="margin-bottom:10px;">
+        <summary>어떤 주식을 조회할 수 있나요?</summary>
+        <div class="body">TSLA, NVDA, MSFT, AAPL, SPY, QQQ 등 미국 주식과 ETF를 조회할 수 있습니다. Twelve Data API가 지원하는 모든 종목이 가능합니다.</div>
+      </details>
+      <details style="margin-bottom:10px;">
+        <summary>데이터가 얼마나 실시간인가요?</summary>
+        <div class="body">데이터는 전일 종가 기준으로 제공되며, 대부분 당일 내에 업데이트됩니다.</div>
+      </details>
+    </div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>📊 MDD 분석기</h4>
+        <p>고점 대비 하락률(MDD)으로 매수 타이밍을 찾아주는 무료 주식 분석 도구입니다.</p>
+      </div>
+      <div class="footer-col">
+        <h4>프리미엄 도구</h4>
+        <a href="#" onclick="navigate('home'); return false;">📊 MDD 계산기</a>
+        <a href="#" onclick="navigate('rsi'); return false;">📈 RSI 계산기</a>
+        <a href="#" onclick="navigate('dividend'); return false;">💰 배당 수익률 계산기</a>
+        <a href="#" onclick="navigate('fx'); return false;">💱 환율 계산기</a>
+        <a href="#" onclick="navigate('roi'); return false;">💹 수익률 계산기</a>
+        <a href="#" onclick="navigate('compound'); return false;">🧮 복리 계산기</a>
+        <a href="#" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
+        <a href="#" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
+        <a href="#" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
+      </div>
+      <div class="footer-col">
+        <h4>투자 가이드</h4>
+        <a href="#" onclick="navigate('blog'); return false;">📚 모든 가이드 보기</a>
+        <a href="/blog.html?post=1">MDD란 무엇인가?</a>
+        <a href="/blog.html?post=3">-30% 하락 시 매수 전략</a>
+        <a href="/blog.html?post=5">RSI 완전 가이드</a>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <a href="#" onclick="navigate('about'); return false;">ℹ️ 소개</a>
+        <a href="#" onclick="navigate('contact'); return false;">✉️ 문의하기</a>
+        <a href="#" onclick="navigate('privacy'); return false;">🔒 개인정보 처리방침</a>
+        <a href="#" onclick="navigate('terms'); return false;">📋 이용약관</a>
+        <a href="#" onclick="navigate('disclaimer'); return false;">⚠️ 면책조항</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MDD 분석기. All rights reserved.</p>
+      <p class="footer-disclaimer">⚠️ 이 사이트에서 제공하는 모든 정보는 교육적 목적으로만 제공되며, 투자 권유나 재정 조언이 아닙니다. 주식 투자는 원금 손실의 위험이 있으며, 모든 투자 결정은 본인의 신중한 판단에 따라 진행하시기 바랍니다.</p>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+const CURRENT_PAGE = 'contact';
+
+// 여러 도구(MDD, RSI 등)가 같은 티커를 조회할 때 API를 중복 호출하지 않도록 공유하는 캐시.
+// 무료 API 한도(분당 8회, 일 800회)를 아끼기 위한 장치입니다. 10분간 유효.
+const PRICE_CACHE = {};
+const PRICE_CACHE_TTL_MS = 10 * 60 * 1000;
+
+async function fetchPriceSeries(ticker, outputsize) {
+  const key = ticker.toUpperCase();
+  const cached = PRICE_CACHE[key];
+  if (cached && (Date.now() - cached.time) < PRICE_CACHE_TTL_MS && cached.values.length >= outputsize) {
+    return { fromCache: true, values: cached.values, metadata: null };
+  }
+
+  const res = await fetch('/api/twelve-data/time-series', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ symbol: key, interval: '1day', outputsize })
+  });
+  const json = await res.json();
+
+  if (res.status === 429) {
+    const err = new Error(json.message || '오늘 사용량을 모두 사용했어요.');
+    err.rateLimited429 = true;
+    throw err;
+  }
+  if (json.status === 'error' && json.message && json.message.includes('rate limit')) {
+    const err = new Error('분당 요청 한도(8회)를 초과했습니다. 60초 뒤에 다시 시도해주세요.');
+    err.rateLimitedMinute = true;
+    throw err;
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (json.error) throw new Error(json.error);
+  if (json.status === 'error') throw new Error(json.message || 'API 오류');
+  if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
+
+  PRICE_CACHE[key] = { values: json.values, time: Date.now() };
+  return { fromCache: false, values: json.values, metadata: json._metadata || null };
+}
+
+// 벤치마크(SPY 등)는 하루 1회만 API를 쓰도록 localStorage에 날짜와 함께 저장해 재사용합니다.
+// (메모리 캐시인 PRICE_CACHE는 페이지를 새로고침하면 사라지지만, 이건 브라우저에 남아있어 하루 종일 재사용됩니다.)
+async function fetchBenchmarkSeries(symbol) {
+  const today = new Date().toISOString().slice(0, 10);
+  const cacheKey = 'bench_cache_' + symbol;
+
+  try {
+    const cachedRaw = localStorage.getItem(cacheKey);
+    if (cachedRaw) {
+      const cached = JSON.parse(cachedRaw);
+      if (cached.date === today && Array.isArray(cached.values) && cached.values.length > 0) {
+        return { values: cached.values, fromCache: true };
+      }
+    }
+  } catch (e) { /* localStorage 접근 불가(사파리 시크릿모드 등) 시 그냥 API로 진행 */ }
+
+  const { values } = await fetchPriceSeries(symbol, 5000);
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify({ date: today, values }));
+  } catch (e) { /* 저장 실패(용량 초과 등)는 기능에 지장 없으므로 무시 */ }
+  return { values, fromCache: false };
+}
+
+let STATE = {
+  raw: null,
+  filtered: null,
+  ticker: '',
+  mode: 'high',
+  startDate: null,
+  endDate: null,
+  ddChart: null,
+  priceChart: null,
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  // CSS 클래스로 홈 페이지 활성화
+  // 홈(MDD 계산기) 페이지에서만 실행 — 다른 페이지에는 #ticker 요소가 없음
+  const tickerEl = document.getElementById('ticker');
+  if (tickerEl) {
+    const savedTicker = localStorage.getItem('td_last_ticker');
+    if (savedTicker) tickerEl.value = savedTicker;
+
+    // 블로그 CTA 등 다른 페이지에서 ?ticker=XXX 로 넘어온 경우 자동 조회
+    const qTicker = new URLSearchParams(window.location.search).get('ticker');
+    if (qTicker) {
+      tickerEl.value = qTicker.toUpperCase();
+      loadData();
+    }
+
+    renderFavorites();
+
+    tickerEl.addEventListener('keypress', e => {
+      if (e.key === 'Enter') loadData();
+    });
+    tickerEl.addEventListener('input', e => {
+      e.target.value = e.target.value.toUpperCase();
+    });
+  }
+
+  const rsiTickerEl = document.getElementById('rsiTicker');
+  if (rsiTickerEl) {
+    rsiTickerEl.addEventListener('keypress', e => {
+      if (e.key === 'Enter') calcRSIByTicker();
+    });
+    rsiTickerEl.addEventListener('input', e => {
+      e.target.value = e.target.value.toUpperCase();
+    });
+  }
+
+  // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
+  if (document.getElementById('blogGrid')) {
+    renderBlogGrid();
+    const qPost = new URLSearchParams(window.location.search).get('post');
+    if (qPost) {
+      showBlogPost(parseInt(qPost, 10));
+    } else {
+      showBlogList();
+    }
+  }
+
+  // 상단 네비게이션 활성 표시 (페이지별 CURRENT_PAGE 값 기준)
+  if (typeof CURRENT_PAGE !== 'undefined') {
+    document.querySelectorAll('.site-nav a').forEach(a => a.classList.remove('active'));
+    let navId = 'nav-' + CURRENT_PAGE;
+    if (['rsi','dividend','fx','roi','compound','leverage','dca'].includes(CURRENT_PAGE)) {
+      navId = 'nav-tools';
+    }
+    const navLink = document.getElementById(navId);
+    if (navLink) navLink.classList.add('active');
+  }
+});
+
+// ========== 관심종목 저장 ==========
+let favorites = JSON.parse(localStorage.getItem('mdd_favorites') || '[]');
+
+function saveFavorites() {
+  localStorage.setItem('mdd_favorites', JSON.stringify(favorites));
+}
+
+function toggleFavorite() {
+  const t = STATE.ticker;
+  if (!t) return;
+  const idx = favorites.indexOf(t);
+  if (idx === -1) {
+    favorites.unshift(t);
+    if (favorites.length > 20) favorites = favorites.slice(0, 20);
+  } else {
+    favorites.splice(idx, 1);
+  }
+  saveFavorites();
+  updateFavBtn();
+  renderFavorites();
+}
+
+function removeFavorite(ticker, event) {
+  if (event) event.stopPropagation();
+  favorites = favorites.filter(f => f !== ticker);
+  saveFavorites();
+  updateFavBtn();
+  renderFavorites();
+}
+
+function updateFavBtn() {
+  const btn = document.getElementById('favBtn');
+  if (!btn) return;
+  const isFav = favorites.includes(STATE.ticker);
+  btn.textContent = isFav ? '★' : '☆';
+  btn.classList.toggle('active', isFav);
+}
+
+function loadFavoriteTicker(ticker) {
+  const input = document.getElementById('ticker');
+  if (input) input.value = ticker;
+  loadData();
+}
+
+function renderFavorites() {
+  const panel = document.getElementById('favoritesPanel');
+  const list = document.getElementById('favoritesList');
+  if (!panel || !list) return;
+  if (favorites.length === 0) {
+    panel.classList.add('hidden');
+    return;
+  }
+  panel.classList.remove('hidden');
+  list.innerHTML = favorites.map(t => `
+    <span class="fav-chip" onclick="loadFavoriteTicker('${escapeHtml(t)}')">
+      ${escapeHtml(t)}
+      <button class="fav-remove" onclick="removeFavorite('${escapeHtml(t)}', event)" title="삭제">✕</button>
+    </span>
+  `).join('');
+}
+
+function showStatus(msg, type='info') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status show ' + type;
+}
+
+async function loadData() {
+  const ticker = document.getElementById('ticker').value.trim().toUpperCase();
+  
+  if (!ticker) return showStatus('❌ 티커를 입력해주세요', 'error');
+  if (!isValidTickerFormat(ticker)) return showStatus('❌ 티커 형식이 올바르지 않습니다 (영문/숫자/./- 만 가능, 최대 10자)', 'error');
+
+  localStorage.setItem('td_last_ticker', ticker);
+
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('result').classList.add('hidden');
+
+  try {
+    showStatus('⏳ 데이터 불러오는 중... 단, 아래 광고가 표시될 수 있습니다!', 'info');
+
+    const { values, fromCache, metadata } = await fetchPriceSeries(ticker, 5000);
+
+    const raw = values.map(v => ({
+      date: v.datetime,
+      open: parseFloat(v.open),
+      high: parseFloat(v.high),
+      low: parseFloat(v.low),
+      close: parseFloat(v.close),
+    })).reverse();
+
+    STATE.raw = raw;
+    STATE.ticker = ticker;
+    setPreset(5);
+    const latestDate = raw.length > 0 ? raw[raw.length-1].date : 'N/A';
+    
+    // 사용량 정보 표시
+    let usageMsg = `✅ ${ticker} 데이터 ${raw.length}일치 로드 완료 (최신: ${latestDate})`;
+    if (fromCache) {
+      usageMsg += `\n♻️ 방금 조회한 데이터를 재사용했어요 (API 미사용)`;
+    } else if (metadata) {
+      usageMsg += `\n📊 오늘 사용량: ${metadata.todayUsage}/${metadata.dailyLimit}회 (남은 횟수: ${metadata.remainingUsage}회)`;
+    }
+    showStatus(usageMsg, 'success');
+    document.getElementById('result').classList.remove('hidden');
+  } catch (e) {
+    const errorMsg = e.message;
+    console.error('API 에러:', errorMsg, e);
+    showStatus(`❌ ${errorMsg} — 티커 오타 / 백엔드 오류 / 무료 한도(분당 8회·일 800회) 확인`, 'error');
+  } finally {
+    document.getElementById('loading').classList.remove('show');
+  }
+}
+
+function setPreset(preset) {
+  if (!STATE.raw) return;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-years="${preset}"]`);
+  if (btn) btn.classList.add('active');
+
+  const latest = new Date(STATE.raw[STATE.raw.length-1].date);
+  const earliest = new Date(STATE.raw[0].date);
+  let start;
+  if (preset === 'all') start = earliest;
+  else if (preset === 'ytd') start = new Date(latest.getFullYear(), 0, 1);
+  else { start = new Date(latest); start.setFullYear(start.getFullYear() - preset); }
+
+  if (start < earliest) start = earliest;
+  document.getElementById('startDate').value = start.toISOString().slice(0,10);
+  document.getElementById('endDate').value = latest.toISOString().slice(0,10);
+  rerender();
+}
+
+function setMode(mode) {
+  STATE.mode = mode;
+  document.getElementById('modeHigh').classList.toggle('active', mode === 'high');
+  document.getElementById('modeClose').classList.toggle('active', mode === 'close');
+  rerender();
+}
+
+function rerender() {
+  if (!STATE.raw) return;
+  const sd = document.getElementById('startDate').value;
+  const ed = document.getElementById('endDate').value;
+  STATE.startDate = sd; STATE.endDate = ed;
+  STATE.filtered = STATE.raw.filter(r => r.date >= sd && r.date <= ed);
+  if (STATE.filtered.length < 2) {
+    showStatus('❌ 선택 기간에 데이터가 너무 적습니다', 'error');
+    return;
+  }
+  render();
+}
+
+function analyze(data, mode) {
+  const n = data.length;
+  const peakSeries = mode === 'high' ? data.map(d => d.high) : data.map(d => d.close);
+  const closes = data.map(d => d.close);
+  const dates = data.map(d => d.date);
+
+  const runMax = new Array(n);
+  let mx = -Infinity, mxIdx = 0;
+  const mxIdxArr = new Array(n);
+  for (let i = 0; i < n; i++) {
+    if (peakSeries[i] > mx) { mx = peakSeries[i]; mxIdx = i; }
+    runMax[i] = mx;
+    mxIdxArr[i] = mxIdx;
+  }
+  const dd = closes.map((c, i) => (c / runMax[i] - 1) * 100);
+
+  const futureMax = new Array(n);
+  let fm = -Infinity;
+  for (let i = n - 1; i >= 0; i--) {
+    if (peakSeries[i] > fm) fm = peakSeries[i];
+    futureMax[i] = fm;
+  }
+  const recovered = runMax.map((m, i) => futureMax[i] > m + 1e-9);
+
+  const currentPrice = closes[n-1];
+  const currentDD = dd[n-1];
+  const currentDate = dates[n-1];
+  const athPrice = runMax[n-1];
+  const athIdx = mxIdxArr[n-1];
+  const athDate = dates[athIdx];
+
+  let maxDD = 0, maxDDIdx = 0;
+  for (let i = 0; i < n; i++) {
+    if (dd[i] < maxDD) { maxDD = dd[i]; maxDDIdx = i; }
+  }
+
+  const buckets = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
+  const EPS = 1e-9;
+  const recoveryTable = buckets.map(b => {
+    let hit = 0, rec = 0;
+    for (let i = 0; i < n; i++) {
+      if (dd[i] <= -b + EPS) {
+        hit++;
+        if (recovered[i]) rec++;
+      }
+    }
+    const rate = hit === 0 ? 0 : (rec / hit * 100);
+    return { bucket: b, hit, rate, total: n, everHit: hit > 0 };
+  });
+
+  return {
+    n, dates, closes, peakSeries, runMax, dd,
+    currentPrice, currentDD, currentDate,
+    athPrice, athDate,
+    maxDD, maxDDDate: dates[maxDDIdx],
+    recoveryTable,
+  };
+}
+
+function fmt(n, d=2) { return n==null || isNaN(n) ? '—' : Number(n).toLocaleString('en-US', { minimumFractionDigits:d, maximumFractionDigits:d }); }
+function fmtPct(n, d=2) { return n==null || isNaN(n) ? '—' : Number(n).toFixed(d) + '%'; }
+
+// 사용자 입력(티커, 이메일, 에러 메시지 등)을 innerHTML에 넣기 전 이스케이프 처리 (XSS 방지)
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// 티커 형식 검증 (알파벳/숫자/점/하이픈만 허용, 최대 10자) — 이상한 값이 API까지 가는 것 자체를 차단
+function isValidTickerFormat(t) {
+  return /^[A-Z0-9.\-]{1,10}$/.test(t);
+}
+
+function render() {
+  const A = analyze(STATE.filtered, STATE.mode);
+  const t = STATE.ticker;
+
+  document.getElementById('tickerLabel').textContent = t + ' (' + (STATE.mode === 'high' ? '장중 최고가 기준' : '종가 기준') + ')';
+  updateFavBtn();
+
+  document.getElementById('currentPrice').textContent = '$' + fmt(A.currentPrice);
+  document.getElementById('currentDate').textContent = A.currentDate;
+  document.getElementById('athPrice').textContent = '$' + fmt(A.athPrice);
+  document.getElementById('athDate').textContent = A.athDate;
+
+  const ddEl = document.getElementById('currentDD');
+  ddEl.textContent = fmtPct(A.currentDD);
+  ddEl.classList.remove('mild','small');
+  if (A.currentDD > -5) ddEl.classList.add('small');
+  else if (A.currentDD > -15) ddEl.classList.add('mild');
+
+  const interp = A.currentDD > -3 ? '고점 근처'
+               : A.currentDD > -10 ? '소폭 조정'
+               : A.currentDD > -20 ? '조정 진행 중'
+               : A.currentDD > -30 ? '약세장 진입'
+               : '심한 하락';
+  document.getElementById('ddInterpret').textContent = interp;
+
+  let sig;
+  if (A.currentDD <= -30) sig = { cls:'signal-strong', e:'🔥', t:'강한 매수 관심 구간', d:'역대급 하락 수준입니다. 기업 펀더멘털을 확인한 후 분할매수를 적극 고려할 만합니다.' };
+  else if (A.currentDD <= -20) sig = { cls:'signal-mid', e:'🟠', t:'적극 분할매수 고려', d:'약세장 진입 구간입니다. 욕심내지 말고 나눠서 매수하는 전략이 유효합니다.' };
+  else if (A.currentDD <= -10) sig = { cls:'signal-mid', e:'🟡', t:'관심 구간 (조정)', d:'조정이 진행 중입니다. 분할매수를 시작하기 좋은 구간입니다.' };
+  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'소폭 조정', d:'작은 조정 중입니다. 관망하거나 아주 소량만 분할매수하세요.' };
+  else sig = { cls:'signal-none', e:'⏸️', t:'고점 근처 — 관망', d:'지금은 신고가 근처입니다. 추격매수보다는 조정을 기다리는 편이 안전합니다.' };
+
+  const sc = document.getElementById('signalCard');
+  sc.className = 'signal-card ' + sig.cls;
+  document.getElementById('signalEmoji').textContent = sig.e;
+  document.getElementById('signalTitle').textContent = sig.t;
+  document.getElementById('signalDesc').textContent = sig.d;
+
+  const t15 = A.athPrice * 0.85, t20 = A.athPrice * 0.80, t30 = A.athPrice * 0.70;
+  document.getElementById('t15').textContent = '$' + fmt(t15);
+  document.getElementById('t20').textContent = '$' + fmt(t20);
+  document.getElementById('t30').textContent = '$' + fmt(t30);
+  document.getElementById('r15').classList.toggle('hidden', A.currentPrice > t15);
+  document.getElementById('r20').classList.toggle('hidden', A.currentPrice > t20);
+  document.getElementById('r30').classList.toggle('hidden', A.currentPrice > t30);
+
+  document.getElementById('maxDD').textContent = fmtPct(A.maxDD);
+  document.getElementById('maxDDDate').textContent = A.maxDDDate;
+  document.getElementById('dataStart').textContent = A.dates[0];
+  document.getElementById('totalDays').textContent = A.n.toLocaleString() + '일';
+
+  drawDDChart(A);
+  drawPriceChart(A);
+  renderRecovery(A);
+  renderTV(t);
+  renderDeepAnalysis();
+  renderBenchmarkComparison();
+}
+
+// ========== 하락 알림 신청 ==========
+async function submitAlert() {
+  const symbolEl = document.getElementById('alertSymbol');
+  const tickerEl2 = document.getElementById('ticker');
+  const symbol = (symbolEl.value.trim() || (tickerEl2 ? tickerEl2.value.trim() : '')).toUpperCase();
+  const target = parseFloat(document.getElementById('alertTarget').value);
+  const email = document.getElementById('alertEmail').value.trim();
+  const msgEl = document.getElementById('alertMsg');
+
+  if (!symbol) { msgEl.innerHTML = '❌ 티커를 입력해주세요.'; return; }
+  if (!isValidTickerFormat(symbol)) { msgEl.innerHTML = '❌ 티커 형식이 올바르지 않습니다.'; return; }
+  if (isNaN(target) || target <= 0 || target > 95) { msgEl.innerHTML = '❌ 목표 하락률을 1~95 사이 숫자로 입력해주세요.'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msgEl.innerHTML = '❌ 올바른 이메일 주소를 입력해주세요.'; return; }
+
+  msgEl.innerHTML = '⏳ 등록 중...';
+  try {
+    const res = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, symbol, targetDiscountPercent: target })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '등록에 실패했습니다.');
+    msgEl.innerHTML = `✅ <b>${symbol}</b>이(가) 고점 대비 <b>-${target}%</b>에 도달하면 <b>${email}</b>로 알려드릴게요!`;
+  } catch (e) {
+    msgEl.innerHTML = `❌ ${e.message}`;
+  }
+}
+
+// ========== 심층 분석 (백분위 / 경과일 / 회복통계 / 이동평균 / Top5 / 유사사례) ==========
+function daysBetween(d1, d2) {
+  return Math.round((new Date(d2) - new Date(d1)) / 86400000);
+}
+
+// 전체 원본 데이터(STATE.raw)를 스캔해서 "고점 → 회복(또는 진행중)" 구간(에피소드) 목록을 만듭니다.
+function computeEpisodes(raw, mode) {
+  const peakSeries = mode === 'high' ? raw.map(d => d.high) : raw.map(d => d.close);
+  const closes = raw.map(d => d.close);
+  const dates = raw.map(d => d.date);
+  const n = raw.length;
+  const episodes = [];
+  if (n < 2) return episodes;
+
+  let peak = peakSeries[0], peakIdx = 0;
+  let cur = null;
+  for (let i = 1; i < n; i++) {
+    if (peakSeries[i] >= peak) {
+      if (cur) {
+        cur.recovered = true;
+        cur.recoverIdx = i;
+        episodes.push(cur);
+        cur = null;
+      }
+      peak = peakSeries[i];
+      peakIdx = i;
+    } else {
+      const ddNow = (closes[i] / peak - 1) * 100;
+      if (!cur) cur = { peakIdx, troughIdx: i, troughDD: ddNow };
+      else if (ddNow < cur.troughDD) { cur.troughIdx = i; cur.troughDD = ddNow; }
+    }
+  }
+  if (cur) { cur.recovered = false; episodes.push(cur); }
+
+  episodes.forEach(ep => {
+    ep.peakDate = dates[ep.peakIdx];
+    ep.troughDate = dates[ep.troughIdx];
+    if (ep.recovered) {
+      ep.recoverDate = dates[ep.recoverIdx];
+      ep.daysToRecover = daysBetween(ep.peakDate, ep.recoverDate);
+    } else {
+      ep.recoverDate = null;
+      ep.daysToRecover = null;
+      ep.daysSoFar = daysBetween(ep.peakDate, dates[n - 1]);
+    }
+  });
+  return episodes;
+}
+
+function computeMA(raw, period) {
+  if (raw.length < period) return null;
+  const slice = raw.slice(raw.length - period);
+  return slice.reduce((a, d) => a + d.close, 0) / period;
+}
+
+function renderDeepAnalysis() {
+  if (!STATE.raw || STATE.raw.length < 2) return;
+  const raw = STATE.raw;
+  const mode = STATE.mode;
+  const n = raw.length;
+
+  const F = analyze(raw, mode); // 전체(필터 무관) 기준 분석
+  const episodes = computeEpisodes(raw, mode);
+
+  // 1) 하락폭 백분위
+  const percentileEl = document.getElementById('ddPercentile');
+  let percentile = null;
+  if (F.currentDD >= -0.01) {
+    percentileEl.textContent = '신고가 근처';
+  } else {
+    const worseOrEqualDays = F.dd.filter(v => v <= F.currentDD).length;
+    percentile = worseOrEqualDays / n * 100;
+    percentileEl.textContent = `상위 ${percentile.toFixed(1)}% (심한 편)`;
+  }
+
+  // 진행 중인(미회복) 에피소드 = 현재 하락 구간
+  const lastEp = episodes[episodes.length - 1];
+  const currentEp = (lastEp && !lastEp.recovered) ? lastEp : null;
+
+  // 2) 경과일
+  document.getElementById('ddDaysElapsed').textContent = currentEp
+    ? `${currentEp.daysSoFar.toLocaleString()}일째`
+    : '신고가 경신 중';
+
+  // 3) 비슷한 깊이 평균 회복일 + 유사 사례
+  const avgBox = document.getElementById('ddAvgRecoveryDays');
+  const simBox = document.getElementById('similarCasesBody');
+  if (!currentEp) {
+    avgBox.textContent = '해당 없음';
+    simBox.innerHTML = '<span style="color:#a0aec0;">현재 신고가 부근이라 비교할 하락 사례가 없습니다.</span>';
+  } else {
+    const depth = currentEp.troughDD;
+    const comparable = episodes.filter(ep => ep !== currentEp && ep.recovered && ep.troughDD <= depth + 1e-9);
+    if (comparable.length === 0) {
+      avgBox.textContent = '비교 사례 없음';
+      simBox.innerHTML = '<span style="color:#a0aec0;">이 정도로 깊은 하락은 조회 기간 내 처음이라 비교할 과거 사례가 없습니다.</span>';
+    } else {
+      const avgDays = comparable.reduce((a, e) => a + e.daysToRecover, 0) / comparable.length;
+      avgBox.textContent = `약 ${Math.round(avgDays).toLocaleString()}일`;
+
+      const closest = episodes
+        .filter(ep => ep !== currentEp && ep.recovered)
+        .slice()
+        .sort((a, b) => Math.abs(a.troughDD - depth) - Math.abs(b.troughDD - depth))
+        .slice(0, 3);
+      simBox.innerHTML = closest.length ? closest.map(ep =>
+        `<div style="margin-bottom:6px;">📌 <b>${ep.peakDate}</b> 고점 이후 <b style="color:#e53e3e;">${ep.troughDD.toFixed(1)}%</b> 하락 → <b style="color:#38a169;">${ep.daysToRecover}일</b> 만에 회복 (${ep.recoverDate})</div>`
+      ).join('') : '<span style="color:#a0aec0;">비교 사례 없음</span>';
+    }
+  }
+
+  // 4) 이동평균선 50일/200일
+  const sma50 = computeMA(raw, 50);
+  const sma200 = computeMA(raw, 200);
+  const price = raw[n - 1].close;
+  document.getElementById('ma50Value').textContent = sma50 != null ? `$${fmt(sma50)} (현재가 ${price >= sma50 ? '위' : '아래'})` : '데이터 부족 (50일 미만)';
+  document.getElementById('ma200Value').textContent = sma200 != null ? `$${fmt(sma200)} (현재가 ${price >= sma200 ? '위' : '아래'})` : '데이터 부족 (200일 미만)';
+  const crossEl = document.getElementById('maCrossStatus');
+  if (sma50 != null && sma200 != null) {
+    crossEl.innerHTML = sma50 > sma200
+      ? '🟢 <b>골든크로스 상태</b> — 50일 평균이 200일 평균보다 높아 중기 상승 흐름입니다.'
+      : '🔴 <b>데드크로스 상태</b> — 50일 평균이 200일 평균보다 낮아 중기 하락 흐름입니다.';
+  } else {
+    crossEl.textContent = '⚠️ 상장(또는 데이터 시작) 후 200일이 지나지 않아 계산할 수 없습니다.';
+  }
+
+  // 5) 역대 낙폭 Top 5
+  const top5 = episodes.slice().sort((a, b) => a.troughDD - b.troughDD).slice(0, 5);
+  document.getElementById('top5DrawdownsBody').innerHTML = top5.length ? top5.map((ep, i) => `
+    <tr>
+      <td>${i + 1}위</td>
+      <td>${ep.peakDate}</td>
+      <td style="color:#e53e3e; font-weight:700;">${ep.troughDD.toFixed(1)}%</td>
+      <td>${ep.recovered ? `✅ ${ep.daysToRecover}일 만에 회복` : `⏳ 진행 중 (${ep.daysSoFar}일째)`}</td>
+    </tr>`).join('') : '<tr><td colspan="4" style="color:#a0aec0;">데이터가 부족합니다</td></tr>';
+
+  STATE.deepAnalysis = { percentile, currentEp, top5 };
+}
+
+function copyResultSummary() {
+  if (!STATE.filtered) return;
+  const A = analyze(STATE.filtered, STATE.mode);
+  const t = STATE.ticker;
+  const lines = [
+    `📊 ${t} MDD 분석 결과`,
+    `현재가: $${fmt(A.currentPrice)} (${A.currentDate})`,
+    `구간 최고가: $${fmt(A.athPrice)} (${A.athDate})`,
+    `고점 대비 하락률: ${fmtPct(A.currentDD)}`,
+    `역대 최대 하락: ${fmtPct(A.maxDD)} (${A.maxDDDate})`,
+  ];
+  if (STATE.deepAnalysis) {
+    const d = STATE.deepAnalysis;
+    if (d.percentile != null) lines.push(`하락폭 순위: 상위 ${d.percentile.toFixed(1)}%`);
+    if (d.currentEp) lines.push(`하락 경과: ${d.currentEp.daysSoFar.toLocaleString()}일째`);
+  }
+  lines.push('', `MDD 분석기(${location.hostname})에서 계산 · 투자 조언 아님, 참고용`);
+  const text = lines.join('\n');
+
+  const statusEl = document.getElementById('copyStatus');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      statusEl.textContent = '✅ 복사되었습니다! 원하는 곳에 붙여넣기 하세요.';
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    }).catch(() => {
+      statusEl.textContent = '❌ 복사에 실패했어요. 브라우저 권한을 확인해주세요.';
+    });
+  } else {
+    statusEl.textContent = '❌ 이 브라우저에서는 복사 기능을 지원하지 않아요.';
+  }
+}
+
+// ========== S&P500(SPY) 대비 비교 (SPY는 하루 1회만 API 호출) ==========
+async function renderBenchmarkComparison() {
+  const loadingEl = document.getElementById('benchmarkLoading');
+  const resultEl = document.getElementById('benchmarkResult');
+  if (!loadingEl || !resultEl) return;
+  if (!STATE.raw || !STATE.filtered || STATE.filtered.length < 2) return;
+
+  if (STATE.ticker === 'SPY') {
+    loadingEl.style.display = 'none';
+    resultEl.innerHTML = '<div style="color:#a0aec0; font-size:13px;">지금 조회 중인 종목이 SPY(S&P500) 자체라서 비교가 필요 없어요.</div>';
+    return;
+  }
+
+  loadingEl.style.display = 'block';
+  resultEl.innerHTML = '';
+  const requestTicker = STATE.ticker; // 응답 도착 전에 사용자가 다른 티커를 조회했는지 확인용
+
+  try {
+    const { values } = await fetchBenchmarkSeries('SPY');
+    if (STATE.ticker !== requestTicker) return; // 그 사이 다른 종목을 조회했으면 이 결과는 버림
+
+    const spyRaw = values.map(v => ({
+      date: v.datetime,
+      open: parseFloat(v.open),
+      high: parseFloat(v.high),
+      low: parseFloat(v.low),
+      close: parseFloat(v.close),
+    })).reverse();
+
+    // 1) SPY 자체의 현재 하락 상태 (전체 히스토리 기준 — 심층분석과 동일한 analyze() 재사용)
+    const spyFull = analyze(spyRaw, STATE.mode);
+    const F = analyze(STATE.raw, STATE.mode);
+    const tickerDD = F.currentDD, spyDD = spyFull.currentDD;
+
+    // 2) 조회 기간(현재 필터된 기간)과 같은 날짜 구간으로 SPY를 맞춰 누적수익률 비교
+    const sd = STATE.filtered[0].date, ed = STATE.filtered[STATE.filtered.length - 1].date;
+    const spyFiltered = spyRaw.filter(r => r.date >= sd && r.date <= ed);
+
+    let compareHtml = '';
+    if (spyFiltered.length >= 2) {
+      const tickerReturn = (STATE.filtered[STATE.filtered.length - 1].close / STATE.filtered[0].close - 1) * 100;
+      const spyReturn = (spyFiltered[spyFiltered.length - 1].close / spyFiltered[0].close - 1) * 100;
+      const alpha = tickerReturn - spyReturn;
+      const alphaColor = alpha >= 0 ? '#38a169' : '#e53e3e';
+      compareHtml = `
+        <div class="stats-grid" style="margin-bottom:14px;">
+          <div class="stat-box"><div class="label">${escapeHtml(STATE.ticker)} 조회기간 수익률</div><div class="value" style="font-size:15px;">${tickerReturn >= 0 ? '+' : ''}${tickerReturn.toFixed(1)}%</div></div>
+          <div class="stat-box"><div class="label">SPY 같은기간 수익률</div><div class="value" style="font-size:15px;">${spyReturn >= 0 ? '+' : ''}${spyReturn.toFixed(1)}%</div></div>
+          <div class="stat-box"><div class="label">초과 수익률(알파)</div><div class="value" style="font-size:15px; color:${alphaColor};">${alpha >= 0 ? '+' : ''}${alpha.toFixed(1)}%p</div></div>
+        </div>`;
+    }
+
+    // 3) 지금 하락이 이 종목만의 이슈인지, 시장 전체 하락인지
+    let context;
+    if (spyDD <= -3) {
+      context = `📉 지금 S&P500 전체도 고점 대비 <b>${fmtPct(spyDD)}</b> 하락한 상태예요. 시장 전반이 조정을 받고 있는 시기입니다.`;
+    } else {
+      context = `📈 S&P500 전체는 고점 대비 <b>${fmtPct(spyDD)}</b>로 신고가 근처예요. 지금 이 종목의 하락은 시장 전체보다는 <b>개별 종목 이슈에 가깝다</b>고 볼 수 있어요.`;
+    }
+    const diff = tickerDD - spyDD; // 음수면 이 종목이 시장보다 더 빠진 것
+    const diffText = diff < -0.01
+      ? `현재 이 종목은 SPY보다 <b style="color:#e53e3e;">${Math.abs(diff).toFixed(1)}%p 더 깊게</b> 하락한 상태입니다.`
+      : diff > 0.01
+      ? `현재 이 종목은 SPY보다 <b style="color:#38a169;">${Math.abs(diff).toFixed(1)}%p 덜</b> 하락한, 시장보다 상대적으로 견고한 상태입니다.`
+      : `현재 이 종목의 하락폭은 SPY와 거의 비슷한 수준입니다.`;
+
+    resultEl.innerHTML = `
+      ${compareHtml}
+      <div style="background:#f7fafc; padding:14px; border-radius:8px; font-size:13px; color:#4a5568; line-height:1.8;">
+        <div>${context}</div>
+        <div style="margin-top:6px;">${diffText}</div>
+      </div>
+      <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ SPY 데이터는 API 사용량 절약을 위해 하루 한 번만 갱신됩니다 (브라우저 기준 당일 데이터 재사용).</p>
+    `;
+  } catch (e) {
+    if (STATE.ticker !== requestTicker) return;
+    resultEl.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px; font-size:13px;">❌ SPY 비교 데이터를 불러오지 못했어요: ${escapeHtml(e.message)}</div>`;
+  } finally {
+    if (STATE.ticker === requestTicker) loadingEl.style.display = 'none';
+  }
+}
+
+function drawDDChart(A) {
+  if (STATE.ddChart) STATE.ddChart.destroy();
+  const step = Math.max(1, Math.floor(A.n / 600));
+  const pts = [];
+  for (let i = 0; i < A.n; i += step) pts.push({ x: A.dates[i], y: A.dd[i] });
+  if (pts[pts.length-1].x !== A.dates[A.n-1]) pts.push({ x: A.dates[A.n-1], y: A.dd[A.n-1] });
+
+  const ctx = document.getElementById('ddChart').getContext('2d');
+  STATE.ddChart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets: [{
+      label: '고점 대비 하락률 (%)', data: pts,
+      borderColor: '#e53e3e', backgroundColor: 'rgba(229,62,62,0.25)',
+      fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.1,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => `${c.parsed.y.toFixed(2)}%` } }
+      },
+      scales: {
+        x: { type: 'time', time: { unit: 'year' } },
+        y: { max: 5, ticks: { callback: v => v + '%' } }
+      }
+    }
+  });
+}
+
+function drawPriceChart(A) {
+  if (STATE.priceChart) STATE.priceChart.destroy();
+  const step = Math.max(1, Math.floor(A.n / 600));
+  const pts = [];
+  for (let i = 0; i < A.n; i += step) pts.push({ x: A.dates[i], y: A.closes[i] });
+  if (pts[pts.length-1].x !== A.dates[A.n-1]) pts.push({ x: A.dates[A.n-1], y: A.closes[A.n-1] });
+
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  STATE.priceChart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets: [{
+      label: '주가 ($)', data: pts,
+      borderColor: '#3182ce', backgroundColor: 'rgba(49,130,206,0.15)',
+      fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.1,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+                 tooltip: { callbacks: { label: c => '$' + c.parsed.y.toFixed(2) } } },
+      scales: {
+        x: { type: 'time', time: { unit: 'year' } },
+        y: { ticks: { callback: v => '$' + v } }
+      }
+    }
+  });
+}
+
+function renderRecovery(A) {
+  const body = document.getElementById('recoveryBody');
+  body.innerHTML = '';
+  const banner = document.getElementById('recoveryBanner');
+
+  const currentDD = A.currentDD;
+  let currentIdx = -1;
+  for (let i = 0; i < A.recoveryTable.length; i++) {
+    const lower = -A.recoveryTable[i].bucket;
+    const upper = i + 1 < A.recoveryTable.length ? -A.recoveryTable[i+1].bucket : -Infinity;
+    if (currentDD <= lower + 1e-9 && currentDD > upper + 1e-9) {
+      currentIdx = i; break;
+    }
+  }
+
+  if (currentDD > -5) {
+    banner.classList.remove('hidden');
+    banner.innerHTML = `ℹ️ 현재 하락률 <b>${fmtPct(currentDD)}</b> 는 -5% 미만의 얕은 조정입니다. 표의 어느 구간에도 해당하지 않습니다.`;
+  } else {
+    banner.classList.add('hidden');
+  }
+
+  A.recoveryTable.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    if (i === currentIdx) tr.classList.add('current');
+    if (!r.everHit) tr.classList.add('never');
+
+    const pct = r.total > 0 ? (r.hit / r.total * 100) : 0;
+    const barWidth = r.everHit ? Math.min(100, r.rate) : 0;
+    const barClass = r.everHit ? '' : 'zero';
+
+    tr.innerHTML = `
+      <td><b>-${r.bucket}%</b>${i === currentIdx ? ' 👈 <span style="color:#d69e2e;">지금 여기</span>' : ''}</td>
+      <td>${r.hit.toLocaleString()}일</td>
+      <td>${pct.toFixed(1)}%</td>
+      <td><b>${r.rate.toFixed(0)}%</b>${!r.everHit ? ' <span style="color:#a0aec0; font-size:11px;">(미도달)</span>' : ''}</td>
+      <td><div class="bar-container"><div class="bar-fill ${barClass}" style="width:${barWidth}%"></div></div></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+// TradingView 지연 로드: 버튼 클릭 시에만 로드
+function renderTV(ticker) {
+  // 자동 로드는 하지 않음 (lazy load 적용)
+  const c = document.getElementById('tvContainer');
+  c.setAttribute('data-ticker', ticker);
+}
+
+function loadTVChart() {
+  const c = document.getElementById('tvContainer');
+  const ticker = c.getAttribute('data-ticker') || STATE.ticker;
+  if (!ticker) return;
+  c.style.display = 'block';
+  c.innerHTML = `<iframe style="width:100%; height:100%; border:0;"
+    src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(ticker)}&interval=D&theme=light&style=1&locale=kr"
+    loading="lazy"></iframe>`;
+}
+
+// ========== 페이지 라우팅 ==========
+// 페이지별 실제 URL 매핑 (사이트가 여러 개의 실제 페이지로 분리되어 있음 — SEO/애드센스용)
+const PAGE_URLS = {
+  home: '/', tools: '/tools.html', rsi: '/rsi-calculator.html', dividend: '/dividend-calculator.html',
+  blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
+  disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
+  compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html'
+};
+
+function navigate(page) {
+  // 이미 그 페이지에 있는 경우: 새로고침 대신 상단으로 스크롤 (블로그는 목록으로 리셋)
+  if (typeof CURRENT_PAGE !== 'undefined' && page === CURRENT_PAGE) {
+    if (page === 'blog' && typeof showBlogList === 'function') showBlogList();
+    document.getElementById('siteNav').classList.remove('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  window.location.href = PAGE_URLS[page] || '/';
+}
+
+function toggleNav() {
+  document.getElementById('siteNav').classList.toggle('open');
+}
+
+// ========== RSI 계산기 ==========
+// ---- RSI 순수 계산 함수 (Wilder's smoothing) ----
+function computeRSI(prices, period) {
+  const changes = [];
+  for (let i = 1; i < prices.length; i++) changes.push(prices[i] - prices[i - 1]);
+  let avgGain = 0, avgLoss = 0;
+  for (let i = 0; i < period; i++) {
+    if (changes[i] > 0) avgGain += changes[i];
+    else avgLoss += Math.abs(changes[i]);
+  }
+  avgGain /= period;
+  avgLoss /= period;
+  for (let i = period; i < changes.length; i++) {
+    const gain = changes[i] > 0 ? changes[i] : 0;
+    const loss = changes[i] < 0 ? Math.abs(changes[i]) : 0;
+    avgGain = (avgGain * (period - 1) + gain) / period;
+    avgLoss = (avgLoss * (period - 1) + loss) / period;
+  }
+  const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+  const rsi = 100 - (100 / (1 + rs));
+  return { rsi, avgGain, avgLoss };
+}
+
+// ---- RSI 결과를 큰 숫자 + 게이지 + 쉬운 말로 렌더링 ----
+function renderRSI(prices, period, tickerLabel) {
+  const result = document.getElementById('rsiResult');
+  if (prices.length < period + 1) {
+    result.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 최소 ${period + 1}일치 데이터가 필요한데 ${prices.length}일치만 확인됐어요.</div>`;
+    return;
+  }
+  const { rsi, avgGain, avgLoss } = computeRSI(prices, period);
+  const rsiRounded = Math.round(rsi * 100) / 100;
+
+  let plain = '', signalColor = '', signalBg = '';
+  if (rsi < 30) { plain = '🟢 최근 많이 빠졌어요 — 반등 관심 구간'; signalColor = '#22543d'; signalBg = '#c6f6d5'; }
+  else if (rsi > 70) { plain = '🔴 최근 많이 올랐어요 — 단기 과열 주의'; signalColor = '#742a2a'; signalBg = '#fed7d7'; }
+  else { plain = '🟡 보통 수준이에요 — 특별한 신호 없음'; signalColor = '#744210'; signalBg = '#fefcbf'; }
+
+  const pos = Math.min(100, Math.max(0, rsi));
+  const label = tickerLabel ? `<div style="font-size:13px; color:#718096; margin-bottom:6px;">📌 ${escapeHtml(tickerLabel)} · 최근 ${prices.length}일 데이터 기준</div>` : '';
+
+  result.innerHTML = `
+    ${label}
+    <div style="background:${signalBg}; color:${signalColor}; padding:16px; border-radius:10px; text-align:center;">
+      <div style="font-size:36px; font-weight:900; margin-bottom:4px;">${rsiRounded}</div>
+      <div style="font-size:14px; font-weight:700;">${plain}</div>
+    </div>
+    <div style="margin-top:14px;">
+      <div style="position:relative; height:14px; border-radius:7px; background:linear-gradient(90deg, #e53e3e 0%, #e53e3e 30%, #ecc94b 30%, #ecc94b 70%, #38a169 70%, #38a169 100%);">
+        <div style="position:absolute; top:-5px; left:${pos}%; transform:translateX(-50%); width:3px; height:24px; background:#1a202c; border-radius:2px;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:#a0aec0; margin-top:4px;">
+        <span>0 (많이 빠짐)</span><span>50</span><span>100 (많이 오름)</span>
+      </div>
+    </div>
+    <div class="stats-grid" style="margin-top:14px;">
+      <div class="stat-box"><div class="label">사용 데이터</div><div class="value">${prices.length}일</div></div>
+      <div class="stat-box"><div class="label">RSI 기간</div><div class="value">${period}일</div></div>
+      <div class="stat-box"><div class="label">평균 상승폭</div><div class="value" style="color:#38a169;">+${(avgGain).toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">평균 하락폭</div><div class="value" style="color:#e53e3e;">-${(avgLoss).toFixed(2)}</div></div>
+    </div>
+  `;
+}
+
+// ---- 티커 입력만으로 자동 조회 (기본 모드) ----
+async function calcRSIByTicker() {
+  const ticker = document.getElementById('rsiTicker').value.trim().toUpperCase();
+  const period = parseInt(document.getElementById('rsiPeriod').value) || 14;
+  const result = document.getElementById('rsiResult');
+  const loading = document.getElementById('rsiLoading');
+
+  if (!ticker) { result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 티커를 입력해주세요. 예: TSLA, NVDA, AAPL</div>'; return; }
+  if (!isValidTickerFormat(ticker)) { result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 티커 형식이 올바르지 않습니다 (영문/숫자/./- 만 가능, 최대 10자)</div>'; return; }
+
+  loading.style.display = 'block';
+  result.innerHTML = '';
+  try {
+    const outputsize = Math.max(period + 30, 60);
+    const { values, fromCache } = await fetchPriceSeries(ticker, outputsize);
+
+    const closes = values.map(v => parseFloat(v.close)).reverse(); // 오래된 → 최신 순
+    renderRSI(closes, period, ticker + (fromCache ? ' · 최근 조회 데이터 재사용' : ''));
+  } catch (e) {
+    result.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ ${escapeHtml(e.message)} — 티커 오타이거나 일시적 오류일 수 있어요.</div>`;
+  } finally {
+    loading.style.display = 'none';
+  }
+}
+
+// ---- 고급: 종가 데이터 직접 입력 모드 ----
+function calcRSIManual() {
+  const period = parseInt(document.getElementById('rsiPeriod').value) || 14;
+  const raw = document.getElementById('rsiPrices').value.trim();
+  const prices = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+  const result = document.getElementById('rsiResult');
+
+  if (prices.length < period + 1) {
+    result.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 최소 ${period + 1}개 이상의 종가 데이터가 필요합니다. 현재 ${prices.length}개 입력됨.</div>`;
+    return;
+  }
+  renderRSI(prices, period, null);
+}
+
+// ========== 배당 수익률 계산기 ==========
+function calcDividend() {
+  const price = parseFloat(document.getElementById('divPrice').value);
+  const annual = parseFloat(document.getElementById('divAnnual').value);
+  const growth = parseFloat(document.getElementById('divGrowth').value) || 0;
+  const years = parseInt(document.getElementById('divYears').value) || 10;
+  const result = document.getElementById('divResult');
+
+  if (!price || !annual || price <= 0 || annual < 0) {
+    result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 주가와 연간 배당금을 입력해주세요.</div>';
+    return;
+  }
+
+  const yieldPct = (annual / price) * 100;
+  
+  // 배당 재투자 수익 계산 (DRIP)
+  let totalShares = 1;
+  let totalDividend = 0;
+  let currentPrice = price;
+  const rows = [];
+  const priceGrowthRate = growth / 100; // 주가 상승률 (연%)
+  const divGrowthRate = growth > 0 ? growth / 100 * 0.5 : 0; // 배당 성장률 (주가 상승률의 50%로 보수적 추정)
+  for (let y = 1; y <= years; y++) {
+    const divPerShare = annual * Math.pow(1 + divGrowthRate, y - 1);
+    const divReceived = totalShares * divPerShare;
+    totalDividend += divReceived;
+    currentPrice = price * Math.pow(1 + priceGrowthRate, y);
+    const newShares = currentPrice > 0 ? divReceived / currentPrice : 0;
+    totalShares += newShares;
+    if (y <= 5 || y === 10 || y === 20 || y === years) {
+      rows.push({ y, divPerShare, divReceived: divReceived.toFixed(2), totalShares: totalShares.toFixed(4), totalDividend: totalDividend.toFixed(2) });
+    }
+  }
+
+  const finalValue = totalShares * currentPrice;
+  const totalReturn = ((finalValue - price) / price * 100).toFixed(1);
+
+  let yieldColor = '#718096';
+  if (yieldPct >= 4) yieldColor = '#d69e2e';
+  else if (yieldPct >= 2) yieldColor = '#38a169';
+
+  result.innerHTML = `
+    <div class="stats-grid" style="margin-bottom:16px;">
+      <div class="stat-box"><div class="label">배당 수익률</div><div class="value" style="color:${yieldColor};">${yieldPct.toFixed(2)}%</div></div>
+      <div class="stat-box"><div class="label">분기 배당금</div><div class="value">$${(annual/4).toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">${years}년 재투자 후 주수</div><div class="value">${totalShares.toFixed(2)}주</div></div>
+      <div class="stat-box"><div class="label">${years}년 재투자 수익</div><div class="value" style="color:#38a169;">+${totalReturn}%</div></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead><tr style="background:#edf2f7;">
+          <th style="padding:8px; text-align:left;">연도</th>
+          <th style="padding:8px; text-align:right;">주당 배당금</th>
+          <th style="padding:8px; text-align:right;">수령 배당금</th>
+          <th style="padding:8px; text-align:right;">누적 배당금</th>
+          <th style="padding:8px; text-align:right;">보유 주수</th>
+        </tr></thead>
+        <tbody>${rows.map(r => `<tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:8px;">${r.y}년</td>
+          <td style="padding:8px; text-align:right;">$${r.divPerShare.toFixed(2)}</td>
+          <td style="padding:8px; text-align:right;">$${r.divReceived}</td>
+          <td style="padding:8px; text-align:right;">$${r.totalDividend}</td>
+          <td style="padding:8px; text-align:right;">${r.totalShares}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ========== 문의 폼 제출 ==========
+async function submitContact() {
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const subject = document.getElementById('contactSubject').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+  const result = document.getElementById('contactResult');
+
+  if (!name || !email || !subject || !message) {
+    result.innerHTML = '<span style="color:#e53e3e;">❌ 모든 항목을 입력해주세요.</span>';
+    return;
+  }
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+    result.innerHTML = '<span style="color:#e53e3e;">❌ 올바른 이메일 주소를 입력해주세요.</span>';
+    return;
+  }
+
+  result.innerHTML = '<span style="color:#4299e1;">⏳ 전송 중...</span>';
+  
+  try {
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, subject, message })
+    });
+    const data = await response.json();
+    
+    if (response.ok && data.success) {
+      result.innerHTML = '<span style="color:#38a169;">✅ 문의가 접수되었습니다. 빠른 시일 내 답변 드리겠습니다.</span>';
+      document.getElementById('contactName').value = '';
+      document.getElementById('contactEmail').value = '';
+      document.getElementById('contactSubject').value = '';
+      document.getElementById('contactMessage').value = '';
+    } else {
+      result.innerHTML = `<span style="color:#e53e3e;">❌ ${escapeHtml(data.error) || '전송 실패. 다시 시도해주세요.'}</span>`;
+    }
+  } catch (err) {
+    result.innerHTML = '<span style="color:#e53e3e;">❌ 네트워크 오류가 발생했습니다. 다시 시도해주세요.</span>';
+  }
+}
+
+// ========== 블로그 콘텐츠 ==========
+const BLOG_POSTS = [
+  {
+    id: 1,
+    tag: 'MDD 기초',
+    emoji: '📊',
+    bg: '#ebf8ff',
+    title: 'MDD란 무엇인가? 고점 대비 하락률 완전 가이드',
+    excerpt: 'Maximum Drawdown의 정의와 투자에서 왜 중요한지, 실제 사례로 쉽게 설명합니다.',
+    date: '2026-01-15',
+    readTime: '5분',
+    content: `
+      <h1>MDD란 무엇인가? 고점 대비 하락률 완전 가이드</h1>
+      <div class="article-meta">📅 2026년 1월 15일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>MDD(Maximum Drawdown, 최대 낙폭)는 <strong>특정 기간 동안 자산의 고점에서 저점까지의 최대 하락률</strong>을 나타내는 지표입니다. 주식 투자에서 MDD는 단순히 수익률을 넘어선, 투자 위험을 측정하고 관리하는 데 필수적인 핵심 지표로 활용됩니다. 많은 투자자들이 연평균 수익률(CAGR)에만 집중하지만, MDD는 그 수익률을 달성하는 과정에서 겪어야 할 고통의 깊이를 보여줍니다. 즉, 투자자가 감당해야 할 최대 손실 폭을 미리 가늠하게 해주는 중요한 도구입니다.</p>
+      <div class="highlight-box"><p>💡 <strong>예시</strong>: 어떤 주식이 $400에서 $100으로 하락했다면, MDD는 (100-400)/400 = <strong>-75%</strong>가 됩니다. 이는 해당 주식에 투자한 자산이 최대 75%까지 감소할 수 있었음을 의미합니다.</p></div>
+      <h2>MDD를 왜 주목해야 하나요?</h2>
+      <p>MDD를 이해하고 활용하는 것은 투자 성공에 있어 매우 중요합니다. 많은 투자자들이 시장의 상승기에만 집중하다가 예상치 못한 큰 하락장에서 심리적 동요를 겪고 손실을 확정하는 경우가 많습니다. MDD는 이러한 상황을 방지하고 더 현명한 투자 결정을 내리는 데 도움을 줍니다.</p>
+      <ul>
+        <li><strong>심리적 한계 사전 파악</strong>: 투자자 본인이 감당할 수 있는 최대 하락률이 어느 정도인지 미리 파악하여, 시장의 변동성에 흔들리지 않는 투자 원칙을 세울 수 있습니다.</li>
+        <li><strong>매수 타이밍 최적화</strong>: 역사적으로 큰 MDD를 기록한 구간은 종종 매력적인 매수 기회가 되기도 합니다. MDD 데이터를 통해 저점 근처에서 분할 매수를 고려하는 전략을 세울 수 있습니다.</li>
+        <li><strong>포트폴리오 리스크 관리</strong>: 개별 종목뿐만 아니라 전체 포트폴리오의 MDD를 분석하여, 예상치 못한 시장 충격에 대비하고 자산 배분을 조정하는 데 활용할 수 있습니다.</li>
+        <li><strong>투자 전략의 견고성 평가</strong>: 특정 투자 전략이 과거 시장의 하락장에서 얼마나 잘 버텨냈는지 평가하는 객관적인 지표가 됩니다.</li>
+      </ul>
+      <h2>MDD 계산 방법</h2>
+      <p>MDD는 특정 기간 동안의 최고점(Peak Value)과 그 이후 발생한 최저점(Trough Value)을 사용하여 계산합니다. 공식은 다음과 같습니다:</p>
+      <div class="highlight-box"><p>MDD = (Trough Value - Peak Value) / Peak Value × 100%</p></div>
+      <p>예를 들어, 주가가 100원에서 150원으로 상승했다가 80원으로 하락한 후 다시 120원으로 상승했다고 가정해봅시다. 이 경우 최고점은 150원이고, 그 이후 최저점은 80원입니다. 따라서 MDD는 (80 - 150) / 150 = -0.4667, 즉 -46.67%가 됩니다. MDD 분석기를 사용하면 이러한 복잡한 계산을 자동으로 처리하여 편리하게 결과를 확인할 수 있습니다.</p>
+      <h2>MDD와 투자 전략</h2>
+      <p>MDD는 투자 전략 수립에 있어 매우 중요한 통찰력을 제공합니다. 일반적으로 MDD가 큰 종목이나 포트폴리오는 높은 변동성을 가지며, 이는 높은 수익률의 가능성과 함께 큰 손실의 위험을 내포합니다. 반대로 MDD가 작은 종목은 상대적으로 안정적인 경향이 있습니다.</p>
+      <ul>
+        <li><strong>매수 전략</strong>: 일반적으로 MDD -30% 이하에서 매수를 검토하고, -50% 이하에서는 분할 매수를 고려하는 전략이 유효합니다. 이는 역사적으로 많은 자산이 이 정도 하락 후 회복하는 경향을 보였기 때문입니다.</li>
+        <li><strong>손절매(Stop-loss) 설정</strong>: 개인의 리스크 허용 범위에 따라 MDD를 기준으로 손절매 라인을 설정할 수 있습니다. 예를 들어, 특정 종목의 역사적 MDD가 -40%였다면, -20% 지점에서 손절매를 고려하는 식입니다.</li>
+        <li><strong>포트폴리오 재조정</strong>: 포트폴리오 내 각 자산의 MDD를 주기적으로 검토하여, 과도한 위험에 노출된 자산을 줄이거나 안정적인 자산으로 교체하는 등의 재조정을 할 수 있습니다.</li>
+      </ul>
+      <p>다만, 모든 종목과 시장 상황에 일률적으로 적용할 수 있는 만능 전략은 없습니다. 종목마다 역사적 회복률과 시장 특성이 다르므로, MDD 데이터를 참고하되 반드시 실제 데이터를 기반으로 신중하게 판단하는 것이 중요합니다. MDD 분석기는 이러한 판단을 돕기 위한 유용한 도구입니다.</p>
+    `
+  },
+  {
+    id: 2,
+    tag: '종목 분석',
+    emoji: '🚗',
+    bg: '#fff5f5',
+    title: 'TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라',
+    excerpt: '테슬라의 역사적 MDD를 분석하고, 각 하락 구간에서의 회복 패턴을 알아보세요.',
+    date: '2026-01-20',
+    readTime: '7분',
+    content: `
+      <h1>TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라</h1>
+      <div class="article-meta">📅 2026년 1월 20일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>테슬라(TSLA)는 지난 몇 년간 전 세계 투자자들의 뜨거운 관심을 받아온 대표적인 성장주입니다. 혁신적인 기술과 일론 머스크의 리더십으로 급성장했지만, 그만큼 높은 변동성을 보여주며 투자자들에게 큰 수익과 함께 깊은 하락의 경험을 안겨주기도 했습니다. 특히 2021년 11월 최고점인 $1,243에서 2022년 12월 $101까지 무려 <strong>-75%에 달하는 역대급 하락</strong>을 경험했습니다. 이러한 하락은 많은 투자자들에게 고통을 주었지만, 동시에 테슬라의 회복 탄력성을 시험하는 계기가 되었습니다.</p>
+      <h2>테슬라의 주요 낙폭 히스토리와 회복 패턴</h2>
+      <p>테슬라는 여러 차례의 시장 조정과 개별 기업 이슈 속에서 다양한 규모의 MDD를 기록했습니다. 주요 낙폭 사례를 통해 테슬라의 회복 패턴을 분석해볼 수 있습니다.</p>
+      <ul>
+        <li><strong>2020년 3월 (코로나 팬데믹)</strong>: 전 세계적인 봉쇄 조치와 경제 불확실성으로 인해 테슬라 주가는 고점 대비 약 -60% 하락했습니다. 하지만 전기차 시장의 성장 잠재력과 빠른 생산 재개로 불과 2주 만에 V자 반등에 성공하며 놀라운 회복력을 보여주었습니다.</li>
+        <li><strong>2021년 11월 ~ 2022년 12월 (금리 인상 및 경기 침체 우려)</strong>: 이 시기는 테슬라 역사상 가장 길고 깊은 하락장이었습니다. 고점 대비 -75%라는 엄청난 낙폭을 기록했으며, 이는 고금리 환경과 경기 침체 우려, 그리고 일론 머스크의 트위터 인수 관련 이슈 등이 복합적으로 작용한 결과였습니다. 이 하락장에서 테슬라가 신고점을 회복하는 데는 약 1년 이상의 시간이 소요되었습니다.</li>
+        <li><strong>2024년 4월 (매출 성장 둔화 및 경쟁 심화)</strong>: 최근에는 전기차 시장의 경쟁 심화와 테슬라의 매출 성장 둔화 우려로 인해 고점 대비 -43% 하락을 경험했습니다. 이는 과거에 비해 짧은 기간 내에 회복될 가능성이 높지만, 시장의 변화에 대한 지속적인 모니터링이 필요합니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 테슬라는 역사적으로 하락마다 평균 <strong>12~18개월</strong> 내에 신고점을 회복하는 경향을 보였습니다. 다만 2022년의 -75% 하락은 예외적으로 장기간이 소요되었으며, 이는 투자자들에게 MDD의 깊이가 깊을수록 회복 기간이 길어질 수 있음을 시사합니다.</p></div>
+      <h2>MDD 분석기로 테슬라 조회하기</h2>
+      <p>MDD 분석기 웹사이트에서 'TSLA' 티커를 입력하면 테슬라의 현재 고점 대비 하락률과 과거의 역사적 회복 패턴을 상세하게 확인할 수 있습니다. 이를 통해 현재 테슬라 주가의 위치를 파악하고, 잠재적인 매수 시점을 가늠하는 데 도움을 받을 수 있습니다. 테슬라는 여전히 높은 변동성을 보이는 종목이므로, 투자 결정 시에는 MDD 분석 결과와 함께 기업의 펀더멘털, 시장 상황 등을 종합적으로 고려하는 신중한 접근이 필요합니다.</p>
+      <p>테슬라와 같은 성장주는 높은 수익률을 기대할 수 있지만, 그만큼 높은 리스크를 수반합니다. MDD 분석은 이러한 리스크를 객관적으로 평가하고, 투자자가 자신의 리스크 허용 범위 내에서 합리적인 결정을 내릴 수 있도록 돕는 중요한 도구입니다.</p>
+    `
+  },
+  {
+    id: 3,
+    tag: '매수 전략',
+    emoji: '🎯',
+    bg: '#f0fff4',
+    title: '고점 대비 -30% 하락 시 매수 전략: 데이터가 말하는 것',
+    excerpt: '-30% 하락 시점에서 매수하면 어떻게 될까요? S&P500 역사 데이터로 검증해보았습니다.',
+    date: '2026-01-25',
+    readTime: '8분',
+    content: `
+      <h1>고점 대비 -30% 하락 시 매수 전략: 데이터가 말하는 것</h1>
+      <div class="article-meta">📅 2026년 1월 25일 &nbsp;&bull;&nbsp; ⏱ 12분 읽기</div>
+      <p>주식 시장에서 "싸게 사서 비싸게 팔라"는 격언은 누구나 알지만, 실제로 하락장에서 용기 있게 매수하기란 쉽지 않습니다. 특히 고점 대비 큰 폭의 하락은 투자자에게 심리적 압박감을 주어 매수를 주저하게 만듭니다. 하지만 역사적 데이터를 분석해보면, 고점 대비 -30% 이하의 하락은 종종 장기적인 관점에서 매력적인 매수 기회를 제공했음을 알 수 있습니다. 이 글에서는 S&P 500의 과거 데이터를 통해 -30% 하락 시 매수 전략의 유효성을 검증하고, 효과적인 분할 매수 전략을 제시합니다.</p>
+      <h2>역사적 데이터 분석: -30% 하락의 의미</h2>
+      <p>S&P 500 지수의 역사를 살펴보면, 고점 대비 -30% 이상의 하락은 주로 경제 위기나 금융 쇼크와 같은 중대한 사건 발생 시 나타났습니다. 이러한 시기는 단기적으로는 공포와 불확실성으로 가득했지만, 장기적으로는 탁월한 투자 수익률을 안겨주었습니다.</p>
+      <ul>
+        <li><strong>2009년 3월 (글로벌 금융 위기)</strong>: S&P 500은 고점 대비 -57%까지 하락했습니다. 이 시점에 매수했다면 1년 후 약 +68%의 경이로운 수익률을 기록할 수 있었습니다.</li>
+        <li><strong>2020년 3월 (코로나 팬데믹)</strong>: 예상치 못한 팬데믹으로 인해 시장은 고점 대비 -34% 급락했습니다. 하지만 정부와 중앙은행의 신속한 대응으로 시장은 빠르게 회복했고, 1년 후 약 +75%의 수익률을 달성했습니다.</li>
+        <li><strong>2022년 10월 (고금리 및 인플레이션)</strong>: S&P 500은 고점 대비 -25% 하락을 경험했습니다. 비록 -30%에는 미치지 못했지만, 이 시점 이후 1년 동안 약 +22%의 수익률을 기록하며 시장의 회복력을 보여주었습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>⚠️ <strong>중요</strong>: 위 데이터는 과거 시장의 흐름을 분석한 결과이며, 미래 수익률을 보장하지 않습니다. 모든 투자 결정은 개인의 신중한 판단과 리스크 관리 하에 이루어져야 합니다.</p></div>
+      <p>이러한 사례들은 시장의 큰 하락이 단순히 위험만을 의미하는 것이 아니라, 장기적인 관점에서 자산을 축적할 수 있는 기회가 될 수 있음을 시사합니다. 중요한 것은 하락의 깊이를 견디고 인내심을 가지고 투자 원칙을 지키는 것입니다.</p>
+      <h2>효과적인 분할 매수 전략</h2>
+      <p>고점 대비 -30% 하락 시 매수 전략을 실행할 때, 한 번에 모든 자금을 투입하기보다는 분할 매수 전략을 활용하는 것이 리스크를 분산하고 심리적 안정감을 유지하는 데 도움이 됩니다. 다음은 효과적인 분할 매수 전략의 예시입니다.</p>
+      <ul>
+        <li><strong>1단계 (-30% 도달 시)</strong>: 전체 투자 예산의 30%를 매수합니다. 이는 시장이 이미 상당한 조정을 거쳤음을 의미하며, 첫 번째 매수 기회가 될 수 있습니다.</li>
+        <li><strong>2단계 (-40% 도달 시)</strong>: 시장이 추가적으로 하락하여 -40%에 도달하면, 추가로 30%의 예산을 투입합니다. 이는 더욱 깊은 하락에 대한 대비이자, 평균 매수 단가를 낮추는 효과를 가져옵니다.</li>
+        <li><strong>3단계 (-50% 도달 시)</strong>: 만약 시장이 -50%까지 하락하는 극단적인 상황이 발생한다면, 나머지 40%의 예산을 투자합니다. 역사적으로 -50% 이상의 하락은 드물며, 이 시점은 장기 투자자에게 매우 매력적인 기회가 될 수 있습니다.</li>
+      </ul>
+      <p>이러한 분할 매수 전략은 시장의 불확실성 속에서도 꾸준히 자산을 매집하고, 평균 매수 단가를 낮춰 장기적인 수익률을 극대화하는 데 기여할 수 있습니다. 물론, 각자의 투자 성향과 자금 상황에 맞춰 비율과 단계를 조절하는 것이 중요합니다. MDD 분석기는 이러한 전략을 세우는 데 필요한 과거 데이터를 제공하여 투자자 여러분의 현명한 결정을 돕습니다.</p>
+    `
+  },
+  {
+    id: 4,
+    tag: 'S&P 500',
+    emoji: '🇺🇸',
+    bg: '#fffff0',
+    title: 'S&P 500 역대 MDD 분석: 각 위기마다 얼마나 하락했나',
+    excerpt: '1929년 대공황부터 2020년 코로나까지, S&P 500의 역사적 낙폭을 정리했습니다.',
+    date: '2026-02-01',
+    readTime: '10분',
+    content: `
+      <h1>S&P 500 역대 MDD 분석: 각 위기마다 얼마나 하락했나</h1>
+      <div class="article-meta">📅 2026년 2월 1일 &nbsp;&bull;&nbsp; ⏱ 15분 읽기</div>
+      <p>S&P 500 지수는 미국 주식 시장의 건강 상태를 나타내는 가장 중요한 지표 중 하나입니다. 이 지수는 미국 경제의 핵심 기업 500개의 성과를 추적하며, 투자자들에게 시장 전반의 흐름을 파악하는 데 필수적인 정보를 제공합니다. S&P 500의 역사적 MDD(Maximum Drawdown, 최대 낙폭) 데이터를 분석하는 것은 과거의 위기 상황에서 시장이 얼마나 깊이 하락했고, 또 얼마나 오랜 기간이 걸려 회복했는지를 이해하는 데 매우 중요합니다. 이를 통해 미래의 잠재적 리스크를 예측하고, 자신의 투자 전략을 더욱 견고하게 세울 수 있습니다.</p>
+      <h2>S&P 500의 주요 낙폭 사례와 회복 기간</h2>
+      <p>S&P 500은 지난 100여 년간 수많은 경제 위기와 시장 조정을 겪어왔습니다. 각 위기마다 시장은 다른 깊이와 기간의 하락을 경험했으며, 이는 투자자들에게 중요한 교훈을 제공합니다.</p>
+      <ul>
+        <li><strong>1929년~1932년 (대공황)</strong>: 역사상 가장 심각한 경제 위기였던 대공황 시기, S&P 500은 고점 대비 무려 -86%라는 엄청난 낙폭을 기록했습니다. 이 충격에서 완전히 회복하는 데는 약 25년이라는 매우 긴 시간이 소요되었습니다. 이는 극심한 경제 위기가 장기적인 투자 회복에 얼마나 큰 영향을 미치는지 보여줍니다.</li>
+        <li><strong>2000년~2002년 (IT 버블 붕괴)</strong>: 닷컴 버블 붕괴로 S&P 500은 고점 대비 -49% 하락했습니다. 기술주 중심의 과열된 시장이 조정되면서 발생한 이 하락은 회복하는 데 약 7년이 걸렸습니다.</li>
+        <li><strong>2007년~2009년 (글로벌 금융 위기)</strong>: 서브프라임 모기지 사태로 촉발된 금융 위기 때 S&P 500은 -57% 하락했습니다. 전 세계 경제를 뒤흔든 이 위기에서 시장이 회복하는 데는 약 5.5년이 소요되었습니다.</li>
+        <li><strong>2020년 3월 (코로나 팬데믹)</strong>: 전례 없는 팬데믹으로 인해 시장은 단기간에 고점 대비 -34% 급락했습니다. 하지만 각국 정부와 중앙은행의 신속하고 대규모적인 경기 부양책 덕분에 시장은 불과 6개월 만에 빠르게 회복하는 모습을 보였습니다.</li>
+        <li><strong>2022년 (고금리 및 인플레이션)</strong>: 높은 인플레이션과 이에 대응하는 중앙은행의 급격한 금리 인상으로 S&P 500은 고점 대비 -25% 하락했습니다. 이 하락은 약 1.5년 만에 회복되었습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 S&P 500은 역사적으로 <strong>모든 낙폭에서 결국 회복</strong>했습니다. 이는 장기 투자의 중요성을 강조하지만, 회복 기간은 낙폭의 심각성과 경제 상황에 따라 수개월에서 25년까지 매우 다양할 수 있음을 명심해야 합니다.</p></div>
+      <h2>투자자에게 주는 교훈: 낙폭의 깊이와 회복 기간</h2>
+      <p>S&P 500의 MDD 분석은 투자자들에게 중요한 교훈을 제공합니다. 단순히 낙폭의 깊이만을 보는 것이 아니라, 그 하락에서 완전히 회복하는 데 걸리는 <strong>회복 기간</strong>을 함께 고려해야 합니다. 대공황과 같은 -80% 이상의 극심한 낙폭은 투자자에게 엄청난 인내심과 장기적인 관점을 요구합니다. 반면, 코로나 팬데믹과 같은 -30~40% 수준의 낙폭은 비교적 빠른 회복이 가능했습니다.</p>
+      <p>이러한 역사적 데이터를 통해 투자자는 자신의 리스크 허용 범위와 투자 기간을 고려하여 적절한 자산 배분 전략을 수립할 수 있습니다. 시장의 하락은 고통스럽지만, 장기적인 관점에서 보면 매수 기회가 될 수 있습니다. MDD 분석기는 이러한 과거 데이터를 객관적으로 제시함으로써, 투자자가 감정적인 판단을 피하고 데이터에 기반한 합리적인 투자 결정을 내릴 수 있도록 돕는 강력한 도구입니다.</p>
+    `
+  },
+  {
+    id: 5,
+    tag: 'RSI 가이드',
+    emoji: '📈',
+    bg: '#e6fffa',
+    title: 'RSI 지표 완전 가이드: 과매수/과매도 판단법',
+    excerpt: 'RSI 14일 기준으로 매수/매도 시점을 판단하는 방법을 실제 사례로 설명합니다.',
+    date: '2026-02-05',
+    readTime: '6분',
+    content: `
+      <h1>RSI 지표 완전 가이드: 과매수/과매도 판단법과 활용 전략</h1>
+      <div class="article-meta">📅 2026년 2월 5일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>RSI(Relative Strength Index), 즉 상대강도지수는 J. Welles Wilder가 1978년 개발한 대표적인 모멘텀 지표입니다. 이 지표는 주식이나 다른 자산의 가격 변동폭 중에서 상승폭이 차지하는 비율을 나타내며, <strong>0에서 100 사이의 값</strong>으로 주가의 과매수(Overbought) 또는 과매도(Oversold) 상태를 판단하는 데 사용됩니다. RSI는 시장의 강도와 약도를 측정하여 잠재적인 추세 전환점을 예측하는 데 도움을 줍니다.</p>
+      <h2>RSI 해석 방법: 과매수/과매도 구간</h2>
+      <p>RSI는 일반적으로 14일 기간을 기준으로 계산되며, 특정 구간을 통해 시장의 상태를 파악합니다.</p>
+      <ul>
+        <li><strong>RSI 30 이하</strong>: 이 구간은 자산이 <strong>과매도 상태</strong>에 있음을 시사합니다. 즉, 주가가 지나치게 하락하여 저평가되었을 가능성이 높으므로, 매수를 검토해볼 수 있는 시점으로 해석될 수 있습니다.</li>
+        <li><strong>RSI 30~50</strong>: 이 구간은 상대적으로 <strong>약세 구간</strong>으로 판단됩니다. 시장의 모멘텀이 약하거나 하락 추세가 지속될 수 있으므로, 신중한 접근이 필요합니다.</li>
+        <li><strong>RSI 50~70</strong>: 이 구간은 <strong>강세 구간</strong>으로 해석됩니다. 시장의 모멘텀이 강하거나 상승 추세가 지속될 가능성이 높으므로, 보유하거나 추가 매수를 고려할 수 있습니다.</li>
+        <li><strong>RSI 70 이상</strong>: 이 구간은 자산이 <strong>과매수 상태</strong>에 있음을 나타냅니다. 주가가 단기간에 급등하여 고평가되었을 가능성이 높으므로, 매도를 검토하거나 신규 매수를 자제하는 것이 좋습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>RSI 다이버전스</strong>: 주가는 신저점을 기록하는데 RSI는 신저점을 기록하지 않거나, 주가는 신고점을 기록하는데 RSI는 신고점을 기록하지 못하는 경우를 다이버전스라고 합니다. 이는 추세 전환의 강력한 신호로 해석될 수 있습니다.</p></div>
+      <h2>RSI 활용 전략</h2>
+      <p>RSI는 강력한 지표이지만, 단독으로 사용하기보다는 다른 기술적 분석 도구들과 함께 사용할 때 그 신뢰도가 더욱 높아집니다. 예를 들어, MDD(최대 낙폭), 거래량, 이동평균선, 볼린저 밴드 등과 결합하여 사용하면 보다 정확한 매매 신호를 포착할 수 있습니다.</p>
+      <ul>
+        <li><strong>MDD와 결합</strong>: MDD 분석기를 통해 종목의 역사적 하락폭을 파악하고, RSI가 과매도 구간에 진입했을 때 매수를 고려하면 더욱 효과적인 저점 매수 전략을 세울 수 있습니다.</li>
+        <li><strong>추세 확인</strong>: RSI가 과매수/과매도 구간에 있더라도, 전체적인 주가 추세가 강한 상승 또는 하락 추세라면 RSI 신호가 일시적으로 무력화될 수 있습니다. 따라서 추세 지표와 함께 확인하는 것이 중요합니다.</li>
+        <li><strong>기간 설정</strong>: RSI의 기간 설정(기본 14일)은 투자자의 매매 스타일에 따라 조절할 수 있습니다. 단기 매매자는 더 짧은 기간을, 장기 투자자는 더 긴 기간을 설정하여 활용할 수 있습니다.</li>
+      </ul>
+      <h2>RSI 계산기 사용법</h2>
+      <p>우리 사이트의 RSI 계산기는 사용자가 입력한 종가 데이터를 기반으로 자동으로 RSI 값을 계산하고, 현재 주가가 과매수/과매도 구간에 있는지 직관적으로 보여줍니다. 이를 통해 복잡한 계산 없이도 RSI 지표를 활용한 투자 결정을 내리는 데 도움을 받을 수 있습니다. 도구 페이지에서 직접 종가 데이터를 입력하여 RSI를 계산하고, 자신만의 투자 전략을 세워보세요.</p>
+      <p>RSI는 시장의 과열과 침체를 판단하는 데 유용한 도구이지만, 맹신하기보다는 보조 지표로 활용하는 것이 현명합니다. 항상 다양한 정보를 종합적으로 분석하고, 자신의 투자 원칙에 따라 신중하게 투자 결정을 내리시길 바랍니다.</p>
+    `
+  },
+  {
+    id: 6,
+    tag: '배당 투자',
+    emoji: '💰',
+    bg: '#fffaf0',
+    title: '배당 재투자(DRIP)의 마술: 10년 후 얼마나 달라지나',
+    excerpt: '배당금을 재투자하면 복리의 효과로 자산이 급성장합니다. 실제 시뮬레이션으로 확인해보세요.',
+    date: '2026-02-10',
+    readTime: '7분',
+    content: `
+      <h1>배당 재투자(DRIP)의 마술: 복리 효과로 자산 증식 극대화</h1>
+      <div class="article-meta">📅 2026년 2월 10일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>DRIP(Dividend Reinvestment Plan), 즉 배당 재투자는 기업으로부터 받은 배당금을 현금으로 수령하는 대신, 해당 기업의 주식을 추가로 매수하는 전략입니다. 이 전략의 핵심은 바로 <strong>복리 효과</strong>에 있습니다. 배당금이 다시 투자되어 더 많은 주식을 매수하고, 그 주식들이 또다시 배당금을 발생시키는 선순환 구조를 통해 장기적으로 자산을 기하급수적으로 증식시킬 수 있습니다. 특히 장기 투자자에게 DRIP는 자산 증식의 마술과도 같은 효과를 선사합니다.</p>
+      <h2>DRIP 시뮬레이션: 시간의 힘</h2>
+      <p>배당 재투자의 강력한 효과를 이해하기 위해 간단한 시뮬레이션을 통해 시간의 힘을 살펴보겠습니다. 초기 투자금 1,000만원, 연간 배당 수익률 4%, 연간 주가 상승률 5%를 가정하고 배당금을 재투자했을 때의 변화입니다.</p>
+      <ul>
+        <li><strong>10년 후</strong>: 보유 주수는 약 48% 증가하며, 총 투자 수익률은 163%에 달할 수 있습니다. 이는 배당금을 현금으로 수령했을 때보다 훨씬 높은 수치입니다.</li>
+        <li><strong>20년 후</strong>: 보유 주수는 119% 이상 증가하고, 총 수익률은 572%를 넘어설 수 있습니다. 복리 효과가 본격적으로 발휘되기 시작하는 시점입니다.</li>
+        <li><strong>30년 후</strong>: 보유 주수는 224% 이상 증가하며, 총 수익률은 1,600% 이상을 기록할 수 있습니다. 초기 투자금의 16배 이상으로 자산이 불어나는 마법을 경험하게 됩니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 배당 수익률 계산기를 사용하면 초기 투자금, 배당률, 주가 상승률 등을 직접 입력하여 자신만의 DRIP 시뮬레이션을 해볼 수 있습니다. 이를 통해 장기적인 투자 계획을 세우는 데 큰 도움을 받을 수 있습니다.</p></div>
+      <p>이 시뮬레이션은 배당 재투자가 장기적으로 얼마나 강력한 자산 증식 수단이 될 수 있는지를 명확히 보여줍니다. 특히 젊은 투자자들에게는 은퇴 자금을 마련하는 데 있어 매우 효과적인 전략이 될 수 있습니다.</p>
+      <h2>배당 재투자 시 주의사항 및 고려할 점</h2>
+      <p>DRIP는 매력적인 전략이지만, 몇 가지 주의사항과 고려할 점이 있습니다.</p>
+      <ul>
+        <li><strong>세금 문제</strong>: 배당금은 재투자되더라도 소득으로 간주되어 세금이 부과됩니다. 예를 들어, 미국 주식의 경우 배당 소득에 대해 15~20%의 배당세가 원천징수됩니다. 따라서 세후 배당금을 기준으로 재투자 효과를 계산해야 합니다.</li>
+        <li><strong>안정적인 배당 종목 선택</strong>: 배당 재투자의 효과를 극대화하려면 꾸준히 배당금을 지급하고, 배당 성장률이 높은 기업을 선택하는 것이 중요합니다. 배당이 삭감되거나 중단될 경우 DRIP의 효과는 크게 감소할 수 있습니다.</li>
+        <li><strong>주가 변동성</strong>: 주가가 하락하는 시기에는 배당 재투자를 통해 더 많은 주식을 저렴하게 매수할 수 있는 기회가 됩니다. 이는 장기적인 관점에서 평균 매수 단가를 낮추고, 향후 시장 회복 시 더 큰 수익을 기대할 수 있게 합니다.</li>
+        <li><strong>수수료</strong>: 일부 증권사에서는 배당 재투자 시 소액의 수수료를 부과할 수 있습니다. 이러한 비용도 장기적인 수익률에 영향을 미칠 수 있으므로 확인하는 것이 좋습니다.</li>
+      </ul>
+      <p>배당 재투자는 인내심을 가지고 장기적인 관점에서 접근할 때 가장 큰 효과를 발휘하는 전략입니다. 자신의 투자 목표와 리스크 허용 범위를 고려하여 현명하게 DRIP 전략을 활용하시길 바랍니다.</p>
+    `
+  },
+  {
+    id: 7,
+    tag: 'ETF 분석',
+    emoji: '💼',
+    bg: '#f0f4ff',
+    title: 'SPY vs QQQ: 어떤 ETF의 MDD가 더 난폭한가?',
+    excerpt: 'S&P 500 ETF(SPY)와 나스닥100 ETF(QQQ)의 MDD를 비교합니다.',
+    date: '2026-02-15',
+    readTime: '6분',
+    content: `
+      <h1>SPY vs QQQ: 어떤 ETF의 MDD가 더 난폭한가?</h1>
+      <div class="article-meta">📅 2026년 2월 15일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>SPY(S&P 500 ETF)와 QQQ(나스닥100 ETF)는 미국 주식 시장에 투자하는 대표적인 상장지수펀드(ETF)입니다. SPY는 S&P 500 지수를 추종하며 미국 대형주 500개 기업에 분산 투자하는 반면, QQQ는 나스닥 100 지수를 추종하며 주로 기술 및 성장주에 집중 투자합니다. 두 ETF는 투자 성격이 다르기 때문에 시장의 상승과 하락에 반응하는 방식, 특히 MDD(Maximum Drawdown, 최대 낙폭)에서 뚜렷한 차이를 보입니다. 이 글에서는 두 ETF의 MDD를 비교 분석하여 투자자들이 자신의 리스크 허용 범위에 맞는 선택을 할 수 있도록 돕겠습니다.</p>
+      <h2>SPY와 QQQ의 투자 성격 차이</h2>
+      <ul>
+        <li><strong>SPY (S&P 500 ETF)</strong>: 미국 경제 전반의 흐름을 반영하는 대형주 중심의 분산 투자 상품입니다. 안정적인 성장을 추구하며, 시장 전체의 움직임과 유사한 경향을 보입니다.</li>
+        <li><strong>QQQ (나스닥100 ETF)</strong>: 기술주 및 성장주 비중이 높은 나스닥 100 지수를 추종합니다. 혁신적인 기업들에 투자하여 높은 성장 잠재력을 가지지만, 시장 변동성에 더 민감하게 반응하는 경향이 있습니다.</li>
+      </ul>
+      <p>이러한 투자 성격의 차이는 시장의 하락장에서 MDD의 크기와 회복 속도에 직접적인 영향을 미칩니다.</p>
+      <h2>주요 시장 하락기 MDD 비교</h2>
+      <p>과거 주요 시장 하락기 동안 SPY와 QQQ가 어떤 MDD를 기록했는지 비교해보겠습니다.</p>
+      <ul>
+        <li><strong>2020년 3월 (코로나 팬데믹)</strong>: 전 세계적인 경제 봉쇄로 시장이 급락했을 때, SPY는 고점 대비 약 -34% 하락했습니다. 반면, QQQ는 기술주 중심의 비대면 산업 수혜 기대감으로 상대적으로 적은 -28%의 하락을 기록하며 SPY보다 빠르게 회복하는 모습을 보였습니다.</li>
+        <li><strong>2022년 (고금리 및 인플레이션)</strong>: 높은 인플레이션과 이에 대응하는 중앙은행의 금리 인상으로 성장주에 대한 투자 심리가 위축되면서, QQQ는 고점 대비 약 -35% 하락하며 SPY(-25%)보다 더 큰 낙폭을 기록했습니다. 이는 금리 인상기에 성장주가 더 큰 타격을 받을 수 있음을 보여주는 사례입니다.</li>
+        <li><strong>2000년~2002년 (닷컴 버블 붕괴)</strong>: 이 시기는 기술주 중심의 QQQ에게는 매우 가혹한 시기였습니다. QQQ는 고점 대비 무려 -83%라는 엄청난 낙폭을 기록하며 거의 10분의 1 토막이 났습니다. 반면 SPY는 -49% 하락에 그쳤습니다. 이 사례는 성장주 중심의 포트폴리오가 극심한 시장 조정 시 얼마나 큰 위험에 노출될 수 있는지를 극명하게 보여줍니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>핵심 요약</strong>: QQQ는 상승장에서는 SPY를 압도하는 높은 수익률을 제공할 수 있지만, 하락장에서는 특히 기술주 버블 붕괴와 같은 특정 상황에서 SPY보다 훨씬 더 깊고 가파른 MDD를 경험할 수 있습니다. 투자자는 자신의 리스크 허용 범위와 투자 목표에 따라 두 ETF 중 하나를 선택하거나, 적절히 혼합하여 포트폴리오를 구성해야 합니다.</p></div>
+      <h2>MDD 분석기로 직접 확인하기</h2>
+      <p>MDD 분석기 웹사이트에서 'SPY'와 'QQQ' 티커를 각각 조회하면 현재 고점 대비 하락률과 역사적 회복 패턴을 상세하게 비교할 수 있습니다. 이를 통해 각 ETF의 변동성 특성을 이해하고, 자신의 투자 전략에 가장 적합한 ETF를 선택하는 데 도움을 받을 수 있습니다. 특히, 과거의 큰 하락장에서 각 ETF가 어떻게 반응했는지 살펴보는 것은 미래의 시장 변동성에 대비하는 데 중요한 통찰력을 제공할 것입니다.</p>
+      <p>결론적으로, SPY와 QQQ는 각각 다른 투자 목표와 리스크 프로필을 가진 투자자에게 적합합니다. 안정적인 시장 수익률과 분산 투자를 원한다면 SPY가, 높은 성장 잠재력과 함께 더 큰 변동성을 감수할 수 있다면 QQQ가 좋은 선택이 될 수 있습니다. 중요한 것은 각 ETF의 특성과 MDD 데이터를 충분히 이해하고, 자신의 투자 성향에 맞는 현명한 결정을 내리는 것입니다.</p>
+    `
+  },
+  {
+    id: 8,
+    tag: '심리 투자',
+    emoji: '🧠',
+    bg: '#fdf2f8',
+    title: '주식 투자의 심리학: 하락장에서 매수하지 못하는 이유',
+    excerpt: '주가가 하락할수록 매수하기 더 어려워지는 심리적 이유를 분석합니다.',
+    date: '2026-02-20',
+    readTime: '5분',
+    content: `
+      <h1>주식 투자의 심리학: 하락장에서 매수하지 못하는 이유와 극복 전략</h1>
+      <div class="article-meta">📅 2026년 2월 20일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>주식 시장은 단순히 숫자의 게임이 아닙니다. 인간의 심리가 가격 변동에 지대한 영향을 미치며, 특히 시장이 하락할 때 투자자들은 공포와 불안감에 휩싸여 합리적인 판단을 내리기 어려워집니다. "하락장에서 매수하라"는 격언을 알면서도 실제로 실행하기 어려운 것은 바로 이러한 심리적 요인 때문입니다. 주식 투자의 심리를 이해하고 주요 심리적 함정을 파악하면, 시장의 변동성 속에서도 더 현명하고 침착한 투자 결정을 내릴 수 있습니다.</p>
+      <h2>주요 심리적 함정</h2>
+      <p>투자자들이 하락장에서 매수하지 못하거나 손실을 키우는 주요 심리적 함정들은 다음과 같습니다.</p>
+      <ul>
+        <li><strong>손실 회피 편향 (Loss Aversion)</strong>: 사람들은 이득을 얻는 기쁨보다 손실을 겪는 고통을 약 2배 이상 크게 느낀다고 합니다. 이 때문에 손실이 발생했을 때 이를 회피하려는 강한 경향을 보이며, 주가가 하락할 때 추가 손실을 두려워하여 매수를 주저하게 됩니다.</li>
+        <li><strong>확증 편향 (Confirmation Bias)</strong>: 투자자들은 자신의 기존 신념을 확인시켜주는 정보에만 집중하고, 반대되는 정보는 무시하는 경향이 있습니다. 하락장에서는 시장에 대한 부정적인 뉴스나 비관적인 전망에만 귀를 기울이게 되어, 매수 기회를 놓치거나 불필요한 공포에 사로잡히기 쉽습니다.</li>
+        <li><strong>앵커링 효과 (Anchoring Effect)</strong>: 특정 가격(예: 매수 가격이나 과거 고점)에 닻을 내리듯 집착하여, 현재의 시장 가치를 객관적으로 평가하지 못하는 현상입니다. 주가가 하락해도 과거의 높은 가격에 묶여 "이 가격은 너무 싸다"고 생각하지 못하고, 오히려 "더 떨어질 것"이라는 비관적인 전망에 빠지기 쉽습니다.</li>
+        <li><strong>군중 심리 (Herd Behavior)</strong>: 시장이 하락할 때 다른 투자자들이 공포에 질려 매도하는 것을 보면, 자신도 모르게 그 흐름에 동참하여 매도하게 되는 경향입니다. 이는 합리적인 분석보다는 감정적인 반응에 의해 주도되는 경우가 많습니다.</li>
+        <li><strong>후회 회피 (Regret Aversion)</strong>: 잘못된 투자 결정으로 인해 발생할 수 있는 후회를 피하려는 심리입니다. 하락장에서 매수했다가 더 큰 손실을 볼까 봐 두려워 매수를 망설이게 됩니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>MDD 분석기로 객관적인 데이터를 확인하면 심리적 편향을 어느 정도 극복할 수 있습니다.</strong> 과거의 데이터를 통해 시장의 하락이 일시적이었고 결국 회복했다는 사실을 인지하면, 감정적인 판단보다는 이성적인 투자 결정을 내리는 데 도움이 됩니다.</p></div>
+      <h2>심리적 함정 극복 전략</h2>
+      <p>이러한 심리적 함정들을 극복하고 하락장을 기회로 삼기 위해서는 다음과 같은 전략들을 활용할 수 있습니다.</p>
+      <ul>
+        <li><strong>투자 원칙 수립 및 준수</strong>: 미리 정해둔 투자 원칙(예: 특정 MDD 도달 시 분할 매수)을 세우고, 시장의 변동성에 흔들리지 않고 이를 준수하는 것이 중요합니다.</li>
+        <li><strong>분할 매수/매도</strong>: 한 번에 모든 자금을 투입하거나 회수하기보다는, 분할 매수/매도 전략을 통해 리스크를 분산하고 심리적 부담을 줄일 수 있습니다.</li>
+        <li><strong>객관적인 데이터 분석</strong>: MDD 분석기와 같은 도구를 활용하여 시장과 종목의 과거 데이터를 객관적으로 분석하고, 감정적인 판단을 배제하는 훈련을 해야 합니다.</li>
+        <li><strong>장기적인 관점 유지</strong>: 단기적인 시장 변동에 일희일비하기보다는, 장기적인 관점에서 기업의 가치와 성장 잠재력을 보고 투자하는 자세가 필요합니다.</li>
+        <li><strong>자신만의 투자 철학 정립</strong>: 다른 사람들의 의견이나 시장의 분위기에 휩쓸리지 않고, 자신만의 확고한 투자 철학을 정립하는 것이 중요합니다.</li>
+      </ul>
+      <p>주식 투자는 심리와의 싸움이라고도 합니다. 자신의 심리를 이해하고 통제하는 능력을 키운다면, 시장의 어떤 상황에서도 성공적인 투자를 이어갈 수 있을 것입니다.</p>
+    `
+  },
+  {
+    id: 9,
+    tag: '상승장 전략',
+    emoji: '🚀',
+    bg: '#f0fff4',
+    title: '마이크로소프트(MSFT) 매수 타이밍 분석',
+    excerpt: 'MSFT의 역사적 MDD와 회복 패턴을 분석하여 언제 매수하는 것이 유리했는지 알아보세요.',
+    date: '2026-03-01',
+    readTime: '8분',
+    content: `
+      <h1>마이크로소프트(MSFT) 매수 타이밍 분석: MDD로 본 안정적인 성장주의 기회</h1>
+      <div class="article-meta">📅 2026년 3월 1일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>마이크로소프트(MSFT)는 전 세계 기술 산업을 선도하는 기업이자, 지난 수십 년간 꾸준히 성장해온 대표적인 우량주입니다. 클라우드 컴퓨팅(Azure), 오피스 생산성 소프트웨어, 게임(Xbox) 등 다양한 사업 부문에서 강력한 경쟁력을 바탕으로 안정적인 실적을 기록하고 있습니다. 특히 지난 10년간 <strong>연평균 +29%에 달하는 경이로운 수익률</strong>을 기록하며 많은 투자자들에게 사랑받아왔습니다. 하지만 아무리 좋은 주식이라도 시장의 변동성에서 자유로울 수는 없습니다. 이 글에서는 MDD(Maximum Drawdown, 최대 낙폭) 분석을 통해 MSFT의 과거 하락 패턴과 회복력을 살펴보고, 이를 바탕으로 현명한 매수 타이밍을 포착하는 방법을 알아보겠습니다.</p>
+      <h2>마이크로소프트(MSFT)의 주요 낙폭 사례와 회복력</h2>
+      <p>MSFT는 시장의 주요 위기 상황에서도 상대적으로 견고한 모습을 보여왔지만, 그럼에도 불구하고 몇 차례의 의미 있는 하락을 경험했습니다. 이러한 하락기에서의 MDD와 회복 패턴은 MSFT의 투자 매력을 이해하는 데 중요한 단서가 됩니다.</p>
+      <ul>
+        <li><strong>2022년 (고금리 및 인플레이션)</strong>: 전 세계적인 고금리 기조와 경기 침체 우려로 기술주 전반이 조정을 받으면서 MSFT는 고점 대비 약 -37% 하락했습니다. 하지만 강력한 펀더멘털과 클라우드 사업의 성장에 힘입어 약 1년 만에 이전 고점을 회복하며 안정적인 회복력을 보여주었습니다.</li>
+        <li><strong>2020년 3월 (코로나 팬데믹)</strong>: 코로나19 팬데믹 초기, 시장 전체가 급락하면서 MSFT도 고점 대비 약 -29% 하락했습니다. 그러나 디지털 전환 가속화의 수혜를 받으며 불과 4개월 만에 빠르게 회복하는 저력을 과시했습니다.</li>
+        <li><strong>2018년 (미중 무역전쟁 및 금리 인상)</strong>: 미중 무역 분쟁 심화와 미국 연준의 금리 인상 기조로 시장이 불안정했던 시기에 MSFT는 고점 대비 약 -25% 하락했습니다. 이 역시 약 6개월 만에 회복되며 견고함을 입증했습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>MSFT는 역사적으로 낙폭 후 평균 12개월 내에 회복하는 안정적인 패턴을 보여주었습니다.</strong> 이는 시장의 일시적인 충격에도 불구하고 기업의 본질적인 가치와 성장 동력이 훼손되지 않았음을 의미합니다.</p></div>
+      <h2>MDD 분석을 통한 매수 타이밍 최적화</h2>
+      <p>MSFT와 같은 우량주에 투자할 때 MDD 분석은 단순히 손실을 피하는 것을 넘어, 매수 타이밍을 최적화하는 데 중요한 역할을 합니다. MSFT의 과거 MDD 데이터를 살펴보면, 큰 폭의 하락은 장기 투자자에게 매력적인 매수 기회가 되었음을 알 수 있습니다.</p>
+      <ul>
+        <li><strong>하락장 활용</strong>: 시장 전체의 하락이나 MSFT 자체의 일시적인 악재로 인해 주가가 고점 대비 20~30% 이상 하락했을 때를 매수 기회로 삼을 수 있습니다. 과거 데이터는 이러한 시점에서 매수한 투자자들이 장기적으로 좋은 수익률을 거두었음을 보여줍니다.</li>
+        <li><strong>분할 매수 전략</strong>: 한 번에 모든 자금을 투입하기보다는, MDD의 깊이에 따라 분할 매수 전략을 사용하는 것이 현명합니다. 예를 들어, -20% 하락 시 1차 매수, -30% 하락 시 2차 매수와 같이 계획을 세울 수 있습니다.</li>
+        <li><strong>기업 펀더멘털 확인</strong>: MDD 분석과 함께 MSFT의 분기별 실적, 클라우드 사업 성장률, 신기술 투자 등 기업의 펀더멘털을 지속적으로 확인하는 것이 중요합니다. 일시적인 시장 하락과 달리 기업의 본질적인 가치에 문제가 생겼다면 투자 전략을 재고해야 합니다.</li>
+      </ul>
+      <p>마이크로소프트는 꾸준한 혁신과 안정적인 사업 구조를 바탕으로 장기적인 성장을 기대할 수 있는 기업입니다. MDD 분석을 통해 시장의 변동성을 이해하고, 이를 현명한 투자 기회로 활용한다면 성공적인 투자를 이어갈 수 있을 것입니다. MDD 분석기는 이러한 투자 결정을 돕는 유용한 도구입니다.</p>`
+  },
+  {
+    id: 10,
+    tag: '위험 관리',
+    emoji: '🛡️',
+    bg: '#fff5f5',
+    title: '주식 투자에서 스톱로스 설정하는 방법',
+    excerpt: 'MDD를 활용한 스톱로스 설정으로 손실을 최소화하는 실질적 방법을 안내합니다.',
+    date: '2026-03-05',
+    readTime: '7분',
+    content: `
+      <h1>주식 투자에서 스톱로스 설정하는 방법: MDD를 활용한 손실 최소화 전략</h1>
+      <div class="article-meta">📅 2026년 3월 5일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>주식 투자에서 손실을 최소화하고 자산을 보호하는 가장 중요한 전략 중 하나는 바로 <strong>스톱로스(Stop-Loss)</strong> 설정입니다. 스톱로스는 미리 정해둔 손실 한도에 도달하면 자동으로 주식을 매도하여 더 큰 손실을 방지하는 주문 방식입니다. 하지만 단순히 "몇 퍼센트 하락하면 판다"는 식의 기계적인 스톱로스 설정은 오히려 불필요한 손실을 초래할 수 있습니다. 이 글에서는 MDD(Maximum Drawdown, 최대 낙폭) 분석을 활용하여 보다 효과적이고 합리적인 스톱로스 설정 방법을 알아보겠습니다.</p>
+      <h2>MDD 기반 스톱로스 전략의 중요성</h2>
+      <p>MDD는 특정 기간 동안 고점 대비 주가가 얼마나 하락했는지를 나타내는 지표입니다. 종목의 역사적 MDD를 이해하면 해당 종목이 일반적으로 어느 정도의 하락을 견디고 회복하는지 파악할 수 있습니다. 이를 바탕으로 스톱로스를 설정하면 시장의 일시적인 변동성에 의해 불필요하게 손절매하는 것을 방지하고, 동시에 감당할 수 없는 수준의 손실을 막을 수 있습니다.</p>
+      <h2>다양한 스톱로스 설정 방법</h2>
+      <p>MDD 데이터를 참고하여 다음과 같은 스톱로스 전략을 고려해볼 수 있습니다.</p>
+      <ul>
+        <li><strong>ATR(Average True Range) 기반 스톱로스</strong>: ATR은 일정 기간 동안 주가의 평균 변동폭을 나타내는 지표입니다. 일반적으로 ATR의 2~3배를 스톱로스 구간으로 설정합니다. 예를 들어, ATR이 100원이라면 200~300원 하락 시 스톱로스를 실행하는 방식입니다. 이는 종목의 고유한 변동성을 반영하여 합리적인 스톱로스 지점을 찾는 데 도움을 줍니다.</li>
+        <li><strong>MDD 비례 스톱로스</strong>: 해당 종목의 역사적 최대 MDD를 참고하여 스톱로스 비율을 설정하는 방법입니다. 예를 들어, 특정 종목의 역사적 MDD가 -40%였다면, 이의 절반 수준인 -20%를 스톱로스 지점으로 설정하는 것을 고려해볼 수 있습니다. 이는 과거의 가장 큰 하락폭을 기준으로 자신의 리스크 허용 범위를 정하는 데 유용합니다.</li>
+        <li><strong>고정 비율 스톱로스</strong>: 매수가 대비 -10% 또는 -15%와 같이 고정된 비율로 스톱로스를 설정하는 가장 단순한 방법입니다. 이는 모든 종목에 일률적으로 적용할 수 있지만, 종목별 변동성 차이를 반영하지 못한다는 단점이 있습니다.</li>
+        <li><strong>지지선/저항선 기반 스톱로스</strong>: 기술적 분석을 통해 중요한 지지선 아래에 스톱로스를 설정하는 방법입니다. 주가가 지지선을 하향 돌파하면 추가 하락 가능성이 높다고 판단하여 손절매하는 전략입니다.</li>
+      </ul>
+      <div class="highlight-box"><p>⚠️ <strong>스톱로스 설정 시 주의사항</strong>: 스톱로스 지점이 너무 좁으면 시장의 일시적인 변동성(노이즈)에 의해 조기에 손절매될 수 있습니다. 반대로 너무 넓으면 감당하기 어려운 큰 손실을 입을 수 있습니다. MDD 데이터를 참고하여 종목의 특성과 자신의 투자 성향에 맞는 적절한 수준으로 스톱로스를 설정하는 것이 중요합니다.</p></div>
+      <h2>스톱로스 설정의 심리적 이점</h2>
+      <p>스톱로스는 단순히 손실을 제한하는 기술적인 도구를 넘어, 투자자의 심리적 안정에도 큰 도움을 줍니다. 미리 손실 한도를 정해두면 시장이 급락할 때 패닉에 빠져 감정적인 결정을 내리는 것을 방지할 수 있습니다. 또한, 스톱로스가 실행되면 다음 투자 기회를 모색할 수 있는 현금을 확보하게 되어, 새로운 투자 전략을 세우는 데 집중할 수 있습니다.</p>
+      <p>성공적인 투자는 수익을 극대화하는 것뿐만 아니라, 손실을 효과적으로 관리하는 것에서 시작됩니다. MDD 분석을 통해 종목의 위험 특성을 이해하고, 이를 바탕으로 현명한 스톱로스 전략을 수립하여 안정적인 투자 여정을 이어가시길 바랍니다.</p>`
+  },
+  {
+    id: 11,
+    tag: '장기 투자',
+    emoji: '⏳',
+    bg: '#f0f4ff',
+    title: '장기 투자에서 MDD가 중요한 이유',
+    excerpt: '장기 투자자일수록 MDD를 이해하는 것이 얼마나 중요한지 설명합니다.',
+    date: '2026-03-10',
+    readTime: '6분',
+    content: `
+      <h1>장기 투자에서 MDD가 중요한 이유: 인내심을 지키는 지표</h1>
+      <div class="article-meta">📅 2026년 3월 10일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>장기 투자는 복리의 마법을 통해 자산을 증식시키는 가장 강력한 전략 중 하나로 꼽힙니다. 많은 투자자들이 "장기 투자자는 단기 변동에 일희일비하지 않는다"고 말하지만, 실제로 시장의 큰 하락을 경험하게 되면 심리적으로 흔들리기 쉽습니다. 이때 MDD(Maximum Drawdown, 최대 낙폭)에 대한 이해는 장기 투자자들이 자신의 투자 원칙을 지키고 성공적인 투자를 이어가는 데 결정적인 역할을 합니다. MDD를 모르면 시장의 큰 하락장에서 패닉에 빠져 잘못된 시점에 매도하게 될 위험이 커지기 때문입니다.</p>
+      <h2>장기 투자와 MDD의 불가분의 관계</h2>
+      <p>장기 투자는 필연적으로 여러 번의 시장 사이클과 그에 따른 하락장을 경험하게 됩니다. 보유 기간이 길어질수록 투자자는 낙폭 위험에 노출되는 횟수가 증가하며, 이는 투자 수익률에 직접적인 영향을 미칩니다.</p>
+      <ul>
+        <li><strong>낙폭 시 패닉 매도 방지</strong>: MDD를 미리 알고 있다면, 시장이 크게 하락했을 때 "이것은 일시적인 조정이며, 과거에도 이런 하락이 있었고 결국 회복했다"는 사실을 인지할 수 있습니다. 이는 투자자가 공포에 질려 저점에서 매도하는 실수를 방지하는 데 큰 도움이 됩니다.</li>
+        <li><strong>역사적 회복 패턴을 통한 확신</strong>: 주요 지수나 우량 종목의 역사적 MDD 데이터를 분석하면, 대부분의 하락장이 결국 회복되었음을 알 수 있습니다. 이러한 역사적 회복 패턴에 대한 이해는 장기 투자자에게 인내심을 가지고 시장을 견딜 수 있는 확신을 제공합니다.</li>
+        <li><strong>리스크 관리의 기준</strong>: MDD는 투자 포트폴리오의 위험 수준을 측정하는 중요한 지표입니다. 자신의 포트폴리오가 감당할 수 있는 최대 낙폭을 미리 설정하고, 이를 초과할 경우 리밸런싱이나 리스크 축소 전략을 고려하는 등 합리적인 리스크 관리의 기준이 될 수 있습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>S&P 500 지수의 경우, 역사적으로 어떤 큰 낙폭에서도 10년 이상 보유 시 100% 이상의 수익률을 기록했습니다.</strong> 이는 장기 투자의 힘이 바로 인내심과 시장의 회복력을 믿는 데 있음을 명확히 보여줍니다.</p></div>
+      <h2>MDD를 활용한 장기 투자 전략</h2>
+      <p>장기 투자자는 MDD를 단순히 과거의 데이터로만 볼 것이 아니라, 미래 투자 전략 수립에 적극적으로 활용해야 합니다.</p>
+      <ul>
+        <li><strong>분할 매수 기회 포착</strong>: 시장이 크게 하락하여 MDD가 깊어질 때를 오히려 저가 매수의 기회로 삼을 수 있습니다. 미리 정해둔 MDD 수준에 따라 분할 매수 계획을 세워 실행한다면, 평균 매수 단가를 낮추고 장기적인 수익률을 극대화할 수 있습니다.</li>
+        <li><strong>포트폴리오 재조정</strong>: 자신의 리스크 허용 범위를 초과하는 MDD가 발생했을 경우, 포트폴리오의 자산 배분을 재조정하여 위험을 줄이는 기회로 삼을 수 있습니다. 예를 들어, 주식 비중을 줄이고 채권이나 현금 비중을 늘리는 방식입니다.</li>
+        <li><strong>심리적 안정 유지</strong>: MDD 데이터를 통해 시장의 하락이 자연스러운 현상임을 이해하고, 감정적인 동요 없이 투자 원칙을 고수하는 데 도움을 받을 수 있습니다. 이는 장기 투자의 성공에 있어 가장 중요한 요소 중 하나입니다.</li>
+      </ul>
+      <p>장기 투자는 시간과의 싸움이며, 그 과정에서 수많은 유혹과 어려움에 직면하게 됩니다. MDD에 대한 깊은 이해는 이러한 어려움을 극복하고, 궁극적으로 투자 목표를 달성하는 데 필요한 지혜와 인내심을 제공할 것입니다. MDD 분석기를 통해 자신의 투자 종목의 역사적 MDD를 확인하고, 이를 바탕으로 더욱 견고한 장기 투자 전략을 세워보세요.</p>`
+  },
+  {
+    id: 12,
+    tag: 'NVDA 분석',
+    emoji: '🎮',
+    bg: '#e6fffa',
+    title: 'NVDA 역대 최대 하락률: AI 시대의 엔비디아',
+    excerpt: '엔비디아의 맹스러운 상승과 하락 역사를 MDD로 분석합니다.',
+    date: '2026-03-15',
+    readTime: '8분',
+    content: `
+      <h1>NVDA 역대 최대 하락률: AI 시대의 엔비디아, 고위험 고수익의 양면성</h1>
+      <div class="article-meta">📅 2026년 3월 15일 &nbsp;&bull;&nbsp; ⏱ 12분 읽기</div>
+      <p>엔비디아(NVDA)는 인공지능(AI) 시대의 핵심 기업으로, GPU(그래픽 처리 장치) 시장을 지배하며 2023년부터 2024년까지 <strong>+800% 이상 상승하는 경이로운 주가 상승률</strong>을 기록했습니다. AI 기술의 발전과 함께 엔비디아의 성장세는 더욱 가속화될 것으로 전망되지만, 이러한 고성장 기업일수록 주가 변동성이 크다는 점을 간과해서는 안 됩니다. 엔비디아는 급격한 상승만큼이나 깊은 하락을 경험하기도 했습니다. 이 글에서는 엔비디아의 역사적 MDD(Maximum Drawdown, 최대 낙폭)를 분석하여 AI 시대의 핵심 기업에 투자할 때 고려해야 할 위험과 기회를 심층적으로 살펴보겠습니다.</p>
+      <h2>엔비디아(NVDA)의 주요 낙폭 사례와 그 배경</h2>
+      <p>엔비디아는 지난 수년간 여러 차례의 시장 조정과 산업 변화 속에서 큰 폭의 하락을 경험했습니다. 이러한 하락기에서의 MDD는 엔비디아의 투자 위험성을 이해하는 데 중요한 지표가 됩니다.</p>
+      <ul>
+        <li><strong>2022년 (고금리 및 반도체 수요 감소)</strong>: 전 세계적인 고금리 기조와 인플레이션 압박, 그리고 팬데믹 이후 PC 및 게임용 GPU 수요 감소가 겹치면서 엔비디아는 고점 대비 약 -66%라는 큰 폭의 하락을 경험했습니다. 이는 기술주 전반에 대한 투자 심리가 위축되고, 특정 산업의 사이클이 둔화될 때 고성장 기업도 예외 없이 큰 타격을 받을 수 있음을 보여줍니다.</li>
+        <li><strong>2020년 3월 (코로나 팬데믹)</strong>: 코로나19 팬데믹 초기, 전 세계적인 경제 봉쇄와 불확실성으로 인해 시장 전체가 급락하면서 엔비디아도 고점 대비 약 -40% 하락했습니다. 하지만 이후 비대면 경제 활성화와 데이터센터 수요 증가로 빠르게 회복하며 강한 펀더멘털을 입증했습니다.</li>
+        <li><strong>2018년 (가상화폐 버블 붕괴)</strong>: 2017년 말부터 2018년 초까지 이어진 가상화폐 버블 붕괴는 엔비디아에 큰 영향을 미쳤습니다. GPU가 가상화폐 채굴에 광범위하게 사용되었기 때문에, 버블 붕괴와 함께 채굴 수요가 급감하면서 엔비디아 주가는 고점 대비 약 -57% 하락했습니다. 이는 특정 산업의 의존도가 높을 경우 발생할 수 있는 위험을 보여주는 사례입니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>엔비디아는 고위험/고수익 종목의 전형적인 예시입니다.</strong> MDD 분석기를 통해 현재 엔비디아의 고점 대비 하락률을 확인하고, 과거의 역사적 회복 패턴을 참고하여 투자 결정을 내리는 것이 중요합니다.</p></div>
+      <h2>AI 시대, 엔비디아 투자 시 고려사항</h2>
+      <p>엔비디아는 AI 시대의 선두 주자로서 여전히 높은 성장 잠재력을 가지고 있습니다. 하지만 과거의 MDD 사례에서 볼 수 있듯이, 투자에는 항상 위험이 따릅니다. 엔비디아에 투자할 때 다음과 같은 점들을 고려해야 합니다.</p>
+      <ul>
+        <li><strong>높은 변동성 이해</strong>: 고성장 기술주는 시장 상황이나 산업 트렌드 변화에 따라 주가 변동성이 매우 클 수 있습니다. 이러한 변동성을 이해하고 감내할 수 있는 투자자에게 적합합니다.</li>
+        <li><strong>장기적인 관점 유지</strong>: 단기적인 주가 등락에 일희일비하기보다는, AI 산업의 장기적인 성장과 엔비디아의 기술 리더십을 믿고 장기적인 관점에서 접근하는 것이 중요합니다.</li>
+        <li><strong>분산 투자</strong>: 엔비디아와 같은 개별 종목에 대한 집중 투자는 높은 수익을 가져다줄 수 있지만, 동시에 높은 위험을 수반합니다. 포트폴리오의 일부로 엔비디아를 편입하고, 다른 자산군이나 산업에 분산 투자하여 위험을 관리하는 것이 현명합니다.</li>
+        <li><strong>지속적인 기업 분석</strong>: 엔비디아의 실적 발표, 신제품 출시, 경쟁 환경 변화, AI 산업 트렌드 등을 지속적으로 모니터링하여 기업의 펀더멘털에 변화가 없는지 확인해야 합니다.</li>
+      </ul>
+      <p>엔비디아는 AI 혁명의 최전선에 있는 매력적인 투자 대상이지만, 그만큼 높은 변동성을 동반합니다. MDD 분석을 통해 엔비디아의 위험 특성을 정확히 이해하고, 자신만의 투자 원칙을 세워 현명하게 투자하시길 바랍니다.</p>`
+  },
+  {
+    id: 13,
+    tag: '분산 투자',
+    emoji: '🌎',
+    bg: '#fffff0',
+    title: '포트폴리오 분산으로 MDD 줄이는 방법',
+    excerpt: '여러 자산에 분산 투자하면 전체 포트폴리오의 MDD를 얼마나 줄일 수 있는지 알아보세요.',
+    date: '2026-03-20',
+    readTime: '7분',
+    content: `
+      <h1>포트폴리오 분산으로 MDD 줄이는 방법: 위험 관리의 핵심 전략</h1>
+      <div class="article-meta">📅 2026년 3월 20일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>주식 투자에서 높은 수익률을 추구하는 것도 중요하지만, 그에 못지않게 중요한 것이 바로 위험 관리입니다. 특히 MDD(Maximum Drawdown, 최대 낙폭)는 투자 포트폴리오의 위험 수준을 측정하는 핵심 지표입니다. 단일 주식이나 특정 섹터에 집중 투자할 경우, 시장의 변동성이나 해당 종목의 개별 악재에 의해 MDD가 크게 확대될 수 있습니다. 이러한 위험을 효과적으로 줄이는 가장 기본적인 전략이 바로 <strong>포트폴리오 분산 투자</strong>입니다. 상관관계가 낮은 다양한 자산에 분산 투자함으로써 전체 포트폴리오의 MDD를 효과적으로 관리하고, 안정적인 수익률을 추구할 수 있습니다.</p>
+      <h2>분산 투자의 원리: 상관관계의 중요성</h2>
+      <p>분산 투자는 "모든 달걀을 한 바구니에 담지 말라"는 격언처럼, 여러 자산에 투자하여 특정 자산의 하락 위험이 전체 포트폴리오에 미치는 영향을 줄이는 전략입니다. 이때 중요한 개념이 바로 <strong>상관관계(Correlation)</strong>입니다. 상관관계는 두 자산의 가격이 함께 움직이는 정도를 나타내는 지표로, -1부터 +1까지의 값을 가집니다.</p>
+      <ul>
+        <li><strong>양의 상관관계 (+1에 가까울수록)</strong>: 두 자산이 같은 방향으로 움직이는 경향이 강합니다. (예: 기술주와 기술주)</li>
+        <li><strong>음의 상관관계 (-1에 가까울수록)</strong>: 두 자산이 반대 방향으로 움직이는 경향이 강합니다. (예: 주식과 채권)</li>
+        <li><strong>무상관관계 (0에 가까울수록)</strong>: 두 자산의 움직임이 서로 독립적입니다.</li>
+      </ul>
+      <p>포트폴리오의 MDD를 효과적으로 줄이기 위해서는 <strong>상관관계가 낮은 자산들을 함께 보유</strong>하는 것이 핵심입니다. 한 자산이 하락할 때 다른 자산이 상승하거나 덜 하락하여 전체 포트폴리오의 손실을 완충해주는 효과를 기대할 수 있습니다.</p>
+      <h2>분산 투자 예시와 MDD 관리 효과</h2>
+      <p>다양한 자산 배분 전략을 통해 MDD를 어떻게 관리할 수 있는지 살펴보겠습니다.</p>
+      <ul>
+        <li><strong>주식 60% + 채권 40% (전통적인 60/40 포트폴리오)</strong>: 주식과 채권은 일반적으로 음의 상관관계를 가지는 경향이 있습니다. 주식 시장이 하락할 때 채권 가격이 상승하여 포트폴리오의 MDD를 약 15% 수준으로 관리하는 데 도움을 줍니다.</li>
+        <li><strong>성장주 50% + 배당주 30% + ETF 20% (스타일 분산)</strong>: 성장주는 높은 성장 잠재력을 가지지만 변동성이 크고, 배당주는 상대적으로 안정적인 현금 흐름을 제공합니다. 여기에 시장 전체를 추종하는 ETF를 추가하여 특정 스타일의 위험에 집중되는 것을 방지하고 MDD를 약 20% 수준으로 관리할 수 있습니다.</li>
+        <li><strong>미국 주식 70% + 해외 주식 30% (지역 분산)</strong>: 특정 국가나 지역의 경제 위기가 발생했을 때의 위험을 줄이기 위해 지역을 분산하는 전략입니다. 각국의 경제 사이클이 다르게 움직이므로, 한 지역의 하락이 다른 지역의 상승으로 상쇄될 수 있습니다.</li>
+        <li><strong>금, 부동산, 대체 투자</strong>: 주식이나 채권 외에 금, 부동산, 원자재 등 다른 자산군을 포트폴리오에 포함시키는 것도 MDD를 줄이는 효과적인 방법입니다. 이러한 자산들은 주식 시장과의 상관관계가 낮거나 음의 상관관계를 가지는 경우가 많습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>상관관계 -0.5 이하의 자산을 함께 보유하면 포트폴리오 MDD를 효과적으로 줄일 수 있습니다.</strong> 하지만 상관관계는 고정된 것이 아니라 시장 상황에 따라 변할 수 있으므로, 주기적인 포트폴리오 검토와 리밸런싱이 필요합니다.</p></div>
+      <h2>분산 투자를 통한 안정적인 투자 여정</h2>
+      <p>분산 투자는 단순히 손실을 줄이는 것을 넘어, 투자자의 심리적 안정에도 기여합니다. 포트폴리오가 잘 분산되어 있다면, 특정 종목이나 섹터의 급락에도 전체 포트폴리오가 크게 흔들리지 않아 투자자가 패닉에 빠지는 것을 방지할 수 있습니다. 이는 장기적인 투자 목표를 달성하는 데 있어 매우 중요한 요소입니다.</p>
+      <p>MDD 분석기는 자신의 포트폴리오에 포함된 각 자산의 위험 특성을 이해하고, 이를 바탕으로 최적의 분산 투자 전략을 수립하는 데 유용한 도구입니다. 다양한 자산군과 투자 스타일을 조합하여 자신만의 견고한 포트폴리오를 구축하고, 시장의 변동성 속에서도 안정적인 투자 여정을 이어가시길 바랍니다.</p>`
+  },
+  {
+    id: 14,
+    tag: '시장 사이클',
+    emoji: '🔄',
+    bg: '#f0f4ff',
+    title: '경기 사이클과 MDD: 언제 주식을 사야 하는가',
+    excerpt: '경기 사이클의 각 단계에서 MDD가 어떻게 변하는지, 매수 타이밍에 어떻게 활용할지 알아보세요.',
+    date: '2026-03-25',
+    readTime: '9분',
+    content: `
+      <h1>경기 사이클과 MDD: 언제 주식을 사야 하는가? 시장의 흐름을 읽는 지혜</h1>
+      <div class="article-meta">📅 2026년 3월 25일 &nbsp;&bull;&nbsp; ⏱ 12분 읽기</div>
+      <p>주식 시장은 독립적으로 움직이는 것이 아니라, 거시 경제의 큰 흐름인 <strong>경기 사이클</strong>과 밀접하게 연동되어 있습니다. 경기가 확장과 수축을 반복하듯이, 주식 시장도 상승과 하락을 거듭합니다. 이러한 경기 사이클을 이해하고, 각 단계에서 MDD(Maximum Drawdown, 최대 낙폭)가 어떻게 변화하는지 파악한다면, 투자자들은 시장의 흐름을 보다 정확하게 예측하고 현명한 매수 타이밍을 포착할 수 있습니다. 단순히 차트만 보고 투자하는 것을 넘어, 경제 전반의 큰 그림 속에서 자신의 투자 전략을 세우는 것이 중요합니다.</p>
+      <h2>경기 사이클의 4단계와 주식 시장의 반응</h2>
+      <p>일반적으로 경기 사이클은 회복기, 호황기, 수축기, 침체기의 4단계로 구분됩니다. 각 단계에서 주식 시장과 MDD는 다음과 같은 특징을 보입니다.</p>
+      <ul>
+        <li><strong>회복기 (Expansion)</strong>: 경기가 바닥을 찍고 회복하기 시작하는 단계입니다. 기업 실적이 개선되고 투자 심리가 살아나면서 주식 시장은 상승세를 보입니다. 이 시기에는 과거의 깊은 MDD가 점차 줄어들고, 새로운 상승 추세가 시작됩니다. 따라서 MDD가 하락하는 초기에 매수 기회를 포착하는 것이 중요합니다.</li>
+        <li><strong>호황기 (Peak)</strong>: 경기가 정점에 달하고 기업 실적이 최고조에 이르는 단계입니다. 주식 시장은 고점을 형성하며, MDD는 낮은 수준을 유지하거나 거의 나타나지 않습니다. 하지만 과열된 시장은 언제든 조정될 수 있으므로, 신중한 접근이 필요합니다.</li>
+        <li><strong>수축기 (Contraction)</strong>: 경기가 둔화되기 시작하고 기업 실적이 악화되는 단계입니다. 투자 심리가 위축되면서 주식 시장은 하락세로 전환되며, MDD가 급등하기 시작합니다. 이 시기에는 불필요한 손실을 피하기 위해 포트폴리오를 점검하고 위험 자산 비중을 줄이는 것을 고려해야 합니다.</li>
+        <li><strong>침체기 (Trough)</strong>: 경기가 바닥을 찍고 가장 어려운 시기입니다. 기업 실적은 최악을 기록하고 투자 심리는 극도로 위축됩니다. 주식 시장은 저점을 형성하며, MDD는 최대 수준에 도달합니다. 하지만 역설적으로 이 시기는 장기 투자자에게는 가장 큰 매수 기회가 될 수 있습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>취업률, 금리, 기업 실적, 소비자 물가지수(CPI) 등 다양한 거시 경제 지표를 MDD와 함께 분석하면 시장의 현재 위치를 파악하고 더 정확한 매수 타이밍을 잡는 데 도움이 됩니다.</strong></p></div>
+      <h2>MDD를 활용한 매수 타이밍 전략</h2>
+      <p>경기 사이클과 MDD의 관계를 이해했다면, 이를 실제 투자 전략에 어떻게 적용할 수 있을까요?</p>
+      <ul>
+        <li><strong>침체기/수축기 말기 매수</strong>: MDD가 최대 수준에 도달했거나 깊은 하락을 보인 후 회복의 조짐이 보일 때가 가장 좋은 매수 타이밍입니다. 이때는 시장의 공포가 극에 달해 저평가된 우량 자산들을 저렴하게 매수할 수 있는 기회가 됩니다.</li>
+        <li><strong>분할 매수 전략</strong>: 경기 사이클의 전환점을 정확히 예측하기는 어렵습니다. 따라서 하락장에서 MDD가 깊어질수록 분할 매수 전략을 활용하여 평균 매수 단가를 낮추는 것이 현명합니다.</li>
+        <li><strong>경기 선행 지표 활용</strong>: 주식 시장은 경기보다 6개월에서 1년 정도 선행하는 경향이 있습니다. 따라서 경기 선행 지표(예: 제조업 PMI, 소비자 신뢰 지수)의 변화를 주시하며 MDD와 함께 분석하면 시장의 전환점을 예측하는 데 도움을 받을 수 있습니다.</li>
+        <li><strong>장기적인 관점 유지</strong>: 경기 사이클은 단기적인 예측이 어렵고, 예상보다 길어질 수 있습니다. 따라서 장기적인 관점에서 투자하고, 단기적인 시장 변동에 일희일비하지 않는 인내심이 중요합니다.</li>
+      </ul>
+      <p>경기 사이클과 MDD 분석은 투자자가 시장의 큰 흐름을 이해하고, 감정적인 판단을 배제한 채 합리적인 투자 결정을 내리는 데 필수적인 도구입니다. MDD 분석기를 통해 자신이 관심 있는 종목이나 지수의 역사적 MDD와 회복 패턴을 확인하고, 이를 경기 사이클 분석과 결합하여 자신만의 성공적인 투자 전략을 수립하시길 바랍니다.</p>`
+  },
+  {
+    id: 15,
+    tag: '실전 가이드',
+    emoji: '🏆',
+    bg: '#fffaf0',
+    title: 'MDD 분석기 100% 활용하는 방법',
+    excerpt: 'MDD 분석기의 모든 기능을 실제 투자에 어떻게 적용할지 단계별로 안내합니다.',
+    date: '2026-04-01',
+    readTime: '10분',
+    content: `
+      <h1>MDD 분석기 100% 활용하는 방법: 스마트한 투자 결정을 위한 실전 가이드</h1>
+      <div class="article-meta">📅 2026년 4월 1일 &nbsp;&bull;&nbsp; ⏱ 12분 읽기</div>
+      <p>MDD(Maximum Drawdown, 최대 낙폭) 분석기는 투자자들이 시장의 위험을 이해하고, 현명한 투자 결정을 내릴 수 있도록 돕는 강력한 도구입니다. 단순히 주가의 등락을 확인하는 것을 넘어, 특정 종목이나 지수가 과거에 얼마나 깊은 하락을 경험했고, 그 후 어떻게 회복했는지를 시각적으로 보여줌으로써 투자자에게 중요한 통찰력을 제공합니다. 이 가이드에서는 MDD 분석기의 모든 기능을 단계별로 상세히 설명하고, 이를 실제 투자 전략에 어떻게 적용할 수 있는지 알아보겠습니다.</p>
+      <h2>Step 1: 관심 종목 입력 및 데이터 조회</h2>
+      <p>MDD 분석기를 활용하는 첫 번째 단계는 자신이 관심 있는 종목의 티커(Ticker Symbol)를 입력하고 데이터를 조회하는 것입니다. 상단의 티커 입력란에 TSLA(테슬라), NVDA(엔비디아), MSFT(마이크로소프트)와 같은 개별 주식 티커나 SPY(S&P 500 ETF), QQQ(나스닥 100 ETF)와 같은 ETF 티커를 입력한 후 '데이터 불러오기' 버튼을 클릭하세요. 시스템은 해당 종목의 과거 주가 데이터를 기반으로 MDD를 계산하고 시각화된 차트를 제공합니다.</p>
+      <h2>Step 2: MDD 차트와 현재 고점 대비 하락률 확인</h2>
+      <p>데이터가 로드되면 화면 상단에 해당 종목의 MDD 차트가 표시됩니다. 이 차트는 특정 기간 동안 주가가 고점 대비 얼마나 하락했는지를 한눈에 보여줍니다. 현재 고점 대비 하락률을 즉시 확인할 수 있으며, 차트의 특정 하락률 구간을 클릭하면 해당 시점의 상세 정보(시작일, 저점일, 회복일, 하락률, 회복 기간 등)를 볼 수 있습니다. 이를 통해 종목의 역사적 변동성 패턴을 파악하고, 현재의 하락이 과거와 비교하여 어느 정도 수준인지 가늠할 수 있습니다.</p>
+      <h2>Step 3: 역사적 회복률 분석 활용</h2>
+      <p>MDD 차트 아래에는 해당 종목의 역사적 회복률 표가 제공됩니다. 이 표는 과거 특정 MDD 구간(예: -10%, -20%, -30% 등)에 도달했을 때, 그 이후 주가가 이전 고점을 회복하는 데 걸린 평균 기간과 회복 확률을 보여줍니다. 이 정보를 활용하면 현재의 하락률에서 해당 종목이 회복할 가능성과 예상 회복 기간을 추정해볼 수 있습니다. 이는 투자자가 하락장에서 인내심을 가지고 기다릴지, 아니면 추가 매수를 고려할지 결정하는 데 중요한 근거가 됩니다.</p>
+      <h2>Step 4: 관심종목 저장으로 꾸준히 모니터링</h2>
+      <p>매번 티커를 다시 입력하기 번거롭다면, 결과 화면 제목 옆의 별표(☆) 버튼을 눌러 관심종목으로 저장해두세요. 홈 화면에 저장한 종목들이 칩 형태로 표시되어, 클릭 한 번으로 바로 그 종목의 MDD를 다시 확인할 수 있습니다. 여러 종목을 저장해두고 주기적으로 방문해 하락률 추이를 비교하면, 시장을 매일 들여다보지 않아도 매수 타이밍을 놓치지 않을 수 있습니다.</p>
+      <div class="highlight-box"><p>🎯 <strong>이 4단계 활용법을 따르면 시장의 변동성을 이해하고, 감정적인 판단을 배제한 채 더 스마트하고 합리적인 매수 타이밍을 포착할 수 있습니다.</strong> MDD 분석기는 단순히 정보를 제공하는 것을 넘어, 투자자의 의사결정을 지원하는 강력한 파트너가 될 것입니다.</p></div>
+      <h2>추가 활용 팁</h2>
+      <ul>
+        <li><strong>분할 매수 전략 수립</strong>: MDD 차트와 회복률 분석을 바탕으로 자신만의 분할 매수 계획을 세울 수 있습니다. 예를 들어, -10% 하락 시 1차 매수, -20% 하락 시 2차 매수와 같이 단계별로 접근하는 전략입니다.</li>
+        <li><strong>리스크 관리</strong>: 자신이 감당할 수 있는 최대 MDD 수준을 미리 정해두고, 이를 초과할 경우 포트폴리오를 재조정하는 등 리스크 관리의 기준으로 활용할 수 있습니다.</li>
+        <li><strong>다양한 종목 비교</strong>: 여러 종목의 MDD를 비교하여 어떤 종목이 상대적으로 안정적인지, 어떤 종목이 더 큰 변동성을 가지는지 파악할 수 있습니다.</li>
+      </ul>
+      <p>MDD 분석기를 꾸준히 활용하여 시장을 이해하고, 자신만의 투자 원칙을 확립한다면 성공적인 투자에 한 걸음 더 다가갈 수 있을 것입니다.</p>`
+  }
+,
+  {
+    id: 16,
+    tag: '레버리지 ETF',
+    emoji: '🚀',
+    bg: '#fef3c7',
+    title: 'TQQQ vs QQQ: 레버리지 ETF의 진실 - MDD로 비교해보니',
+    excerpt: '3배 레버리지 ETF TQQQ는 정말 3배의 수익을 줌가요? 변동성 감쇠 효과와 MDD로 진실을 확인해보세요.',
+    date: '2026-04-05',
+    readTime: '9분',
+    content: `
+      <h1>레버리지 ETF의 진실: 양날의 검, 장기 투자의 함정</h1>
+      <div class="article-meta">📅 2026년 4월 5일 &nbsp;&bull;&nbsp; ⏱ 12분 읽기</div>
+      <p>레버리지 ETF(Exchange Traded Fund)는 특정 지수나 자산의 일일 수익률을 2배, 3배 등으로 추종하도록 설계된 상품입니다. 시장이 상승할 때 일반 ETF보다 훨씬 높은 수익률을 기대할 수 있어 많은 투자자들의 관심을 받지만, 이는 동시에 <strong>장기적으로는 원금 손실을 크게 키울 수 있는 양날의 검</strong>과 같습니다. 레버리지 ETF의 복잡한 구조와 내재된 위험성을 제대로 이해하지 못하고 투자할 경우, 예상치 못한 큰 손실을 경험할 수 있습니다. 이 글에서는 레버리지 ETF의 작동 원리와 주요 위험성을 심층적으로 분석하여 현명한 투자 결정을 돕고자 합니다.</p>
+      <h2>레버리지 ETF의 작동 원리: 일일 수익률 추종</h2>
+      <p>레버리지 ETF는 선물, 스왑 등 파생상품을 활용하여 목표 지수의 일일 수익률을 일정 배율로 추종합니다. 예를 들어, 3배 레버리지 ETF는 기초 지수가 1% 상승하면 3% 상승하고, 1% 하락하면 3% 하락하도록 설계됩니다. 여기서 핵심은 <strong>"일일 수익률"을 추종한다</strong>는 점입니다. 이 일일 재조정(Daily Rebalancing) 메커니즘 때문에 장기적으로는 기초 지수의 누적 수익률과 레버리지 ETF의 누적 수익률 사이에 큰 괴리가 발생할 수 있습니다.</p>
+      <h2>레버리지 ETF의 주요 위험성</h2>
+      <p>레버리지 ETF는 다음과 같은 여러 가지 위험 요소를 내포하고 있어 장기 투자에는 적합하지 않습니다.</p>
+      <ul>
+        <li><strong>복리 효과의 역작용 (Volatility Decay)</strong>: 시장이 횡보하거나 변동성이 큰 경우, 레버리지 ETF는 기초 지수보다 훨씬 큰 손실을 보게 됩니다. 예를 들어, 기초 지수가 첫날 10% 상승하고 다음 날 10% 하락하면 원금으로 돌아오지만, 2배 레버리지 ETF는 첫날 20% 상승 후 다음 날 20% 하락하면 원금보다 손실이 발생합니다. 이러한 복리 효과의 역작용은 장기적으로 손실을 가속화시키는 주된 원인입니다.</li>
+        <li><strong>롤오버 비용 (Roll-over Cost)</strong>: 레버리지 ETF는 주로 선물 계약을 통해 운용됩니다. 선물 계약은 만기가 존재하므로, 만기가 도래하면 다음 달 선물 계약으로 교체(롤오버)해야 합니다. 이 과정에서 발생하는 비용이 롤오버 비용이며, 이는 ETF의 운용 비용을 증가시켜 장기 수익률을 갉아먹는 요인이 됩니다.</li>
+        <li><strong>괴리율 (Tracking Error)</strong>: 레버리지 ETF는 파생상품을 통해 지수를 추종하므로, 기초 지수의 움직임과 레버리지 ETF의 실제 수익률 사이에 차이(괴리율)가 발생할 수 있습니다. 이는 운용사의 전략, 시장 상황, 거래 비용 등 다양한 요인에 의해 발생하며, 투자자가 예상한 수익률을 얻지 못하게 할 수 있습니다.</li>
+        <li><strong>유동성 위험</strong>: 일부 레버리지 ETF는 거래량이 적어 유동성 위험이 존재할 수 있습니다. 이는 투자자가 원하는 가격에 매수 또는 매도하기 어렵게 만들 수 있습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>레버리지 ETF는 단기적인 시장 예측에 기반한 투자에만 활용하고, 장기적인 관점에서의 투자는 피하는 것이 현명합니다.</strong> 특히 시장의 변동성이 높은 시기에는 더욱 신중한 접근이 필요합니다.</p></div>
+      <h2>현명한 레버리지 ETF 투자 전략</h2>
+      <p>레버리지 ETF의 위험성을 이해했다면, 다음과 같은 전략을 통해 보다 현명하게 접근할 수 있습니다.</p>
+      <ul>
+        <li><strong>단기 투자 목적</strong>: 레버리지 ETF는 단기적인 시장 상승에 베팅하거나, 헤지 목적으로 활용하는 것이 적합합니다. 장기적인 시장 방향성에 대한 확신이 있을 때 짧은 기간 동안 활용하는 것을 고려해야 합니다.</li>
+        <li><strong>시장 상황 분석</strong>: 시장의 변동성이 낮고 명확한 상승 추세가 예상될 때 레버리지 ETF를 고려할 수 있습니다. 횡보장이나 하락장에서는 복리 효과의 역작용으로 큰 손실을 볼 수 있습니다.</li>
+        <li><strong>손절매 원칙 준수</strong>: 레버리지 ETF는 손실이 빠르게 확대될 수 있으므로, 명확한 손절매 원칙을 세우고 이를 철저히 지키는 것이 중요합니다.</li>
+        <li><strong>소액 투자 및 분산</strong>: 전체 투자 자산에서 레버리지 ETF가 차지하는 비중을 매우 낮게 유지하고, 다른 안정적인 자산과 함께 분산 투자하여 위험을 관리해야 합니다.</li>
+      </ul>
+      <p>레버리지 ETF는 높은 수익률의 유혹만큼이나 큰 위험을 동반하는 상품입니다. 그 진실을 정확히 이해하고, 자신의 투자 목표와 위험 감수 수준에 맞춰 신중하게 접근한다면, 특정 상황에서 효과적인 투자 도구가 될 수 있을 것입니다. 하지만 장기적인 자산 증식을 목표로 한다면, 일반 ETF나 개별 주식에 대한 투자가 더 안정적인 선택일 수 있습니다.</p>`
+  },
+  {
+    id: 17,
+    tag: '분할매수',
+    emoji: '💰',
+    bg: '#f0fff4',
+    title: '분할매수(DCA) 완전 가이드: 언제, 얼마나, 어떻게 나누어 살 것인가',
+    excerpt: '분할매수의 3가지 전략(균등/계단식/후반집중)을 MDD와 함께 활용하는 방법을 알아보세요.',
+    date: '2026-04-10',
+    readTime: '8분',
+    content: `
+      <h1>분할매수(DCA) 완전 가이드: 언제, 얼마나, 어떻게 나누어 살 것인가</h1>
+      <div class="article-meta">📅 2026년 4월 10일 &nbsp;&bull;&nbsp; ⏱ 12분 읽기</div>
+      <p>분할매수(Dollar Cost Averaging, DCA)는 주식 시장의 변동성에 대응하고 투자 위험을 줄이는 가장 효과적인 전략 중 하나입니다. 시장의 타이밍을 정확히 예측하기 어렵다는 전제 하에, <strong>일정 금액을 주기적으로 나누어 매수</strong>함으로써 평균 매수 단가를 낮추고 장기적인 수익률을 안정적으로 추구하는 방식입니다. 특히 MDD(Maximum Drawdown, 최대 낙폭)와 같은 시장의 하락 지표를 함께 활용한다면, 단순히 기계적인 분할매수를 넘어 훨씬 스마트하고 전략적인 매수 타이밍을 잡을 수 있습니다. 이 가이드에서는 분할매수의 기본 원리부터 다양한 전략, 그리고 MDD와의 연계 활용법까지 심층적으로 다루겠습니다.</p>
+      <h2>분할매수(DCA)의 기본 원리 및 장점</h2>
+      <p>분할매수는 주가가 높을 때는 적은 수량을, 주가가 낮을 때는 많은 수량을 매수하게 되어 장기적으로 평균 매수 단가를 낮추는 효과를 가져옵니다. 이는 시장의 단기적인 등락에 대한 심리적 부담을 줄여주고, 투자자가 감정적인 판단으로 인해 손실을 보는 것을 방지하는 데 큰 도움이 됩니다.</p>
+      <ul>
+        <li><strong>심리적 안정</strong>: 시장 하락 시에도 꾸준히 매수함으로써 공포에 휩쓸리지 않고 투자 원칙을 지킬 수 있습니다.</li>
+        <li><strong>평균 매수 단가 하락</strong>: 주가가 낮을 때 더 많은 주식을 매수하여 장기적인 수익률을 개선합니다.</li>
+        <li><strong>시장 타이밍 예측 불필요</strong>: 시장의 저점을 정확히 맞추려는 시도 없이 꾸준히 투자할 수 있습니다.</li>
+      </ul>
+      <h2>3가지 주요 분할매수(DCA) 전략</h2>
+      <p>분할매수에는 투자자의 성향과 시장 상황에 따라 다양한 전략이 존재합니다. 여기서는 대표적인 3가지 전략을 소개합니다.</p>
+      <ul>
+        <li><strong>균등 분할 (Equal Amount Averaging)</strong>: 가장 단순하고 일반적인 방법으로, 매회 동일한 금액을 투자하는 방식입니다. 매월 100만원씩 투자하는 것이 대표적인 예시입니다. 시장 상황에 관계없이 꾸준함을 유지할 수 있다는 장점이 있습니다.</li>
+        <li><strong>계단식 분할 (Stepped Averaging)</strong>: 시장이 하락할수록 더 많은 금액을 투자하는 전략입니다. 예를 들어, MDD가 -10%에 도달할 때마다 투자 금액의 비율을 증가시키는 방식입니다. 시장의 하락을 매수 기회로 적극 활용하여 평균 매수 단가를 더욱 효과적으로 낮출 수 있습니다.</li>
+        <li><strong>후반 집중 분할 (Late-Stage Concentrated Averaging)</strong>: 시장의 저점을 어느 정도 확인한 후 집중적으로 매수하는 전략입니다. 이는 시장의 큰 하락이 마무리되는 시점을 예측해야 하므로, 어느 정도 시장 분석 능력이 요구됩니다.</li>
+      </ul>
+      <h2>MDD와 분할매수(DCA)를 함께 활용하기</h2>
+      <p>MDD 분석기를 통해 특정 종목의 역사적 최대 낙폭과 회복 패턴을 이해한다면, 분할매수 전략을 더욱 정교하게 수립할 수 있습니다.</p>
+      <ul>
+        <li><strong>MDD 기반 계단식 분할매수</strong>: 예를 들어, 특정 종목의 MDD가 -20%에 도달하면 전체 투자 예산의 30%를 진입하고, -30%에 도달하면 추가 30%, -40%에 도달하면 나머지 40%를 투자하는 계단식 DCA 전략은 역사적으로 좋은 성과를 보여왔습니다. 이는 시장의 공포가 극에 달했을 때 용기 있는 매수를 통해 장기적인 수익률을 극대화하는 방법입니다.</li>
+        <li><strong>MDD 회복률과 연계</strong>: MDD 분석기의 회복률 데이터를 참고하여, 특정 낙폭 구간에서 주가가 회복될 확률이 높은 시점에 분할매수를 시작하는 것도 좋은 전략입니다.</li>
+      </ul>
+      <div class="highlight-box"><p>📊 <strong>도구 탭의 분할매수 계획 계산기를 활용하면, 다양한 전략에 따른 매수 시나리오를 직접 시뮬레이션해볼 수 있습니다.</strong> 이를 통해 자신에게 가장 적합한 분할매수 전략을 찾아보세요.</p></div>
+      <h2>분할매수 시 주의사항</h2>
+      <ul>
+        <li><strong>장기적인 관점 유지</strong>: 분할매수는 단기적인 시장 예측이 아닌, 장기적인 관점에서 꾸준히 실행될 때 가장 큰 효과를 발휘합니다.</li>
+        <li><strong>투자 원칙 준수</strong>: 미리 세운 분할매수 계획을 감정적인 요인에 흔들리지 않고 꾸준히 지키는 것이 중요합니다.</li>
+        <li><strong>기업 분석 병행</strong>: 단순히 가격이 하락했다고 무조건 매수하기보다는, 기업의 펀더멘털이 여전히 견고한지 확인하는 과정이 필요합니다.</li>
+      </ul>
+      <p>분할매수는 시장의 불확실성 속에서도 투자자가 안정적으로 자산을 증식시킬 수 있도록 돕는 현명한 투자 전략입니다. MDD 분석기와 분할매수 계획 계산기를 활용하여 자신만의 투자 원칙을 세우고, 성공적인 투자 여정을 이어가시길 바랍니다.</p>`
+  },
+  {
+    id: 18,
+    tag: '환율 투자',
+    emoji: '💱',
+    bg: '#f0f4ff',
+    title: '미국 주식 투자 시 환율이 수익률에 미치는 영향',
+    excerpt: '원화/달러 환율 변동이 미국 주식 수익률에 어떻게 영향을 미치는지, 환율 리스크를 관리하는 방법을 알아보세요.',
+    date: '2026-04-15',
+    readTime: '7분',
+    content: `
+      <h1>미국 주식 투자 시 환율이 수익률에 미치는 영향: 숨겨진 변수, 환율 리스크 관리</h1>
+      <div class="article-meta">📅 2026년 4월 15일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>한국 투자자가 미국 주식에 투자할 때, 단순히 주가 상승률만 고려해서는 안 됩니다. <strong>주가 수익률과 함께 원화 대비 달러 환율 변동이 실제 투자 수익률에 미치는 영향</strong>을 반드시 이해해야 합니다. 주가가 아무리 크게 올랐더라도 원화가 달러 대비 강세를 보인다면, 즉 환율이 하락한다면 실제 원화 기준의 수익률은 기대보다 낮아질 수 있기 때문입니다. 반대로 주가가 횡보하거나 소폭 하락했더라도 환율이 상승한다면, 예상치 못한 환차익을 얻을 수도 있습니다. 이 글에서는 환율이 미국 주식 투자 수익률에 어떻게 영향을 미치는지, 그리고 환율 리스크를 효과적으로 관리하는 방법에 대해 심층적으로 알아보겠습니다.</p>
+      <h2>환율이 투자 수익률에 미치는 영향</h2>
+      <p>미국 주식에 투자하는 한국 투자자의 최종 수익률은 다음과 같은 공식으로 이해할 수 있습니다.</p>
+      <div class="highlight-box"><p><strong>최종 수익률 = (주가 변동률 + 1) × (환율 변동률 + 1) - 1</strong></p></div>
+      <p>예를 들어, 주가가 20% 상승하고 환율이 10% 하락(원화 강세)한 경우를 살펴보겠습니다.</p>
+      <div class="highlight-box"><p>주가 +20% 상승, 환율 -10% 하락 → 실제 수익률 = (1.2 × 0.9) - 1 = 1.08 - 1 = <strong>+8%</strong></p></div>
+      <p>이처럼 주가 상승률이 높았음에도 불구하고 환율 하락으로 인해 실제 원화 기준 수익률은 크게 감소할 수 있습니다. 반대로 주가가 10% 하락했지만 환율이 20% 상승(원화 약세)했다면 다음과 같습니다.</p>
+      <div class="highlight-box"><p>주가 -10% 하락, 환율 +20% 상승 → 실제 수익률 = (0.9 × 1.2) - 1 = 1.08 - 1 = <strong>+8%</strong></p></div>
+      <p>이 경우 주가는 하락했지만 환차익으로 인해 오히려 수익을 얻는 결과가 나타납니다. 이는 환율이 미국 주식 투자에 있어 얼마나 중요한 변수인지 보여줍니다.</p>
+      <h2>환율 리스크 관리 방법</h2>
+      <p>환율 변동은 예측하기 매우 어렵기 때문에, 투자자는 환율 리스크를 효과적으로 관리하기 위한 전략을 수립해야 합니다.</p>
+      <ul>
+        <li><strong>장기 보유 전략</strong>: 단기적인 환율 변동은 예측하기 어렵지만, 장기적으로는 평균으로 회귀하는 경향이 있습니다. 따라서 장기적인 관점에서 투자한다면 단기적인 환율 변동의 영향이 희석되어 평균화될 수 있습니다.</li>
+        <li><strong>원화 자산과 혼합 투자</strong>: 포트폴리오에 원화 자산(예: 국내 주식, 원화 예금)과 달러 자산(예: 미국 주식)을 적절히 혼합하여 보유함으로써 환율 리스크를 분산할 수 있습니다. 원화가 강세일 때는 국내 자산이 유리하고, 원화가 약세일 때는 달러 자산이 유리하므로 서로 상쇄 효과를 기대할 수 있습니다.</li>
+        <li><strong>정기적인 환전 또는 분할 환전</strong>: 환율이 유리하다고 판단될 때마다 일정 금액을 정기적으로 환전하거나, 여러 차례에 걸쳐 분할 환전하는 전략입니다. 이는 환율의 저점을 정확히 맞추기보다는 평균적인 환전 단가를 낮추는 효과를 가져옵니다.</li>
+        <li><strong>환헤지 상품 활용</strong>: 선물환 계약이나 환헤지 ETF와 같은 금융 상품을 활용하여 환율 변동 위험을 회피할 수 있습니다. 하지만 이러한 상품들은 추가적인 비용이 발생하거나 복잡성이 따를 수 있으므로 신중하게 고려해야 합니다.</li>
+      </ul>
+      <h2>2024년 환율 영향 사례 (가상의 예시)</h2>
+      <p>2024년 상반기, 원화가 달러 대비 약 10% 강세를 보였다고 가정해봅시다. 이 기간 동안 미국 주식에 투자한 한국인 투자자는 주가 상승률이 15%였다면, 실제 원화 기준 수익률은 (1.15 * 0.9) - 1 = 0.035, 즉 3.5%에 그쳤을 것입니다. 반대로 하반기에 원화가 5% 약세를 보였다면, 주가 상승률이 10%였을 때 실제 수익률은 (1.1 * 1.05) - 1 = 0.155, 즉 15.5%가 되었을 것입니다. 이처럼 환율은 투자 수익률에 직접적인 영향을 미치므로, 항상 주시해야 할 요소입니다.</p>
+      <p>미국 주식 투자는 매력적인 기회를 제공하지만, 환율이라는 숨겨진 변수를 반드시 고려해야 합니다. 환율의 기본적인 원리를 이해하고, 자신에게 맞는 환율 리스크 관리 전략을 수립한다면 더욱 안정적이고 성공적인 해외 투자 경험을 할 수 있을 것입니다. MDD 분석기와 함께 환율 계산기를 활용하여 자신의 투자 전략을 더욱 견고하게 만들어보세요.</p>`
+  },
+  {
+    id: 19,
+    tag: '수익률 계산',
+    emoji: '💹',
+    bg: '#fff5f5',
+    title: '주식 수익률 계산법: 매수가와 매도가로 실제 수익률 계산하기',
+    excerpt: '주식 수익률을 정확하게 계산하는 방법. 수수료, 세금, 환율까지 포함한 실제 수익률을 계산해보세요.',
+    date: '2026-04-20',
+    readTime: '6분',
+    content: `
+      <h1>주식 수익률 계산법: 매수가와 매도가로 실제 수익률 계산하기</h1>
+      <div class="article-meta">📅 2026년 4월 20일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>주식 투자에서 수익률을 계산하는 것은 투자 성과를 평가하는 가장 기본적인 과정입니다. 하지만 단순히 매수가와 매도가만으로 수익률을 계산하는 것은 실제 투자 성과를 정확히 반영하지 못할 수 있습니다. <strong>거래 수수료, 세금, 그리고 해외 주식의 경우 환율 변동까지</strong> 다양한 요소를 고려해야 비로소 실제 손에 쥐는 수익률을 파악할 수 있습니다. 이 글에서는 주식 수익률을 정확하게 계산하는 방법과 함께, 간과하기 쉬운 추가 비용 및 환율의 영향을 심층적으로 다루겠습니다.</p>
+      <h2>기본 주식 수익률 계산</h2>
+      <p>가장 기본적인 주식 수익률 계산 공식은 다음과 같습니다.</p>
+      <div class="highlight-box"><p><strong>수익률 = ( (매도가 - 매수가) / 매수가 ) × 100</strong></p></div>
+      <p>예를 들어, 10,000원에 매수한 주식을 12,000원에 매도했다면, 수익률은 ((12,000 - 10,000) / 10,000) × 100 = 20%가 됩니다. 하지만 이 계산은 실제 투자에서 발생하는 여러 비용을 전혀 고려하지 않은 것입니다.</p>
+      <h2>수수료 및 세금 고려</h2>
+      <p>실제 수익률을 계산할 때는 다음과 같은 수수료와 세금을 반드시 포함해야 합니다.</p>
+      <ul>
+        <li><strong>증권사 거래 수수료</strong>: 주식을 매수하거나 매도할 때 증권사에 지불하는 수수료입니다. 온라인 거래의 경우 매우 낮지만, 거래 금액이 크거나 빈번할 경우 무시할 수 없는 수준이 될 수 있습니다.</li>
+        <li><strong>거래세 (국내 주식)</strong>: 국내 주식을 매도할 때 부과되는 세금입니다. 현재 코스피/코스닥 모두 0.20%의 세율이 적용됩니다.</li>
+        <li><strong>양도소득세 (해외 주식)</strong>: 해외 주식 투자로 연간 250만원을 초과하는 수익을 얻었을 경우, 초과분에 대해 22% (지방소득세 포함)의 양도소득세가 부과됩니다. 이는 국내 주식과 달리 매년 정산해야 하는 중요한 세금입니다.</li>
+        <li><strong>배당 소득세</strong>: 주식 보유를 통해 배당금을 받았다면, 배당금에 대해서도 소득세가 부과됩니다. 국내 주식은 15.4%, 해외 주식은 국가별로 다르지만 미국 주식의 경우 15%의 원천징수세율이 적용됩니다.</li>
+      </ul>
+      <p>이러한 비용들을 모두 고려한 실제 수익률은 다음과 같이 계산할 수 있습니다.</p>
+      <div class="highlight-box"><p><strong>실제 수익률 = ( (매도가 - 매수가 - 총 수수료 - 총 세금) / (매수가 + 매수 수수료) ) × 100</strong></p></div>
+      <h2>환율 영향 (미국 주식 투자 시)</h2>
+      <p>미국 주식과 같은 해외 주식에 투자할 때는 환율 변동이 수익률에 미치는 영향을 반드시 고려해야 합니다. 주식을 매수할 때의 환율과 매도할 때의 환율이 다르기 때문입니다.</p>
+      <ul>
+        <li><strong>환율 상승 (원화 약세)</strong>: 주가 수익률이 낮더라도 환율이 상승하면 환차익이 발생하여 전체 수익률이 증가할 수 있습니다.</li>
+        <li><strong>환율 하락 (원화 강세)</strong>: 주가 수익률이 높더라도 환율이 하락하면 환차손이 발생하여 전체 수익률이 감소할 수 있습니다.</li>
+      </ul>
+      <p>환율까지 고려한 실제 수익률 계산은 복잡해지므로, 별도의 환율 계산기를 활용하거나 다음과 같은 개념을 이해하는 것이 중요합니다.</p>
+      <div class="highlight-box"><p><strong>최종 원화 수익 = (매도 주가 × 매도 시점 환율) - (매수 주가 × 매수 시점 환율) - 총 수수료 - 총 세금</strong></p></div>
+      <p>이처럼 환율은 해외 주식 투자 수익률의 숨겨진 변수이므로, 투자 결정 시 반드시 고려해야 합니다.</p>
+      <div class="highlight-box"><p>💡 <strong>도구 탭의 수익률 계산기를 활용하면 매수가, 매도가, 수량, 수수료, 세금, 그리고 환율까지 모든 요소를 반영한 실제 수익률을 간편하게 계산해볼 수 있습니다.</strong> 복잡한 계산 없이 자신의 투자 성과를 정확하게 파악하고, 더 나은 투자 전략을 수립하는 데 도움을 받으세요!</p></div>
+      <h2>결론</h2>
+      <p>주식 수익률 계산은 단순히 숫자를 나열하는 것을 넘어, 투자 성과를 객관적으로 평가하고 미래 투자 전략을 개선하는 데 필수적인 과정입니다. 수수료, 세금, 환율 등 다양한 요소를 정확히 이해하고 계산에 반영함으로써, 투자자들은 자신의 실제 수익률을 명확하게 파악하고 보다 현명한 투자 결정을 내릴 수 있을 것입니다. MDD 분석기와 함께 수익률 계산기를 활용하여 성공적인 투자 여정을 이어가시길 바랍니다.</p>`
+  },
+  {
+    id: 20,
+    tag: '시장 분석',
+    emoji: '🔭',
+    bg: '#f0f4ff',
+    title: 'AAPL 주가 MDD 분석: 애플의 역사적 하락과 회복 패턴',
+    excerpt: '애플(AAPL)의 역대 최대 하락률을 분석하고, 투자자들이 어떻게 대응했는지 알아보세요.',
+    date: '2026-04-25',
+    readTime: '8분',
+    content: `
+      <h1>AAPL 주가 MDD 분석</h1>
+      <div class="article-meta">📅 2026년 4월 25일 &nbsp;&bull;&nbsp; ⏱ 8분 읽기</div>
+      <p>애플(AAPL)은 세계 시가액 1위 기업으로, 안정적인 수익률을 보여왜지만 <strong>여러 차례의 큰 하락</strong>도 겪었습니다.</p>
+      <h2>애플 주요 MDD 히스토리</h2>
+      <ul>
+        <li><strong>2000년 IT 버블</strong>: -81% (가장 큰 하락)</li>
+        <li><strong>2008년 금융위기</strong>: -61%</li>
+        <li><strong>2020년 코로나</strong>: -32% (2개월 만에 회복)</li>
+        <li><strong>2022년 금리인상</strong>: -28%</li>
+      </ul>
+      <div class="highlight-box"><p>💡 애플은 대부분의 하락에서 <strong>12개월 이내 회복</strong>하는 안정적인 패턴을 보여왜습니다. 다만 2000년 IT 버블 때는 회복에 수년이 소요되었습니다.</p></div>
+      <h2>MDD 분석기로 AAPL 조회하기</h2>
+      <p>MDD 분석기에서 'AAPL'을 입력하면 현재 고점 대비 하락률과 역사적 회복 패턴을 확인할 수 있습니다.</p>
+    `
+  },
+  {
+    id: 21,
+    tag: '실전 투자',
+    emoji: '🎯',
+    bg: '#fffff0',
+    title: '주식 매수 전 반드시 확인해야 할 5가지 지표',
+    excerpt: 'MDD, RSI, 거래량, PER, 이동평균선. 주식 매수 전 반드시 확인해야 할 5가지 핵심 지표를 알아보세요.',
+    date: '2026-05-01',
+    readTime: '9분',
+    content: `
+      <h1>주식 매수 전 반드시 확인해야 할 5가지 지표</h1>
+      <div class="article-meta">📅 2026년 5월 1일 &nbsp;&bull;&nbsp; ⏱ 9분 읽기</div>
+      <p>주식을 살 때 하나의 지표만 보면 실패할 수 있습니다. <strong>5가지 지표를 종합적으로 확인</strong>하면 더 안전한 매수가 가능합니다.</p>
+      <h2>1. MDD (최대 낙폭)</h2>
+      <p>현재 고점 대비 하락률. -30% 이상이면 역사적 매수 구간에 진입하는 것을 검토하세요.</p>
+      <h2>2. RSI (상대강도지수)</h2>
+      <p>RSI 30 이하는 과매도 구간. MDD와 RSI가 동시에 낙은 것은 강력한 매수 신호입니다.</p>
+      <h2>3. 거래량 확인</h2>
+      <p>하락 시 거래량이 급증하면 패닉 셀링, 거래량이 줄면서 하락하면 자연스러운 조정 가능성이 높습니다.</p>
+      <h2>4. PER (주가수익비율)</h2>
+      <p>업종 평균 PER 대비 낮으면 저평가 가능성. 다만 성장주는 PER이 높아도 정상일 수 있습니다.</p>
+      <h2>5. 이동평균선 (50일, 200일)</h2>
+      <p>50일 이동평균선이 200일을 위로 돌파하는 골든크로스는 상승 신호입니다.</p>
+      <div class="highlight-box"><p>🎯 5가지 지표 중 3개 이상이 매수 신호를 보낼 때 진입을 검토하는 것이 안전합니다.</p></div>
+    `
+  },
+  {
+    id: 22,
+    tag: '투자 심리',
+    emoji: '🧠',
+    bg: '#fdf2f8',
+    title: '주식 투자자의 가장 큰 적: 심리적 편향 7가지',
+    excerpt: '손실 회피, 확증 편향, FOMO... 주식 투자자를 망치는 심리적 함정을 알고 피하는 방법을 알아보세요.',
+    date: '2026-05-05',
+    readTime: '8분',
+    content: `
+      <h1>주식 투자자의 가장 큰 적: 심리적 편향 7가지</h1>
+      <div class="article-meta">📅 2026년 5월 5일 &nbsp;&bull;&nbsp; ⏱ 8분 읽기</div>
+      <p>주식 투자에서 실패하는 원인의 80%는 <strong>심리적 편향</strong>에 있습니다. 데이터가 아니라 우리의 두뇌가 적입니다.</p>
+      <h2>1. 손실 회피 편향</h2>
+      <p>손실이 확정되는 것이 두려워 주가가 내려가도 파는 않는 심리. MDD -50%가 되어도 잘못된 종목을 계속 보유하는 원인입니다.</p>
+      <h2>2. 확증 편향</h2>
+      <p>자신의 생각을 확인해주는 정보만 찾는 심리. 다양한 관점의 정보를 적극적으로 찾아야 합니다.</p>
+      <h2>3. FOMO (놓치는 것에 대한 두려움)</h2>
+      <p>주가가 오를 때 서둘러 매수하는 심리. MDD가 낮을 때는 오히려 매수를 자제하는 것이 현명합니다.</p>
+      <h2>4. 과신 편향</h2>
+      <p>자신의 주식 선택 능력을 과대평가하는 심리. 데이터와 시스템에 의존하는 것이 더 안전합니다.</p>
+      <h2>5. 단기 사고</h2>
+      <p>장기 성과를 위해 단기 변동에 과장 반응하는 심리.</p>
+      <h2>6. 앙커링 편향</h2>
+      <p>주가를 처음 산 가격에 고정하는 심리. 시장 가격은 단순한 숫자가 아닙니다.</p>
+      <h2>7. 헤딩 편향</h2>
+      <p>다수의 사람이 사는 주식이라면 좋을 것이라는 심리. 다수가 틀릴 때가 많습니다.</p>
+      <div class="highlight-box"><p>🧠 MDD 분석기로 데이터를 확인하고 시스템적으로 매수하면 심리적 편향을 줄일 수 있습니다.</p></div>
+    `
+  },
+  {
+    id: 23,
+    tag: 'ETF 전략',
+    emoji: '📊',
+    bg: '#f0fff4',
+    title: 'SPY, QQQ, VTI 중 어떤 ETF가 나에게 맞는가?',
+    excerpt: '대표적인 3가지 ETF의 MDD, 수익률, 수수료를 비교하고 나에게 맞는 ETF를 찾아보세요.',
+    date: '2026-05-10',
+    readTime: '8분',
+    content: `
+      <h1>SPY, QQQ, VTI 중 어떤 ETF가 나에게 맞는가?</h1>
+      <div class="article-meta">📅 2026년 5월 10일 &nbsp;&bull;&nbsp; ⏱ 8분 읽기</div>
+      <p>미국 주식에 투자하는 가장 쉽는 방법은 ETF입니다. <strong>SPY, QQQ, VTI</strong> 세 가지를 비교해보겠습니다.</p>
+      <h2>SPY (S&P 500 ETF)</h2>
+      <ul>
+        <li>추적 지수: S&P 500 (500개 대형주)</li>
+        <li>연평균 수익률: 약 10%</li>
+        <li>역대 최대 MDD: -57% (2009년)</li>
+        <li>수수료: 0.09%</li>
+      </ul>
+      <h2>QQQ (NASDAQ 100 ETF)</h2>
+      <ul>
+        <li>추적 지수: 나스닥 100 (기술주 중심)</li>
+        <li>연평균 수익률: 약 13%</li>
+        <li>역대 최대 MDD: -83% (2002년)</li>
+        <li>수수료: 0.20%</li>
+      </ul>
+      <h2>VTI (전체 미국 주식 시장 ETF)</h2>
+      <ul>
+        <li>추적 지수: CRSP US Total Market Index</li>
+        <li>연평균 수익률: 약 10%</li>
+        <li>역대 최대 MDD: -55%</li>
+        <li>수수료: 0.03% (가장 저렴)</li>
+      </ul>
+      <div class="highlight-box"><p>💡 안정적 투자자는 VTI, 성장 집중은 QQQ, 균형 잡힌 투자는 SPY가 적합합니다.</p></div>
+    `
+  },
+  {
+    id: 24,
+    tag: '장기 투자',
+    emoji: '⏳',
+    bg: '#fffff0',
+    title: '10년 장기 투자자가 MDD를 대하는 방법',
+    excerpt: '장기 투자자는 MDD를 어떻게 바라요? 단기 투자자와 완전히 다른 시각으로 MDD를 활용하는 방법을 알아보세요.',
+    date: '2026-05-15',
+    readTime: '7분',
+    content: `
+      <h1>10년 장기 투자자가 MDD를 대하는 방법</h1>
+      <div class="article-meta">📅 2026년 5월 15일 &nbsp;&bull;&nbsp; ⏱ 7분 읽기</div>
+      <p>장기 투자자에게 MDD는 <strong>'싸게 살 기회'</strong>입니다. 단기 투자자에게는 '위험 신호'이지만, 장기 투자자에게는 '할인 시점'입니다.</p>
+      <h2>장기 투자자의 MDD 활용법</h2>
+      <ul>
+        <li>MDD -30% 이상: 매월 정기 매수 시작</li>
+        <li>MDD -50% 이상: 적극적 추가 매수 (단, 재정적 여유 있을 때)</li>
+        <li>MDD -70% 이상: 역사적 최저점 구간 검토</li>
+      </ul>
+      <h2>10년 동안 MDD를 견들면?</h2>
+      <p>S&P 500은 1928년부터 현재까지 <strong>10년 동안 마이너스 수익률을 기록한 적이 없습니다</strong>. MDD를 견디는 인내심이 장기 투자의 핵심입니다.</p>
+      <div class="highlight-box"><p>⏳ 시간은 장기 투자자의 가장 큰 원군입니다. MDD를 견디는 인내심이 벵리 투자의 마술을 완성합니다.</p></div>
+    `
+  },
+  {
+    id: 25,
+    tag: '투자 시작',
+    emoji: '🌱',
+    bg: '#f0fff4',
+    title: '주식 투자 완전 초보 가이드: MDD로 시작하는 첫 투자',
+    excerpt: '주식 투자를 시작하는 분들을 위한 완전 가이드. MDD로 첫 투자를 시작하는 방법을 단계별로 알려드립니다.',
+    date: '2026-05-20',
+    readTime: '10분',
+    content: `
+      <h1>주식 투자 완전 초보 가이드</h1>
+      <div class="article-meta">📅 2026년 5월 20일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>주식 투자를 시작하려는데 어디서부터 시작해야 할지 몰라서 릩설이실 분들을 위한 <strong>완전 시작 가이드</strong>입니다.</p>
+      <h2>Step 1: 증권사 계좌 개설</h2>
+      <p>미국 주식을 사려면 한국에서 해외주식 거래를 지원하는 증권사에 계좌를 개설해야 합니다. 주요 증권사: 미래에셋, 한투증권, 코리아인베스트먼트 등</p>
+      <h2>Step 2: 종목 선정</h2>
+      <p>처음에는 <strong>ETF로 시작</strong>하는 것을 권장합니다. SPY, QQQ, VTI 중 하나를 선택하세요. 개별 주식은 리스크가 크니 어느 정도 투자 경험이 생긴 후에 시작하세요.</p>
+      <h2>Step 3: MDD 분석기로 매수 타이밍 잡기</h2>
+      <p>MDD 분석기에 종목을 입력하고 현재 고점 대비 하락률을 확인하세요. -20% 이상 하락 시 소액으로 첫 매수를 검토하세요.</p>
+      <h2>Step 4: 소액으로 시작</h2>
+      <p>첫 투자는 마음편하게 들어갈 수 있는 소액으로 시작하세요. 주식은 단마에 살 수 있는 돈으로만 투자하는 것이 원칙입니다.</p>
+      <div class="highlight-box"><p>🌱 주식 투자는 시작하는 것이 가장 어렵습니다. 오늘 MDD 분석기로 첫 종목을 조회해보세요!</p></div>
+    `
+  }
+];
+
+// ========== 관련 글 & CTA ==========
+const RELATED_POSTS = {
+  1:[15,4,11], 2:[12,9,20], 3:[17,1,15], 4:[7,24,14], 5:[3,10,19],
+  6:[11,24,19], 7:[23,16,13], 8:[22,21,10], 9:[2,12,20], 10:[8,3,22],
+  11:[24,6,13], 12:[2,9,20], 13:[7,23,11], 14:[4,3,24], 15:[1,21,25],
+  16:[7,23,13], 17:[3,6,11], 18:[19,25,21], 19:[18,6,17], 20:[2,12,9],
+  21:[15,25,10], 22:[8,10,3], 23:[7,16,13], 24:[11,6,13], 25:[1,15,21]
+};
+
+const CTA_MAP = {
+  1:{type:'home', label:'내 관심 종목 MDD 직접 확인해보기'},
+  2:{type:'ticker', value:'TSLA', label:'TSLA MDD 지금 확인하기'},
+  3:{type:'home', label:'관심 종목 하락폭 확인하고 매수 타이밍 잡기'},
+  4:{type:'ticker', value:'SPY', label:'SPY MDD 지금 확인하기'},
+  5:{type:'page', value:'rsi', label:'RSI 계산기 써보기'},
+  6:{type:'page', value:'dividend', label:'배당 수익률 계산기 써보기'},
+  7:{type:'ticker', value:'QQQ', label:'QQQ MDD 지금 확인하기'},
+  8:{type:'home', label:'감정 대신 데이터로 확인해보기'},
+  9:{type:'ticker', value:'MSFT', label:'MSFT MDD 지금 확인하기'},
+  10:{type:'home', label:'내 종목 손절 기준 데이터로 잡아보기'},
+  11:{type:'page', value:'compound', label:'복리 계산기로 장기 수익 확인하기'},
+  12:{type:'ticker', value:'NVDA', label:'NVDA MDD 지금 확인하기'},
+  13:{type:'home', label:'포트폴리오 종목별 MDD 비교해보기'},
+  14:{type:'home', label:'지금 시장 사이클 위치 확인해보기'},
+  15:{type:'page', value:'tools', label:'전체 도구 모음 보러가기'},
+  16:{type:'page', value:'leverage', label:'레버리지 ETF 계산기 써보기'},
+  17:{type:'page', value:'dca', label:'분할매수 계산기 써보기'},
+  18:{type:'page', value:'fx', label:'환율 계산기 써보기'},
+  19:{type:'page', value:'roi', label:'수익률 계산기 써보기'},
+  20:{type:'ticker', value:'AAPL', label:'AAPL MDD 지금 확인하기'},
+  21:{type:'home', label:'5가지 지표 직접 확인해보기'},
+  22:{type:'home', label:'감정 대신 데이터로 확인해보기'},
+  23:{type:'ticker', value:'VTI', label:'VTI MDD 지금 확인하기'},
+  24:{type:'page', value:'compound', label:'복리 계산기로 장기 수익 확인하기'},
+  25:{type:'ticker', value:'SPY', label:'첫 종목 SPY로 시작해보기'}
+};
+
+function getRelatedPostsHtml(id) {
+  const ids = RELATED_POSTS[id] || [];
+  const cards = ids.map(rid => {
+    const p = BLOG_POSTS.find(post => post.id === rid);
+    if (!p) return '';
+    return `
+      <div class="related-card" onclick="showBlogPost(${p.id})">
+        <div class="related-card-tag">${p.tag}</div>
+        <div class="related-card-title">${p.title}</div>
+      </div>
+    `;
+  }).join('');
+  if (!cards) return '';
+  return `
+    <div class="related-posts">
+      <h3>📚 이어서 보면 좋은 글</h3>
+      <div class="related-grid">${cards}</div>
+    </div>
+  `;
+}
+
+function getCtaHtml(id) {
+  const cta = CTA_MAP[id];
+  if (!cta) return '';
+  return `
+    <div class="blog-cta">
+      <div class="blog-cta-text">👉 지금 배운 내용을 실제 데이터로 확인해보세요</div>
+      <button class="blog-cta-btn" onclick="handleBlogCta(${id})">${cta.label}</button>
+    </div>
+  `;
+}
+
+function handleBlogCta(id) {
+  const cta = CTA_MAP[id];
+  if (!cta) return;
+  if (cta.type === 'ticker') {
+    // MDD 계산기(홈)로 이동하면서 티커를 쿼리파라미터로 전달 → 홈 페이지 로드 시 자동 조회
+    window.location.href = '/?ticker=' + encodeURIComponent(cta.value);
+  } else if (cta.type === 'page') {
+    navigate(cta.value);
+  } else {
+    navigate('home');
+  }
+}
+
+function renderBlogGrid() {
+  const grid = document.getElementById('blogGrid');
+  if (!grid) return;
+  grid.innerHTML = BLOG_POSTS.map(post => `
+    <div class="blog-card" onclick="showBlogPost(${post.id})">
+      <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
+      <div class="blog-card-body">
+        <div class="blog-card-tag">${post.tag}</div>
+        <div class="blog-card-title">${post.title}</div>
+        <div class="blog-card-excerpt">${post.excerpt}</div>
+        <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showBlogPost(id) {
+  const post = BLOG_POSTS.find(p => p.id === id);
+  if (!post) return;
+  const detail = document.getElementById('blogDetail');
+  const list = document.getElementById('blogList');
+  detail.innerHTML = `
+    <div class="blog-article">
+      <div class="back-btn" onclick="showBlogList()">← 목록으로 돌아가기</div>
+      ${post.content}
+      ${getCtaHtml(id)}
+      ${getRelatedPostsHtml(id)}
+    </div>
+  `;
+  list.style.display = 'none';
+  detail.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showBlogList() {
+  document.getElementById('blogList').style.display = 'block';
+  document.getElementById('blogDetail').style.display = 'none';
+}
+
+// ========== 환율 계산기 ==========
+let KRW_RATE = 1380;
+
+function updateFxRate() {
+  const newRate = parseFloat(document.getElementById('fxRate').value);
+  if (!isNaN(newRate) && newRate > 0) {
+    KRW_RATE = newRate;
+    document.getElementById('displayRate').textContent = `$1 = ₩${KRW_RATE.toLocaleString()}`;
+    calcFxFromUsd();
+    calcFxFromKrw();
+  }
+}
+
+function calcFxFromUsd() {
+  const usd = parseFloat(document.getElementById('fxUsd').value);
+  const result = document.getElementById('fxResult');
+  if (isNaN(usd) || usd <= 0) { result.innerHTML = ''; return; }
+  const krw = usd * KRW_RATE;
+  result.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-box"><div class="label">환산 원화</div><div class="value" style="color:#2b6cb0;">₩${krw.toLocaleString('ko-KR', {maximumFractionDigits:0})}</div></div>
+      <div class="stat-box"><div class="label">적용 환율</div><div class="value">$1 = ₩${KRW_RATE.toLocaleString()}</div></div>
+    </div>`;
+}
+
+function calcFxFromKrw() {
+  const krw = parseFloat(String(document.getElementById('fxKrw').value).replace(/,/g, ''));
+  const result = document.getElementById('fxResult');
+  if (isNaN(krw) || krw <= 0) { result.innerHTML = ''; return; }
+  const usd = krw / KRW_RATE;
+  result.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-box"><div class="label">환산 달러</div><div class="value" style="color:#2b6cb0;">$${usd.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">적용 환율</div><div class="value">$1 = ₩${KRW_RATE.toLocaleString()}</div></div>
+    </div>`;
+}
+
+// ========== 수익률 계산기 ==========
+function calcROI() {
+  const buy = parseFloat(document.getElementById('roiBuy').value);
+  const sell = parseFloat(document.getElementById('roiSell').value);
+  const shares = parseFloat(document.getElementById('roiShares').value) || 1;
+  const result = document.getElementById('roiResult');
+  if (isNaN(buy) || isNaN(sell) || buy <= 0) { result.innerHTML = ''; return; }
+  const pnl = (sell - buy) * shares;
+  const pct = ((sell - buy) / buy) * 100;
+  const pnlKrw = pnl * KRW_RATE;
+  const isProfit = pnl >= 0;
+  const color = isProfit ? '#38a169' : '#e53e3e';
+  const sign = isProfit ? '+' : '';
+  result.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-box"><div class="label">수익률</div><div class="value" style="color:${color};">${sign}${pct.toFixed(2)}%</div></div>
+      <div class="stat-box"><div class="label">수익금 (USD)</div><div class="value" style="color:${color};">${sign}$${pnl.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">원화 환산</div><div class="value" style="color:${color};">${sign}₩${Math.round(pnlKrw).toLocaleString()}</div></div>
+      <div class="stat-box"><div class="label">보유 수량</div><div class="value">${shares}주</div></div>
+    </div>
+    <div style="background:${isProfit?'#c6f6d5':'#fed7d7'}; color:${isProfit?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:14px;">
+      ${isProfit ? '🚀' : '📉'} 매수가 $${buy.toFixed(2)} → 매도가 $${sell.toFixed(2)} — <strong>${sign}${pct.toFixed(2)}% (${sign}$${pnl.toFixed(2)})</strong>
+    </div>`;
+}
+
+// ========== 복리 계산기 ==========
+function calcCompound() {
+  const resultEl = document.getElementById('cpResult');
+  if (!resultEl) return;
+
+  const init = parseFloat(document.getElementById('cpInit').value) || 0;
+  const monthly = parseFloat(document.getElementById('cpMonthly').value) || 0;
+  const annualRate = parseFloat(document.getElementById('cpRate').value);
+  const years = parseInt(document.getElementById('cpYears').value);
+
+  if (isNaN(annualRate) || !years || years <= 0 || (init <= 0 && monthly <= 0)) {
+    resultEl.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 투자금(또는 월 납입액), 연 수익률, 투자 기간을 입력해주세요.</div>';
+    return;
+  }
+
+  const monthlyRate = annualRate / 100 / 12;
+  const totalMonths = years * 12;
+  const fmt = n => Math.round(n).toLocaleString('ko-KR');
+
+  let balance = init;
+  let totalContrib = init;
+  const yearRows = [];
+  for (let m = 1; m <= totalMonths; m++) {
+    balance = balance * (1 + monthlyRate) + monthly;
+    totalContrib += monthly;
+    if (m % 12 === 0) {
+      yearRows.push({ year: m / 12, balance, totalContrib });
+    }
+  }
+
+  const finalBalance = balance;
+  const totalProfit = finalBalance - totalContrib;
+  const profitPct = totalContrib > 0 ? (totalProfit / totalContrib) * 100 : 0;
+  const isProfit = totalProfit >= 0;
+
+  // 표는 연도가 많으면(10년 이상) 일부만 보여주고 마지막 해는 항상 포함
+  let visibleRows = yearRows;
+  if (yearRows.length > 12) {
+    const step = Math.ceil(yearRows.length / 10);
+    visibleRows = yearRows.filter((r, i) => i % step === 0 || i === yearRows.length - 1);
+  }
+
+  const tableRows = visibleRows.map(r => {
+    const rowProfit = r.balance - r.totalContrib;
+    const rowColor = rowProfit >= 0 ? '#38a169' : '#e53e3e';
+    return `<tr>
+      <td>${r.year}년차</td>
+      <td>${fmt(r.totalContrib)}원</td>
+      <td style="font-weight:700;">${fmt(r.balance)}원</td>
+      <td style="color:${rowColor};">${rowProfit >= 0 ? '+' : ''}${fmt(rowProfit)}원</td>
+    </tr>`;
+  }).join('');
+
+  resultEl.innerHTML = `
+    <div style="background:${isProfit ? '#c6f6d5' : '#fed7d7'}; color:${isProfit ? '#22543d' : '#742a2a'}; padding:16px; border-radius:10px; text-align:center; margin-bottom:12px;">
+      <div style="font-size:13px; font-weight:600; margin-bottom:4px;">${years}년 후 예상 평가금액</div>
+      <div style="font-size:32px; font-weight:900;">${fmt(finalBalance)}원</div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:16px;">
+      <div class="stat-box"><div class="label">총 납입 원금</div><div class="value">${fmt(totalContrib)}원</div></div>
+      <div class="stat-box"><div class="label">투자 수익</div><div class="value" style="color:${isProfit ? '#38a169' : '#e53e3e'};">${isProfit ? '+' : ''}${fmt(totalProfit)}원</div></div>
+      <div class="stat-box"><div class="label">수익률</div><div class="value" style="color:${isProfit ? '#38a169' : '#e53e3e'};">${isProfit ? '+' : ''}${profitPct.toFixed(1)}%</div></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>경과</th><th>납입 원금 누적</th><th>평가 금액</th><th>수익</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+
+const ETF_INFO = {
+  QQQ:  { mult: 1, fee: 0.0020, name: 'QQQ (1x)',  riskLabel: '낮음' },
+  QLD:  { mult: 2, fee: 0.0095, name: 'QLD (2x)',  riskLabel: '높음' },
+  TQQQ: { mult: 3, fee: 0.0098, name: 'TQQQ (3x)', riskLabel: '매우 높음' },
+};
+const SCENARIOS = {
+  bull:  { annualReturn: 0.20, annualVol: 0.15, label: '강세' },
+  base:  { annualReturn: 0.12, annualVol: 0.20, label: '기본' },
+  bear:  { annualReturn: 0.04, annualVol: 0.28, label: '약세' },
+  crash: { annualReturn: -0.30, annualVol: 0.45, label: '폭락' },
+};
+
+function runLevSim(init, years, annRet, annVol, mult, annFee, trials = 200) {
+  const days = years * 252;
+  const dr = annRet / 252, dv = annVol / Math.sqrt(252), df = annFee / 252;
+  const finals = [];
+  for (let t = 0; t < trials; t++) {
+    let v = init;
+    for (let d = 0; d < days; d++) {
+      const u1 = Math.random(), u2 = Math.random();
+      const z = Math.sqrt(-2 * Math.log(Math.max(u1, 1e-10))) * Math.cos(2 * Math.PI * u2);
+      const dailyRet = dr + dv * z;
+      const levRet = mult * dailyRet - (mult * mult - mult) * dv * dv / 2 - df;
+      v = Math.max(v * (1 + levRet), 0);
+    }
+    finals.push(v);
+  }
+  finals.sort((a, b) => a - b);
+  return {
+    median: finals[Math.floor(trials * 0.5)],
+    p25: finals[Math.floor(trials * 0.25)],
+    p75: finals[Math.floor(trials * 0.75)],
+    p10: finals[Math.floor(trials * 0.1)],
+  };
+}
+
+function runLeverageSim() {
+  const etfKey = document.getElementById('levEtf').value;
+  const scenario = document.getElementById('levScenario').value;
+  const init = parseFloat(document.getElementById('levInvestment').value) || 10000;
+  const years = parseInt(document.getElementById('levYears').value) || 5;
+  const sc = SCENARIOS[scenario];
+  const result = document.getElementById('leverageResult');
+  result.innerHTML = '<div style="color:#4299e1; padding:12px;">⏳ 시뮬레이션 실행 중... (200회 시뮬레이션)</div>';
+  setTimeout(() => {
+    const etfs = etfKey === 'COMPARE' ? ['QQQ','QLD','TQQQ'] : [etfKey];
+    const rows = etfs.map(key => {
+      const info = ETF_INFO[key];
+      const sim = runLevSim(init, years, sc.annualReturn, sc.annualVol, info.mult, info.fee);
+      const medRoi = ((sim.median - init) / init * 100).toFixed(1);
+      const medColor = sim.median >= init ? '#38a169' : '#e53e3e';
+      return `<tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:10px 12px; font-weight:700;">${info.name}</td>
+        <td style="padding:10px 12px; text-align:right; color:${medColor}; font-weight:700;">$${Math.round(sim.median).toLocaleString()}</td>
+        <td style="padding:10px 12px; text-align:right; color:${medColor};">${medRoi >= 0 ? '+' : ''}${medRoi}%</td>
+        <td style="padding:10px 12px; text-align:right; color:#718096;">$${Math.round(sim.p25).toLocaleString()}</td>
+        <td style="padding:10px 12px; text-align:right; color:#718096;">$${Math.round(sim.p75).toLocaleString()}</td>
+        <td style="padding:10px 12px; text-align:center;">${info.riskLabel}</td>
+      </tr>`;
+    }).join('');
+    result.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+          <thead><tr style="background:#edf2f7;">
+            <th style="padding:10px 12px; text-align:left;">ETF</th>
+            <th style="padding:10px 12px; text-align:right;">중간값 (예상)</th>
+            <th style="padding:10px 12px; text-align:right;">수익률</th>
+            <th style="padding:10px 12px; text-align:right;">25백분위</th>
+            <th style="padding:10px 12px; text-align:right;">75백분위</th>
+            <th style="padding:10px 12px; text-align:center;">리스크</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div style="background:#fffbeb; border:1px solid #f6e05e; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:13px; color:#744210;">
+        📊 시나리오: <strong>${sc.label}</strong> | 초기 투자: <strong>$${init.toLocaleString()}</strong> | 기간: <strong>${years}년</strong> | 200회 몬테카를로 시뮬레이션 결과입니다. 실제 수익률을 보장하지 않습니다.
+      </div>`;
+  }, 50);
+}
+
+// ========== 분할매수 계획 ==========
+function calcDCA() {
+  const budget = parseFloat(document.getElementById('dcaBudget').value) || 10000;
+  const price = parseFloat(document.getElementById('dcaPrice').value) || 200;
+  const rounds = parseInt(document.getElementById('dcaRounds').value) || 5;
+  const strategy = document.getElementById('dcaStrategy').value;
+  const targetAvgInput = parseFloat(document.getElementById('dcaTargetAvg').value);
+  const targetAvg = isNaN(targetAvgInput) ? price * 0.95 : targetAvgInput;
+  const result = document.getElementById('dcaResult');
+
+  const weights = Array.from({ length: rounds }, (_, i) => {
+    if (strategy === 'equal') return 1;
+    if (strategy === 'staircase') return rounds - i;
+    if (strategy === 'backloaded') return i + 1;
+    return 1;
+  });
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+
+  const priceProgression = Array.from({ length: rounds }, (_, i) => {
+    const t = i / Math.max(rounds - 1, 1);
+    const drift = -0.10 * Math.sin(Math.PI * t);
+    return Math.max(price * (1 + drift + (Math.random() - 0.5) * 0.02), 1);
+  });
+
+  let cumShares = 0, cumCost = 0;
+  const plan = Array.from({ length: rounds }, (_, i) => {
+    const amount = (weights[i] / totalWeight) * budget;
+    const p = priceProgression[i];
+    const shares = amount / p;
+    cumShares += shares;
+    cumCost += amount;
+    const date = new Date();
+    date.setDate(date.getDate() + i * 14);
+    return {
+      round: i + 1,
+      date: date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+      price: p, amount, shares, cumShares,
+      cumAvgPrice: cumCost / cumShares,
+    };
+  });
+
+  const last = plan[plan.length - 1];
+  const achievable = last.cumAvgPrice <= targetAvg * 1.02;
+  const strategyLabel = { equal: '균등 분할', staircase: '계단식', backloaded: '후반 집중' }[strategy];
+
+  result.innerHTML = `
+    <div class="stats-grid" style="margin-bottom:16px;">
+      <div class="stat-box"><div class="label">전략</div><div class="value">${strategyLabel}</div></div>
+      <div class="stat-box"><div class="label">총 매수 주수</div><div class="value">${last.cumShares.toFixed(3)}주</div></div>
+      <div class="stat-box"><div class="label">예상 평균단가</div><div class="value" style="color:${achievable?'#38a169':'#e53e3e'};">$${last.cumAvgPrice.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
+    </div>
+    <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
+      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 회수를 늘리거나 예산을 늘려보세요.'}
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead><tr style="background:#edf2f7;">
+          <th style="padding:8px; text-align:center;">회차</th>
+          <th style="padding:8px; text-align:center;">날짜</th>
+          <th style="padding:8px; text-align:right;">예상가</th>
+          <th style="padding:8px; text-align:right;">투자금액</th>
+          <th style="padding:8px; text-align:right;">매수 주수</th>
+          <th style="padding:8px; text-align:right;">누적 평균단가</th>
+        </tr></thead>
+        <tbody>${plan.map(r => `<tr style="border-bottom:1px solid #e2e8f0;">
+          <td style="padding:8px; text-align:center;">${r.round}회</td>
+          <td style="padding:8px; text-align:center;">${r.date}</td>
+          <td style="padding:8px; text-align:right;">$${r.price.toFixed(2)}</td>
+          <td style="padding:8px; text-align:right;">$${r.amount.toFixed(0)}</td>
+          <td style="padding:8px; text-align:right;">${r.shares.toFixed(3)}</td>
+          <td style="padding:8px; text-align:right;">$${r.cumAvgPrice.toFixed(2)}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ 예상 주가는 V자형 시나리오 기반으로 시뮬레이션된 값입니다. 실제 주가는 다를 수 있습니다.</p>`;
+}
+
+// 페이지 로드 시 복리 계산기 초기화
+document.addEventListener('DOMContentLoaded', () => {
+  calcCompound();
+});
+
+</script>
+</body>
+</html>

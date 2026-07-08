@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDD 계산기 — 고점 대비 하락률 계산기</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://mddcalc.com/">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.5; padding: 16px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 28px; margin-bottom: 6px; color: #2d3748; }
+  .subtitle { color: #718096; margin-bottom: 20px; font-size: 14px; }
+
+  .card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+  .api-panel { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
+  .api-panel h2 { font-size: 18px; margin-bottom: 12px; }
+  .api-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .api-row label { font-size: 13px; min-width: 90px; font-weight: 600; }
+  .api-row input { flex: 1; min-width: 180px; padding: 10px 12px; border: none; border-radius: 8px;
+                   font-size: 14px; font-family: monospace; }
+  .btn { padding: 10px 20px; background: #fff; color: #2d3748; border: none; border-radius: 8px;
+         font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+  .btn-primary { background: #2d3748; color: #fff; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .api-help { font-size: 12px; opacity: 0.95; margin-top: 8px; }
+  .api-help a { color: #fff; text-decoration: underline; }
+  .status { margin-top: 10px; padding: 8px 12px; border-radius: 6px; font-size: 13px;
+            background: rgba(255,255,255,0.2); display: none; }
+  .status.show { display: block; }
+  .status.error { background: rgba(254, 178, 178, 0.9); color: #742a2a; }
+  .status.success { background: rgba(198, 246, 213, 0.9); color: #22543d; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .controls label { font-size: 13px; font-weight: 600; color: #4a5568; }
+  .controls input[type=date] { padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; }
+  .preset-btn { padding: 6px 12px; background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 6px;
+                cursor: pointer; font-size: 12px; }
+  .preset-btn.active { background: #4299e1; color: #fff; border-color: #4299e1; }
+  .mode-toggle { display: inline-flex; background: #edf2f7; border-radius: 8px; padding: 3px; }
+  .mode-toggle button { padding: 6px 14px; border: none; background: transparent; cursor: pointer;
+                        border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .mode-toggle button.active { background: #4299e1; color: #fff; }
+
+  .hero { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center;
+          text-align: center; padding: 24px 16px; }
+  .hero-box h3 { font-size: 12px; color: #718096; font-weight: 600; margin-bottom: 6px; }
+  .hero-box .big { font-size: 28px; font-weight: 800; color: #2d3748; }
+  .hero-box .sub { font-size: 12px; color: #718096; margin-top: 4px; }
+  .hero .arrow { font-size: 24px; color: #a0aec0; }
+  .hero-dd { color: #e53e3e !important; }
+  .hero-dd.mild { color: #d69e2e !important; }
+  .hero-dd.small { color: #38a169 !important; }
+
+  .signal-card { padding: 20px; border-radius: 12px; text-align: center; margin-top: 14px; }
+  .signal-strong { background: #fed7d7; border: 2px solid #e53e3e; }
+  .signal-mid { background: #fefcbf; border: 2px solid #d69e2e; }
+  .signal-mild { background: #feebc8; border: 2px solid #dd6b20; }
+  .signal-none { background: #e2e8f0; border: 2px solid #a0aec0; }
+  .signal-emoji { font-size: 40px; margin-bottom: 6px; }
+  .signal-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .signal-desc { font-size: 14px; color: #4a5568; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .stat-box { background: #f7fafc; padding: 14px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
+  .stat-box .label { font-size: 11px; color: #718096; margin-bottom: 4px; font-weight: 600; }
+  .stat-box .value { font-size: 18px; font-weight: 700; color: #2d3748; }
+
+  .target-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
+  .target-box { padding: 12px; border-radius: 10px; border-left: 4px solid; }
+  .t-15 { background: #c6f6d5; border-color: #38a169; }
+  .t-20 { background: #fefcbf; border-color: #d69e2e; }
+  .t-30 { background: #feebc8; border-color: #dd6b20; }
+  .target-box .pct { font-size: 13px; font-weight: 700; }
+  .target-box .price { font-size: 20px; font-weight: 800; margin: 4px 0; }
+  .target-box .note { font-size: 11px; color: #4a5568; }
+  .reached { background: #2d3748; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 6px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 10px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+  th { background: #f7fafc; font-size: 12px; color: #4a5568; font-weight: 700; }
+  tr.current { background: #fefcbf !important; font-weight: 700; }
+  tr.never { color: #a0aec0; }
+  .bar-container { background: #edf2f7; height: 14px; border-radius: 7px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, #4299e1, #3182ce); }
+  .bar-fill.zero { background: #cbd5e0; }
+
+  .info-banner { padding: 12px 16px; background: #bee3f8; color: #2a4365; border-radius: 8px;
+                 font-size: 13px; margin-bottom: 10px; }
+
+  details { background: #f7fafc; border-radius: 8px; padding: 12px 16px; margin-top: 10px; border: 1px solid #e2e8f0; }
+  summary { cursor: pointer; font-weight: 600; color: #2d3748; }
+  details .body { margin-top: 10px; font-size: 13px; color: #4a5568; line-height: 1.7; }
+
+  h2.section { font-size: 18px; margin-bottom: 12px; color: #2d3748; }
+  .chart-wrap { position: relative; height: 320px; }
+  .loading { display: none; text-align: center; padding: 30px; color: #718096; }
+  .loading.show { display: block; }
+  .hidden { display: none !important; }
+
+  @media (max-width: 640px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero .arrow { display: none; }
+    .hero-box .big { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>📊 MDD 계산기</h1>
+  <p class="subtitle">고점 대비 하락률(Maximum Drawdown)로 매수 타이밍 찾기</p>
+
+  <!-- API 키 & 티커 입력 -->
+  <div class="card api-panel">
+    <h2>🔑 1단계: API 키 + 종목 티커 입력</h2>
+    <div class="api-row">
+      <label>API 키</label>
+      <input type="password" id="apiKey" placeholder="Twelve Data API 키를 붙여넣으세요 (선택사항)">
+      <button class="btn btn-sm" onclick="toggleKey()">👁 보기</button>
+    </div>
+    <div class="api-row">
+      <label>종목 티커</label>
+      <input type="text" id="ticker" placeholder="예: TSLA, NVDA, MSFT, AAPL, SPY, QQQ" style="text-transform:uppercase;">
+      <button class="btn btn-primary" onclick="loadData()">📡 데이터 불러오기</button>
+    </div>
+    <div class="api-help">
+      💡 팁: API 키를 입력하지 않으면 사이트 관리자의 API를 사용합니다 (사용량 초과 시 자동으로 수동 입력으로 전환)
+    </div>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div id="loading" class="loading">⏳ 데이터 불러오는 중... (최대 10초)</div>
+
+  <!-- 결과 영역 -->
+  <div id="result" class="hidden">
+
+    <!-- 사용법 가이드 -->
+    <details class="card" style="background:#ebf8ff;">
+      <summary>💡 처음이신가요? MDD 보는 법 (클릭해서 펼치기)</summary>
+      <div class="body">
+        <b>MDD(Maximum Drawdown)</b>는 <b>"과거 최고가 대비 현재 얼마나 내려왔는가"</b> 입니다.<br>
+        📌 <b>-10% = 고점 대비 10% 할인</b>, <b>-30% = 고점 대비 30% 할인</b><br><br>
+        <b>🎯 매수 타이밍 가이드 (일반적 기준)</b><br>
+        🙂 <b>0% ~ -10%</b> : 고점 근처 — 관망 또는 소량 분할매수<br>
+        🟡 <b>-15% ~ -20%</b> : 조정장 — 분할매수 관심 구간<br>
+        🟠 <b>-20% ~ -30%</b> : 약세장 진입 — 적극 분할매수 고려<br>
+        🔥 <b>-30% 이하</b> : 강한 매수 기회 (단, 기업가치 확인 필수)<br><br>
+        <b>⚠️ 수치가 네이버/Yahoo와 살짝 다른 이유</b><br>
+        1. <b>종가 vs 장중고가</b>: 네이버는 보통 장중고가(High), API도 High 제공 → 이 앱은 <b>기본 High 기준</b><br>
+        2. <b>배당/분할 조정</b>: Twelve Data 무료플랜은 분할만 조정 (Yahoo Adj Close와 미세 차이)<br>
+        3. <b>실시간 vs 지연</b>: 무료 API는 전일 종가 또는 15분 지연
+      </div>
+    </details>
+
+    <!-- 설정: ATH 기준 & 기간 -->
+    <div class="card">
+      <h2 class="section">⚙️ 조회 설정</h2>
+      <div class="controls" style="margin-bottom:12px;">
+        <label>ATH 기준:</label>
+        <div class="mode-toggle">
+          <button id="modeHigh" class="active" onclick="setMode('high')">📈 장중 최고가</button>
+          <button id="modeClose" onclick="setMode('close')">🕘 종가</button>
+        </div>
+        <span style="color:#718096; font-size:12px;">← 네이버/Yahoo 수치 맞추려면 장중고가</span>
+      </div>
+      <div class="controls">
+        <label>빠른 기간:</label>
+        <button class="preset-btn" data-years="all" onclick="setPreset('all')">전체</button>
+        <button class="preset-btn" data-years="10" onclick="setPreset(10)">10년</button>
+        <button class="preset-btn active" data-years="5" onclick="setPreset(5)">5년</button>
+        <button class="preset-btn" data-years="3" onclick="setPreset(3)">3년</button>
+        <button class="preset-btn" data-years="1" onclick="setPreset(1)">1년</button>
+        <button class="preset-btn" data-years="ytd" onclick="setPreset('ytd')">올해</button>
+      </div>
+      <div class="controls" style="margin-top:8px;">
+        <label>시작일:</label>
+        <input type="date" id="startDate" onchange="rerender()">
+        <label>종료일:</label>
+        <input type="date" id="endDate" onchange="rerender()">
+      </div>
+    </div>
+
+    <!-- 핵심 히어로: 지금 vs ATH -->
+    <div class="card">
+      <h2 class="section" id="tickerTitle">📌 <span id="tickerLabel"></span></h2>
+      <div class="hero">
+        <div class="hero-box">
+          <h3>💵 지금 가격</h3>
+          <div class="big" id="currentPrice">—</div>
+          <div class="sub" id="currentDate">—</div>
+        </div>
+        <div class="arrow">←</div>
+        <div class="hero-box">
+          <h3>🏆 구간 최고가 (ATH)</h3>
+          <div class="big" id="athPrice">—</div>
+          <div class="sub" id="athDate">—</div>
+        </div>
+        <div class="arrow">=</div>
+        <div class="hero-box">
+          <h3>📉 고점 대비 하락률</h3>
+          <div class="big hero-dd" id="currentDD">—</div>
+          <div class="sub" id="ddInterpret">—</div>
+        </div>
+      </div>
+      <div id="signalCard" class="signal-card signal-none">
+        <div class="signal-emoji" id="signalEmoji">⏸️</div>
+        <div class="signal-title" id="signalTitle">—</div>
+        <div class="signal-desc" id="signalDesc">—</div>
+      </div>
+    </div>
+
+    <!-- 매수 목표가 -->
+    <div class="card">
+      <h2 class="section">🎯 ATH 대비 할인 가격 (매수 목표가)</h2>
+      <div class="target-grid">
+        <div class="target-box t-15">
+          <div class="pct">🟢 -15% 할인 <span id="r15" class="reached hidden">✅ 도달</span></div>
+          <div class="price" id="t15">—</div>
+          <div class="note">가벼운 조정 · 분할매수 시작</div>
+        </div>
+        <div class="target-box t-20">
+          <div class="pct">🟡 -20% 할인 <span id="r20" class="reached hidden">✅ 도달</span></div>
+          <div class="price" id="t20">—</div>
+          <div class="note">약세장 진입 · 적극 분할매수</div>
+        </div>
+        <div class="target-box t-30">
+          <div class="pct">🟠 -30% 할인 <span id="r30" class="reached hidden">✅ 도달</span></div>
+          <div class="price" id="t30">—</div>
+          <div class="note">강한 매수 기회 · 기업가치 확인</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 주요 통계 -->
+    <div class="card">
+      <h2 class="section">📊 구간 주요 통계</h2>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="label">역대 최대 하락</div><div class="value" id="maxDD">—</div></div>
+        <div class="stat-box"><div class="label">최대 하락 발생일</div><div class="value" id="maxDDDate">—</div></div>
+        <div class="stat-box"><div class="label">데이터 시작일</div><div class="value" id="dataStart">—</div></div>
+        <div class="stat-box"><div class="label">총 영업일수</div><div class="value" id="totalDays">—</div></div>
+      </div>
+    </div>
+
+    <!-- 차트 -->
+    <div class="card">
+      <h2 class="section">📉 고점 대비 하락률 차트</h2>
+      <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section">💵 주가 흐름 차트</h2>
+      <div class="chart-wrap"><canvas id="priceChart"></canvas></div>
+    </div>
+
+    <!-- 회복률 표 -->
+    <div class="card">
+      <h2 class="section">📋 구간별 회복률 (과거 패턴)</h2>
+      <div id="recoveryBanner" class="info-banner hidden"></div>
+      <details style="margin-bottom:10px; background:#fff; border:1px dashed #cbd5e0;">
+        <summary style="font-size:13px;">🔍 회복률이 뭔가요?</summary>
+        <div class="body">
+          <b>도달일수</b>: 과거에 해당 하락 레벨(예: -20%)까지 떨어진 영업일 수<br>
+          <b>회복일수</b>: 그 날들 중 <b>이후 새 최고가를 다시 갱신한</b> 날 수<br>
+          <b>회복률 = 회복일수 ÷ 도달일수 × 100%</b><br>
+          예) -20% 도달 100일 중 80일이 나중에 신고가를 봤다면 회복률 80%<br>
+          <b>한 번도 내려가지 않은 레벨은 회복률 0%로 표시</b>합니다 (판단할 근거가 없음)
+        </div>
+      </details>
+      <table>
+        <thead>
+          <tr>
+            <th>하락률</th>
+            <th>도달일수</th>
+            <th>전체 대비</th>
+            <th>회복률</th>
+            <th style="min-width:120px;">회복률 그래프</th>
+          </tr>
+        </thead>
+        <tbody id="recoveryBody"></tbody>
+      </table>
+    </div>
+
+    <!-- TradingView -->
+    <div class="card">
+      <h2 class="section">📺 TradingView 실시간 차트 (참고)</h2>
+      <div id="tvContainer" style="height:400px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ============ 상태 ============
+let STATE = {
+  raw: null,
+  filtered: null,
+  ticker: '',
+  mode: 'high',
+  startDate: null,
+  endDate: null,
+  ddChart: null,
+  priceChart: null,
+  useBackendApi: true,  // 백엔드 API 사용 여부
+};
+
+// ============ 초기화 ============
+window.addEventListener('DOMContentLoaded', () => {
+  const savedKey = localStorage.getItem('td_api_key');
+  if (savedKey) document.getElementById('apiKey').value = savedKey;
+  const savedTicker = localStorage.getItem('td_last_ticker');
+  if (savedTicker) document.getElementById('ticker').value = savedTicker;
+
+  document.getElementById('ticker').addEventListener('keypress', e => {
+    if (e.key === 'Enter') loadData();
+  });
+  document.getElementById('ticker').addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase();
+  });
+});
+
+function toggleKey() {
+  const el = document.getElementById('apiKey');
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function showStatus(msg, type='info') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status show ' + type;
+}
+
+// ============ 데이터 로드 ============
+async function loadData() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const ticker = document.getElementById('ticker').value.trim().toUpperCase();
+  
+  if (!ticker) return showStatus('❌ 티커를 입력해주세요', 'error');
+
+  localStorage.setItem('td_last_ticker', ticker);
+
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('result').classList.add('hidden');
+
+  try {
+    let json;
+
+    if (STATE.useBackendApi && !apiKey) {
+      // 백엔드 프록시 사용 (API 키 없을 때)
+      showStatus('⏳ 데이터 불러오는 중... (백엔드 API 사용)', 'info');
+      
+      const res = await fetch('/api/trpc/twelvedata.timeSeries?input=' + encodeURIComponent(JSON.stringify({
+        symbol: ticker,
+        interval: '1day',
+        outputsize: 5000
+      })));
+      
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      json = data.result?.data;
+      
+      if (!json) throw new Error('응답 형식 오류');
+    } else {
+      // 직접 API 사용 (API 키 있을 때 또는 폴백)
+      if (!apiKey) return showStatus('❌ API 키를 입력해주세요', 'error');
+      
+      localStorage.setItem('td_api_key', apiKey);
+      showStatus('⏳ Twelve Data API에서 데이터 가져오는 중...', 'info');
+      
+      const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(ticker)}&interval=1day&outputsize=5000&apikey=${encodeURIComponent(apiKey)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      json = await res.json();
+      STATE.useBackendApi = false;  // 직접 API 사용 모드로 전환
+    }
+
+    if (json.status === 'error') throw new Error(json.message || 'API 오류');
+    if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
+
+    const raw = json.values.map(v => ({
+      date: v.datetime,
+      open: parseFloat(v.open),
+      high: parseFloat(v.high),
+      low: parseFloat(v.low),
+      close: parseFloat(v.close),
+    })).reverse();
+
+    STATE.raw = raw;
+    STATE.ticker = ticker;
+    setPreset(5);
+    showStatus(`✅ ${ticker} 데이터 ${raw.length}일치 로드 완료 (최신: ${raw[raw.length-1].date})`, 'success');
+    document.getElementById('result').classList.remove('hidden');
+  } catch (e) {
+    const errorMsg = e.message;
+    
+    // 사용량 초과 감지 (429 또는 API limit 메시지)
+    if (errorMsg.includes('429') || errorMsg.includes('limit') || errorMsg.includes('quota')) {
+      showStatus(`⚠️ 사용량 초과됨. 직접 API 키로 시도하세요.`, 'error');
+      STATE.useBackendApi = false;
+    } else {
+      showStatus(`❌ ${errorMsg} — 티커 오타 / API 키 / 무료 한도(분당 8회·일 800회) 확인`, 'error');
+    }
+  } finally {
+    document.getElementById('loading').classList.remove('show');
+  }
+}
+
+// ============ 기간 프리셋 ============
+function setPreset(preset) {
+  if (!STATE.raw) return;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-years="${preset}"]`);
+  if (btn) btn.classList.add('active');
+
+  const latest = new Date(STATE.raw[STATE.raw.length-1].date);
+  const earliest = new Date(STATE.raw[0].date);
+  let start;
+  if (preset === 'all') start = earliest;
+  else if (preset === 'ytd') start = new Date(latest.getFullYear(), 0, 1);
+  else { start = new Date(latest); start.setFullYear(start.getFullYear() - preset); }
+
+  if (start < earliest) start = earliest;
+  document.getElementById('startDate').value = start.toISOString().slice(0,10);
+  document.getElementById('endDate').value = latest.toISOString().slice(0,10);
+  rerender();
+}
+
+function setMode(mode) {
+  STATE.mode = mode;
+  document.getElementById('modeHigh').classList.toggle('active', mode === 'high');
+  document.getElementById('modeClose').classList.toggle('active', mode === 'close');
+  rerender();
+}
+
+// ============ 필터 + 렌더 ============
+function rerender() {
+  if (!STATE.raw) return;
+  const sd = document.getElementById('startDate').value;
+  const ed = document.getElementById('endDate').value;
+  STATE.startDate = sd; STATE.endDate = ed;
+  STATE.filtered = STATE.raw.filter(r => r.date >= sd && r.date <= ed);
+  if (STATE.filtered.length < 2) {
+    showStatus('❌ 선택 기간에 데이터가 너무 적습니다', 'error');
+    return;
+  }
+  render();
+}
+
+// ============ 핵심 계산 ============
+function analyze(data, mode) {
+  const n = data.length;
+  const peakSeries = mode === 'high' ? data.map(d => d.high) : data.map(d => d.close);
+  const closes = data.map(d => d.close);
+  const dates = data.map(d => d.date);
+
+  const runMax = new Array(n);
+  let mx = -Infinity, mxIdx = 0;
+  const mxIdxArr = new Array(n);
+  for (let i = 0; i < n; i++) {
+    if (peakSeries[i] > mx) { mx = peakSeries[i]; mxIdx = i; }
+    runMax[i] = mx;
+    mxIdxArr[i] = mxIdx;
+  }
+  const dd = closes.map((c, i) => (c / runMax[i] - 1) * 100);
+
+  const futureMax = new Array(n);
+  let fm = -Infinity;
+  for (let i = n - 1; i >= 0; i--) {
+    if (peakSeries[i] > fm) fm = peakSeries[i];
+    futureMax[i] = fm;
+  }
+  const recovered = runMax.map((m, i) => futureMax[i] > m + 1e-9);
+
+  const currentPrice = closes[n-1];
+  const currentDD = dd[n-1];
+  const currentDate = dates[n-1];
+  const athPrice = runMax[n-1];
+  const athIdx = mxIdxArr[n-1];
+  const athDate = dates[athIdx];
+
+  let maxDD = 0, maxDDIdx = 0;
+  for (let i = 0; i < n; i++) {
+    if (dd[i] < maxDD) { maxDD = dd[i]; maxDDIdx = i; }
+  }
+
+  const buckets = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
+  const EPS = 1e-9;
+  const recoveryTable = buckets.map(b => {
+    let hit = 0, rec = 0;
+    for (let i = 0; i < n; i++) {
+      if (dd[i] <= -b + EPS) {
+        hit++;
+        if (recovered[i]) rec++;
+      }
+    }
+    const rate = hit === 0 ? 0 : (rec / hit * 100);
+    return { bucket: b, hit, rate, total: n, everHit: hit > 0 };
+  });
+
+  return {
+    n, dates, closes, peakSeries, runMax, dd,
+    currentPrice, currentDD, currentDate,
+    athPrice, athDate,
+    maxDD, maxDDDate: dates[maxDDIdx],
+    recoveryTable,
+  };
+}
+
+// ============ 렌더 ============
+function fmt(n, d=2) { return n==null || isNaN(n) ? '—' : Number(n).toLocaleString('en-US', { minimumFractionDigits:d, maximumFractionDigits:d }); }
+function fmtPct(n, d=2) { return n==null || isNaN(n) ? '—' : Number(n).toFixed(d) + '%'; }
+
+function render() {
+  const A = analyze(STATE.filtered, STATE.mode);
+  const t = STATE.ticker;
+
+  document.getElementById('tickerLabel').textContent = t + ' (' + (STATE.mode === 'high' ? '장중 최고가 기준' : '종가 기준') + ')';
+
+  document.getElementById('currentPrice').textContent = '$' + fmt(A.currentPrice);
+  document.getElementById('currentDate').textContent = A.currentDate;
+  document.getElementById('athPrice').textContent = '$' + fmt(A.athPrice);
+  document.getElementById('athDate').textContent = A.athDate;
+
+  const ddEl = document.getElementById('currentDD');
+  ddEl.textContent = fmtPct(A.currentDD);
+  ddEl.classList.remove('mild','small');
+  if (A.currentDD > -5) ddEl.classList.add('small');
+  else if (A.currentDD > -15) ddEl.classList.add('mild');
+
+  const interp = A.currentDD > -3 ? '고점 근처'
+               : A.currentDD > -10 ? '소폭 조정'
+               : A.currentDD > -20 ? '조정 진행 중'
+               : A.currentDD > -30 ? '약세장 진입'
+               : '심한 하락';
+  document.getElementById('ddInterpret').textContent = interp;
+
+  let sig;
+  if (A.currentDD <= -30) sig = { cls:'signal-strong', e:'🔥', t:'강한 매수 관심 구간', d:'역대급 하락 수준입니다. 기업 펀더멘털을 확인한 후 분할매수를 적극 고려할 만합니다.' };
+  else if (A.currentDD <= -20) sig = { cls:'signal-mid', e:'🟠', t:'적극 분할매수 고려', d:'약세장 진입 구간입니다. 욕심내지 말고 나눠서 매수하는 전략이 유효합니다.' };
+  else if (A.currentDD <= -10) sig = { cls:'signal-mid', e:'🟡', t:'관심 구간 (조정)', d:'조정이 진행 중입니다. 분할매수를 시작하기 좋은 구간입니다.' };
+  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'소폭 조정', d:'작은 조정 중입니다. 관망하거나 아주 소량만 분할매수하세요.' };
+  else sig = { cls:'signal-none', e:'⏸️', t:'고점 근처 — 관망', d:'지금은 신고가 근처입니다. 추격매수보다는 조정을 기다리는 편이 안전합니다.' };
+
+  const sc = document.getElementById('signalCard');
+  sc.className = 'signal-card ' + sig.cls;
+  document.getElementById('signalEmoji').textContent = sig.e;
+  document.getElementById('signalTitle').textContent = sig.t;
+  document.getElementById('signalDesc').textContent = sig.d;
+
+  const t15 = A.athPrice * 0.85, t20 = A.athPrice * 0.80, t30 = A.athPrice * 0.70;
+  document.getElementById('t15').textContent = '$' + fmt(t15);
+  document.getElementById('t20').textContent = '$' + fmt(t20);
+  document.getElementById('t30').textContent = '$' + fmt(t30);
+  document.getElementById('r15').classList.toggle('hidden', A.currentPrice > t15);
+  document.getElementById('r20').classList.toggle('hidden', A.currentPrice > t20);
+  document.getElementById('r30').classList.toggle('hidden', A.currentPrice > t30);
+
+  document.getElementById('maxDD').textContent = fmtPct(A.maxDD);
+  document.getElementById('maxDDDate').textContent = A.maxDDDate;
+  document.getElementById('dataStart').textContent = A.dates[0];
+  document.getElementById('totalDays').textContent = A.n.toLocaleString() + '일';
+
+  drawDDChart(A);
+  drawPriceChart(A);
+  renderRecovery(A);
+  renderTV(t);
+}
+
+function drawDDChart(A) {
+  if (STATE.ddChart) STATE.ddChart.destroy();
+  const step = Math.max(1, Math.floor(A.n / 600));
+  const pts = [];
+  for (let i = 0; i < A.n; i += step) pts.push({ x: A.dates[i], y: A.dd[i] });
+  if (pts[pts.length-1].x !== A.dates[A.n-1]) pts.push({ x: A.dates[A.n-1], y: A.dd[A.n-1] });
+
+  const ctx = document.getElementById('ddChart').getContext('2d');
+  STATE.ddChart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets: [{
+      label: '고점 대비 하락률 (%)', data: pts,
+      borderColor: '#e53e3e', backgroundColor: 'rgba(229,62,62,0.25)',
+      fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.1,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => `${c.parsed.y.toFixed(2)}%` } }
+      },
+      scales: {
+        x: { type: 'time', time: { unit: 'year' } },
+        y: { max: 5, ticks: { callback: v => v + '%' } }
+      }
+    }
+  });
+}
+
+function drawPriceChart(A) {
+  if (STATE.priceChart) STATE.priceChart.destroy();
+  const step = Math.max(1, Math.floor(A.n / 600));
+  const pts = [];
+  for (let i = 0; i < A.n; i += step) pts.push({ x: A.dates[i], y: A.closes[i] });
+  if (pts[pts.length-1].x !== A.dates[A.n-1]) pts.push({ x: A.dates[A.n-1], y: A.closes[A.n-1] });
+
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  STATE.priceChart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets: [{
+      label: '주가 ($)', data: pts,
+      borderColor: '#3182ce', backgroundColor: 'rgba(49,130,206,0.15)',
+      fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.1,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+                 tooltip: { callbacks: { label: c => '$' + c.parsed.y.toFixed(2) } } },
+      scales: {
+        x: { type: 'time', time: { unit: 'year' } },
+        y: { ticks: { callback: v => '$' + v } }
+      }
+    }
+  });
+}
+
+function renderRecovery(A) {
+  const body = document.getElementById('recoveryBody');
+  body.innerHTML = '';
+  const banner = document.getElementById('recoveryBanner');
+
+  const currentDD = A.currentDD;
+  let currentIdx = -1;
+  for (let i = 0; i < A.recoveryTable.length; i++) {
+    const lower = -A.recoveryTable[i].bucket;
+    const upper = i + 1 < A.recoveryTable.length ? -A.recoveryTable[i+1].bucket : -Infinity;
+    if (currentDD <= lower + 1e-9 && currentDD > upper + 1e-9) {
+      currentIdx = i; break;
+    }
+  }
+
+  if (currentDD > -5) {
+    banner.classList.remove('hidden');
+    banner.innerHTML = `ℹ️ 현재 하락률 <b>${fmtPct(currentDD)}</b> 는 -5% 미만의 얕은 조정입니다. 표의 어느 구간에도 해당하지 않습니다.`;
+  } else {
+    banner.classList.add('hidden');
+  }
+
+  A.recoveryTable.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    if (i === currentIdx) tr.classList.add('current');
+    if (!r.everHit) tr.classList.add('never');
+
+    const pct = r.total > 0 ? (r.hit / r.total * 100) : 0;
+    const barWidth = r.everHit ? Math.min(100, r.rate) : 0;
+    const barClass = r.everHit ? '' : 'zero';
+
+    tr.innerHTML = `
+      <td><b>-${r.bucket}%</b>${i === currentIdx ? ' 👈 <span style="color:#d69e2e;">지금 여기</span>' : ''}</td>
+      <td>${r.hit.toLocaleString()}일</td>
+      <td>${pct.toFixed(1)}%</td>
+      <td><b>${r.rate.toFixed(0)}%</b>${!r.everHit ? ' <span style="color:#a0aec0; font-size:11px;">(미도달)</span>' : ''}</td>
+      <td><div class="bar-container"><div class="bar-fill ${barClass}" style="width:${barWidth}%"></div></div></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function renderTV(ticker) {
+  const c = document.getElementById('tvContainer');
+  c.innerHTML = `<iframe style="width:100%; height:100%; border:0;"
+    src="https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(ticker)}&interval=D&theme=light&style=1&locale=kr"></iframe>`;
+}
+</script>
+</body>
+</html>
