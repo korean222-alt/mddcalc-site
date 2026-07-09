@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mddcalc-v42jdeq5.manus.space/sitemap.xml
+Sitemap: https://mddcalc.com/sitemap.xml
