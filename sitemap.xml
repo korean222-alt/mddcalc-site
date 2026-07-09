@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://mddcalc-v42jdeq5.manus.space/</loc>
-    <lastmod>2025-04-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://mddcalc.com/</loc><priority>1.0</priority></url>
+  <url><loc>https://mddcalc.com/tools.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/rsi-calculator.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/dividend-calculator.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/fx-calculator.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/roi-calculator.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/compound-calculator.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/leverage-etf-simulator.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/dca-planner.html</loc><priority>0.8</priority></url>
+  <url><loc>https://mddcalc.com/blog.html</loc><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/about.html</loc><priority>0.5</priority></url>
+  <url><loc>https://mddcalc.com/contact.html</loc><priority>0.5</priority></url>
+  <url><loc>https://mddcalc.com/privacy.html</loc><priority>0.3</priority></url>
+  <url><loc>https://mddcalc.com/terms.html</loc><priority>0.3</priority></url>
+  <url><loc>https://mddcalc.com/disclaimer.html</loc><priority>0.3</priority></url>
 </urlset>
