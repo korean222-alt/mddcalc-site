@@ -121,8 +121,8 @@ function buildPage(ticker, A) {
   const drop = Math.abs(A.currentDD).toFixed(1);
   const isNearATH = Math.abs(A.currentDD) < 1;
   const title = isNearATH
-    ? `${ticker} 지금 사도 될까? 사상 최고가 근접 | MDD 분석기`
-    : `${ticker} 지금 사도 될까? 고점 대비 ${drop}% 하락 | MDD 분석기`;
+    ? `${ticker} 사상 최고가(ATH) 근접 — MDD 분석 | MDD 분석기`
+    : `${ticker} 고점 대비 ${drop}% 하락 — MDD 분석 | MDD 분석기`;
   const description = isNearATH
     ? `${ticker}는 현재 사상 최고가(ATH) 부근입니다. 과거 하락·회복 패턴과 최대 낙폭(MDD)을 무료로 확인하세요.`
     : `${ticker}는 고점(ATH) 대비 ${drop}% 하락한 상태입니다. 역대 최대 낙폭 ${fmtPct(A.maxDD)}, 현재가 $${fmt(A.currentPrice)}. 과거 회복 패턴을 무료로 확인하세요.`;
@@ -178,7 +178,7 @@ function buildPage(ticker, A) {
 <div class="container">
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/tools.html">도구 모음</a> &gt; ${escapeHtml(ticker)}</nav>
   <div class="card">
-    <h1>${escapeHtml(ticker)} 지금 사도 될까?</h1>
+    <h1>${escapeHtml(ticker)} 고점 대비 하락률 분석</h1>
     <p class="subtitle">고점(ATH) 대비 하락률과 과거 회복 패턴 — 기준일 ${escapeHtml(A.currentDate)}</p>
 
     <div class="stat-grid">
