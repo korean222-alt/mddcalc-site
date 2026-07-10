@@ -128,6 +128,22 @@ function buildPage(ticker, A) {
     : `${ticker}는 고점(ATH) 대비 ${drop}% 하락한 상태입니다. 역대 최대 낙폭 ${fmtPct(A.maxDD)}, 현재가 $${fmt(A.currentPrice)}. 과거 회복 패턴을 무료로 확인하세요.`;
   const canonical = `https://mddcalc.com/stock/${ticker.toLowerCase()}.html`;
 
+  // 실제 계산된 숫자를 그대로 쓰는 CTA — 과장 문구 대신 "궁금하게 만드는 사실" + "무료" 강조로 유도
+  const ctaText = isNearATH
+    ? `과거 조정(하락)은 평균 며칠 만에 다시 회복됐을까? 무료로 전체 분석 보기 →`
+    : `역대 최대 낙폭은 ${fmtPct(A.maxDD)} — 지금은 그때보다 얼마나 덜/더 떨어졌을까? 무료로 전체 보기 →`;
+
+  // 관련 종목 3개 (내부 링크 + 체류시간용, 랜덤 아님: 같은 리스트 내 다음 종목들)
+  const idx = TICKERS.indexOf(ticker);
+  const related = [];
+  for (let i = 1; related.length < 3 && i < TICKERS.length; i++) {
+    const t = TICKERS[(idx + i) % TICKERS.length];
+    if (t !== ticker) related.push(t);
+  }
+  const relatedHtml = related.map(t =>
+    `<a href="/stock/${t.toLowerCase()}.html" class="related-chip">${escapeHtml(t)}</a>`
+  ).join('');
+
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -161,38 +177,42 @@ function buildPage(ticker, A) {
   .container { max-width: 760px; margin: 0 auto; }
   a { color: #4299e1; }
   .card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-  h1 { font-size: 26px; margin-bottom: 8px; color: #2d3748; }
-  .subtitle { color: #718096; margin-bottom: 20px; font-size: 14px; }
+  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
+  .ticker-name { font-size: 15px; font-weight: 700; color: #718096; letter-spacing: 0.5px; }
+  .hero { font-size: 52px; font-weight: 800; line-height: 1.1; margin: 6px 0 4px; }
+  .hero.neg { color: #e53e3e; } .hero.pos { color: #38a169; }
+  .hero-label { font-size: 14px; color: #718096; margin-bottom: 18px; }
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
   .stat { background: #f7fafc; border-radius: 10px; padding: 14px; }
   .stat .label { font-size: 12px; color: #718096; margin-bottom: 4px; }
-  .stat .value { font-size: 20px; font-weight: 700; color: #2d3748; }
-  .neg { color: #e53e3e; } .pos { color: #38a169; }
-  .cta { display: inline-block; margin-top: 12px; padding: 12px 20px; background: #2d3748; color: #fff;
-         border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; }
+  .stat .value { font-size: 18px; font-weight: 700; color: #2d3748; }
+  .cta { display: block; margin-top: 0; padding: 18px 20px; background: linear-gradient(135deg, #d4a017, #f0c14b);
+         color: #2d2200; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 15px; text-align: center;
+         box-shadow: 0 4px 14px rgba(212,160,23,0.35); position: relative; z-index: 2; }
+  .cta:active { transform: scale(0.98); }
   .note { font-size: 12px; color: #a0aec0; margin-top: 16px; }
-  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
+  .related { margin-top: 16px; }
+  .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
+  .related-chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
+                  border-radius: 20px; font-size: 13px; font-weight: 600; margin-right: 6px; text-decoration: none; }
+  .teaser { position: relative; max-height: 92px; overflow: hidden; margin: 16px 0 0; }
+  .teaser::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+                    background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%); }
+  .cta-wrap { margin-top: -8px; }
 </style>
 </head>
 <body>
 <div class="container">
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/tools.html">도구 모음</a> &gt; ${escapeHtml(ticker)}</nav>
   <div class="card">
-    <h1>${escapeHtml(ticker)} 고점 대비 하락률 분석</h1>
-    <p class="subtitle">고점(ATH) 대비 하락률과 과거 회복 패턴 — 기준일 ${escapeHtml(A.currentDate)}</p>
+    <div class="ticker-name">${escapeHtml(ticker)}</div>
+    <div class="hero ${A.currentDD < -0.01 ? 'neg' : 'pos'}">${fmtPct(A.currentDD)}</div>
+    <div class="hero-label">고점(ATH $${fmt(A.athPrice)}, ${escapeHtml(A.athDate)}) 대비 · 현재가 $${fmt(A.currentPrice)} · 기준일 ${escapeHtml(A.currentDate)}</div>
 
     <div class="stat-grid">
       <div class="stat">
-        <div class="label">현재가</div>
-        <div class="value">$${fmt(A.currentPrice)}</div>
-      </div>
-      <div class="stat">
-        <div class="label">고점 대비 (ATH: $${fmt(A.athPrice)}, ${escapeHtml(A.athDate)})</div>
-        <div class="value ${A.currentDD < -0.01 ? 'neg' : 'pos'}">${fmtPct(A.currentDD)}</div>
-      </div>
-      <div class="stat">
         <div class="label">최근 5년 최대 낙폭(MDD)</div>
-        <div class="value neg">${fmtPct(A.maxDD)}</div>
+        <div class="value">${fmtPct(A.maxDD)}</div>
       </div>
       <div class="stat">
         <div class="label">최대 낙폭 발생일</div>
@@ -200,12 +220,21 @@ function buildPage(ticker, A) {
       </div>
     </div>
 
-    <p>${escapeHtml(ticker)}는 현재 고점 대비 <strong>${fmtPct(A.currentDD)}</strong> 하락한 상태입니다.
-    최근 5년 기준 가장 크게 떨어졌던 시점은 <strong>${escapeHtml(A.maxDDDate)}</strong>이며,
-    당시 고점 대비 <strong>${fmtPct(A.maxDD)}</strong>까지 낙폭이 커졌습니다.
-    아래에서 이동평균, SPY 대비 상대강도, 과거 유사 하락 이후 평균 회복 기간까지 무료로 확인할 수 있습니다.</p>
+    <div class="teaser">
+      <p>${escapeHtml(ticker)}는 현재 고점 대비 <strong>${fmtPct(A.currentDD)}</strong> 하락한 상태입니다.
+      최근 5년 기준 가장 크게 떨어졌던 시점은 <strong>${escapeHtml(A.maxDDDate)}</strong>이며,
+      당시 고점 대비 <strong>${fmtPct(A.maxDD)}</strong>까지 낙폭이 커졌습니다. 이동평균, SPY 대비 상대강도,
+      과거 유사 하락 이후 평균 회복 기간까지 이어서 확인할 수 있는데,</p>
+    </div>
+    <div class="cta-wrap">
+      <a class="cta" href="/?ticker=${encodeURIComponent(ticker)}">${escapeHtml(ctaText)}</a>
+    </div>
 
-    <a class="cta" href="/?ticker=${encodeURIComponent(ticker)}">${escapeHtml(ticker)} 전체 분석 보기 →</a>
+    <div class="related">
+      <div class="related-title">다른 종목도 보기</div>
+      ${relatedHtml}
+    </div>
+
     <p class="note">본 페이지는 정보 제공 목적이며 투자 자문이 아닙니다. 데이터 기준일: ${escapeHtml(A.currentDate)}</p>
   </div>
 </div>
