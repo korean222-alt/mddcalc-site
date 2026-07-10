@@ -117,7 +117,38 @@ function last5Years(rows) {
   return rows.filter(r => new Date(r.date) >= cutoff);
 }
 
-function buildPage(ticker, A) {
+// 5년치 종가로 정적 SVG 스파크라인 생성 (차트 라이브러리/JS 없이 빌드 시점에 굽는 방식)
+function buildSparkline(rows) {
+  const W = 600, H = 150, PAD = 4;
+  const step = Math.max(1, Math.floor(rows.length / 140));
+  const sampled = rows.filter((_, i) => i % step === 0);
+  if (sampled[sampled.length - 1] !== rows[rows.length - 1]) sampled.push(rows[rows.length - 1]);
+
+  const closes = sampled.map(r => r.close);
+  const min = Math.min(...closes), max = Math.max(...closes);
+  const range = (max - min) || 1;
+  const pts = sampled.map((r, i) => {
+    const x = PAD + (i / (sampled.length - 1)) * (W - PAD * 2);
+    const y = PAD + (1 - (r.close - min) / range) * (H - PAD * 2);
+    return [x, y];
+  });
+  const pointsStr = pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const areaStr = `${PAD},${H - PAD} ${pointsStr} ${W - PAD},${H - PAD}`;
+  const up = closes[closes.length - 1] >= closes[0];
+  const color = up ? '#38a169' : '#e53e3e';
+  const lastPt = pts[pts.length - 1];
+
+  return `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" role="img" aria-label="5년 주가 추이">
+<defs><linearGradient id="sg-${up ? 'u' : 'd'}" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="${color}" stop-opacity="0.28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+</linearGradient></defs>
+<polygon points="${areaStr}" fill="url(#sg-${up ? 'u' : 'd'})"/>
+<polyline points="${pointsStr}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="${lastPt[0].toFixed(1)}" cy="${lastPt[1].toFixed(1)}" r="4" fill="${color}"/>
+</svg>`;
+}
+
+function buildPage(ticker, A, rows) {
   const drop = Math.abs(A.currentDD).toFixed(1);
   const isNearATH = Math.abs(A.currentDD) < 1;
   const title = isNearATH
@@ -127,11 +158,13 @@ function buildPage(ticker, A) {
     ? `${ticker}는 현재 사상 최고가(ATH) 부근입니다. 과거 하락·회복 패턴과 최대 낙폭(MDD)을 무료로 확인하세요.`
     : `${ticker}는 고점(ATH) 대비 ${drop}% 하락한 상태입니다. 역대 최대 낙폭 ${fmtPct(A.maxDD)}, 현재가 $${fmt(A.currentPrice)}. 과거 회복 패턴을 무료로 확인하세요.`;
   const canonical = `https://mddcalc.com/stock/${ticker.toLowerCase()}.html`;
+  const sparkSvg = buildSparkline(rows);
 
-  // 실제 계산된 숫자를 그대로 쓰는 CTA — 과장 문구 대신 "궁금하게 만드는 사실" + "무료" 강조로 유도
-  const ctaText = isNearATH
-    ? `과거 조정(하락)은 평균 며칠 만에 다시 회복됐을까? 무료로 전체 분석 보기 →`
-    : `역대 최대 낙폭은 ${fmtPct(A.maxDD)} — 지금은 그때보다 얼마나 덜/더 떨어졌을까? 무료로 전체 보기 →`;
+  // 버튼 위 짧은 캡션(궁금증 유발용 실제 숫자) + 버튼 자체는 짧고 명확하게 분리
+  const ctaCaption = isNearATH
+    ? `과거 조정, 평균 며칠 만에 회복됐을까?`
+    : `역대 최대 낙폭 ${fmtPct(A.maxDD)} — 지금 위치는?`;
+  const ctaLabel = `무료로 전체 분석 보기`;
 
   // 관련 종목 3개 (내부 링크 + 체류시간용, 랜덤 아님: 같은 리스트 내 다음 종목들)
   const idx = TICKERS.indexOf(ticker);
@@ -182,14 +215,21 @@ function buildPage(ticker, A) {
   .hero { font-size: 52px; font-weight: 800; line-height: 1.1; margin: 6px 0 4px; }
   .hero.neg { color: #e53e3e; } .hero.pos { color: #38a169; }
   .hero-label { font-size: 14px; color: #718096; margin-bottom: 18px; }
+  .chart-wrap { margin: 4px 0 8px; border-radius: 10px; overflow: hidden; background: #fafbfc; padding: 8px 4px; }
+  .spark { width: 100%; height: 90px; display: block; }
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
   .stat { background: #f7fafc; border-radius: 10px; padding: 14px; }
   .stat .label { font-size: 12px; color: #718096; margin-bottom: 4px; }
   .stat .value { font-size: 18px; font-weight: 700; color: #2d3748; }
-  .cta { display: block; margin-top: 0; padding: 18px 20px; background: linear-gradient(135deg, #d4a017, #f0c14b);
-         color: #2d2200; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 15px; text-align: center;
-         box-shadow: 0 4px 14px rgba(212,160,23,0.35); position: relative; z-index: 2; }
-  .cta:active { transform: scale(0.98); }
+  .cta-caption { font-size: 14px; font-weight: 700; color: #97650b; text-align: center; margin-bottom: 10px; }
+  .cta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 0;
+         padding: 15px 20px; background: linear-gradient(135deg, #f0c14b, #d4a017);
+         color: #2d2200; border-radius: 999px; text-decoration: none; font-weight: 800; font-size: 16px;
+         text-align: center; box-shadow: 0 6px 16px rgba(212,160,23,0.4); position: relative; z-index: 2;
+         border: 1px solid rgba(255,255,255,0.5); }
+  .cta .arrow { width: 22px; height: 22px; border-radius: 50%; background: rgba(45,34,0,0.15);
+                display: inline-flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .cta:active { transform: scale(0.97); }
   .note { font-size: 12px; color: #a0aec0; margin-top: 16px; }
   .related { margin-top: 16px; }
   .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
@@ -198,7 +238,7 @@ function buildPage(ticker, A) {
   .teaser { position: relative; max-height: 92px; overflow: hidden; margin: 16px 0 0; }
   .teaser::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
                     background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%); }
-  .cta-wrap { margin-top: -8px; }
+  .cta-wrap { margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -208,6 +248,8 @@ function buildPage(ticker, A) {
     <div class="ticker-name">${escapeHtml(ticker)}</div>
     <div class="hero ${A.currentDD < -0.01 ? 'neg' : 'pos'}">${fmtPct(A.currentDD)}</div>
     <div class="hero-label">고점(ATH $${fmt(A.athPrice)}, ${escapeHtml(A.athDate)}) 대비 · 현재가 $${fmt(A.currentPrice)} · 기준일 ${escapeHtml(A.currentDate)}</div>
+
+    <div class="chart-wrap">${sparkSvg}</div>
 
     <div class="stat-grid">
       <div class="stat">
@@ -227,7 +269,8 @@ function buildPage(ticker, A) {
       과거 유사 하락 이후 평균 회복 기간까지 이어서 확인할 수 있는데,</p>
     </div>
     <div class="cta-wrap">
-      <a class="cta" href="/?ticker=${encodeURIComponent(ticker)}">${escapeHtml(ctaText)}</a>
+      <div class="cta-caption">${escapeHtml(ctaCaption)}</div>
+      <a class="cta" href="/?ticker=${encodeURIComponent(ticker)}">${escapeHtml(ctaLabel)}<span class="arrow">→</span></a>
     </div>
 
     <div class="related">
@@ -272,7 +315,7 @@ async function main() {
       })).reverse();
       const windowed = last5Years(rows);
       const A = analyze(windowed);
-      const html = buildPage(ticker, A);
+      const html = buildPage(ticker, A, windowed);
       fs.writeFileSync(path.join(OUT_DIR, `${ticker.toLowerCase()}.html`), html);
       console.log(`OK (${fmtPct(A.currentDD)})`);
       ok.push(ticker);

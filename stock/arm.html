@@ -36,14 +36,21 @@
   .hero { font-size: 52px; font-weight: 800; line-height: 1.1; margin: 6px 0 4px; }
   .hero.neg { color: #e53e3e; } .hero.pos { color: #38a169; }
   .hero-label { font-size: 14px; color: #718096; margin-bottom: 18px; }
+  .chart-wrap { margin: 4px 0 8px; border-radius: 10px; overflow: hidden; background: #fafbfc; padding: 8px 4px; }
+  .spark { width: 100%; height: 90px; display: block; }
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
   .stat { background: #f7fafc; border-radius: 10px; padding: 14px; }
   .stat .label { font-size: 12px; color: #718096; margin-bottom: 4px; }
   .stat .value { font-size: 18px; font-weight: 700; color: #2d3748; }
-  .cta { display: block; margin-top: 0; padding: 18px 20px; background: linear-gradient(135deg, #d4a017, #f0c14b);
-         color: #2d2200; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 15px; text-align: center;
-         box-shadow: 0 4px 14px rgba(212,160,23,0.35); position: relative; z-index: 2; }
-  .cta:active { transform: scale(0.98); }
+  .cta-caption { font-size: 14px; font-weight: 700; color: #97650b; text-align: center; margin-bottom: 10px; }
+  .cta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 0;
+         padding: 15px 20px; background: linear-gradient(135deg, #f0c14b, #d4a017);
+         color: #2d2200; border-radius: 999px; text-decoration: none; font-weight: 800; font-size: 16px;
+         text-align: center; box-shadow: 0 6px 16px rgba(212,160,23,0.4); position: relative; z-index: 2;
+         border: 1px solid rgba(255,255,255,0.5); }
+  .cta .arrow { width: 22px; height: 22px; border-radius: 50%; background: rgba(45,34,0,0.15);
+                display: inline-flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .cta:active { transform: scale(0.97); }
   .note { font-size: 12px; color: #a0aec0; margin-top: 16px; }
   .related { margin-top: 16px; }
   .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
@@ -52,7 +59,7 @@
   .teaser { position: relative; max-height: 92px; overflow: hidden; margin: 16px 0 0; }
   .teaser::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
                     background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%); }
-  .cta-wrap { margin-top: -8px; }
+  .cta-wrap { margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -62,6 +69,15 @@
     <div class="ticker-name">ARM</div>
     <div class="hero neg">-27.57%</div>
     <div class="hero-label">고점(ATH $452.70, 2026-06-18) 대비 · 현재가 $327.87 · 기준일 2026-07-09</div>
+
+    <div class="chart-wrap"><svg viewBox="0 0 600 150" class="spark" preserveAspectRatio="none" role="img" aria-label="5년 주가 추이">
+<defs><linearGradient id="sg-u" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#38a169" stop-opacity="0.28"/><stop offset="100%" stop-color="#38a169" stop-opacity="0"/>
+</linearGradient></defs>
+<polygon points="4,146 4.0,140.4 8.2,145.0 12.4,143.7 16.6,144.9 20.8,145.2 25.0,146.0 29.2,145.8 33.4,144.8 37.6,145.3 41.8,144.2 46.0,140.3 50.2,140.3 54.4,139.0 58.6,137.4 62.8,136.9 67.0,138.3 71.2,137.1 75.4,137.9 79.6,135.5 83.8,137.6 88.0,135.0 92.2,115.2 96.4,114.3 100.6,109.3 104.8,109.3 109.0,113.3 113.2,112.3 117.4,115.7 121.6,115.8 125.8,115.2 130.0,130.9 134.2,125.0 138.4,125.1 142.6,122.2 146.8,121.6 151.0,119.9 155.1,114.9 159.3,109.7 163.5,101.5 167.7,101.4 171.9,100.3 176.1,91.0 180.3,101.0 184.5,102.6 188.7,108.0 192.9,122.9 197.1,115.4 201.3,113.2 205.5,115.6 209.7,116.5 213.9,110.0 218.1,109.5 222.3,106.0 226.5,110.4 230.7,105.9 234.9,103.8 239.1,109.3 243.3,109.2 247.5,105.4 251.7,111.2 255.9,112.4 260.1,112.0 264.3,109.3 268.5,104.9 272.7,112.8 276.9,115.4 281.1,107.9 285.3,106.7 289.5,99.0 293.7,104.4 297.9,98.6 302.1,99.7 306.3,107.7 310.5,113.0 314.7,115.5 318.9,118.6 323.1,118.1 327.3,122.6 331.5,130.7 335.7,124.2 339.9,127.1 344.1,120.9 348.3,116.9 352.5,115.8 356.7,112.9 360.9,112.1 365.1,114.2 369.3,109.4 373.5,107.8 377.7,102.7 381.9,103.8 386.1,106.2 390.3,102.8 394.5,101.6 398.7,109.1 402.9,111.5 407.1,109.5 411.3,112.4 415.5,108.7 419.7,110.4 423.9,105.4 428.1,108.5 432.3,109.8 436.5,104.6 440.7,103.7 444.9,99.4 449.0,97.3 453.2,97.7 457.4,104.7 461.6,109.8 465.8,113.1 470.0,111.7 474.2,109.8 478.4,116.0 482.6,120.4 486.8,121.4 491.0,119.5 495.2,123.8 499.4,118.1 503.6,122.4 507.8,121.4 512.0,116.9 516.2,115.5 520.4,114.7 524.6,120.0 528.8,119.4 533.0,112.8 537.2,108.0 541.4,106.2 545.6,102.6 549.8,95.6 554.0,79.2 558.2,84.2 562.4,80.5 566.6,79.5 570.8,36.8 575.0,4.0 579.2,35.3 583.4,6.6 587.6,21.6 591.8,30.2 596.0,34.1 596,146" fill="url(#sg-u)"/>
+<polyline points="4.0,140.4 8.2,145.0 12.4,143.7 16.6,144.9 20.8,145.2 25.0,146.0 29.2,145.8 33.4,144.8 37.6,145.3 41.8,144.2 46.0,140.3 50.2,140.3 54.4,139.0 58.6,137.4 62.8,136.9 67.0,138.3 71.2,137.1 75.4,137.9 79.6,135.5 83.8,137.6 88.0,135.0 92.2,115.2 96.4,114.3 100.6,109.3 104.8,109.3 109.0,113.3 113.2,112.3 117.4,115.7 121.6,115.8 125.8,115.2 130.0,130.9 134.2,125.0 138.4,125.1 142.6,122.2 146.8,121.6 151.0,119.9 155.1,114.9 159.3,109.7 163.5,101.5 167.7,101.4 171.9,100.3 176.1,91.0 180.3,101.0 184.5,102.6 188.7,108.0 192.9,122.9 197.1,115.4 201.3,113.2 205.5,115.6 209.7,116.5 213.9,110.0 218.1,109.5 222.3,106.0 226.5,110.4 230.7,105.9 234.9,103.8 239.1,109.3 243.3,109.2 247.5,105.4 251.7,111.2 255.9,112.4 260.1,112.0 264.3,109.3 268.5,104.9 272.7,112.8 276.9,115.4 281.1,107.9 285.3,106.7 289.5,99.0 293.7,104.4 297.9,98.6 302.1,99.7 306.3,107.7 310.5,113.0 314.7,115.5 318.9,118.6 323.1,118.1 327.3,122.6 331.5,130.7 335.7,124.2 339.9,127.1 344.1,120.9 348.3,116.9 352.5,115.8 356.7,112.9 360.9,112.1 365.1,114.2 369.3,109.4 373.5,107.8 377.7,102.7 381.9,103.8 386.1,106.2 390.3,102.8 394.5,101.6 398.7,109.1 402.9,111.5 407.1,109.5 411.3,112.4 415.5,108.7 419.7,110.4 423.9,105.4 428.1,108.5 432.3,109.8 436.5,104.6 440.7,103.7 444.9,99.4 449.0,97.3 453.2,97.7 457.4,104.7 461.6,109.8 465.8,113.1 470.0,111.7 474.2,109.8 478.4,116.0 482.6,120.4 486.8,121.4 491.0,119.5 495.2,123.8 499.4,118.1 503.6,122.4 507.8,121.4 512.0,116.9 516.2,115.5 520.4,114.7 524.6,120.0 528.8,119.4 533.0,112.8 537.2,108.0 541.4,106.2 545.6,102.6 549.8,95.6 554.0,79.2 558.2,84.2 562.4,80.5 566.6,79.5 570.8,36.8 575.0,4.0 579.2,35.3 583.4,6.6 587.6,21.6 591.8,30.2 596.0,34.1" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="596.0" cy="34.1" r="4" fill="#38a169"/>
+</svg></div>
 
     <div class="stat-grid">
       <div class="stat">
@@ -81,7 +97,8 @@
       과거 유사 하락 이후 평균 회복 기간까지 이어서 확인할 수 있는데,</p>
     </div>
     <div class="cta-wrap">
-      <a class="cta" href="/?ticker=ARM">역대 최대 낙폭은 -54.53% — 지금은 그때보다 얼마나 덜/더 떨어졌을까? 무료로 전체 보기 →</a>
+      <div class="cta-caption">역대 최대 낙폭 -54.53% — 지금 위치는?</div>
+      <a class="cta" href="/?ticker=ARM">무료로 전체 분석 보기<span class="arrow">→</span></a>
     </div>
 
     <div class="related">
