@@ -116,7 +116,7 @@
 <div class="container">
 
   <h1>📊 MDD 계산기</h1>
-  <p class="subtitle">고점 대비 하락률(Maximum Drawdown)로 매수 타이밍 찾기</p>
+  <p class="subtitle">고점 대비 하락률(Maximum Drawdown)로 하락 및 회복 패턴 찾기</p>
 
   <!-- API 키 & 티커 입력 -->
   <div class="card api-panel">
@@ -148,7 +148,7 @@
       <div class="body">
         <b>MDD(Maximum Drawdown)</b>는 <b>"과거 최고가 대비 현재 얼마나 내려왔는가"</b> 입니다.<br>
         📌 <b>-10% = 고점 대비 10% 할인</b>, <b>-30% = 고점 대비 30% 할인</b><br><br>
-        <b>🎯 매수 타이밍 가이드 (일반적 기준)</b><br>
+        <b>🎯 하락 및 회복 패턴 가이드 (일반적 기준)</b><br>
         🙂 <b>0% ~ -10%</b> : 고점 근처 — 관망 또는 소량 분할매수<br>
         🟡 <b>-15% ~ -20%</b> : 조정장 — 분할매수 관심 구간<br>
         🟠 <b>-20% ~ -30%</b> : 약세장 진입 — 적극 분할매수 고려<br>
@@ -546,7 +546,7 @@ function render() {
   if (A.currentDD <= -30) sig = { cls:'signal-strong', e:'🔥', t:'강한 매수 관심 구간', d:'역대급 하락 수준입니다. 기업 펀더멘털을 확인한 후 분할매수를 적극 고려할 만합니다.' };
   else if (A.currentDD <= -20) sig = { cls:'signal-mid', e:'🟠', t:'적극 분할매수 고려', d:'약세장 진입 구간입니다. 욕심내지 말고 나눠서 매수하는 전략이 유효합니다.' };
   else if (A.currentDD <= -10) sig = { cls:'signal-mid', e:'🟡', t:'관심 구간 (조정)', d:'조정이 진행 중입니다. 분할매수를 시작하기 좋은 구간입니다.' };
-  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'소폭 조정', d:'작은 조정 중입니다. 관망하거나 아주 소량만 분할매수하세요.' };
+  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'소폭 조정', d:'작은 조정 중입니다. 관망하거나 아주 소량만 분할매수를 검토해볼 수 있습니다.' };
   else sig = { cls:'signal-none', e:'⏸️', t:'고점 근처 — 관망', d:'지금은 신고가 근처입니다. 추격매수보다는 조정을 기다리는 편이 안전합니다.' };
 
   const sc = document.getElementById('signalCard');
