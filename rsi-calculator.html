@@ -737,11 +737,11 @@ function render() {
   document.getElementById('ddInterpret').textContent = interp;
 
   let sig;
-  if (A.currentDD <= -30) sig = { cls:'signal-strong', e:'🔥', t:'강한 매수 관심 구간', d:'역대급 하락 수준입니다. 기업 펀더멘털을 확인한 후 분할매수를 적극 고려할 만합니다.' };
-  else if (A.currentDD <= -20) sig = { cls:'signal-mid', e:'🟠', t:'적극 분할매수 고려', d:'약세장 진입 구간입니다. 욕심내지 말고 나눠서 매수하는 전략이 유효합니다.' };
-  else if (A.currentDD <= -10) sig = { cls:'signal-mid', e:'🟡', t:'관심 구간 (조정)', d:'조정이 진행 중입니다. 분할매수를 시작하기 좋은 구간입니다.' };
-  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'소폭 조정', d:'작은 조정 중입니다. 관망하거나 아주 소량만 분할매수를 검토해볼 수 있습니다.' };
-  else sig = { cls:'signal-none', e:'⏸️', t:'고점 근처 — 관망', d:'지금은 신고가 근처입니다. 추격매수보다는 조정을 기다리는 편이 안전합니다.' };
+  if (A.currentDD <= -30) sig = { cls:'signal-strong', e:'🔥', t:'역대급 하락 구간', d:'과거 데이터상 매우 깊은 하락 수준에 도달했습니다. 기업의 본질적 가치와 시장 상황을 함께 검토할 시점입니다.' };
+  else if (A.currentDD <= -20) sig = { cls:'signal-mid', e:'🟠', t:'주요 조정 구간', d:'주가가 고점 대비 유의미하게 하락한 구간입니다. 과거 사례에서는 이 시점부터 자금을 나누어 대응하는 방식이 활용되기도 했습니다.' };
+  else if (A.currentDD <= -10) sig = { cls:'signal-mid', e:'🟡', t:'통상적 조정 구간', d:'시장의 통상적인 조정 범위 내에 있습니다. 과거 데이터를 통해 현재 하락의 깊이를 확인해보시기 바랍니다.' };
+  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'단기 변동 구간', d:'단기적인 가격 변동이 진행 중인 구간입니다. 추세 변화 여부를 모니터링하며 대응할 수 있습니다.' };
+  else sig = { cls:'signal-none', e:'⏸️', t:'신고가 근처 구간', d:'현재 주가가 역사적 신고가 부근에 위치해 있습니다. 과거 데이터상으로는 이 구간에서 변동성이 커지는 경향이 있었습니다.' };
 
   const sc = document.getElementById('signalCard');
   sc.className = 'signal-card ' + sig.cls;
