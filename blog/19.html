@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주식 수익률 계산법: 매수가와 매도가로 실제 수익률 계산하기 | MDD 분석기 블로그</title>
+<meta name="description" content="주식 수익률을 정확하게 계산하는 방법. 수수료, 세금, 환율까지 포함한 실제 수익률을 계산해보세요.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mddcalc.com/blog/19.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="주식 수익률 계산법: 매수가와 매도가로 실제 수익률 계산하기">
+<meta property="og:description" content="주식 수익률을 정확하게 계산하는 방법. 수수료, 세금, 환율까지 포함한 실제 수익률을 계산해보세요.">
+<meta property="og:url" content="https://mddcalc.com/blog/19.html">
+<meta property="og:site_name" content="MDD 분석기">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "주식 수익률 계산법: 매수가와 매도가로 실제 수익률 계산하기",
+  "description": "주식 수익률을 정확하게 계산하는 방법. 수수료, 세금, 환율까지 포함한 실제 수익률을 계산해보세요.",
+  "datePublished": "2026-04-20",
+  "articleSection": "수익률 계산",
+  "url": "https://mddcalc.com/blog/19.html"
+}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.75; padding: 16px; }
+  .container { max-width: 720px; margin: 0 auto; }
+  a { color: #4299e1; }
+  .card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
+  .article-meta { font-size: 13px; color: #a0aec0; margin: 4px 0 20px; }
+  .highlight-box { background: #f7fafc; border-left: 3px solid #4299e1; border-radius: 6px; padding: 12px 16px; margin: 14px 0; }
+  h1 { font-size: 24px; margin-bottom: 4px; color: #2d3748; }
+  h2 { font-size: 19px; margin: 22px 0 10px; color: #2d3748; }
+  p { margin-bottom: 12px; }
+  ul { margin: 10px 0 14px 20px; } li { margin-bottom: 6px; }
+  .related { margin-top: 20px; padding-top: 16px; border-top: 1px solid #edf2f7; }
+  .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
+  .related-chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
+                  border-radius: 20px; font-size: 13px; font-weight: 600; margin: 0 6px 6px 0; text-decoration: none; }
+  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/blog.html">블로그</a></nav>
+  <div class="card">
+    <article>
+      <h1>주식 수익률 계산법: 매수가와 매도가로 실제 수익률 계산하기</h1>
+      <div class="article-meta">📅 2026년 4월 20일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>주식 투자에서 수익률을 계산하는 것은 투자 성과를 평가하는 가장 기본적인 과정입니다. 하지만 단순히 매수가와 매도가만으로 수익률을 계산하는 것은 실제 투자 성과를 정확히 반영하지 못할 수 있습니다. <strong>거래 수수료, 세금, 그리고 해외 주식의 경우 환율 변동까지</strong> 다양한 요소를 고려해야 비로소 실제 손에 쥐는 수익률을 파악할 수 있습니다. 이 글에서는 주식 수익률을 정확하게 계산하는 방법과 함께, 간과하기 쉬운 추가 비용 및 환율의 영향을 심층적으로 다루겠습니다.</p>
+      <h2>기본 주식 수익률 계산</h2>
+      <p>가장 기본적인 주식 수익률 계산 공식은 다음과 같습니다.</p>
+      <div class="highlight-box"><p><strong>수익률 = ( (매도가 - 매수가) / 매수가 ) × 100</strong></p></div>
+      <p>예를 들어, 10,000원에 매수한 주식을 12,000원에 매도했다면, 수익률은 ((12,000 - 10,000) / 10,000) × 100 = 20%가 됩니다. 하지만 이 계산은 실제 투자에서 발생하는 여러 비용을 전혀 고려하지 않은 것입니다.</p>
+      <h2>수수료 및 세금 고려</h2>
+      <p>실제 수익률을 계산할 때는 다음과 같은 수수료와 세금을 반드시 포함해야 합니다.</p>
+      <ul>
+        <li><strong>증권사 거래 수수료</strong>: 주식을 매수하거나 매도할 때 증권사에 지불하는 수수료입니다. 온라인 거래의 경우 매우 낮지만, 거래 금액이 크거나 빈번할 경우 무시할 수 없는 수준이 될 수 있습니다.</li>
+        <li><strong>거래세 (국내 주식)</strong>: 국내 주식을 매도할 때 부과되는 세금입니다. 현재 코스피/코스닥 모두 0.20%의 세율이 적용됩니다.</li>
+        <li><strong>양도소득세 (해외 주식)</strong>: 해외 주식 투자로 연간 250만원을 초과하는 수익을 얻었을 경우, 초과분에 대해 22% (지방소득세 포함)의 양도소득세가 부과됩니다. 이는 국내 주식과 달리 매년 정산해야 하는 중요한 세금입니다.</li>
+        <li><strong>배당 소득세</strong>: 주식 보유를 통해 배당금을 받았다면, 배당금에 대해서도 소득세가 부과됩니다. 국내 주식은 15.4%, 해외 주식은 국가별로 다르지만 미국 주식의 경우 15%의 원천징수세율이 적용됩니다.</li>
+      </ul>
+      <p>이러한 비용들을 모두 고려한 실제 수익률은 다음과 같이 계산할 수 있습니다.</p>
+      <div class="highlight-box"><p><strong>실제 수익률 = ( (매도가 - 매수가 - 총 수수료 - 총 세금) / (매수가 + 매수 수수료) ) × 100</strong></p></div>
+      <h2>환율 영향 (미국 주식 투자 시)</h2>
+      <p>미국 주식과 같은 해외 주식에 투자할 때는 환율 변동이 수익률에 미치는 영향을 반드시 고려해야 합니다. 주식을 매수할 때의 환율과 매도할 때의 환율이 다르기 때문입니다.</p>
+      <ul>
+        <li><strong>환율 상승 (원화 약세)</strong>: 주가 수익률이 낮더라도 환율이 상승하면 환차익이 발생하여 전체 수익률이 증가할 수 있습니다.</li>
+        <li><strong>환율 하락 (원화 강세)</strong>: 주가 수익률이 높더라도 환율이 하락하면 환차손이 발생하여 전체 수익률이 감소할 수 있습니다.</li>
+      </ul>
+      <p>환율까지 고려한 실제 수익률 계산은 복잡해지므로, 별도의 환율 계산기를 활용하거나 다음과 같은 개념을 이해하는 것이 중요합니다.</p>
+      <div class="highlight-box"><p><strong>최종 원화 수익 = (매도 주가 × 매도 시점 환율) - (매수 주가 × 매수 시점 환율) - 총 수수료 - 총 세금</strong></p></div>
+      <p>이처럼 환율은 해외 주식 투자 수익률의 숨겨진 변수이므로, 투자 결정 시 반드시 고려해야 합니다.</p>
+      <div class="highlight-box"><p>💡 <strong>도구 탭의 수익률 계산기를 활용하면 매수가, 매도가, 수량, 수수료, 세금, 그리고 환율까지 모든 요소를 반영한 실제 수익률을 간편하게 계산해볼 수 있습니다.</strong> 복잡한 계산 없이 자신의 투자 성과를 정확하게 파악하고, 더 나은 투자 전략을 수립하는 데 도움을 받으세요!</p></div>
+      <h2>결론</h2>
+      <p>주식 수익률 계산은 단순히 숫자를 나열하는 것을 넘어, 투자 성과를 객관적으로 평가하고 미래 투자 전략을 개선하는 데 필수적인 과정입니다. 수수료, 세금, 환율 등 다양한 요소를 정확히 이해하고 계산에 반영함으로써, 투자자들은 자신의 실제 수익률을 명확하게 파악하고 보다 현명한 투자 결정을 내릴 수 있을 것입니다. MDD 분석기와 함께 수익률 계산기를 활용하여 성공적인 투자 여정을 이어가시길 바랍니다.</p></article>
+    <div class="related">
+      <div class="related-title">다른 글도 보기</div>
+      <a href="/blog/1.html" class="related-chip">MDD란 무엇인가? 고점 대비 하락률 완전 가이드</a><a href="/blog/2.html" class="related-chip">TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라</a><a href="/blog/3.html" class="related-chip">고점 대비 -30% 하락 시 시장은 어떻게 움직였나: 과거 데이터 분석</a>
+    </div>
+    <p class="note">본 콘텐츠는 정보 제공 목적이며 투자 자문이 아닙니다.</p>
+  </div>
+</div>
+</body>
+</html>

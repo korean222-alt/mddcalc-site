@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSI 지표 완전 가이드: 과매수/과매도 판단법 | MDD 분석기 블로그</title>
+<meta name="description" content="RSI 14일 기준으로 매수/매도 시점을 판단하는 방법을 실제 사례로 설명합니다.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mddcalc.com/blog/5.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RSI 지표 완전 가이드: 과매수/과매도 판단법">
+<meta property="og:description" content="RSI 14일 기준으로 매수/매도 시점을 판단하는 방법을 실제 사례로 설명합니다.">
+<meta property="og:url" content="https://mddcalc.com/blog/5.html">
+<meta property="og:site_name" content="MDD 분석기">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "RSI 지표 완전 가이드: 과매수/과매도 판단법",
+  "description": "RSI 14일 기준으로 매수/매도 시점을 판단하는 방법을 실제 사례로 설명합니다.",
+  "datePublished": "2026-02-05",
+  "articleSection": "RSI 가이드",
+  "url": "https://mddcalc.com/blog/5.html"
+}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.75; padding: 16px; }
+  .container { max-width: 720px; margin: 0 auto; }
+  a { color: #4299e1; }
+  .card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
+  .article-meta { font-size: 13px; color: #a0aec0; margin: 4px 0 20px; }
+  .highlight-box { background: #f7fafc; border-left: 3px solid #4299e1; border-radius: 6px; padding: 12px 16px; margin: 14px 0; }
+  h1 { font-size: 24px; margin-bottom: 4px; color: #2d3748; }
+  h2 { font-size: 19px; margin: 22px 0 10px; color: #2d3748; }
+  p { margin-bottom: 12px; }
+  ul { margin: 10px 0 14px 20px; } li { margin-bottom: 6px; }
+  .related { margin-top: 20px; padding-top: 16px; border-top: 1px solid #edf2f7; }
+  .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
+  .related-chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
+                  border-radius: 20px; font-size: 13px; font-weight: 600; margin: 0 6px 6px 0; text-decoration: none; }
+  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/blog.html">블로그</a></nav>
+  <div class="card">
+    <article>
+      <h1>RSI 지표 완전 가이드: 과매수/과매도 판단법과 활용 전략</h1>
+      <div class="article-meta">📅 2026년 2월 5일 &nbsp;&bull;&nbsp; ⏱ 10분 읽기</div>
+      <p>RSI(Relative Strength Index), 즉 상대강도지수는 J. Welles Wilder가 1978년 개발한 대표적인 모멘텀 지표입니다. 이 지표는 주식이나 다른 자산의 가격 변동폭 중에서 상승폭이 차지하는 비율을 나타내며, <strong>0에서 100 사이의 값</strong>으로 주가의 과매수(Overbought) 또는 과매도(Oversold) 상태를 판단하는 데 사용됩니다. RSI는 시장의 강도와 약도를 측정하여 잠재적인 추세 전환점을 예측하는 데 도움을 줍니다.</p>
+      <h2>RSI 해석 방법: 과매수/과매도 구간</h2>
+      <p>RSI는 일반적으로 14일 기간을 기준으로 계산되며, 특정 구간을 통해 시장의 상태를 파악합니다.</p>
+      <ul>
+        <li><strong>RSI 30 이하</strong>: 이 구간은 자산이 <strong>과매도 상태</strong>에 있음을 시사합니다. 즉, 주가가 지나치게 하락하여 저평가되었을 가능성이 높으므로, 매수를 검토해볼 수 있는 시점으로 해석될 수 있습니다.</li>
+        <li><strong>RSI 30~50</strong>: 이 구간은 상대적으로 <strong>약세 구간</strong>으로 판단됩니다. 시장의 모멘텀이 약하거나 하락 추세가 지속될 수 있으므로, 신중한 접근이 필요합니다.</li>
+        <li><strong>RSI 50~70</strong>: 이 구간은 <strong>강세 구간</strong>으로 해석됩니다. 시장의 모멘텀이 강하거나 상승 추세가 지속될 가능성이 높으므로, 보유하거나 추가 매수를 고려할 수 있습니다.</li>
+        <li><strong>RSI 70 이상</strong>: 이 구간은 자산이 <strong>과매수 상태</strong>에 있음을 나타냅니다. 주가가 단기간에 급등하여 고평가되었을 가능성이 높으므로, 매도를 검토하거나 신규 매수를 자제하는 것이 좋습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>💡 <strong>RSI 다이버전스</strong>: 주가는 신저점을 기록하는데 RSI는 신저점을 기록하지 않거나, 주가는 신고점을 기록하는데 RSI는 신고점을 기록하지 못하는 경우를 다이버전스라고 합니다. 이는 추세 전환의 강력한 신호로 해석될 수 있습니다.</p></div>
+      <h2>RSI 활용 전략</h2>
+      <p>RSI는 강력한 지표이지만, 단독으로 사용하기보다는 다른 기술적 분석 도구들과 함께 사용할 때 그 신뢰도가 더욱 높아집니다. 예를 들어, MDD(최대 낙폭), 거래량, 이동평균선, 볼린저 밴드 등과 결합하여 사용하면 보다 정확한 매매 신호를 포착할 수 있습니다.</p>
+      <ul>
+        <li><strong>MDD와 결합</strong>: MDD 분석기를 통해 종목의 역사적 하락폭을 파악하고, RSI가 과매도 구간에 진입했을 때 매수를 고려하면 더욱 효과적인 저점 하락 대응 패턴을 세울 수 있습니다.</li>
+        <li><strong>추세 확인</strong>: RSI가 과매수/과매도 구간에 있더라도, 전체적인 주가 추세가 강한 상승 또는 하락 추세라면 RSI 신호가 일시적으로 무력화될 수 있습니다. 따라서 추세 지표와 함께 확인하는 것이 중요합니다.</li>
+        <li><strong>기간 설정</strong>: RSI의 기간 설정(기본 14일)은 투자자의 매매 스타일에 따라 조절할 수 있습니다. 단기 매매자는 더 짧은 기간을, 장기 투자자는 더 긴 기간을 설정하여 활용할 수 있습니다.</li>
+      </ul>
+      <h2>RSI 계산기 사용법</h2>
+      <p>우리 사이트의 RSI 계산기는 사용자가 입력한 종가 데이터를 기반으로 자동으로 RSI 값을 계산하고, 현재 주가가 과매수/과매도 구간에 있는지 직관적으로 보여줍니다. 이를 통해 복잡한 계산 없이도 RSI 지표를 활용한 투자 결정을 내리는 데 도움을 받을 수 있습니다. 도구 페이지에서 직접 종가 데이터를 입력하여 RSI를 계산하고, 자신만의 판단 기준을 세우는 데 참고할 수 있습니다.</p>
+      <p>RSI는 시장의 과열과 침체를 판단하는 데 유용한 도구이지만, 맹신하기보다는 보조 지표로 활용하는 것이 현명합니다. 항상 다양한 정보를 종합적으로 분석하고, 자신의 투자 원칙에 따라 신중하게 투자 결정을 내리시길 바랍니다.</p>
+    </article>
+    <div class="related">
+      <div class="related-title">다른 글도 보기</div>
+      <a href="/blog/1.html" class="related-chip">MDD란 무엇인가? 고점 대비 하락률 완전 가이드</a><a href="/blog/2.html" class="related-chip">TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라</a><a href="/blog/3.html" class="related-chip">고점 대비 -30% 하락 시 시장은 어떻게 움직였나: 과거 데이터 분석</a>
+    </div>
+    <p class="note">본 콘텐츠는 정보 제공 목적이며 투자 자문이 아닙니다.</p>
+  </div>
+</div>
+</body>
+</html>
