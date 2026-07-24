@@ -319,6 +319,29 @@
   </div>
 </div>
 
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">🧭 어떤 상황에 어떤 도구를 쓰면 좋을까요?</h2>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">도구가 8가지나 되다 보니 무엇부터 써야 할지 막막할 수 있습니다. 투자 과정의 단계별로 정리해 봤습니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">① 시장이 많이 빠졌을 때 — MDD 계산기</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">지금 하락이 이 종목의 과거 기준으로 흔한 수준인지 드문 수준인지 확인하고 싶을 때 사용합니다. 고점 대비 하락률과 과거 하락 구간별 회복 이력을 보여줍니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">② 단기 과열·침체가 궁금할 때 — RSI 계산기</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">최근 상승·하락 속도를 0~100 숫자로 확인합니다. MDD가 "위치"를 본다면 RSI는 "속도"를 봅니다. 두 지표를 함께 보면 서로의 사각지대를 보완할 수 있습니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">③ 장기 계획을 세울 때 — 복리 계산기</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">초기 투자금과 월 납입액, 수익률 가정을 넣으면 10년, 20년, 30년 후 자산을 시뮬레이션합니다. 수익률 가정을 낙관·중립·보수로 바꿔가며 범위로 이해하는 것을 권합니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">④ 현금흐름이 목적일 때 — 배당 수익률 계산기</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">배당수익률과 재투자 효과를 계산합니다. 세전·세후 차이(미국 배당 원천징수 15%)도 감안해 보세요.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">⑤ 매수 계획을 세울 때 — 분할매수 계획</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">총 투자금을 하락 구간별로 나눠 사는 계획표를 만듭니다. 하락장이 오기 전에 미리 계획을 세워두는 용도입니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">⑥ 원화 기준 손익이 궁금할 때 — 환율 계산기</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">달러↔원화 환산과 함께, 환율 변동이 미국 주식 수익률에 미치는 영향을 계산합니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">⑦ 성과를 평가할 때 — 수익률 계산기</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">매수가·매도가에 수수료와 세금까지 반영한 실수익률을 계산합니다. 연환산 수익률로 서로 다른 투자를 공정하게 비교할 수 있습니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">⑧ 고위험 상품을 이해하고 싶을 때 — 레버리지 ETF 시뮬레이터</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">레버리지 상품의 일일 배수 리셋과 변동성 잠식이 장기 성과에 미치는 영향을 시뮬레이션합니다. 매수 전 위험을 숫자로 확인하는 용도입니다.</p>
+    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 모든 도구의 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
+  </section>
+
 </div><!-- end container -->
 
 <footer class="site-footer">
@@ -476,12 +499,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
   if (document.getElementById('blogGrid')) {
-    renderBlogGrid();
+    // 글 목록은 정적 HTML로 제공. 구버전 ?post=N 링크만 정적 페이지로 리다이렉트.
     const qPost = new URLSearchParams(window.location.search).get('post');
-    if (qPost) {
-      showBlogPost(parseInt(qPost, 10));
-    } else {
-      showBlogList();
+    if (qPost && /^[0-9]+$/.test(qPost)) {
+      window.location.replace('/blog/' + qPost + '.html');
     }
   }
 
@@ -2247,10 +2268,10 @@ function getRelatedPostsHtml(id) {
     const p = BLOG_POSTS.find(post => post.id === rid);
     if (!p) return '';
     return `
-      <div class="related-card" onclick="showBlogPost(${p.id})">
+      <a class="related-card" href="/blog/${p.id}.html" style="display:block; text-decoration:none; color:inherit;">
         <div class="related-card-tag">${p.tag}</div>
         <div class="related-card-title">${p.title}</div>
-      </div>
+      </a>
     `;
   }).join('');
   if (!cards) return '';
@@ -2290,7 +2311,7 @@ function renderBlogGrid() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
   grid.innerHTML = BLOG_POSTS.map(post => `
-    <div class="blog-card" onclick="showBlogPost(${post.id})">
+    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
       <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
       <div class="blog-card-body">
         <div class="blog-card-tag">${post.tag}</div>
@@ -2298,7 +2319,7 @@ function renderBlogGrid() {
         <div class="blog-card-excerpt">${post.excerpt}</div>
         <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
       </div>
-    </div>
+    </a>
   `).join('');
 }
 

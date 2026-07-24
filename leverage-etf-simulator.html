@@ -311,6 +311,27 @@
   </div>
 </div>
 
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">📚 레버리지 ETF의 원리와 위험</h2>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">"3배 ETF"는 연 수익률의 3배가 아닙니다</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">TQQQ, SOXL 같은 레버리지 ETF는 기초지수 <strong>"하루" 수익률의 배수</strong>를 추적하도록 설계되어 있습니다. 지수가 하루 +1% 오르면 3배 ETF는 약 +3%, 하루 -1%면 약 -3%로 움직입니다. 중요한 것은 이 배수가 <strong>일 단위로 리셋</strong>된다는 점입니다. 그래서 한 달, 1년처럼 기간이 길어지면 누적 수익률은 지수의 3배와 전혀 다른 값이 됩니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">변동성 잠식: 숫자로 보는 원리</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">지수가 +10% 오른 다음 날 -10% 내리면 지수는 1.10 × 0.90 = 0.99, 즉 <strong>-1%</strong>입니다. 그런데 3배 ETF는 1.30 × 0.70 = 0.91, 즉 <strong>-9%</strong>가 됩니다. 지수는 거의 제자리인데 레버리지 상품만 크게 깎인 것이죠. 이렇게 오르내림이 반복될수록 수익이 침식되는 현상을 <strong>변동성 잠식(volatility decay)</strong>이라고 합니다. 횡보장이 길수록, 변동성이 클수록 잠식은 커집니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">과거 사례가 보여주는 하락폭</h3>
+    <ul style="font-size:14px; color:#4a5568; line-height:1.8; margin:8px 0 12px 20px;">
+      <li>2022년 금리 인상기에 나스닥 100이 약 -35% 하락하는 동안 3배 상품인 TQQQ는 약 -80% 수준까지 하락했습니다.</li>
+      <li>-80% 손실을 회복하려면 +400%의 수익이 필요합니다. 기초지수가 전고점을 회복해도 레버리지 상품은 전고점에 한참 못 미치는 경우가 생기는 이유입니다.</li>
+      <li>레버리지 ETF는 스왑 비용, 이자 비용, 상대적으로 높은 운용보수도 수익률에서 차감됩니다.</li>
+    </ul>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">이 시뮬레이터로 확인할 수 있는 것</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">이 도구는 기초지수의 일별 흐름을 바탕으로 레버리지 배수를 적용했을 때의 누적 성과와 MDD를 시뮬레이션합니다. "지수가 결국 회복하면 레버리지도 회복하겠지"라는 직관이 왜 자주 틀리는지, 변동성 잠식이 실제 수치로 얼마나 되는지를 직접 확인해 보세요.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 레버리지 ETF는 장기 투자에 적합한가요?</strong><br>일반적으로 레버리지 ETF는 단기 트레이딩 도구로 설계되었으며, 운용사들도 장기 보유 시 기초지수 배수와 괴리가 커질 수 있음을 명시하고 있습니다. 장기 보유를 고려한다면 변동성 잠식과 최대 -80~-90%에 이를 수 있는 하락폭을 감내할 수 있는지 신중히 판단해야 합니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 곱버스(인버스 레버리지)도 같은 원리인가요?</strong><br>네. 하락에 베팅하는 인버스·레버리지 상품도 일 단위 리셋 구조라 변동성 잠식의 영향을 동일하게 받으며, 장기 보유 시 손실이 누적되기 쉽습니다.</p>
+    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 레버리지 상품은 원금 대부분을 잃을 수 있는 고위험 상품입니다. 본 도구의 결과는 교육 목적의 시뮬레이션이며 투자 권유가 아닙니다.</p>
+  </section>
+
 </div><!-- end container -->
 
 <footer class="site-footer">
@@ -468,12 +489,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
   if (document.getElementById('blogGrid')) {
-    renderBlogGrid();
+    // 글 목록은 정적 HTML로 제공. 구버전 ?post=N 링크만 정적 페이지로 리다이렉트.
     const qPost = new URLSearchParams(window.location.search).get('post');
-    if (qPost) {
-      showBlogPost(parseInt(qPost, 10));
-    } else {
-      showBlogList();
+    if (qPost && /^[0-9]+$/.test(qPost)) {
+      window.location.replace('/blog/' + qPost + '.html');
     }
   }
 
@@ -2239,10 +2258,10 @@ function getRelatedPostsHtml(id) {
     const p = BLOG_POSTS.find(post => post.id === rid);
     if (!p) return '';
     return `
-      <div class="related-card" onclick="showBlogPost(${p.id})">
+      <a class="related-card" href="/blog/${p.id}.html" style="display:block; text-decoration:none; color:inherit;">
         <div class="related-card-tag">${p.tag}</div>
         <div class="related-card-title">${p.title}</div>
-      </div>
+      </a>
     `;
   }).join('');
   if (!cards) return '';
@@ -2282,7 +2301,7 @@ function renderBlogGrid() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
   grid.innerHTML = BLOG_POSTS.map(post => `
-    <div class="blog-card" onclick="showBlogPost(${post.id})">
+    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
       <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
       <div class="blog-card-body">
         <div class="blog-card-tag">${post.tag}</div>
@@ -2290,7 +2309,7 @@ function renderBlogGrid() {
         <div class="blog-card-excerpt">${post.excerpt}</div>
         <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
       </div>
-    </div>
+    </a>
   `).join('');
 }
 

@@ -302,6 +302,31 @@
   </div>
 </div>
 
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">📚 RSI 더 깊이 이해하기</h2>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">RSI는 어떻게 계산되나요?</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">RSI(Relative Strength Index)는 1978년 웰레스 와일더가 고안한 지표로, 일정 기간(기본 14일) 동안의 <strong>평균 상승폭과 평균 하락폭의 비율</strong>을 0~100 사이 값으로 바꾼 것입니다. 계산식은 RSI = 100 − 100 ÷ (1 + RS)이고, 여기서 RS는 평균 상승폭 ÷ 평균 하락폭입니다. 이 계산기는 와일더 방식의 지수 평활(Wilder's smoothing)을 사용해 일반적인 증권사 HTS·차트 서비스와 같은 방식으로 계산합니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">기간(9일·14일·25일)에 따라 무엇이 달라지나요?</h3>
+    <ul style="font-size:14px; color:#4a5568; line-height:1.8; margin:8px 0 12px 20px;">
+      <li><strong>9일(단기)</strong>: 최근 움직임에 민감하게 반응합니다. 신호가 빨리 나오는 대신 잘못된 신호(노이즈)도 많아집니다.</li>
+      <li><strong>14일(기본)</strong>: 와일더가 제안한 표준 설정으로, 대부분의 차트 도구가 기본값으로 사용합니다.</li>
+      <li><strong>25일(장기)</strong>: 완만하게 움직여 큰 흐름을 보는 데 적합하지만, 단기 과열·침체는 놓칠 수 있습니다.</li>
+    </ul>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">다이버전스: 한 단계 깊은 활용법</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">주가는 신저점을 낮추는데 RSI 저점은 오히려 높아지는 경우를 <strong>강세 다이버전스</strong>, 반대로 주가는 신고점인데 RSI 고점이 낮아지는 경우를 <strong>약세 다이버전스</strong>라고 부릅니다. 추세의 힘이 약해지고 있다는 참고 신호로 활용되지만, 다이버전스가 나타나도 추세가 한동안 이어지는 경우가 많아 단독 판단 근거로는 부족합니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">RSI의 한계</h3>
+    <ul style="font-size:14px; color:#4a5568; line-height:1.8; margin:8px 0 12px 20px;">
+      <li>강한 상승 추세에서는 RSI 70 이상의 과매수 상태가 몇 주씩 지속될 수 있습니다. "70 넘으면 판다"는 기계적 대응은 추세장에서 손해로 이어질 수 있습니다.</li>
+      <li>급락장에서는 RSI 30 미만에서 추가 하락이 이어지는 경우도 흔합니다.</li>
+      <li>RSI는 가격만으로 계산되므로 실적 발표, 금리 결정 같은 이벤트 정보를 반영하지 못합니다.</li>
+    </ul>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. RSI가 30 아래면 매수해야 하나요?</strong><br>아닙니다. RSI 30 미만은 "최근 하락 속도가 가팔랐다"는 뜻일 뿐 반등 시점을 알려주지 않습니다. MDD, 거래량, 기업 실적 등과 함께 참고하세요.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 이 계산기의 데이터는 어디서 오나요?</strong><br>홈 화면의 MDD 계산기와 같은 출처(Twelve Data API)의 전일 종가 데이터를 사용합니다. 종가를 직접 입력해 계산할 수도 있습니다.</p>
+    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
+  </section>
+
 </div><!-- end container -->
 
 <footer class="site-footer">
@@ -459,12 +484,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
   if (document.getElementById('blogGrid')) {
-    renderBlogGrid();
+    // 글 목록은 정적 HTML로 제공. 구버전 ?post=N 링크만 정적 페이지로 리다이렉트.
     const qPost = new URLSearchParams(window.location.search).get('post');
-    if (qPost) {
-      showBlogPost(parseInt(qPost, 10));
-    } else {
-      showBlogList();
+    if (qPost && /^[0-9]+$/.test(qPost)) {
+      window.location.replace('/blog/' + qPost + '.html');
     }
   }
 
@@ -2230,10 +2253,10 @@ function getRelatedPostsHtml(id) {
     const p = BLOG_POSTS.find(post => post.id === rid);
     if (!p) return '';
     return `
-      <div class="related-card" onclick="showBlogPost(${p.id})">
+      <a class="related-card" href="/blog/${p.id}.html" style="display:block; text-decoration:none; color:inherit;">
         <div class="related-card-tag">${p.tag}</div>
         <div class="related-card-title">${p.title}</div>
-      </div>
+      </a>
     `;
   }).join('');
   if (!cards) return '';
@@ -2273,7 +2296,7 @@ function renderBlogGrid() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
   grid.innerHTML = BLOG_POSTS.map(post => `
-    <div class="blog-card" onclick="showBlogPost(${post.id})">
+    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
       <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
       <div class="blog-card-body">
         <div class="blog-card-tag">${post.tag}</div>
@@ -2281,7 +2304,7 @@ function renderBlogGrid() {
         <div class="blog-card-excerpt">${post.excerpt}</div>
         <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
       </div>
-    </div>
+    </a>
   `).join('');
 }
 

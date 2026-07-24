@@ -446,12 +446,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
   if (document.getElementById('blogGrid')) {
-    renderBlogGrid();
+    // 글 목록은 정적 HTML로 제공. 구버전 ?post=N 링크만 정적 페이지로 리다이렉트.
     const qPost = new URLSearchParams(window.location.search).get('post');
-    if (qPost) {
-      showBlogPost(parseInt(qPost, 10));
-    } else {
-      showBlogList();
+    if (qPost && /^[0-9]+$/.test(qPost)) {
+      window.location.replace('/blog/' + qPost + '.html');
     }
   }
 
@@ -2217,10 +2215,10 @@ function getRelatedPostsHtml(id) {
     const p = BLOG_POSTS.find(post => post.id === rid);
     if (!p) return '';
     return `
-      <div class="related-card" onclick="showBlogPost(${p.id})">
+      <a class="related-card" href="/blog/${p.id}.html" style="display:block; text-decoration:none; color:inherit;">
         <div class="related-card-tag">${p.tag}</div>
         <div class="related-card-title">${p.title}</div>
-      </div>
+      </a>
     `;
   }).join('');
   if (!cards) return '';
@@ -2260,7 +2258,7 @@ function renderBlogGrid() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
   grid.innerHTML = BLOG_POSTS.map(post => `
-    <div class="blog-card" onclick="showBlogPost(${post.id})">
+    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
       <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
       <div class="blog-card-body">
         <div class="blog-card-tag">${post.tag}</div>
@@ -2268,7 +2266,7 @@ function renderBlogGrid() {
         <div class="blog-card-excerpt">${post.excerpt}</div>
         <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
       </div>
-    </div>
+    </a>
   `).join('');
 }
 

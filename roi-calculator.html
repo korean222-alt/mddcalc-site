@@ -302,6 +302,26 @@
   </div>
 </div>
 
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">📚 수익률, 제대로 계산하기</h2>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">단순 수익률과 연환산 수익률(CAGR)</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">단순 수익률은 <strong>(매도가 − 매수가) ÷ 매수가 × 100</strong>입니다. 하지만 "3년 동안 +30%"와 "1년 동안 +30%"는 전혀 다른 성과죠. 기간을 반영한 지표가 <strong>연환산 수익률(CAGR)</strong>로, (최종금액 ÷ 원금)<sup>1/년수</sup> − 1로 계산합니다. 3년에 +30%면 CAGR은 약 9.1%입니다. 서로 다른 투자를 공정하게 비교하려면 CAGR로 환산해 보는 것이 좋습니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">수수료·세금까지 넣어야 "실수익률"입니다</h3>
+    <ul style="font-size:14px; color:#4a5568; line-height:1.8; margin:8px 0 12px 20px;">
+      <li><strong>거래 수수료</strong>: 매수·매도 시 각각 부과됩니다. 소액을 자주 매매할수록 비중이 커집니다.</li>
+      <li><strong>환전 비용</strong>: 미국 주식은 환전 스프레드가 왕복으로 발생합니다.</li>
+      <li><strong>양도소득세</strong>: 한국 거주자의 해외 주식 매매 차익에는 일반적으로 연 250만 원 기본공제 후 22%(지방소득세 포함)의 양도소득세가 부과되는 것으로 알려져 있습니다. 세법은 바뀔 수 있으므로 신고 전에 최신 규정을 확인하세요.</li>
+    </ul>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">예를 들어 1,000만 원 투자로 500만 원의 차익을 얻었다면, 기본공제 250만 원을 뺀 250만 원에 22%가 과세되어 약 55만 원의 세금이 발생하고, 실수익은 445만 원 수준이 됩니다. 표면 수익률 +50%가 실수익률 약 +44.5%로 내려오는 셈입니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">손실과 수익의 비대칭</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">수익률 계산에서 가장 많이 놓치는 사실은 <strong>손실 회복에 필요한 수익률이 손실률보다 크다</strong>는 점입니다. −20% 손실을 회복하려면 +25%가, −50% 손실을 회복하려면 +100%가 필요합니다. 큰 손실을 피하는 것이 높은 수익을 좇는 것만큼 중요한 이유이며, MDD 관리가 강조되는 배경이기도 합니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 배당도 수익률에 포함해야 하나요?</strong><br>네. 총수익률(Total Return)은 시세 차익에 배당을 더해 계산합니다. 배당을 빼고 비교하면 배당주의 성과가 실제보다 낮아 보입니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 여러 번 나눠 샀는데 수익률은 어떻게 계산하나요?</strong><br>매수 금액 가중 평균 단가를 구한 뒤 현재가와 비교하는 것이 기본입니다. 이 계산기에 평균 단가를 입력하면 됩니다.</p>
+    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 세금 관련 내용은 일반적인 정보이며 개인별 상황과 세법 개정에 따라 달라질 수 있습니다. 본 도구의 결과는 교육 목적이며 투자 권유가 아닙니다.</p>
+  </section>
+
 </div><!-- end container -->
 
 <footer class="site-footer">
@@ -459,12 +479,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
   if (document.getElementById('blogGrid')) {
-    renderBlogGrid();
+    // 글 목록은 정적 HTML로 제공. 구버전 ?post=N 링크만 정적 페이지로 리다이렉트.
     const qPost = new URLSearchParams(window.location.search).get('post');
-    if (qPost) {
-      showBlogPost(parseInt(qPost, 10));
-    } else {
-      showBlogList();
+    if (qPost && /^[0-9]+$/.test(qPost)) {
+      window.location.replace('/blog/' + qPost + '.html');
     }
   }
 
@@ -2230,10 +2248,10 @@ function getRelatedPostsHtml(id) {
     const p = BLOG_POSTS.find(post => post.id === rid);
     if (!p) return '';
     return `
-      <div class="related-card" onclick="showBlogPost(${p.id})">
+      <a class="related-card" href="/blog/${p.id}.html" style="display:block; text-decoration:none; color:inherit;">
         <div class="related-card-tag">${p.tag}</div>
         <div class="related-card-title">${p.title}</div>
-      </div>
+      </a>
     `;
   }).join('');
   if (!cards) return '';
@@ -2273,7 +2291,7 @@ function renderBlogGrid() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
   grid.innerHTML = BLOG_POSTS.map(post => `
-    <div class="blog-card" onclick="showBlogPost(${post.id})">
+    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
       <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
       <div class="blog-card-body">
         <div class="blog-card-tag">${post.tag}</div>
@@ -2281,7 +2299,7 @@ function renderBlogGrid() {
         <div class="blog-card-excerpt">${post.excerpt}</div>
         <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
       </div>
-    </div>
+    </a>
   `).join('');
 }
 

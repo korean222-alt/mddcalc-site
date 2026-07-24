@@ -118,6 +118,34 @@ function updateSitemap(posts) {
   fs.writeFileSync(SITEMAP_PATH, xml);
 }
 
+// blog.html 안의 정적 글 목록(그리드)을 BLOG_POSTS 기준으로 재생성.
+// 크롤러가 JS 실행 없이도 글 25개의 링크를 전부 볼 수 있어야 하므로
+// 목록은 JS 렌더가 아니라 정적 HTML로 유지한다.
+function updateBlogIndex(posts) {
+  const p = path.join(SITE_ROOT, 'blog.html');
+  let html = fs.readFileSync(p, 'utf8');
+  const cards = posts.map(post => `    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
+      <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
+      <div class="blog-card-body">
+        <div class="blog-card-tag">${escapeHtml(post.tag)}</div>
+        <div class="blog-card-title">${escapeHtml(post.title)}</div>
+        <div class="blog-card-excerpt">${escapeHtml(post.excerpt)}</div>
+        <div class="blog-card-meta">${escapeHtml(post.date)} &bull; ${escapeHtml(post.readTime)} 읽기</div>
+      </div>
+    </a>`).join('\n');
+  const block = `<!-- BLOG_GRID_STATIC:START -->\n${cards}\n<!-- BLOG_GRID_STATIC:END -->`;
+  const markerRe = /<!-- BLOG_GRID_STATIC:START -->[\s\S]*?<!-- BLOG_GRID_STATIC:END -->/;
+  if (markerRe.test(html)) {
+    html = html.replace(markerRe, () => block);
+  } else if (html.includes('<div class="blog-grid" id="blogGrid"></div>')) {
+    html = html.replace('<div class="blog-grid" id="blogGrid"></div>',
+      () => `<div class="blog-grid" id="blogGrid">\n${block}\n</div>`);
+  } else {
+    throw new Error('blog.html 에서 blogGrid 컨테이너를 찾지 못했습니다.');
+  }
+  fs.writeFileSync(p, html);
+}
+
 // 사이트 전체에서 "/blog.html?post=N" 링크를 "/blog/N.html" 로 치환
 function patchInternalLinks() {
   const files = fs.readdirSync(SITE_ROOT).filter(f => f.endsWith('.html'));
@@ -145,6 +173,9 @@ function main() {
     fs.writeFileSync(path.join(OUT_DIR, `${post.id}.html`), html);
   }
   console.log(`✅ ${posts.length}개 블로그 글 정적 페이지 생성 완료 (/blog/1.html ~ /blog/${posts.length}.html)`);
+
+  updateBlogIndex(posts);
+  console.log('✅ blog.html 정적 글 목록 갱신 완료');
 
   updateSitemap(posts);
   console.log('✅ sitemap.xml 갱신 완료');

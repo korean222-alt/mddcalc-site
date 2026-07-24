@@ -318,6 +318,26 @@
   </div>
 </div>
 
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">📚 분할매수(DCA) 제대로 알기</h2>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">분할매수란 무엇인가요?</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">분할매수(Dollar Cost Averaging)는 목돈을 한 번에 투자하는 대신 <strong>일정 기간에 걸쳐 나누어 사는 전략</strong>입니다. 가격이 쌀 때는 같은 돈으로 더 많은 수량을, 비쌀 때는 적은 수량을 사게 되어 평균 매입 단가가 자연스럽게 평탄화됩니다. "최악의 타이밍에 전 재산을 넣는" 위험을 구조적으로 줄여주는 것이 핵심 효과입니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">일괄매수와 분할매수, 무엇이 나은가요?</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">정직하게 말하면 <strong>사후적으로는 일괄매수가 이긴 경우가 더 많았다</strong>는 연구들이 있습니다. 시장은 장기적으로 우상향한 기간이 길었기 때문에, 일찍 전액을 넣는 쪽이 통계적으로 유리했던 것이죠. 그럼에도 분할매수가 널리 권장되는 이유는 <strong>최악의 경우를 줄이고, 하락장에서도 계획을 지킬 수 있게 하는 심리적 장치</strong>이기 때문입니다. 수익률 기대값을 조금 양보하는 대신 변동성과 후회 위험을 줄이는 선택으로 이해하는 것이 정확합니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">분할매수 계획을 설계하는 3가지 방법</h3>
+    <ul style="font-size:14px; color:#4a5568; line-height:1.8; margin:8px 0 12px 20px;">
+      <li><strong>정기 분할</strong>: 매주·매월 같은 금액을 기계적으로 매수합니다. 가장 단순하고 감정 개입이 적습니다. 적립식 투자와 사실상 같습니다.</li>
+      <li><strong>하락폭 기반 분할</strong>: 고점 대비 -10%, -20%, -30% 같은 MDD 구간마다 미리 정한 비중을 매수합니다. 하락이 깊어질수록 더 많이 사는 구조를 만들 수 있지만, 하락이 얕게 끝나면 일부 자금은 집행되지 않을 수 있습니다.</li>
+      <li><strong>혼합형</strong>: 일부는 정기 분할로, 일부는 큰 하락 시 추가 매수용으로 남겨두는 방식입니다.</li>
+    </ul>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">이 도구는 총 투자금, 분할 횟수, 하락 구간별 비중을 입력하면 각 구간에서 얼마씩 매수하게 되는지 계획표를 만들어 줍니다. 중요한 것은 <strong>계획을 하락장이 오기 전에 미리 세워두는 것</strong>입니다. 급락 한복판에서 즉흥적으로 정한 계획은 지키기 어렵습니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 몇 번에 나눠 사는 것이 좋나요?</strong><br>정답은 없지만, 너무 잘게 나누면 수수료 부담과 관리 피로가 커지고, 너무 크게 나누면 분할의 의미가 약해집니다. 3~12회 범위에서 본인의 투자금 규모와 기간에 맞게 정하는 경우가 많습니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 개별 주식에도 분할매수가 유효한가요?</strong><br>평균 단가 평탄화 효과는 동일하지만, 개별 종목은 영영 회복하지 못할 위험이 있어 "내려갈 때마다 더 산다"는 접근이 위험할 수 있습니다. 분산된 지수형 자산과 개별 종목은 구분해서 생각하세요.</p>
+    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 특정 매매 전략의 권유가 아닙니다.</p>
+  </section>
+
 </div><!-- end container -->
 
 <footer class="site-footer">
@@ -475,12 +495,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
   if (document.getElementById('blogGrid')) {
-    renderBlogGrid();
+    // 글 목록은 정적 HTML로 제공. 구버전 ?post=N 링크만 정적 페이지로 리다이렉트.
     const qPost = new URLSearchParams(window.location.search).get('post');
-    if (qPost) {
-      showBlogPost(parseInt(qPost, 10));
-    } else {
-      showBlogList();
+    if (qPost && /^[0-9]+$/.test(qPost)) {
+      window.location.replace('/blog/' + qPost + '.html');
     }
   }
 
@@ -2246,10 +2264,10 @@ function getRelatedPostsHtml(id) {
     const p = BLOG_POSTS.find(post => post.id === rid);
     if (!p) return '';
     return `
-      <div class="related-card" onclick="showBlogPost(${p.id})">
+      <a class="related-card" href="/blog/${p.id}.html" style="display:block; text-decoration:none; color:inherit;">
         <div class="related-card-tag">${p.tag}</div>
         <div class="related-card-title">${p.title}</div>
-      </div>
+      </a>
     `;
   }).join('');
   if (!cards) return '';
@@ -2289,7 +2307,7 @@ function renderBlogGrid() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
   grid.innerHTML = BLOG_POSTS.map(post => `
-    <div class="blog-card" onclick="showBlogPost(${post.id})">
+    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
       <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
       <div class="blog-card-body">
         <div class="blog-card-tag">${post.tag}</div>
@@ -2297,7 +2315,7 @@ function renderBlogGrid() {
         <div class="blog-card-excerpt">${post.excerpt}</div>
         <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
       </div>
-    </div>
+    </a>
   `).join('');
 }
 

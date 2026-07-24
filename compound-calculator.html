@@ -299,6 +299,28 @@
   </div>
 </div>
 
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">📚 복리, 제대로 이해하기</h2>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">복리는 왜 강력한가요?</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">복리는 <strong>이자가 다시 이자를 낳는 구조</strong>입니다. 계산식은 미래가치 = 원금 × (1 + 수익률)<sup>기간</sup>입니다. 예를 들어 1,000만 원을 연 7%로 30년 굴리면 단리로는 약 3,100만 원이 되지만, 복리로는 약 7,600만 원이 됩니다. 기간이 길어질수록 차이는 기하급수적으로 벌어지는데, 이것이 장기 투자에서 "시간"이 가장 중요한 변수로 꼽히는 이유입니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">72의 법칙: 암산으로 배가 기간 구하기</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">원금이 두 배가 되는 데 걸리는 기간은 <strong>72 ÷ 연 수익률(%)</strong>로 근사할 수 있습니다. 연 6%면 약 12년, 연 8%면 약 9년, 연 10%면 약 7.2년입니다. 수익률 몇 %p 차이가 장기적으로 얼마나 큰 격차를 만드는지 감을 잡는 데 유용합니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">매월 적립식 투자의 효과</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">목돈 없이 시작해도 매월 일정액을 적립하면 각 납입금이 저마다의 기간 동안 복리로 불어납니다. 이 계산기는 초기 투자금과 월 납입액을 함께 입력받아 <strong>적립식 복리</strong>를 시뮬레이션합니다. 월 30만 원씩 연 7%로 30년을 적립하면 납입 원금 1억 800만 원이 약 3억 5천만 원 안팎으로 불어나는 식의 계산을 직접 확인할 수 있습니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">계산기를 쓸 때 주의할 점</h3>
+    <ul style="font-size:14px; color:#4a5568; line-height:1.8; margin:8px 0 12px 20px;">
+      <li><strong>수익률 가정이 절반입니다.</strong> 미국 대형주 지수의 초장기 연평균 수익률은 배당 포함 7~10% 수준으로 알려져 있지만, 이는 수십 년 평균일 뿐 특정 10년은 이보다 훨씬 낮거나 높았습니다. 낙관·중립·보수 시나리오를 각각 계산해 보는 것이 안전합니다.</li>
+      <li><strong>실제 수익은 매끄럽지 않습니다.</strong> 계산기는 매년 같은 수익률을 가정하지만 실제 시장은 +30%와 -30%를 오가며 평균에 수렴합니다. 그 과정의 하락(MDD)을 견딜 수 있는지가 계획의 성패를 좌우합니다.</li>
+      <li><strong>물가상승률을 감안하세요.</strong> 연 수익률에서 물가상승률(예: 2~3%)을 뺀 실질 수익률로 계산하면 "오늘의 구매력" 기준 결과를 얻을 수 있습니다.</li>
+      <li><strong>세금과 수수료는 별도입니다.</strong> 배당소득세, 양도소득세, 운용보수 등을 반영하면 실제 수령액은 계산 결과보다 줄어듭니다.</li>
+    </ul>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 수익률에는 어떤 값을 넣어야 하나요?</strong><br>정답은 없습니다. 과거 지수 평균(7~10%)을 참고하되, 보수적인 값(4~6%)으로도 함께 계산해 범위로 이해하는 방식을 권합니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 복리 주기는 어떻게 가정하나요?</strong><br>이 계산기는 연 단위 복리를 기본으로 하며, 월 납입액은 매월 투입되어 남은 기간 동안 복리로 계산됩니다.</p>
+    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적의 시뮬레이션이며 투자 권유가 아닙니다.</p>
+  </section>
+
 </div><!-- end container -->
 
 <footer class="site-footer">
@@ -456,12 +478,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 블로그 페이지: 그리드 렌더 + ?post=ID 로 특정 글 바로 열기
   if (document.getElementById('blogGrid')) {
-    renderBlogGrid();
+    // 글 목록은 정적 HTML로 제공. 구버전 ?post=N 링크만 정적 페이지로 리다이렉트.
     const qPost = new URLSearchParams(window.location.search).get('post');
-    if (qPost) {
-      showBlogPost(parseInt(qPost, 10));
-    } else {
-      showBlogList();
+    if (qPost && /^[0-9]+$/.test(qPost)) {
+      window.location.replace('/blog/' + qPost + '.html');
     }
   }
 
@@ -2227,10 +2247,10 @@ function getRelatedPostsHtml(id) {
     const p = BLOG_POSTS.find(post => post.id === rid);
     if (!p) return '';
     return `
-      <div class="related-card" onclick="showBlogPost(${p.id})">
+      <a class="related-card" href="/blog/${p.id}.html" style="display:block; text-decoration:none; color:inherit;">
         <div class="related-card-tag">${p.tag}</div>
         <div class="related-card-title">${p.title}</div>
-      </div>
+      </a>
     `;
   }).join('');
   if (!cards) return '';
@@ -2270,7 +2290,7 @@ function renderBlogGrid() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
   grid.innerHTML = BLOG_POSTS.map(post => `
-    <div class="blog-card" onclick="showBlogPost(${post.id})">
+    <a class="blog-card" href="/blog/${post.id}.html" style="display:block; text-decoration:none; color:inherit;">
       <div class="blog-card-img" style="background:${post.bg}">${post.emoji}</div>
       <div class="blog-card-body">
         <div class="blog-card-tag">${post.tag}</div>
@@ -2278,7 +2298,7 @@ function renderBlogGrid() {
         <div class="blog-card-excerpt">${post.excerpt}</div>
         <div class="blog-card-meta">${post.date} &bull; ${post.readTime} 읽기</div>
       </div>
-    </div>
+    </a>
   `).join('');
 }
 
