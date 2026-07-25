@@ -22,6 +22,8 @@ const SITE_ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(SITE_ROOT, 'blog');
 const SITEMAP_PATH = path.join(SITE_ROOT, 'sitemap.xml');
 const ADSENSE_CLIENT = 'ca-pub-5583100002281558';
+// 전체 글을 마지막으로 검토·수정한 날짜. 내용을 손볼 때마다 갱신한다.
+const REVIEWED_DATE = '2026-07-25';
 
 function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -67,8 +69,24 @@ function buildPostPage(post, related) {
   "headline": "${escapeHtml(post.title)}",
   "description": "${escapeHtml(description)}",
   "datePublished": "${escapeHtml(post.date)}",
+  "dateModified": "${REVIEWED_DATE}",
   "articleSection": "${escapeHtml(post.tag)}",
-  "url": "${canonical}"
+  "inLanguage": "ko",
+  "url": "${canonical}",
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "${canonical}" },
+  "author": {
+    "@type": "Person",
+    "name": "MDD 분석기 운영자",
+    "description": "개인 투자자이자 개발자. 투자자문업 등록 사업자가 아니며, 공개된 표준 계산식과 공개 시세 데이터만을 사용해 콘텐츠를 작성합니다.",
+    "url": "https://mddcalc.com/about.html",
+    "email": "gktgkt2309@gmail.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "MDD 분석기",
+    "url": "https://mddcalc.com/"
+  },
+  "isAccessibleForFree": true
 }
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>
@@ -90,7 +108,13 @@ function buildPostPage(post, related) {
   .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
   .related-chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
                   border-radius: 20px; font-size: 13px; font-weight: 600; margin: 0 6px 6px 0; text-decoration: none; }
-  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; }
+  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; line-height: 1.7; }
+  .author-box { display: flex; gap: 14px; align-items: flex-start; margin-top: 26px; padding: 16px;
+                background: #f7fafc; border-radius: 10px; border: 1px solid #edf2f7; }
+  .author-avatar { flex: none; width: 44px; height: 44px; border-radius: 50%; background: #edf2f7;
+                   display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .author-name { font-size: 14px; font-weight: 700; color: #2d3748; margin-bottom: 4px; }
+  .author-bio { font-size: 13px; color: #718096; line-height: 1.7; margin: 0; }
 </style>
 </head>
 <body>
@@ -98,11 +122,28 @@ function buildPostPage(post, related) {
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/blog.html">블로그</a></nav>
   <div class="card">
     <article>${post.content}</article>
+    <div class="author-box">
+      <div class="author-avatar">📊</div>
+      <div>
+        <div class="author-name">MDD 분석기 운영자</div>
+        <p class="author-bio">
+          개인 투자자이자 개발자입니다. 고점 대비 하락률을 매번 손으로 계산하기 번거로워 만든 도구를 무료로 공개하고 있습니다.
+          투자자문업·금융투자업 등록 사업자가 아니며, 특정 종목이나 상품을 추천하지 않습니다.
+          글에 쓰인 계산식은 모두 공개된 표준 공식이고, 시세는 Twelve Data의 종가 데이터를 사용합니다.
+          내용에 오류가 있으면 <a href="mailto:gktgkt2309@gmail.com">gktgkt2309@gmail.com</a> 으로 알려주세요. 확인 후 수정합니다.
+          <a href="/about.html">운영 원칙 자세히 보기 →</a>
+        </p>
+      </div>
+    </div>
     <div class="related">
       <div class="related-title">다른 글도 보기</div>
       ${relatedHtml}
     </div>
-    <p class="note">본 콘텐츠는 정보 제공 목적이며 투자 자문이 아닙니다.</p>
+    <p class="note">
+      📅 최초 작성 ${escapeHtml(post.date)} · 최종 검토 ${REVIEWED_DATE}<br>
+      본 글은 정보 제공 및 교육 목적으로 작성되었으며 투자 자문이 아닙니다. 과거 데이터는 미래 수익을 보장하지 않고,
+      주식 투자에는 원금 손실 위험이 있습니다. 투자 판단과 그 결과에 대한 책임은 투자자 본인에게 있습니다.
+    </p>
   </div>
 </div>
 </body>
