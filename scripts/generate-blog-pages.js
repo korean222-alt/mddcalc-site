@@ -27,12 +27,14 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// 글 데이터의 단일 원본. 예전에는 blog.html 인라인 JS에서 배열을 긁어왔지만,
+// 그 60KB짜리 블록을 모든 페이지에서 걷어내고 scripts/posts-data.js 로 분리했다.
 function extractPosts() {
-  const html = fs.readFileSync(path.join(SITE_ROOT, 'blog.html'), 'utf8');
-  const m = html.match(/const BLOG_POSTS = (\[[\s\S]*?\n\]);/);
-  if (!m) throw new Error('blog.html 에서 BLOG_POSTS 배열을 찾지 못했습니다.');
-  // 신뢰된 1차 콘텐츠(직접 작성한 자체 데이터)를 빌드 시점에만 평가 — 외부 입력 없음
-  return new Function('return ' + m[1])();
+  const { BLOG_POSTS } = require('./posts-data.js');
+  if (!Array.isArray(BLOG_POSTS) || !BLOG_POSTS.length) {
+    throw new Error('scripts/posts-data.js 에서 BLOG_POSTS 를 읽지 못했습니다.');
+  }
+  return BLOG_POSTS;
 }
 
 function buildPostPage(post, related) {
