@@ -151,11 +151,16 @@ function buildPostPage(post, related) {
 `;
 }
 
+// 사이트맵의 모든 항목에 lastmod 를 넣는다. 이게 없으면 구글은 페이지가 언제
+// 바뀌었는지 알 수 없어 재크롤링 우선순위를 낮게 잡는다.
 function updateSitemap(posts) {
   let xml = fs.existsSync(SITEMAP_PATH) ? fs.readFileSync(SITEMAP_PATH, 'utf8') : '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</urlset>\n';
-  xml = xml.replace(/\s*<url><loc>https:\/\/mddcalc\.com\/blog\/[^<]+<\/loc><priority>0\.6<\/priority><\/url>/g, '');
+  xml = xml.replace(/\s*<url><loc>https:\/\/mddcalc\.com\/blog\/[^<]+<\/loc>[\s\S]*?<\/url>/g, '');
+  // 블로그 외 기존 항목에도 lastmod 를 붙이거나 갱신
+  xml = xml.replace(/<url><loc>(https:\/\/mddcalc\.com\/[^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?(<priority>[^<]*<\/priority>)<\/url>/g,
+    (_m, loc, prio) => `<url><loc>${loc}</loc><lastmod>${REVIEWED_DATE}</lastmod>${prio}</url>`);
   const entries = posts.map(p =>
-    `  <url><loc>https://mddcalc.com/blog/${p.id}.html</loc><priority>0.6</priority></url>`
+    `  <url><loc>https://mddcalc.com/blog/${p.id}.html</loc><lastmod>${REVIEWED_DATE}</lastmod><priority>0.6</priority></url>`
   ).join('\n');
   xml = xml.replace('</urlset>', entries + '\n</urlset>');
   fs.writeFileSync(SITEMAP_PATH, xml);
