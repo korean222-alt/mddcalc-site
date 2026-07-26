@@ -1,52 +1,57 @@
 // scripts/generate-stock-pages.js
 //
-// 왜 필요한가
-// -----------
-// 지금 index.html 은 티커를 "/?ticker=NVDA" 쿼리스트링 + 클라이언트 JS로만 보여주고,
-// <link rel="canonical" href="https://mddcalc.com/"> 가 모든 티커에 동일하게 박혀 있어서
-// 구글 입장에서는 "NVDA 페이지"라는 게 아예 존재하지 않는다 (전부 홈페이지로 합쳐짐).
+// 왜 다시 만드는가
+// ---------------
+// 이전 버전(/stock/*.html, 39개)은 종목당 442자 안팎이었고, 그마저도 설명을
+// 두 문장에서 그라데이션으로 잘라내고 "무료로 전체 보기 →" 버튼으로 인터랙티브
+// 계산기 쪽 클릭을 유도하는 구조였다. 이건 정확히 구글이 "낮은 가치의 콘텐츠"로
+// 분류하는 패턴(완결된 답을 주지 않고 클릭을 유도하는 티저)이라 전부 삭제했다.
 //
-// 이 스크립트는 빌드 시점(로컬 or CI)에 한 번 Twelve Data를 호출해서
-// 티커별 정적 HTML(/stock/nvda.html 등)을 실제 숫자가 박힌 채로 미리 만들어 둔다.
-// 방문자가 올 때마다 API를 부르는 게 아니라 "빌드할 때 한 번"만 부르므로
-// 800회/일 한도와 무관하게 안전하다.
+// 이번 버전은 정반대로 설계한다: 계산기가 실제로 계산하는 것과 동일한 원본
+// 시세 데이터를 빌드 시점에 가져와서, 역대 주요 하락 구간 표·변동성·SPY 대비
+// 비교까지 페이지 자체에 전부 담는다. 클릭을 유도해 콘텐츠를 완성시키는 구조가
+// 아니라, 페이지 하나만 봐도 그 자체로 답이 되도록 만드는 것이 목표다.
 //
 // 실행: TWELVE_DATA_API_KEY=xxxx node scripts/generate-stock-pages.js
-//
-// 배포 연동 (Vercel):
-//   Project Settings → Build Command 를
-//   "node scripts/generate-stock-pages.js && echo done"
-//   로 바꾸면 매 배포마다 자동으로 재생성된다.
-//   숫자를 매일 최신으로 유지하려면 GitHub Actions cron으로 하루 1회
-//   빈 커밋(or Vercel Deploy Hook) 을 트리거해서 재배포되게 하면 된다.
+// (Twelve Data 무료 한도: 분당 8회 · 일 800회 — 15개 종목이면 넉넉하게 안전)
 
 const fs = require('fs');
 const path = require('path');
-
-const API_KEY = process.env.TWELVE_DATA_API_KEY;
-if (!API_KEY) {
-  console.error('❌ TWELVE_DATA_API_KEY 환경변수가 없습니다. export TWELVE_DATA_API_KEY=... 후 재실행하세요.');
-  process.exit(1);
-}
 
 const SITE_ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(SITE_ROOT, 'stock');
 const SITEMAP_PATH = path.join(SITE_ROOT, 'sitemap.xml');
 const ADSENSE_CLIENT = 'ca-pub-5583100002281558';
 
-// 한국 서학개미들이 실제로 많이 검색하는 티커 위주. 필요하면 자유롭게 추가/삭제.
-const TICKERS = [
-  'NVDA', 'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NFLX',
-  'TQQQ', 'SOXL', 'SPXL', 'UPRO', 'SQQQ', 'SOXS', 'FNGU', 'TECL',
-  'SPY', 'QQQ', 'VOO', 'VTI', 'SCHD', 'JEPI', 'JEPQ',
-  'AMD', 'AVGO', 'SMCI', 'ARM', 'MU', 'TSM', 'INTC',
-  'PLTR', 'COIN', 'MSTR', 'RIVN', 'LCID', 'NIO', 'BABA', 'DIS', 'BA',
-];
+const API_KEY = process.env.TWELVE_DATA_API_KEY;
+if (!API_KEY) {
+  console.error('❌ TWELVE_DATA_API_KEY 환경변수가 없습니다. TWELVE_DATA_API_KEY=xxxx node scripts/generate-stock-pages.js 로 실행하세요.');
+  process.exit(1);
+}
 
-const RATE_LIMIT_PER_MIN = 8; // twelve data 무료 티어
-const DELAY_MS = Math.ceil(60000 / RATE_LIMIT_PER_MIN) + 500;
+// 서학개미가 실제로 많이 찾는 핵심 15종목으로 시작 (전체 확대는 이후 검토)
+const TICKERS = [
+  'AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'AMZN', 'META',
+  'SPY', 'QQQ', 'VOO', 'VTI', 'SCHD', 'TQQQ', 'SOXL', 'AMD',
+];
+const BENCHMARK = 'SPY'; // 상대 비교 기준 지수
+
+const REFRESH_CYCLE_DAYS = 7; // 매주 자동 갱신 (.github/workflows/refresh-stock-pages.yml)
+const TOP_N_DRAWDOWNS = 5;
+
+// 이 리포트가 다루는 종목과 겹치는 블로그 글이 있으면 서로 링크한다.
+// generate-blog-pages.js도 같은 매핑을 반대 방향으로 써서 상호 링크를 만든다.
+const { TICKER_RELATED_POSTS } = require('./posts-data.js');
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function fmtPct(n) { return `${n >= 0 ? '+' : ''}${n.toFixed(1)}%`; }
+function fmtPrice(n) { return `$${n.toFixed(2)}`; }
+function fmtDate(d) { return d; } // 이미 YYYY-MM-DD 문자열
 
 async function fetchSeries(symbol) {
   const url = new URL('https://api.twelvedata.com/time_series');
@@ -57,125 +62,140 @@ async function fetchSeries(symbol) {
 
   const res = await fetch(url.toString());
   const json = await res.json();
-  if (json.status === 'error' || !json.values) {
-    throw new Error(json.message || `${symbol}: no data`);
-  }
-  return json.values; // newest first, like the front-end expects
+
+  if (json.status === 'error') throw new Error(`${symbol}: ${json.message}`);
+  if (!json.values || !json.values.length) throw new Error(`${symbol}: 데이터 없음`);
+
+  // Twelve Data는 최신순으로 내려주므로 오래된 순으로 뒤집는다
+  return json.values.map(v => ({ date: v.datetime, close: parseFloat(v.close) })).reverse();
 }
 
-// index.html 의 analyze() 를 그대로 이식 (mode='high' 기본값과 동일한 로직)
-function analyze(data) {
-  const n = data.length;
-  const peakSeries = data.map(d => d.high);
-  const closes = data.map(d => d.close);
-  const dates = data.map(d => d.date);
+function daysBetween(d1, d2) {
+  return Math.round((new Date(d2) - new Date(d1)) / 86400000);
+}
 
-  const runMax = new Array(n);
-  let mx = -Infinity, mxIdx = 0;
-  const mxIdxArr = new Array(n);
-  for (let i = 0; i < n; i++) {
-    if (peakSeries[i] > mx) { mx = peakSeries[i]; mxIdx = i; }
-    runMax[i] = mx;
-    mxIdxArr[i] = mxIdx;
+// 고점→저점→회복(신고점 경신)을 하나의 "구간"으로 묶어 전부 계산.
+// 마지막까지 회복 못 한 구간은 ongoing으로 별도 반환.
+function computeDrawdowns(series) {
+  const episodes = [];
+  let peak = series[0].close, peakDate = series[0].date;
+  let trough = null, troughDate = null;
+
+  for (let i = 1; i < series.length; i++) {
+    const { date, close } = series[i];
+    if (close >= peak) {
+      if (trough !== null) {
+        episodes.push({
+          peakDate, peakPrice: peak,
+          troughDate, troughPrice: trough,
+          declinePct: (trough - peak) / peak * 100,
+          recoveryDate: date,
+          recoveryDays: daysBetween(troughDate, date),
+        });
+        trough = null; troughDate = null;
+      }
+      peak = close; peakDate = date;
+    } else if (trough === null || close < trough) {
+      trough = close; troughDate = date;
+    }
   }
-  const dd = closes.map((c, i) => (c / runMax[i] - 1) * 100);
 
-  const currentPrice = closes[n - 1];
-  const currentDD = dd[n - 1];
-  const currentDate = dates[n - 1];
-  const athPrice = runMax[n - 1];
-  const athIdx = mxIdxArr[n - 1];
-  const athDate = dates[athIdx];
-
-  let maxDD = 0, maxDDIdx = 0;
-  for (let i = 0; i < n; i++) {
-    if (dd[i] < maxDD) { maxDD = dd[i]; maxDDIdx = i; }
+  let ongoing = null;
+  if (trough !== null) {
+    ongoing = {
+      peakDate, peakPrice: peak,
+      troughDate, troughPrice: trough,
+      declinePct: (trough - peak) / peak * 100,
+      recoveryDate: null, recoveryDays: null,
+    };
   }
+  return { episodes, ongoing, athPrice: peak, athDate: peakDate };
+}
+
+// 연환산 변동성 (일간 로그수익률의 표준편차 × √252)
+function annualizedVolatility(series) {
+  const rets = [];
+  for (let i = 1; i < series.length; i++) rets.push(Math.log(series[i].close / series[i - 1].close));
+  const mean = rets.reduce((a, b) => a + b, 0) / rets.length;
+  const variance = rets.reduce((a, b) => a + (b - mean) ** 2, 0) / (rets.length - 1);
+  return Math.sqrt(variance) * Math.sqrt(252) * 100;
+}
+
+function analyze(series) {
+  const { episodes, ongoing, athPrice, athDate } = computeDrawdowns(series);
+  const all = ongoing ? [...episodes, ongoing] : episodes;
+  const top = [...all].sort((a, b) => a.declinePct - b.declinePct).slice(0, TOP_N_DRAWDOWNS);
+
+  const last = series[series.length - 1];
+  const currentDrawdownPct = (last.close - athPrice) / athPrice * 100;
 
   return {
-    currentPrice, currentDD, currentDate,
+    startDate: series[0].date,
+    endDate: last.date,
+    years: (daysBetween(series[0].date, last.date) / 365.25),
+    currentPrice: last.close,
+    currentDate: last.date,
     athPrice, athDate,
-    maxDD, maxDDDate: dates[maxDDIdx],
+    currentDrawdownPct,
+    isAtAth: Math.abs(currentDrawdownPct) < 0.05,
+    volatility: annualizedVolatility(series),
+    topDrawdowns: top,
+    worstDrawdownPct: top.length ? top[0].declinePct : 0,
   };
 }
 
-function fmt(n, d = 2) {
-  return n == null || isNaN(n) ? '—' : Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
-}
-function fmtPct(n, d = 2) {
-  return n == null || isNaN(n) ? '—' : Number(n).toFixed(d) + '%';
-}
-function escapeHtml(str) {
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
-// 최근 5년만 사용 (index.html 의 기본 setPreset(5) 와 동일)
-function last5Years(rows) {
-  const latest = new Date(rows[rows.length - 1].date);
-  const cutoff = new Date(latest);
-  cutoff.setFullYear(cutoff.getFullYear() - 5);
-  return rows.filter(r => new Date(r.date) >= cutoff);
+function buildDrawdownTableHtml(top) {
+  return top.map(d => `
+        <tr>
+          <td>${d.peakDate}<br><span class="muted">${fmtPrice(d.peakPrice)}</span></td>
+          <td>${d.troughDate}<br><span class="muted">${fmtPrice(d.troughPrice)}</span></td>
+          <td class="neg">${fmtPct(d.declinePct)}</td>
+          <td>${d.recoveryDate ? `${d.recoveryDate}<br><span class="muted">${d.recoveryDays.toLocaleString()}일 소요</span>` : '<span class="ongoing">미회복 (진행 중)</span>'}</td>
+        </tr>`).join('');
 }
 
-// 5년치 종가로 정적 SVG 스파크라인 생성 (차트 라이브러리/JS 없이 빌드 시점에 굽는 방식)
-function buildSparkline(rows) {
-  const W = 600, H = 150, PAD = 4;
-  const step = Math.max(1, Math.floor(rows.length / 140));
-  const sampled = rows.filter((_, i) => i % step === 0);
-  if (sampled[sampled.length - 1] !== rows[rows.length - 1]) sampled.push(rows[rows.length - 1]);
-
-  const closes = sampled.map(r => r.close);
-  const min = Math.min(...closes), max = Math.max(...closes);
-  const range = (max - min) || 1;
-  const pts = sampled.map((r, i) => {
-    const x = PAD + (i / (sampled.length - 1)) * (W - PAD * 2);
-    const y = PAD + (1 - (r.close - min) / range) * (H - PAD * 2);
-    return [x, y];
-  });
-  const pointsStr = pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
-  const areaStr = `${PAD},${H - PAD} ${pointsStr} ${W - PAD},${H - PAD}`;
-  const up = closes[closes.length - 1] >= closes[0];
-  const color = up ? '#38a169' : '#e53e3e';
-  const lastPt = pts[pts.length - 1];
-
-  return `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" role="img" aria-label="5년 주가 추이">
-<defs><linearGradient id="sg-${up ? 'u' : 'd'}" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0%" stop-color="${color}" stop-opacity="0.28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-</linearGradient></defs>
-<polygon points="${areaStr}" fill="url(#sg-${up ? 'u' : 'd'})"/>
-<polyline points="${pointsStr}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="${lastPt[0].toFixed(1)}" cy="${lastPt[1].toFixed(1)}" r="4" fill="${color}"/>
-</svg>`;
+function buildRelatedTickersHtml(symbol) {
+  const others = TICKERS.filter(t => t !== symbol).slice(0, 6);
+  return others.map(t => `<a href="/stock/${t.toLowerCase()}.html" class="chip">${t}</a>`).join('');
 }
 
-function buildPage(ticker, A, rows) {
-  const drop = Math.abs(A.currentDD).toFixed(1);
-  const isNearATH = Math.abs(A.currentDD) < 1;
-  const title = isNearATH
-    ? `${ticker} 사상 최고가(ATH) 근접 — MDD 분석 | MDD 분석기`
-    : `${ticker} 고점 대비 ${drop}% 하락 — MDD 분석 | MDD 분석기`;
-  const description = isNearATH
-    ? `${ticker}는 현재 사상 최고가(ATH) 부근입니다. 과거 하락·회복 패턴과 최대 낙폭(MDD)을 무료로 확인하세요.`
-    : `${ticker}는 고점(ATH) 대비 ${drop}% 하락한 상태입니다. 역대 최대 낙폭 ${fmtPct(A.maxDD)}, 현재가 $${fmt(A.currentPrice)}. 과거 회복 패턴을 무료로 확인하세요.`;
-  const canonical = `https://mddcalc.com/stock/${ticker.toLowerCase()}.html`;
-  const sparkSvg = buildSparkline(rows);
+function buildRelatedBlogHtml(symbol) {
+  const ids = TICKER_RELATED_POSTS[symbol] || [];
+  if (!ids.length) return '';
+  const { BLOG_POSTS } = require('./posts-data.js');
+  const links = ids.map(id => {
+    const p = BLOG_POSTS.find(x => x.id === id);
+    return p ? `<a href="/blog/${id}.html" class="chip">${escapeHtml(p.title)}</a>` : '';
+  }).filter(Boolean).join('');
+  if (!links) return '';
+  return `
+    <div class="related">
+      <div class="related-title">관련 글</div>
+      ${links}
+    </div>`;
+}
 
-  // 버튼 위 짧은 캡션(궁금증 유발용 실제 숫자) + 버튼 자체는 짧고 명확하게 분리
-  const ctaCaption = isNearATH
-    ? `과거 조정, 평균 며칠 만에 회복됐을까?`
-    : `역대 최대 낙폭 ${fmtPct(A.maxDD)} — 지금 위치는?`;
-  const ctaLabel = `무료로 전체 분석 보기`;
+function buildPage(symbol, a, spyA, generatedDate) {
+  const canonical = `https://mddcalc.com/stock/${symbol.toLowerCase()}.html`;
+  const title = `${symbol} MDD 실데이터: 역대 하락 구간·회복 기간 전체 정리 | MDD 분석기`;
+  const description = `${symbol}의 실제 시세로 계산한 고점 대비 하락률, 역대 주요 하락 구간과 회복 기간, 변동성을 무료로 확인하세요.`;
 
-  // 관련 종목 3개 (내부 링크 + 체류시간용, 랜덤 아님: 같은 리스트 내 다음 종목들)
-  const idx = TICKERS.indexOf(ticker);
-  const related = [];
-  for (let i = 1; related.length < 3 && i < TICKERS.length; i++) {
-    const t = TICKERS[(idx + i) % TICKERS.length];
-    if (t !== ticker) related.push(t);
+  const yearsLabel = a.years.toFixed(1);
+  const heroClass = a.currentDrawdownPct < -0.05 ? 'neg' : 'pos';
+  const heroText = a.isAtAth ? '현재 사상 최고가' : fmtPct(a.currentDrawdownPct);
+
+  let spyCompareHtml = '';
+  if (symbol !== BENCHMARK && spyA) {
+    const diff = a.worstDrawdownPct - spyA.worstDrawdownPct;
+    const deeper = diff < 0;
+    spyCompareHtml = `
+    <div class="card">
+      <h2>📊 ${BENCHMARK}(시장 전체) 대비 비교</h2>
+      <p>같은 기간(${spyA.startDate} ~ ${spyA.endDate}) 동안 ${BENCHMARK}의 최대 낙폭은 <strong>${fmtPct(spyA.worstDrawdownPct)}</strong>였습니다.
+      ${symbol}의 최대 낙폭 <strong>${fmtPct(a.worstDrawdownPct)}</strong>은 ${BENCHMARK}보다 <strong>${Math.abs(diff).toFixed(1)}%p ${deeper ? '더 깊었습니다' : '더 얕았습니다'}</strong>.
+      연환산 변동성도 ${symbol}가 ${a.volatility.toFixed(1)}%로 ${BENCHMARK}(${spyA.volatility.toFixed(1)}%)보다 ${a.volatility > spyA.volatility ? '높았습니다' : '낮았습니다'}.</p>
+    </div>`;
   }
-  const relatedHtml = related.map(t =>
-    `<a href="/stock/${t.toLowerCase()}.html" class="related-chip">${escapeHtml(t)}</a>`
-  ).join('');
 
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -196,89 +216,103 @@ function buildPage(ticker, A, rows) {
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "FinancialProduct",
-  "name": "${escapeHtml(ticker)} MDD(최대낙폭) 분석",
+  "@type": "WebPage",
+  "name": "${escapeHtml(symbol)} MDD 실데이터 리포트",
   "description": "${escapeHtml(description)}",
-  "url": "${canonical}"
+  "url": "${canonical}",
+  "dateModified": "${generatedDate}",
+  "inLanguage": "ko"
 }
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
-         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.6; padding: 16px; }
+         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.65; padding: 16px; }
   .container { max-width: 760px; margin: 0 auto; }
   a { color: #4299e1; }
-  .card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .card { background: #fff; border-radius: 14px; padding: 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
-  .ticker-name { font-size: 15px; font-weight: 700; color: #718096; letter-spacing: 0.5px; }
-  .hero { font-size: 52px; font-weight: 800; line-height: 1.1; margin: 6px 0 4px; }
+  .ticker-name { font-size: 14px; font-weight: 700; color: #718096; letter-spacing: 0.5px; }
+  .hero { font-size: 46px; font-weight: 800; line-height: 1.1; margin: 6px 0 4px; }
   .hero.neg { color: #e53e3e; } .hero.pos { color: #38a169; }
-  .hero-label { font-size: 14px; color: #718096; margin-bottom: 18px; }
-  .chart-wrap { margin: 4px 0 8px; border-radius: 10px; overflow: hidden; background: #fafbfc; padding: 8px 4px; }
-  .spark { width: 100%; height: 90px; display: block; }
-  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
+  .hero-label { font-size: 13px; color: #718096; margin-bottom: 6px; }
+  .data-range { font-size: 12px; color: #a0aec0; margin-bottom: 14px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 14px 0; }
   .stat { background: #f7fafc; border-radius: 10px; padding: 14px; }
   .stat .label { font-size: 12px; color: #718096; margin-bottom: 4px; }
-  .stat .value { font-size: 18px; font-weight: 700; color: #2d3748; }
-  .cta-caption { font-size: 14px; font-weight: 700; color: #97650b; text-align: center; margin-bottom: 10px; }
-  .cta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 0;
-         padding: 15px 20px; background: linear-gradient(135deg, #f0c14b, #d4a017);
-         color: #2d2200; border-radius: 999px; text-decoration: none; font-weight: 800; font-size: 16px;
-         text-align: center; box-shadow: 0 6px 16px rgba(212,160,23,0.4); position: relative; z-index: 2;
-         border: 1px solid rgba(255,255,255,0.5); }
-  .cta .arrow { width: 22px; height: 22px; border-radius: 50%; background: rgba(45,34,0,0.15);
-                display: inline-flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
-  .cta:active { transform: scale(0.97); }
-  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; }
-  .related { margin-top: 16px; }
+  .stat .value { font-size: 17px; font-weight: 700; color: #2d3748; }
+  h2 { font-size: 17px; margin-bottom: 10px; color: #2d3748; }
+  p { font-size: 14px; color: #4a5568; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; color: #a0aec0; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #edf2f7; }
+  td { padding: 8px; border-bottom: 1px solid #f7fafc; vertical-align: top; }
+  td.neg { color: #e53e3e; font-weight: 700; }
+  .muted { font-size: 11px; color: #a0aec0; }
+  .ongoing { color: #d69e2e; font-weight: 600; }
+  .tool-cta { display: block; margin-top: 4px; padding: 14px 18px; background: #2b6cb0; color: #fff !important;
+              border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; text-align: center; }
+  .tool-cta:hover { background: #2c5282; }
+  .related { margin-top: 4px; }
   .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
-  .related-chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
-                  border-radius: 20px; font-size: 13px; font-weight: 600; margin-right: 6px; text-decoration: none; }
-  .teaser { position: relative; max-height: 92px; overflow: hidden; margin: 16px 0 0; }
-  .teaser::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
-                    background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%); }
-  .cta-wrap { margin-top: 4px; }
+  .chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
+          border-radius: 20px; font-size: 13px; font-weight: 600; margin: 0 6px 6px 0; text-decoration: none; }
+  .freshness { font-size: 12px; color: #718096; background: #f7fafc; border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
+  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; line-height: 1.7; }
 </style>
 </head>
 <body>
 <div class="container">
-  <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/tools.html">도구 모음</a> &gt; ${escapeHtml(ticker)}</nav>
-  <div class="card">
-    <div class="ticker-name">${escapeHtml(ticker)}</div>
-    <div class="hero ${A.currentDD < -0.01 ? 'neg' : 'pos'}">${fmtPct(A.currentDD)}</div>
-    <div class="hero-label">고점(ATH $${fmt(A.athPrice)}, ${escapeHtml(A.athDate)}) 대비 · 현재가 $${fmt(A.currentPrice)} · 기준일 ${escapeHtml(A.currentDate)}</div>
+  <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/tools.html">도구 모음</a> &gt; ${symbol}</nav>
 
-    <div class="chart-wrap">${sparkSvg}</div>
+  <div class="card">
+    <div class="ticker-name">${symbol}</div>
+    <div class="hero ${heroClass}">${heroText}</div>
+    <div class="hero-label">${a.isAtAth ? `사상 최고가 ${fmtPrice(a.athPrice)} 경신 중` : `사상 최고가(ATH) ${fmtPrice(a.athPrice)} (${a.athDate}) 대비 · 현재가 ${fmtPrice(a.currentPrice)}`} · 기준일 ${a.currentDate}</div>
+    <div class="data-range">📅 데이터 기간: ${a.startDate} ~ ${a.endDate} (약 ${yearsLabel}년, 일봉 기준)</div>
 
     <div class="stat-grid">
       <div class="stat">
-        <div class="label">최근 5년 최대 낙폭(MDD)</div>
-        <div class="value">${fmtPct(A.maxDD)}</div>
+        <div class="label">이 기간 최대 낙폭(MDD)</div>
+        <div class="value">${fmtPct(a.worstDrawdownPct)}</div>
       </div>
       <div class="stat">
-        <div class="label">최대 낙폭 발생일</div>
-        <div class="value">${escapeHtml(A.maxDDDate)}</div>
+        <div class="label">연환산 변동성</div>
+        <div class="value">${a.volatility.toFixed(1)}%</div>
       </div>
     </div>
 
-    <div class="teaser">
-      <p>${escapeHtml(ticker)}는 현재 고점 대비 <strong>${fmtPct(A.currentDD)}</strong> 하락한 상태입니다.
-      최근 5년 기준 가장 크게 떨어졌던 시점은 <strong>${escapeHtml(A.maxDDDate)}</strong>이며,
-      당시 고점 대비 <strong>${fmtPct(A.maxDD)}</strong>까지 낙폭이 커졌습니다. 이동평균, SPY 대비 상대강도,
-      과거 유사 하락 이후 평균 회복 기간까지 이어서 확인할 수 있는데,</p>
-    </div>
-    <div class="cta-wrap">
-      <div class="cta-caption">${escapeHtml(ctaCaption)}</div>
-      <a class="cta" href="/?ticker=${encodeURIComponent(ticker)}">${escapeHtml(ctaLabel)}<span class="arrow">→</span></a>
-    </div>
+    <p>${symbol} 종목은 ${a.isAtAth
+      ? `현재 사상 최고가(${a.athDate} 기록, ${fmtPrice(a.athPrice)})를 경신하며 거래되고 있습니다.`
+      : `현재 사상 최고가(${a.athDate} 기록, ${fmtPrice(a.athPrice)}) 대비 <strong>${heroText}</strong> 상태입니다.`}
+    분석 기간(${yearsLabel}년) 동안 가장 크게 하락했던 구간은 <strong>${a.topDrawdowns[0].declinePct.toFixed(1)}%</strong> 하락한 사례로,
+    ${a.topDrawdowns[0].peakDate}부터 ${a.topDrawdowns[0].troughDate}까지 낙폭이 커졌${a.topDrawdowns[0].recoveryDate ? `고, 이후 ${a.topDrawdowns[0].recoveryDays.toLocaleString()}일 만에 이전 고점을 회복했습니다.` : `으며, 이 분석 시점까지 아직 이전 고점을 회복하지 못한 상태입니다.`}</p>
+  </div>
 
+  <div class="card">
+    <h2>📋 역대 주요 하락 구간 (하락률 상위 ${a.topDrawdowns.length}개)</h2>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>고점</th><th>저점</th><th>하락률</th><th>회복</th></tr></thead>
+        <tbody>${buildDrawdownTableHtml(a.topDrawdowns)}</tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:10px;">종가 기준으로 계산한 근사치이며, 실제 장중 고가/저가 기준으로는 수치가 다소 달라질 수 있습니다.</p>
+  </div>
+  ${spyCompareHtml}
+
+  <div class="card">
+    <a class="tool-cta" href="/?ticker=${symbol}">MDD 계산기에서 ${symbol} 실시간으로 다시 조회하기 →</a>
+  </div>
+
+  <div class="card">
     <div class="related">
-      <div class="related-title">다른 종목도 보기</div>
-      ${relatedHtml}
+      <div class="related-title">다른 종목 리포트</div>
+      ${buildRelatedTickersHtml(symbol)}
     </div>
-
-    <p class="note">본 페이지는 정보 제공 목적이며 투자 자문이 아닙니다. 데이터 기준일: ${escapeHtml(A.currentDate)}</p>
+    ${buildRelatedBlogHtml(symbol)}
+    <p class="freshness">📅 데이터 기준일: ${generatedDate} · 이 페이지는 매주 자동으로 최신 데이터로 갱신됩니다. 지금 보시는 수치가 실제 시세와 최대 ${REFRESH_CYCLE_DAYS}일 정도 차이가 날 수 있습니다.</p>
+    <p class="note">본 페이지는 정보 제공 목적이며 투자 자문이 아닙니다. 데이터 출처: Twelve Data. 오류 제보: <a href="mailto:gktgkt2309@gmail.com">gktgkt2309@gmail.com</a></p>
   </div>
 </div>
 </body>
@@ -286,49 +320,69 @@ function buildPage(ticker, A, rows) {
 `;
 }
 
-function updateSitemap(tickers) {
-  let xml = fs.existsSync(SITEMAP_PATH) ? fs.readFileSync(SITEMAP_PATH, 'utf8') : '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</urlset>\n';
-
-  // 기존에 이 스크립트가 넣어둔 /stock/ 항목은 지우고 새로 채워서 중복 방지
-  xml = xml.replace(/\s*<url><loc>https:\/\/mddcalc\.com\/stock\/[^<]+<\/loc><priority>0\.6<\/priority><\/url>/g, '');
-
+function updateSitemap(tickers, generatedDate) {
+  let xml = fs.readFileSync(SITEMAP_PATH, 'utf8');
+  xml = xml.replace(/\s*<url><loc>https:\/\/mddcalc\.com\/stock\/[^<]+<\/loc>[\s\S]*?<\/url>/g, '');
   const entries = tickers.map(t =>
-    `  <url><loc>https://mddcalc.com/stock/${t.toLowerCase()}.html</loc><priority>0.6</priority></url>`
+    `  <url><loc>https://mddcalc.com/stock/${t.toLowerCase()}.html</loc><lastmod>${generatedDate}</lastmod><priority>0.7</priority></url>`
   ).join('\n');
-
   xml = xml.replace('</urlset>', entries + '\n</urlset>');
   fs.writeFileSync(SITEMAP_PATH, xml);
 }
 
-async function main() {
-  fs.mkdirSync(OUT_DIR, { recursive: true });
-  const ok = [];
-  const failed = [];
-
-  for (const ticker of TICKERS) {
-    try {
-      process.stdout.write(`${ticker} ... `);
-      const values = await fetchSeries(ticker);
-      const rows = values.map(v => ({
-        date: v.datetime, open: parseFloat(v.open), high: parseFloat(v.high),
-        low: parseFloat(v.low), close: parseFloat(v.close),
-      })).reverse();
-      const windowed = last5Years(rows);
-      const A = analyze(windowed);
-      const html = buildPage(ticker, A, windowed);
-      fs.writeFileSync(path.join(OUT_DIR, `${ticker.toLowerCase()}.html`), html);
-      console.log(`OK (${fmtPct(A.currentDD)})`);
-      ok.push(ticker);
-    } catch (e) {
-      console.log(`FAIL (${e.message})`);
-      failed.push(ticker);
-    }
-    await sleep(DELAY_MS); // 무료 티어 분당 8회 한도 준수
+// tools.html 안에 "종목별 실데이터 리포트" 허브 섹션을 정적으로 유지한다.
+// (blog.html의 BLOG_GRID_STATIC 마커와 같은 방식 — 크롤러가 JS 없이도 15개 링크를 전부 보게 하려면
+// 어딘가 한 곳에는 15개 링크가 정적 HTML로 모여 있어야 한다.)
+function updateToolsHub(tickers) {
+  const p = path.join(SITE_ROOT, 'tools.html');
+  let html = fs.readFileSync(p, 'utf8');
+  const chips = tickers.map(t => `<a href="/stock/${t.toLowerCase()}.html" class="chip">${t}</a>`).join('\n        ');
+  const block = `<!-- STOCK_HUB_STATIC:START -->
+      <div class="card">
+        <h2 class="section">📈 종목별 MDD 실데이터 리포트</h2>
+        <p style="font-size:14px; color:#4a5568; margin-bottom:10px;">실제 시세 데이터로 계산한 역대 하락 구간과 회복 기간을 종목별로 정리했습니다.</p>
+        ${chips}
+      </div>
+<!-- STOCK_HUB_STATIC:END -->`;
+  const markerRe = /<!-- STOCK_HUB_STATIC:START -->[\s\S]*?<!-- STOCK_HUB_STATIC:END -->/;
+  if (markerRe.test(html)) {
+    html = html.replace(markerRe, () => block);
+  } else if (html.includes('</div><!-- end container -->')) {
+    html = html.replace('</div><!-- end container -->', () => block + '\n</div><!-- end container -->');
+  } else {
+    throw new Error('tools.html 에서 삽입 위치를 찾지 못했습니다.');
   }
-
-  updateSitemap(ok);
-  console.log(`\n완료: ${ok.length}개 생성, ${failed.length}개 실패`);
-  if (failed.length) console.log('실패한 티커:', failed.join(', '));
+  fs.writeFileSync(p, html);
 }
 
-main();
+async function main() {
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  const generatedDate = new Date().toISOString().slice(0, 10);
+
+  const analyses = {};
+  for (const symbol of TICKERS) {
+    process.stdout.write(`⏳ ${symbol} 조회 중... `);
+    const series = await fetchSeries(symbol);
+    analyses[symbol] = analyze(series);
+    console.log(`완료 (${series.length}일치, ${analyses[symbol].startDate} ~ ${analyses[symbol].endDate})`);
+    await sleep(8000); // 분당 8회 제한 준수 (60s / 8 = 7.5s, 여유 있게 8s)
+  }
+
+  const spyA = analyses[BENCHMARK];
+  for (const symbol of TICKERS) {
+    const html = buildPage(symbol, analyses[symbol], spyA, generatedDate);
+    fs.writeFileSync(path.join(OUT_DIR, `${symbol.toLowerCase()}.html`), html);
+  }
+  console.log(`\n✅ ${TICKERS.length}개 종목 리포트 생성 완료 (/stock/*.html)`);
+
+  updateSitemap(TICKERS, generatedDate);
+  console.log('✅ sitemap.xml 갱신 완료');
+
+  updateToolsHub(TICKERS);
+  console.log('✅ tools.html 허브 섹션 갱신 완료');
+}
+
+main().catch(err => {
+  console.error('❌ 생성 실패:', err.message);
+  process.exit(1);
+});

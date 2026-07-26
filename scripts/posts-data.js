@@ -1049,4 +1049,11 @@ const CTA_MAP = {
   25:{type:'ticker', value:'SPY', label:'첫 종목 SPY로 시작해보기'}
 };
 
-module.exports = { BLOG_POSTS, RELATED_POSTS, CTA_MAP };
+// 티커 실데이터 리포트(/stock/*.html)와 이 글이 서로 링크할 때 쓰는 매핑.
+// generate-stock-pages.js와 generate-blog-pages.js가 공유하는 단일 원본.
+const TICKER_RELATED_POSTS = {
+  TSLA: [2], SPY: [4, 25], MSFT: [9], NVDA: [12], AAPL: [20],
+  QQQ: [7, 16], VTI: [23],
+};
+
+module.exports = { BLOG_POSTS, RELATED_POSTS, CTA_MAP, TICKER_RELATED_POSTS };

@@ -31,7 +31,17 @@ function escapeHtml(str) {
 
 // 글 데이터의 단일 원본. 예전에는 blog.html 인라인 JS에서 배열을 긁어왔지만,
 // 그 60KB짜리 블록을 모든 페이지에서 걷어내고 scripts/posts-data.js 로 분리했다.
-const { BLOG_POSTS, CTA_MAP } = require('./posts-data.js');
+const { BLOG_POSTS, CTA_MAP, TICKER_RELATED_POSTS } = require('./posts-data.js');
+
+// TICKER_RELATED_POSTS(티커 → 글 id[])를 반대로 뒤집어서 글 id → 티커[] 로.
+// generate-stock-pages.js가 만드는 /stock/{ticker}.html 쪽에서 이 글로 링크하니,
+// 이 글에서도 그 리포트로 되돌아가는 링크를 넣어 상호 링크를 만든다.
+const POST_RELATED_TICKERS = {};
+for (const [ticker, ids] of Object.entries(TICKER_RELATED_POSTS)) {
+  for (const id of ids) {
+    (POST_RELATED_TICKERS[id] = POST_RELATED_TICKERS[id] || []).push(ticker);
+  }
+}
 function extractPosts() {
   if (!Array.isArray(BLOG_POSTS) || !BLOG_POSTS.length) {
     throw new Error('scripts/posts-data.js 에서 BLOG_POSTS 를 읽지 못했습니다.');
@@ -71,6 +81,12 @@ function buildPostPage(post, related) {
   const relatedHtml = related.map(p =>
     `<a href="/blog/${p.id}.html" class="related-chip">${escapeHtml(p.title)}</a>`
   ).join('');
+  const relatedTickers = POST_RELATED_TICKERS[post.id] || [];
+  const tickerReportHtml = relatedTickers.length ? `
+    <div class="related">
+      <div class="related-title">실데이터 리포트</div>
+      ${relatedTickers.map(t => `<a href="/stock/${t.toLowerCase()}.html" class="related-chip">${t} 하락 구간 전체 보기</a>`).join('')}
+    </div>` : '';
 
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -172,6 +188,7 @@ function buildPostPage(post, related) {
       <div class="related-title">다른 글도 보기</div>
       ${relatedHtml}
     </div>
+    ${tickerReportHtml}
     <p class="note">
       📅 최초 작성 ${escapeHtml(post.date)} · 최종 검토 ${REVIEWED_DATE}<br>
       본 글은 정보 제공 및 교육 목적으로 작성되었으며 투자 자문이 아닙니다. 과거 데이터는 미래 수익을 보장하지 않고,

@@ -1,0 +1,53 @@
+name: Refresh stock report pages
+
+# scripts/generate-stock-pages.js를 매주 자동 실행해서 /stock/*.html의 실데이터
+# (현재가, ATH, 하락 구간 표 등)를 최신 상태로 갱신하고 main에 직접 커밋한다.
+# 필요 조건: 이 저장소의 Settings > Secrets and variables > Actions 에
+# TWELVE_DATA_API_KEY 라는 이름으로 시크릿을 등록해야 동작한다.
+#
+# 수동으로 지금 바로 돌리고 싶으면: Actions 탭 > Refresh stock report pages
+# > Run workflow 버튼으로 즉시 실행 가능 (workflow_dispatch).
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # 매주 월요일 03:00 UTC (한국시간 낮 12시경)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Regenerate stock report pages
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: |
+          if [ -z "$TWELVE_DATA_API_KEY" ]; then
+            echo "::error::TWELVE_DATA_API_KEY 시크릿이 설정되어 있지 않습니다. Settings > Secrets and variables > Actions 에서 추가해주세요."
+            exit 1
+          fi
+          node scripts/generate-stock-pages.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add stock/ sitemap.xml tools.html
+          if git diff --cached --quiet; then
+            echo "변경 사항 없음 — 커밋하지 않음"
+          else
+            git commit -m "chore: weekly refresh of stock report pages"
+            git push
+          fi
