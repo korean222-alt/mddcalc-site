@@ -681,15 +681,14 @@ window.addEventListener('DOMContentLoaded', () => {
   // 홈(MDD 계산기) 페이지에서만 실행 — 다른 페이지에는 #ticker 요소가 없음
   const tickerEl = document.getElementById('ticker');
   if (tickerEl) {
-    const savedTicker = localStorage.getItem('td_last_ticker');
-    if (savedTicker) tickerEl.value = savedTicker;
-
-    // 블로그 CTA 등 다른 페이지에서 ?ticker=XXX 로 넘어온 경우 자동 조회
+    // 홈페이지를 그냥 열었을 때 빈 검색창만 보이는 문제를 막기 위해
+    // 매번 실제 계산 결과가 바로 보이도록 자동 조회한다.
+    // 우선순위: URL의 ?ticker=XXX > 이전에 조회했던 종목(localStorage) > 기본값 SPY
     const qTicker = new URLSearchParams(window.location.search).get('ticker');
-    if (qTicker) {
-      tickerEl.value = qTicker.toUpperCase();
-      loadData();
-    }
+    const savedTicker = localStorage.getItem('td_last_ticker');
+    const initialTicker = (qTicker || savedTicker || 'SPY').toUpperCase();
+    tickerEl.value = initialTicker;
+    loadData();
 
     renderFavorites();
 

@@ -67,6 +67,12 @@
                    display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .author-name { font-size: 14px; font-weight: 700; color: #2d3748; margin-bottom: 4px; }
   .author-bio { font-size: 13px; color: #718096; line-height: 1.7; margin: 0; }
+  .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+             background: #ebf8ff; border-radius: 10px; padding: 14px 18px; margin-top: 20px; }
+  .cta-text { font-size: 14px; color: #2c5282; font-weight: 600; }
+  .cta-btn { display: inline-block; background: #2b6cb0; color: #fff !important; padding: 9px 18px; border-radius: 8px;
+             font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .cta-btn:hover { background: #2c5282; }
 </style>
 </head>
 <body>
@@ -105,6 +111,11 @@
       <h2>지수가 회복한다는 말의 정확한 의미</h2>
       <p>S&P 500이 매번 회복해 온 데에는 구조적인 이유가 있습니다. 지수는 고정된 500개 기업이 아니라 <strong>기준에 미달한 기업이 빠지고 성장한 기업이 들어오는 방식</strong>으로 계속 교체되기 때문입니다. 즉 "지수의 회복"은 개별 기업들이 모두 살아남았다는 뜻이 아니라, 시장 전체가 구성원을 갈아 끼우며 성장했다는 뜻에 가깝습니다. 개별 종목에 이 경험칙을 그대로 적용할 수 없는 이유가 여기에 있습니다.</p>
     </article>
+    
+    <div class="cta-box">
+      <div class="cta-text">👉 지금 배운 내용을 실제 데이터로 확인해보세요</div>
+      <a href="/?ticker=SPY" class="cta-btn">SPY MDD 지금 확인하기</a>
+    </div>
     <div class="author-box">
       <div class="author-avatar">📊</div>
       <div>

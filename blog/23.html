@@ -67,6 +67,12 @@
                    display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .author-name { font-size: 14px; font-weight: 700; color: #2d3748; margin-bottom: 4px; }
   .author-bio { font-size: 13px; color: #718096; line-height: 1.7; margin: 0; }
+  .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+             background: #ebf8ff; border-radius: 10px; padding: 14px 18px; margin-top: 20px; }
+  .cta-text { font-size: 14px; color: #2c5282; font-weight: 600; }
+  .cta-btn { display: inline-block; background: #2b6cb0; color: #fff !important; padding: 9px 18px; border-radius: 8px;
+             font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .cta-btn:hover { background: #2c5282; }
 </style>
 </head>
 <body>
@@ -112,6 +118,11 @@
       <h2>세 가지를 한 문장으로 정리하면</h2>
       <p>SPY는 미국 대형주 시장의 표준, VTI는 거기에 중소형주까지 더한 미국 시장 전체, QQQ는 기술·성장주에 집중된 상품입니다. 셋 중 무엇이 우월한지는 정해져 있지 않고, 자신이 감당할 수 있는 하락폭이 어디까지인지에 따라 답이 달라집니다.</p>
     </article>
+    
+    <div class="cta-box">
+      <div class="cta-text">👉 지금 배운 내용을 실제 데이터로 확인해보세요</div>
+      <a href="/?ticker=VTI" class="cta-btn">VTI MDD 지금 확인하기</a>
+    </div>
     <div class="author-box">
       <div class="author-avatar">📊</div>
       <div>

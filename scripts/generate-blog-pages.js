@@ -31,12 +31,38 @@ function escapeHtml(str) {
 
 // 글 데이터의 단일 원본. 예전에는 blog.html 인라인 JS에서 배열을 긁어왔지만,
 // 그 60KB짜리 블록을 모든 페이지에서 걷어내고 scripts/posts-data.js 로 분리했다.
+const { BLOG_POSTS, CTA_MAP } = require('./posts-data.js');
 function extractPosts() {
-  const { BLOG_POSTS } = require('./posts-data.js');
   if (!Array.isArray(BLOG_POSTS) || !BLOG_POSTS.length) {
     throw new Error('scripts/posts-data.js 에서 BLOG_POSTS 를 읽지 못했습니다.');
   }
   return BLOG_POSTS;
+}
+
+// index.html의 PAGE_URLS와 같은 매핑. 글 안 CTA가 'page' 타입일 때 실제 주소로 바꾸는 데 쓴다.
+const PAGE_URLS = {
+  home: '/', tools: '/tools.html', rsi: '/rsi-calculator.html', dividend: '/dividend-calculator.html',
+  blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
+  disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
+  compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
+};
+
+// 글 하단 CTA. 예전에는 blog.html의 JS(getCtaHtml)가 클릭 시 navigate 하는 방식이었는데,
+// 정적 페이지로 옮기며 그 함수 자체가 통째로 빠져서 CTA_MAP 데이터는 남았지만 버튼이
+// 어디에도 그려지지 않고 있었다 — 홈의 실제 계산 결과로 가는 유일한 경로였던 만큼 실제
+// <a href> 링크로 복원한다 (JS 없이도, 크롤러도 그대로 따라갈 수 있도록).
+function buildCtaHtml(postId) {
+  const cta = CTA_MAP[postId];
+  if (!cta) return '';
+  let href;
+  if (cta.type === 'ticker') href = `/?ticker=${encodeURIComponent(cta.value)}`;
+  else if (cta.type === 'page') href = PAGE_URLS[cta.value] || '/';
+  else href = '/';
+  return `
+    <div class="cta-box">
+      <div class="cta-text">👉 지금 배운 내용을 실제 데이터로 확인해보세요</div>
+      <a href="${href}" class="cta-btn">${escapeHtml(cta.label)}</a>
+    </div>`;
 }
 
 function buildPostPage(post, related) {
@@ -115,6 +141,12 @@ function buildPostPage(post, related) {
                    display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .author-name { font-size: 14px; font-weight: 700; color: #2d3748; margin-bottom: 4px; }
   .author-bio { font-size: 13px; color: #718096; line-height: 1.7; margin: 0; }
+  .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+             background: #ebf8ff; border-radius: 10px; padding: 14px 18px; margin-top: 20px; }
+  .cta-text { font-size: 14px; color: #2c5282; font-weight: 600; }
+  .cta-btn { display: inline-block; background: #2b6cb0; color: #fff !important; padding: 9px 18px; border-radius: 8px;
+             font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .cta-btn:hover { background: #2c5282; }
 </style>
 </head>
 <body>
@@ -122,6 +154,7 @@ function buildPostPage(post, related) {
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/blog.html">블로그</a></nav>
   <div class="card">
     <article>${post.content}</article>
+    ${buildCtaHtml(post.id)}
     <div class="author-box">
       <div class="author-avatar">📊</div>
       <div>

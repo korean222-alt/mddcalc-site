@@ -67,6 +67,12 @@
                    display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .author-name { font-size: 14px; font-weight: 700; color: #2d3748; margin-bottom: 4px; }
   .author-bio { font-size: 13px; color: #718096; line-height: 1.7; margin: 0; }
+  .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+             background: #ebf8ff; border-radius: 10px; padding: 14px 18px; margin-top: 20px; }
+  .cta-text { font-size: 14px; color: #2c5282; font-weight: 600; }
+  .cta-btn { display: inline-block; background: #2b6cb0; color: #fff !important; padding: 9px 18px; border-radius: 8px;
+             font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .cta-btn:hover { background: #2c5282; }
 </style>
 </head>
 <body>
@@ -104,6 +110,11 @@
       <p>주식 100% 포트폴리오와 주식 60%·채권 40% 포트폴리오는 기대수익률도 다르지만 MDD의 차이가 더 큽니다. 과거 주요 약세장에서 광범위 주식 지수가 -50% 안팎 하락했을 때, 채권을 섞은 포트폴리오의 하락폭은 그보다 뚜렷하게 작았던 경우가 많았습니다.</p>
       <p>다만 2022년처럼 금리가 빠르게 오르는 국면에서는 주식과 채권이 함께 하락하기도 했습니다. 분산이 하락을 없애주지는 않으며, 평균적으로 완충하는 역할을 한다고 이해하는 편이 정확합니다.</p>
     </article>
+    
+    <div class="cta-box">
+      <div class="cta-text">👉 지금 배운 내용을 실제 데이터로 확인해보세요</div>
+      <a href="/compound-calculator.html" class="cta-btn">복리 계산기로 장기 수익 확인하기</a>
+    </div>
     <div class="author-box">
       <div class="author-avatar">📊</div>
       <div>

@@ -67,6 +67,12 @@
                    display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .author-name { font-size: 14px; font-weight: 700; color: #2d3748; margin-bottom: 4px; }
   .author-bio { font-size: 13px; color: #718096; line-height: 1.7; margin: 0; }
+  .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+             background: #ebf8ff; border-radius: 10px; padding: 14px 18px; margin-top: 20px; }
+  .cta-text { font-size: 14px; color: #2c5282; font-weight: 600; }
+  .cta-btn { display: inline-block; background: #2b6cb0; color: #fff !important; padding: 9px 18px; border-radius: 8px;
+             font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .cta-btn:hover { background: #2c5282; }
 </style>
 </head>
 <body>
@@ -95,6 +101,11 @@
       <p>MDD 분석기 웹사이트에서 'SPY'와 'QQQ' 티커를 각각 조회하면 현재 고점 대비 하락률과 역사적 회복 패턴을 상세하게 비교할 수 있습니다. 이를 통해 각 ETF의 변동성 특성을 이해하고, 자신의 투자 전략에 가장 적합한 ETF를 선택하는 데 도움을 받을 수 있습니다. 특히, 과거의 큰 하락장에서 각 ETF가 어떻게 반응했는지 살펴보는 것은 미래의 시장 변동성에 대비하는 데 중요한 통찰력을 제공할 것입니다.</p>
       <p>결론적으로, SPY와 QQQ는 각각 다른 투자 목표와 리스크 프로필을 가진 투자자에게 적합합니다. 안정적인 시장 수익률과 분산 투자를 원한다면 SPY가, 높은 성장 잠재력과 함께 더 큰 변동성을 감수할 수 있다면 QQQ가 적합한 상품으로 꼽힙니다. 중요한 것은 각 ETF의 특성과 MDD 데이터를 충분히 이해하고, 자신의 투자 성향에 맞는 현명한 결정을 내리는 것입니다.</p>
     </article>
+    
+    <div class="cta-box">
+      <div class="cta-text">👉 지금 배운 내용을 실제 데이터로 확인해보세요</div>
+      <a href="/?ticker=QQQ" class="cta-btn">QQQ MDD 지금 확인하기</a>
+    </div>
     <div class="author-box">
       <div class="author-avatar">📊</div>
       <div>
