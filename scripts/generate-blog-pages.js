@@ -206,8 +206,10 @@ function buildPostPage(post, related) {
 function updateSitemap(posts) {
   let xml = fs.existsSync(SITEMAP_PATH) ? fs.readFileSync(SITEMAP_PATH, 'utf8') : '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</urlset>\n';
   xml = xml.replace(/\s*<url><loc>https:\/\/mddcalc\.com\/blog\/[^<]+<\/loc>[\s\S]*?<\/url>/g, '');
-  // 블로그 외 기존 항목에도 lastmod 를 붙이거나 갱신
-  xml = xml.replace(/<url><loc>(https:\/\/mddcalc\.com\/[^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?(<priority>[^<]*<\/priority>)<\/url>/g,
+  // 블로그·종목 리포트를 제외한 나머지 정적 페이지에만 lastmod 를 붙이거나 갱신한다.
+  // /stock/ 항목은 generate-stock-pages.js가 실제로 데이터를 다시 받아온 날짜로 따로 관리하므로
+  // 여기서 건드리면 방금 갱신한 실제 기준일을 이 스크립트의 마지막 편집일로 덮어써 버리게 된다.
+  xml = xml.replace(/<url><loc>(https:\/\/mddcalc\.com\/(?!stock\/)[^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?(<priority>[^<]*<\/priority>)<\/url>/g,
     (_m, loc, prio) => `<url><loc>${loc}</loc><lastmod>${REVIEWED_DATE}</lastmod>${prio}</url>`);
   const entries = posts.map(p =>
     `  <url><loc>https://mddcalc.com/blog/${p.id}.html</loc><lastmod>${REVIEWED_DATE}</lastmod><priority>0.6</priority></url>`
