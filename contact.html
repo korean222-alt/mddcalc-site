@@ -561,7 +561,7 @@ async function loadData() {
   document.getElementById('result').classList.add('hidden');
 
   try {
-    showStatus('⏳ 데이터 불러오는 중... 단, 아래 광고가 표시될 수 있습니다!', 'info');
+    showStatus('⏳ 데이터 불러오는 중...', 'info');
 
     const { values, fromCache, metadata } = await fetchPriceSeries(ticker, 5000);
 
@@ -770,35 +770,6 @@ function render() {
   renderTV(t);
   renderDeepAnalysis();
   renderBenchmarkComparison();
-}
-
-// ========== 하락 알림 신청 ==========
-async function submitAlert() {
-  const symbolEl = document.getElementById('alertSymbol');
-  const tickerEl2 = document.getElementById('ticker');
-  const symbol = (symbolEl.value.trim() || (tickerEl2 ? tickerEl2.value.trim() : '')).toUpperCase();
-  const target = parseFloat(document.getElementById('alertTarget').value);
-  const email = document.getElementById('alertEmail').value.trim();
-  const msgEl = document.getElementById('alertMsg');
-
-  if (!symbol) { msgEl.innerHTML = '❌ 티커를 입력해주세요.'; return; }
-  if (!isValidTickerFormat(symbol)) { msgEl.innerHTML = '❌ 티커 형식이 올바르지 않습니다.'; return; }
-  if (isNaN(target) || target <= 0 || target > 95) { msgEl.innerHTML = '❌ 목표 하락률을 1~95 사이 숫자로 입력해주세요.'; return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msgEl.innerHTML = '❌ 올바른 이메일 주소를 입력해주세요.'; return; }
-
-  msgEl.innerHTML = '⏳ 등록 중...';
-  try {
-    const res = await fetch('/api/alerts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, symbol, targetDiscountPercent: target })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || '등록에 실패했습니다.');
-    msgEl.innerHTML = `✅ <b>${symbol}</b>이(가) 고점 대비 <b>-${target}%</b>에 도달하면 <b>${email}</b>로 알려드릴게요!`;
-  } catch (e) {
-    msgEl.innerHTML = `❌ ${e.message}`;
-  }
 }
 
 // ========== 심층 분석 (백분위 / 경과일 / 회복통계 / 이동평균 / Top5 / 유사사례) ==========

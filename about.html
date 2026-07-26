@@ -307,7 +307,7 @@
       <p style="font-size:13px; color:#718096;">블로그 글에 인용된 과거 하락률·회복 기간은 종가 기준의 대략적인 수치이며, 집계 방식과 데이터 출처에 따라 몇 %p의 차이가 발생할 수 있습니다. 정확한 수치가 필요하신 경우 원 데이터를 직접 확인하시기 바랍니다.</p>
 
       <h2>🛡️ 데이터 보안</h2>
-      <p>API 키는 백엔드 서버에만 저장되어 F12 개발자 도구에서 절대 노출되지 않습니다. 문의하기를 통해 남기신 이메일 주소는 답변 목적으로만 사용됩니다.</p>
+      <p>시세 데이터 조회에 쓰이는 인증 정보는 서버에만 보관하며 브라우저로 전달되지 않습니다. 문의하기를 통해 남기신 이메일 주소는 답변 목적으로만 사용하고, 답변이 끝나면 파기합니다.</p>
 
       <h2>⚠️ 투자 유의사항</h2>
       <p>이 사이트에서 제공하는 모든 정보는 <strong>교육적 목적</strong>으로만 제공되며, 투자 권유나 재정 조언이 아닙니다. 모든 투자 결정은 본인의 신중한 판단에 따라 진행하시기 바랍니다.</p>
@@ -571,7 +571,7 @@ async function loadData() {
   document.getElementById('result').classList.add('hidden');
 
   try {
-    showStatus('⏳ 데이터 불러오는 중... 단, 아래 광고가 표시될 수 있습니다!', 'info');
+    showStatus('⏳ 데이터 불러오는 중...', 'info');
 
     const { values, fromCache, metadata } = await fetchPriceSeries(ticker, 5000);
 
@@ -780,35 +780,6 @@ function render() {
   renderTV(t);
   renderDeepAnalysis();
   renderBenchmarkComparison();
-}
-
-// ========== 하락 알림 신청 ==========
-async function submitAlert() {
-  const symbolEl = document.getElementById('alertSymbol');
-  const tickerEl2 = document.getElementById('ticker');
-  const symbol = (symbolEl.value.trim() || (tickerEl2 ? tickerEl2.value.trim() : '')).toUpperCase();
-  const target = parseFloat(document.getElementById('alertTarget').value);
-  const email = document.getElementById('alertEmail').value.trim();
-  const msgEl = document.getElementById('alertMsg');
-
-  if (!symbol) { msgEl.innerHTML = '❌ 티커를 입력해주세요.'; return; }
-  if (!isValidTickerFormat(symbol)) { msgEl.innerHTML = '❌ 티커 형식이 올바르지 않습니다.'; return; }
-  if (isNaN(target) || target <= 0 || target > 95) { msgEl.innerHTML = '❌ 목표 하락률을 1~95 사이 숫자로 입력해주세요.'; return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msgEl.innerHTML = '❌ 올바른 이메일 주소를 입력해주세요.'; return; }
-
-  msgEl.innerHTML = '⏳ 등록 중...';
-  try {
-    const res = await fetch('/api/alerts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, symbol, targetDiscountPercent: target })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || '등록에 실패했습니다.');
-    msgEl.innerHTML = `✅ <b>${symbol}</b>이(가) 고점 대비 <b>-${target}%</b>에 도달하면 <b>${email}</b>로 알려드릴게요!`;
-  } catch (e) {
-    msgEl.innerHTML = `❌ ${e.message}`;
-  }
 }
 
 // ========== 심층 분석 (백분위 / 경과일 / 회복통계 / 이동평균 / Top5 / 유사사례) ==========
