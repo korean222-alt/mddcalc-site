@@ -490,17 +490,29 @@ async function main() {
   const generatedDate = new Date().toISOString().slice(0, 10);
 
   const analyses = {};
+  const rawSeries = {};
   for (const symbol of TICKERS) {
     process.stdout.write(`⏳ ${symbol} 조회 중... `);
     const series = await fetchSeries(symbol);
+    rawSeries[symbol] = series;
     analyses[symbol] = analyze(series);
     console.log(`완료 (${series.length}일치, ${analyses[symbol].startDate} ~ ${analyses[symbol].endDate})`);
     await sleep(8000); // 분당 8회 제한 준수 (60s / 8 = 7.5s, 여유 있게 8s)
   }
 
-  const spyA = analyses[BENCHMARK];
+  // 벤치마크 비교는 "같은 기간"이라고 적는 만큼 실제로 같은 기간이어야 한다.
+  // SPY는 2006년부터 데이터가 있지만 BABA는 2014년 상장이라, SPY 전체 구간을 그대로
+  // 갖다 붙이면 서로 다른 기간을 비교해놓고 같은 기간이라고 주장하게 된다.
+  // 종목별 시작일 이후로 SPY를 잘라내 그 구간만 다시 계산한다.
+  const spySeries = rawSeries[BENCHMARK];
   for (const symbol of TICKERS) {
-    const html = buildPage(symbol, analyses[symbol], spyA, generatedDate);
+    const a = analyses[symbol];
+    let spyA = null;
+    if (symbol !== BENCHMARK && spySeries) {
+      const windowed = spySeries.filter(p => p.date >= a.startDate && p.date <= a.endDate);
+      if (windowed.length > 30) spyA = analyze(windowed);
+    }
+    const html = buildPage(symbol, a, spyA, generatedDate);
     fs.writeFileSync(path.join(OUT_DIR, `${symbol.toLowerCase()}.html`), html);
   }
   console.log(`\n✅ ${TICKERS.length}개 종목 리포트 생성 완료 (/stock/*.html)`);
