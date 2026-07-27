@@ -48,6 +48,8 @@ const BENCHMARK = 'SPY'; // 상대 비교 기준 지수
 
 const REFRESH_CYCLE_DAYS = 7; // 매주 자동 갱신 (.github/workflows/refresh-stock-pages.yml)
 const TOP_N_DRAWDOWNS = 5;
+// 회복 통계에서 "하락 구간"으로 셀 최소 낙폭(%). 이 밑은 일상적인 등락으로 보고 제외한다.
+const MEANINGFUL_DRAWDOWN_PCT = 10;
 
 // 이 리포트가 다루는 종목과 겹치는 블로그 글이 있으면 서로 링크한다.
 // generate-blog-pages.js도 같은 매핑을 반대 방향으로 써서 상호 링크를 만든다.
@@ -159,12 +161,17 @@ function analyze(series) {
     count: all.filter(e => e.declinePct <= -th).length,
   }));
 
-  // 회복 통계는 실제로 회복이 끝난 구간만 대상으로 한다 (진행 중인 구간은 기간이 확정되지 않음).
-  const recovered = episodes.filter(e => e.recoveryDays != null);
+  // 회복 통계는 "의미 있는 하락"만 대상으로 한다.
+  // computeDrawdowns는 고점 대비 0.5%짜리 미세한 등락도 하나의 구간으로 세기 때문에,
+  // 필터 없이 집계하면 BABA 기준 "구간 42개, 회복 중앙값 5일"처럼 노이즈가 지배해
+  // 숫자가 사실상 무의미해진다. -10% 이상 하락한 구간만 남겨 실제로 체감되는 하락을 본다.
+  const meaningful = all.filter(e => e.declinePct <= -MEANINGFUL_DRAWDOWN_PCT);
+  const recovered = meaningful.filter(e => e.recoveryDays != null);
   const recDays = recovered.map(e => e.recoveryDays).sort((a, b) => a - b);
   const recoveryStats = {
+    meaningfulCount: meaningful.length,
     recoveredCount: recovered.length,
-    ongoingCount: ongoing ? 1 : 0,
+    ongoingCount: meaningful.length - recovered.length,
     medianDays: recDays.length ? recDays[Math.floor(recDays.length / 2)] : null,
     maxDays: recDays.length ? recDays[recDays.length - 1] : null,
   };
@@ -223,26 +230,33 @@ function buildFrequencyRowsHtml(a) {
 
 function buildRecoveryStatsHtml(symbol, a) {
   const r = a.recoveryStats;
+  const TH = MEANINGFUL_DRAWDOWN_PCT;
+  if (!r.meaningfulCount) {
+    return `<p>분석 기간 동안 ${symbol}이(가) -${TH}% 이상 하락한 구간은 없었습니다.</p>`;
+  }
   if (!r.recoveredCount) {
-    return `<p>분석 기간 동안 고점을 회복한 하락 구간이 아직 집계되지 않았습니다.${r.ongoingCount ? ' 현재 구간은 회복이 진행 중입니다.' : ''}</p>`;
+    return `<p>${symbol}은(는) 분석 기간 동안 -${TH}% 이상 하락한 구간을 <strong>${r.meaningfulCount}개</strong> 지나갔지만, 그중 이전 고점을 회복한 구간은 아직 없습니다.</p>`;
   }
   const nowLine = a.isAtAth
     ? `현재는 사상 최고가를 경신 중이라 진행 중인 하락 구간이 없습니다.`
     : `현재 낙폭 <strong>${fmtPct(a.currentDrawdownPct)}</strong>은 분석 기간 전체 거래일 중 <strong>약 ${a.deeperPct.toFixed(0)}%</strong>의 날들보다 얕은 수준입니다. 즉 과거 ${a.deeperPct.toFixed(0)}%의 날은 지금보다 더 깊이 빠져 있었습니다.`;
+  const ongoingLine = r.ongoingCount
+    ? ` 나머지 ${r.ongoingCount}개 구간은 이 분석 시점까지 아직 회복되지 않았습니다.`
+    : '';
   return `
     <div class="stat-grid">
       <div class="stat">
-        <div class="label">회복 완료된 하락 구간</div>
-        <div class="value">${r.recoveredCount}회</div>
+        <div class="label">-${TH}% 이상 하락 후 회복한 구간</div>
+        <div class="value">${r.recoveredCount}회 / ${r.meaningfulCount}회</div>
       </div>
       <div class="stat">
         <div class="label">회복까지 걸린 기간(중앙값)</div>
         <div class="value">${r.medianDays.toLocaleString()}일</div>
       </div>
     </div>
-    <p style="margin-top:12px;">${symbol}은(는) 분석 기간 동안 하락 구간 <strong>${a.episodeCount}개</strong>를 지나갔고, 그중 <strong>${r.recoveredCount}개</strong>는 이전 고점을 회복했습니다. 회복까지 걸린 기간은 중앙값 기준 <strong>${r.medianDays.toLocaleString()}일</strong>, 가장 오래 걸린 경우는 <strong>${r.maxDays.toLocaleString()}일</strong>이었습니다.${r.ongoingCount ? ' 나머지 1개 구간은 아직 회복이 진행 중입니다.' : ''}</p>
+    <p style="margin-top:12px;">${symbol}은(는) 분석 기간 동안 <strong>-${TH}% 이상 하락한 구간</strong>을 <strong>${r.meaningfulCount}개</strong> 지나갔고, 그중 <strong>${r.recoveredCount}개</strong>가 이전 고점을 회복했습니다. 회복까지 걸린 기간은 중앙값 기준 <strong>${r.medianDays.toLocaleString()}일</strong>, 가장 오래 걸린 경우는 <strong>${r.maxDays.toLocaleString()}일</strong>이었습니다.${ongoingLine}</p>
     <p>${nowLine}</p>
-    <p class="muted">회복은 종가가 직전 고점을 다시 넘어선 시점을 기준으로 하며, 과거에 회복했다는 사실이 앞으로도 회복한다는 근거가 되지는 않습니다. 개별 종목은 사업 환경이 바뀌면 전고점을 영영 회복하지 못할 수도 있습니다.</p>`;
+    <p class="muted">일상적인 등락과 구분하기 위해 -${TH}% 이상 하락한 구간만 집계했습니다. 회복은 종가가 직전 고점을 다시 넘어선 시점을 기준으로 하며, 과거에 회복했다는 사실이 앞으로도 회복한다는 근거가 되지는 않습니다. 개별 종목은 사업 환경이 바뀌면 전고점을 영영 회복하지 못할 수도 있습니다.</p>`;
 }
 
 // 목록에서 자기 다음에 오는 6개를 순환식으로 고른다.
