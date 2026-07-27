@@ -29,10 +29,20 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-// 서학개미가 실제로 많이 찾는 핵심 15종목으로 시작 (전체 확대는 이후 검토)
+// 서학개미가 실제로 많이 찾는 종목들.
+//
+// 처음에는 품질 검증을 위해 핵심 15개로 시작했는데, 그 사이 구글 검색에
+// /stock/baba.html 이 노출되는 걸 발견했다. 예전 얇은 버전(423자 티저) 39개를
+// 지울 때 그중 24개가 이미 색인된 상태였고, 새 15개에 없는 것들이 전부 404가 된 것.
+// 이미 색인·노출까지 얻은 URL을 버리는 셈이라 옛 목록 39개를 그대로 복원한다.
+// 아래 두 번째 줄부터가 그 복원분이다.
 const TICKERS = [
   'AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'AMZN', 'META',
   'SPY', 'QQQ', 'VOO', 'VTI', 'SCHD', 'TQQQ', 'SOXL', 'AMD',
+  // 아래 24개는 예전에 색인됐다가 404가 된 URL 복구분
+  'NFLX', 'SPXL', 'UPRO', 'SQQQ', 'SOXS', 'FNGU', 'TECL', 'JEPI',
+  'JEPQ', 'AVGO', 'SMCI', 'ARM', 'MU', 'TSM', 'INTC', 'PLTR',
+  'COIN', 'MSTR', 'RIVN', 'LCID', 'NIO', 'BABA', 'DIS', 'BA',
 ];
 const BENCHMARK = 'SPY'; // 상대 비교 기준 지수
 
@@ -154,8 +164,16 @@ function buildDrawdownTableHtml(top) {
         </tr>`).join('');
 }
 
+// 목록에서 자기 다음에 오는 6개를 순환식으로 고른다.
+// 앞에서 6개를 그냥 잘라 쓰면 39개 페이지가 전부 같은 종목(AAPL·TSLA·…)만 가리켜서,
+// 새로 복구한 뒤쪽 종목들로는 들어오는 링크가 거의 생기지 않는다. 순환식으로 고르면
+// 모든 종목이 비슷한 수의 인바운드 링크를 갖게 되어 크롤러가 전체를 고르게 훑는다.
 function buildRelatedTickersHtml(symbol) {
-  const others = TICKERS.filter(t => t !== symbol).slice(0, 6);
+  const i = TICKERS.indexOf(symbol);
+  const others = [];
+  for (let k = 1; others.length < 6 && k < TICKERS.length; k++) {
+    others.push(TICKERS[(i + k) % TICKERS.length]);
+  }
   return others.map(t => `<a href="/stock/${t.toLowerCase()}.html" class="chip">${t}</a>`).join('');
 }
 
