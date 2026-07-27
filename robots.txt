@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /docs/
+Disallow: /scripts/
 
 Sitemap: https://mddcalc.com/sitemap.xml
