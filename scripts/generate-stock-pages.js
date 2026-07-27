@@ -131,6 +131,18 @@ function annualizedVolatility(series) {
   return Math.sqrt(variance) * Math.sqrt(252) * 100;
 }
 
+// 하루하루의 "그 시점 고점 대비 낙폭"을 이어붙인 시계열.
+// 현재 낙폭이 이 종목 역사에서 어느 정도 위치인지 백분위로 따질 때 쓴다.
+function drawdownSeries(series) {
+  const out = [];
+  let peak = series[0].close;
+  for (const p of series) {
+    if (p.close > peak) peak = p.close;
+    out.push((p.close - peak) / peak * 100);
+  }
+  return out;
+}
+
 function analyze(series) {
   const { episodes, ongoing, athPrice, athDate } = computeDrawdowns(series);
   const all = ongoing ? [...episodes, ongoing] : episodes;
@@ -139,10 +151,34 @@ function analyze(series) {
   const last = series[series.length - 1];
   const currentDrawdownPct = (last.close - athPrice) / athPrice * 100;
 
+  // -10/-20/-30/-50% 구간을 각각 몇 번이나 지나갔는지. 이 사이트의 핵심 개념(구간별 빈도)과
+  // 같은 계산이고, 종목마다 값이 완전히 달라서 페이지의 고유성을 만드는 부분이기도 하다.
+  const thresholds = [10, 20, 30, 50];
+  const frequency = thresholds.map(th => ({
+    threshold: th,
+    count: all.filter(e => e.declinePct <= -th).length,
+  }));
+
+  // 회복 통계는 실제로 회복이 끝난 구간만 대상으로 한다 (진행 중인 구간은 기간이 확정되지 않음).
+  const recovered = episodes.filter(e => e.recoveryDays != null);
+  const recDays = recovered.map(e => e.recoveryDays).sort((a, b) => a - b);
+  const recoveryStats = {
+    recoveredCount: recovered.length,
+    ongoingCount: ongoing ? 1 : 0,
+    medianDays: recDays.length ? recDays[Math.floor(recDays.length / 2)] : null,
+    maxDays: recDays.length ? recDays[recDays.length - 1] : null,
+  };
+
+  // 오늘보다 더 깊이 빠져 있던 거래일의 비율.
+  const dd = drawdownSeries(series);
+  const deeperDays = dd.filter(v => v < currentDrawdownPct).length;
+  const deeperPct = dd.length ? deeperDays / dd.length * 100 : 0;
+
   return {
     startDate: series[0].date,
     endDate: last.date,
     years: (daysBetween(series[0].date, last.date) / 365.25),
+    tradingDays: series.length,
     currentPrice: last.close,
     currentDate: last.date,
     athPrice, athDate,
@@ -151,6 +187,10 @@ function analyze(series) {
     volatility: annualizedVolatility(series),
     topDrawdowns: top,
     worstDrawdownPct: top.length ? top[0].declinePct : 0,
+    episodeCount: all.length,
+    frequency,
+    recoveryStats,
+    deeperPct,
   };
 }
 
@@ -162,6 +202,47 @@ function buildDrawdownTableHtml(top) {
           <td class="neg">${fmtPct(d.declinePct)}</td>
           <td>${d.recoveryDate ? `${d.recoveryDate}<br><span class="muted">${d.recoveryDays.toLocaleString()}일 소요</span>` : '<span class="ongoing">미회복 (진행 중)</span>'}</td>
         </tr>`).join('');
+}
+
+function buildFrequencyRowsHtml(a) {
+  return a.frequency.map(f => {
+    // 상장 기간이 짧은 종목은 주기가 1년 미만으로 나올 수 있어 개월 단위로 표기한다.
+    let cycle = '해당 없음';
+    if (f.count > 0) {
+      const yrs = a.years / f.count;
+      cycle = yrs >= 1 ? `약 ${yrs.toFixed(1)}년에 1회` : `약 ${Math.max(1, Math.round(yrs * 12))}개월에 1회`;
+    }
+    return `
+        <tr>
+          <td>-${f.threshold}% 이상 하락</td>
+          <td class="${f.count > 0 ? 'neg' : ''}">${f.count}회</td>
+          <td><span class="muted">${cycle}</span></td>
+        </tr>`;
+  }).join('');
+}
+
+function buildRecoveryStatsHtml(symbol, a) {
+  const r = a.recoveryStats;
+  if (!r.recoveredCount) {
+    return `<p>분석 기간 동안 고점을 회복한 하락 구간이 아직 집계되지 않았습니다.${r.ongoingCount ? ' 현재 구간은 회복이 진행 중입니다.' : ''}</p>`;
+  }
+  const nowLine = a.isAtAth
+    ? `현재는 사상 최고가를 경신 중이라 진행 중인 하락 구간이 없습니다.`
+    : `현재 낙폭 <strong>${fmtPct(a.currentDrawdownPct)}</strong>은 분석 기간 전체 거래일 중 <strong>약 ${a.deeperPct.toFixed(0)}%</strong>의 날들보다 얕은 수준입니다. 즉 과거 ${a.deeperPct.toFixed(0)}%의 날은 지금보다 더 깊이 빠져 있었습니다.`;
+  return `
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="label">회복 완료된 하락 구간</div>
+        <div class="value">${r.recoveredCount}회</div>
+      </div>
+      <div class="stat">
+        <div class="label">회복까지 걸린 기간(중앙값)</div>
+        <div class="value">${r.medianDays.toLocaleString()}일</div>
+      </div>
+    </div>
+    <p style="margin-top:12px;">${symbol}은(는) 분석 기간 동안 하락 구간 <strong>${a.episodeCount}개</strong>를 지나갔고, 그중 <strong>${r.recoveredCount}개</strong>는 이전 고점을 회복했습니다. 회복까지 걸린 기간은 중앙값 기준 <strong>${r.medianDays.toLocaleString()}일</strong>, 가장 오래 걸린 경우는 <strong>${r.maxDays.toLocaleString()}일</strong>이었습니다.${r.ongoingCount ? ' 나머지 1개 구간은 아직 회복이 진행 중입니다.' : ''}</p>
+    <p>${nowLine}</p>
+    <p class="muted">회복은 종가가 직전 고점을 다시 넘어선 시점을 기준으로 하며, 과거에 회복했다는 사실이 앞으로도 회복한다는 근거가 되지는 않습니다. 개별 종목은 사업 환경이 바뀌면 전고점을 영영 회복하지 못할 수도 있습니다.</p>`;
 }
 
 // 목록에서 자기 다음에 오는 6개를 순환식으로 고른다.
@@ -316,6 +397,23 @@ function buildPage(symbol, a, spyA, generatedDate) {
       </table>
     </div>
     <p class="muted" style="margin-top:10px;">종가 기준으로 계산한 근사치이며, 실제 장중 고가/저가 기준으로는 수치가 다소 달라질 수 있습니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>📉 하락 구간별 발생 횟수</h2>
+    <p>분석 기간 ${yearsLabel}년(거래일 ${a.tradingDays.toLocaleString()}일) 동안 ${symbol}이(가) 각 하락 구간을 지나간 횟수입니다. 같은 구간이라도 종목마다 빈도가 크게 다릅니다.</p>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>하락 구간</th><th>발생 횟수</th><th>평균 주기</th></tr></thead>
+        <tbody>${buildFrequencyRowsHtml(a)}</tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:10px;">고점을 새로 경신한 뒤 다시 하락한 구간을 각각 1회로 셉니다. 평균 주기는 분석 기간을 발생 횟수로 나눈 값으로, 실제 발생 간격은 시기에 따라 편차가 큽니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>⏱ 회복 통계</h2>
+    ${buildRecoveryStatsHtml(symbol, a)}
   </div>
   ${spyCompareHtml}
 
