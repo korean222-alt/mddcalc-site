@@ -36,6 +36,12 @@ if (!API_KEY) {
 // 지울 때 그중 24개가 이미 색인된 상태였고, 새 15개에 없는 것들이 전부 404가 된 것.
 // 이미 색인·노출까지 얻은 URL을 버리는 셈이라 옛 목록 39개를 그대로 복원한다.
 // 아래 두 번째 줄부터가 그 복원분이다.
+//
+// 2026-07 추가분(세 번째 줄 이후): Search Console 실적을 보니 클릭이 붙는 검색어가
+// "mdd 계산기" 같은 도구 이름보다 "soxl mdd", "voo mdd", "schd mdd", "qqq mdd" 처럼
+// **종목명 + mdd** 형태였다. 이미 있는 종목만으로 노출이 잡히고 있다는 뜻이라,
+// 같은 패턴으로 검색될 만한 종목(양자컴퓨팅·원전·개별 2배 레버리지 등 국내에서
+// 많이 찾는 것들)을 늘린다.
 const TICKERS = [
   'AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'AMZN', 'META',
   'SPY', 'QQQ', 'VOO', 'VTI', 'SCHD', 'TQQQ', 'SOXL', 'AMD',
@@ -43,7 +49,46 @@ const TICKERS = [
   'NFLX', 'SPXL', 'UPRO', 'SQQQ', 'SOXS', 'FNGU', 'TECL', 'JEPI',
   'JEPQ', 'AVGO', 'SMCI', 'ARM', 'MU', 'TSM', 'INTC', 'PLTR',
   'COIN', 'MSTR', 'RIVN', 'LCID', 'NIO', 'BABA', 'DIS', 'BA',
+  // 아래 30개가 2026-07 확장분
+  'IONQ', 'RGTI', 'QBTS', 'OKLO', 'SMR', 'VST', 'CEG',
+  'TSLL', 'NVDL', 'CONL', 'QLD', 'SOXX', 'IVV', 'TLT', 'GLD',
+  'HOOD', 'SOFI', 'APP', 'ORCL', 'ASML', 'MRVL', 'CRWD', 'ANET',
+  'RKLB', 'JOBY', 'MARA', 'LLY', 'COST', 'UNH', 'V',
 ];
+
+// 한국어 검색어를 잡기 위한 종목명. 서학개미는 "테슬라 하락률", "엔비디아 mdd" 처럼
+// 티커가 아니라 한글 이름으로도 검색하는데, 지금 페이지에는 한글 종목명이 한 글자도
+// 없어서 그런 검색어로는 아예 후보에 오르지 못한다. 제목·설명·h1에 같이 넣는다.
+// 값이 없으면 티커만 쓴다(ARM, AMD, ASML처럼 한글명이 따로 없는 경우).
+const TICKER_NAMES = {
+  AAPL: '애플', TSLA: '테슬라', NVDA: '엔비디아', MSFT: '마이크로소프트',
+  GOOGL: '구글 알파벳', AMZN: '아마존', META: '메타',
+  SPY: 'S&P500 ETF', QQQ: '나스닥100 ETF', VOO: '뱅가드 S&P500 ETF',
+  VTI: '미국 전체시장 ETF', SCHD: '미국 배당 ETF', TQQQ: '나스닥100 3배',
+  SOXL: '반도체 3배 레버리지', AMD: '', NFLX: '넷플릭스',
+  SPXL: 'S&P500 3배', UPRO: 'S&P500 3배', SQQQ: '나스닥100 3배 인버스',
+  SOXS: '반도체 3배 인버스', FNGU: '빅테크 3배', TECL: '기술주 3배',
+  JEPI: 'S&P500 커버드콜 ETF', JEPQ: '나스닥 커버드콜 ETF', AVGO: '브로드컴',
+  SMCI: '슈퍼마이크로', ARM: '', MU: '마이크론', TSM: 'TSMC',
+  INTC: '인텔', PLTR: '팔란티어', COIN: '코인베이스', MSTR: '마이크로스트래티지',
+  RIVN: '리비안', LCID: '루시드', NIO: '니오', BABA: '알리바바',
+  DIS: '디즈니', BA: '보잉',
+  IONQ: '아이온큐', RGTI: '리게티', QBTS: '디웨이브', OKLO: '오클로',
+  SMR: '뉴스케일파워', VST: '비스트라', CEG: '컨스텔레이션에너지',
+  TSLL: '테슬라 2배', NVDL: '엔비디아 2배', CONL: '코인베이스 2배',
+  QLD: '나스닥100 2배', SOXX: '필라델피아 반도체 ETF', IVV: 'iShares S&P500 ETF',
+  TLT: '미국 장기국채 ETF', GLD: '금 ETF',
+  HOOD: '로빈후드', SOFI: '소파이', APP: '앱러빈', ORCL: '오라클',
+  ASML: '', MRVL: '마벨', CRWD: '크라우드스트라이크', ANET: '아리스타네트웍스',
+  RKLB: '로켓랩', JOBY: '조비에비에이션', MARA: '마라홀딩스',
+  LLY: '일라이릴리', COST: '코스트코', UNH: '유나이티드헬스', V: '비자',
+};
+
+// "SOXL(반도체 3배 레버리지)" 처럼. 한글명이 없으면 티커만.
+function labelOf(symbol) {
+  const kor = TICKER_NAMES[symbol];
+  return kor ? `${symbol}(${kor})` : symbol;
+}
 const BENCHMARK = 'SPY'; // 상대 비교 기준 지수
 
 const REFRESH_CYCLE_DAYS = 7; // 매주 자동 갱신 (.github/workflows/refresh-stock-pages.yml)
@@ -290,12 +335,23 @@ function buildRelatedBlogHtml(symbol) {
 
 function buildPage(symbol, a, spyA, generatedDate) {
   const canonical = `https://mddcalc.com/stock/${symbol.toLowerCase()}.html`;
-  const title = `${symbol} MDD 실데이터: 역대 하락 구간·회복 기간 전체 정리 | MDD 분석기`;
-  const description = `${symbol}의 실제 시세로 계산한 고점 대비 하락률, 역대 주요 하락 구간과 회복 기간, 변동성을 무료로 확인하세요.`;
+  const label = labelOf(symbol);
+
+  // 제목은 실제로 들어오는 검색어 두 가지("soxl mdd", "고점 대비 하락률")를 한 줄에
+  // 같이 담는다. 옛 제목("MDD 실데이터: 역대 하락 구간·회복 기간 전체 정리")은
+  // "고점 대비 하락률"이라는 표현이 제목에 없어서, 노출은 잡히는데 클릭이 0에
+  // 가까웠던 검색어들과 글자가 맞지 않았다.
+  const title = `${label} MDD·고점 대비 하락률 총정리`;
 
   const yearsLabel = a.years.toFixed(1);
   const heroClass = a.currentDrawdownPct < -0.05 ? 'neg' : 'pos';
   const heroText = a.isAtAth ? '현재 사상 최고가' : fmtPct(a.currentDrawdownPct);
+
+  // 설명문에는 숫자를 앞에 둔다. 검색 결과에서 "지금 몇 % 빠졌는지"가 먼저 보이는 쪽이
+  // 같은 순위에서도 클릭을 더 가져간다. 매주 자동 갱신되므로 숫자도 같이 최신화된다.
+  const description = a.isAtAth
+    ? `${label}은 현재 사상 최고가 부근입니다. 역대 최대 낙폭(MDD) ${fmtPct(a.worstDrawdownPct)}, 주요 하락 구간과 전고점 회복까지 걸린 기간을 실제 시세로 계산해 정리했습니다.`
+    : `${label}의 현재 고점 대비 하락률은 ${fmtPct(a.currentDrawdownPct)}입니다. 역대 최대 낙폭(MDD) ${fmtPct(a.worstDrawdownPct)}, 주요 하락 구간과 전고점 회복까지 걸린 기간을 실제 시세로 계산해 정리했습니다.`;
 
   let spyCompareHtml = '';
   if (symbol !== BENCHMARK && spyA) {
@@ -330,7 +386,7 @@ function buildPage(symbol, a, spyA, generatedDate) {
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "${escapeHtml(symbol)} MDD 실데이터 리포트",
+  "name": "${escapeHtml(label)} MDD·고점 대비 하락률 리포트",
   "description": "${escapeHtml(description)}",
   "url": "${canonical}",
   "dateModified": "${generatedDate}",
@@ -346,7 +402,7 @@ function buildPage(symbol, a, spyA, generatedDate) {
   a { color: #4299e1; }
   .card { background: #fff; border-radius: 14px; padding: 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
-  .ticker-name { font-size: 14px; font-weight: 700; color: #718096; letter-spacing: 0.5px; }
+  h1.ticker-name { font-size: 15px; font-weight: 700; color: #4a5568; letter-spacing: 0.3px; margin-bottom: 2px; }
   .hero { font-size: 46px; font-weight: 800; line-height: 1.1; margin: 6px 0 4px; }
   .hero.neg { color: #e53e3e; } .hero.pos { color: #38a169; }
   .hero-label { font-size: 13px; color: #718096; margin-bottom: 6px; }
@@ -379,7 +435,9 @@ function buildPage(symbol, a, spyA, generatedDate) {
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/tools.html">도구 모음</a> &gt; ${symbol}</nav>
 
   <div class="card">
-    <div class="ticker-name">${symbol}</div>
+    <!-- 이 페이지들에는 h1이 아예 없었다. 크롤러 입장에서 "이 문서가 무엇에 대한
+         문서인지" 선언하는 자리가 비어 있던 셈이라, 제목과 같은 문구로 채운다. -->
+    <h1 class="ticker-name">${escapeHtml(label)} MDD·고점 대비 하락률</h1>
     <div class="hero ${heroClass}">${heroText}</div>
     <div class="hero-label">${a.isAtAth ? `사상 최고가 ${fmtPrice(a.athPrice)} 경신 중` : `사상 최고가(ATH) ${fmtPrice(a.athPrice)} (${a.athDate}) 대비 · 현재가 ${fmtPrice(a.currentPrice)}`} · 기준일 ${a.currentDate}</div>
     <div class="data-range">📅 데이터 기간: ${a.startDate} ~ ${a.endDate} (약 ${yearsLabel}년, 일봉 기준)</div>
@@ -450,12 +508,20 @@ function buildPage(symbol, a, spyA, generatedDate) {
 `;
 }
 
-function updateSitemap(tickers, generatedDate) {
+// staleTickers: 이번 실행에서 갱신하지 못한 종목. lastmod까지 오늘 날짜로 바꿔버리면
+// 바뀌지도 않은 페이지를 바뀌었다고 알리는 셈이라, 사이트맵에 있던 날짜를 그대로 둔다.
+function updateSitemap(tickers, generatedDate, staleTickers = []) {
   let xml = fs.readFileSync(SITEMAP_PATH, 'utf8');
+  const previousLastmod = {};
+  for (const m of xml.matchAll(/<loc>https:\/\/mddcalc\.com\/stock\/([^<]+)\.html<\/loc><lastmod>([^<]+)<\/lastmod>/g)) {
+    previousLastmod[m[1].toUpperCase()] = m[2];
+  }
+  const stale = new Set(staleTickers);
   xml = xml.replace(/\s*<url><loc>https:\/\/mddcalc\.com\/stock\/[^<]+<\/loc>[\s\S]*?<\/url>/g, '');
-  const entries = tickers.map(t =>
-    `  <url><loc>https://mddcalc.com/stock/${t.toLowerCase()}.html</loc><lastmod>${generatedDate}</lastmod><priority>0.7</priority></url>`
-  ).join('\n');
+  const entries = tickers.map(t => {
+    const lastmod = (stale.has(t) && previousLastmod[t]) || generatedDate;
+    return `  <url><loc>https://mddcalc.com/stock/${t.toLowerCase()}.html</loc><lastmod>${lastmod}</lastmod><priority>0.7</priority></url>`;
+  }).join('\n');
   xml = xml.replace('</urlset>', entries + '\n</urlset>');
   fs.writeFileSync(SITEMAP_PATH, xml);
 }
@@ -466,7 +532,13 @@ function updateSitemap(tickers, generatedDate) {
 function updateToolsHub(tickers) {
   const p = path.join(SITE_ROOT, 'tools.html');
   let html = fs.readFileSync(p, 'utf8');
-  const chips = tickers.map(t => `<a href="/stock/${t.toLowerCase()}.html" class="chip">${t}</a>`).join('\n        ');
+  // 앵커 텍스트에 한글 종목명을 같이 넣는다. 링크 글자는 구글이 대상 페이지를 무엇으로
+  // 이해할지에 직접 쓰이는데, 지금까지는 사이트 어디에도 "테슬라"라는 한글이 없어서
+  // 한글 검색어로는 후보에 오를 근거 자체가 없었다.
+  const chips = tickers.map(t => {
+    const kor = TICKER_NAMES[t];
+    return `<a href="/stock/${t.toLowerCase()}.html" class="chip">${t}${kor ? ` ${escapeHtml(kor)}` : ''}</a>`;
+  }).join('\n        ');
   const block = `<!-- STOCK_HUB_STATIC:START -->
       <div class="card">
         <h2 class="section">📈 종목별 MDD 실데이터 리포트</h2>
@@ -491,13 +563,27 @@ async function main() {
 
   const analyses = {};
   const rawSeries = {};
+  const failed = [];
   for (const symbol of TICKERS) {
     process.stdout.write(`⏳ ${symbol} 조회 중... `);
-    const series = await fetchSeries(symbol);
-    rawSeries[symbol] = series;
-    analyses[symbol] = analyze(series);
-    console.log(`완료 (${series.length}일치, ${analyses[symbol].startDate} ~ ${analyses[symbol].endDate})`);
+    // 한 종목이 실패해도 전체를 중단하지 않는다. 예전에는 던진 에러가 그대로 올라가
+    // 주간 갱신 전체가 죽었는데, 목록에 종목을 늘릴수록 (상장폐지·티커 변경·무료 플랜
+    // 미지원 등으로) 한 종목이 실패할 확률이 같이 올라간다. 실패한 종목은 기존 페이지를
+    // 그대로 두고 넘어간다.
+    try {
+      const series = await fetchSeries(symbol);
+      rawSeries[symbol] = series;
+      analyses[symbol] = analyze(series);
+      console.log(`완료 (${series.length}일치, ${analyses[symbol].startDate} ~ ${analyses[symbol].endDate})`);
+    } catch (err) {
+      failed.push(symbol);
+      console.log(`건너뜀 — ${err.message}`);
+    }
     await sleep(8000); // 분당 8회 제한 준수 (60s / 8 = 7.5s, 여유 있게 8s)
+  }
+
+  if (!analyses[BENCHMARK]) {
+    throw new Error(`벤치마크 ${BENCHMARK} 조회에 실패해 비교 섹션을 만들 수 없습니다. 이번 실행은 중단합니다.`);
   }
 
   // 벤치마크 비교는 "같은 기간"이라고 적는 만큼 실제로 같은 기간이어야 한다.
@@ -507,6 +593,7 @@ async function main() {
   const spySeries = rawSeries[BENCHMARK];
   for (const symbol of TICKERS) {
     const a = analyses[symbol];
+    if (!a) continue; // 조회 실패분 — 기존 페이지 유지
     let spyA = null;
     if (symbol !== BENCHMARK && spySeries) {
       const windowed = spySeries.filter(p => p.date >= a.startDate && p.date <= a.endDate);
@@ -515,12 +602,21 @@ async function main() {
     const html = buildPage(symbol, a, spyA, generatedDate);
     fs.writeFileSync(path.join(OUT_DIR, `${symbol.toLowerCase()}.html`), html);
   }
-  console.log(`\n✅ ${TICKERS.length}개 종목 리포트 생성 완료 (/stock/*.html)`);
+  const generatedCount = TICKERS.length - failed.length;
+  console.log(`\n✅ ${generatedCount}개 종목 리포트 생성 완료 (/stock/*.html)`);
+  if (failed.length) console.log(`⚠️  건너뛴 종목 ${failed.length}개: ${failed.join(', ')}`);
 
-  updateSitemap(TICKERS, generatedDate);
-  console.log('✅ sitemap.xml 갱신 완료');
+  // 사이트맵과 허브 링크에는 "파일이 실제로 있는" 종목만 넣는다. 조회에 실패한 종목까지
+  // 넣어버리면 구글이 존재하지 않는 URL을 크롤링하러 갔다가 404를 받게 되고,
+  // 그게 정확히 Search Console 색인 리포트에 쌓이는 오류가 된다.
+  const publishedTickers = TICKERS.filter(t =>
+    fs.existsSync(path.join(OUT_DIR, `${t.toLowerCase()}.html`))
+  );
 
-  updateToolsHub(TICKERS);
+  updateSitemap(publishedTickers, generatedDate, failed);
+  console.log(`✅ sitemap.xml 갱신 완료 (${publishedTickers.length}개)`);
+
+  updateToolsHub(publishedTickers);
   console.log('✅ tools.html 허브 섹션 갱신 완료');
 }
 
