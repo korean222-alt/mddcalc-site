@@ -2,5 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /docs/
 Disallow: /scripts/
+# 한국 주식 시세 원본(JSON). 페이지가 아니라 데이터 파일이라 색인할 이유가 없다.
+# 아직 한 번도 색인된 적 없는 새 경로라, /api/alerts 때와 달리 막아도 문제가 없다.
+Disallow: /data/
 
 Sitemap: https://mddcalc.com/sitemap.xml
