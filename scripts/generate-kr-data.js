@@ -56,41 +56,48 @@ async function httpGet(url, extraHeaders) {
 // 소스를 하나만 두면 그게 막히는 날 한국 주식 갱신이 통째로 멈춥니다. 순서대로 시도해서
 // 먼저 성공하는 것을 쓰고, 어느 소스가 쓰였는지 로그로 남깁니다.
 
-// 1) 네이버 금융이 자기 차트에 쓰는 공개 엔드포인트. 국내 종목 전용.
-//    응답이 작은따옴표를 쓴 JS 배열 리터럴이라 JSON 으로 고쳐서 파싱합니다.
-//    행: [날짜, 시가, 고가, 저가, 종가, 거래량, 외국인소진율]
+// 1) 네이버 금융이 자기 차트에 쓰는 공개 엔드포인트.
+//    행 형식: [날짜, 시가, 고가, 저가, 종가, 거래량, 외국인소진율]
+const NAVER_INDEX_SYMBOL = { KS11: 'KOSPI', KQ11: 'KOSDAQ' };
+
 async function fromNaver(t) {
-  if (t.market === 'IDX') throw new Error('지수는 이 소스가 지원하지 않음');
+  const symbol = t.market === 'IDX' ? NAVER_INDEX_SYMBOL[t.code] : t.code;
+  if (!symbol) throw new Error('이 소스가 모르는 심볼');
 
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const url =
     'https://api.finance.naver.com/siseJson.naver' +
-    `?symbol=${t.code}&requestType=1&startTime=19900101&endTime=${today}&timeframe=day`;
+    `?symbol=${symbol}&requestType=1&startTime=19900101&endTime=${today}&timeframe=day`;
 
   const text = await (await httpGet(url, { Referer: 'https://finance.naver.com/' })).text();
 
-  let rows;
-  try {
-    rows = JSON.parse(text.replace(/'/g, '"'));
-  } catch (err) {
-    throw new Error('응답 형식이 예상과 다름');
-  }
-  if (!Array.isArray(rows) || rows.length < 2) throw new Error('데이터 없음');
+  // 응답은 작은따옴표를 쓴 JS 배열 리터럴이라 JSON.parse 가 그대로는 안 됩니다.
+  // 처음엔 따옴표를 일괄 치환해서 통째로 파싱했는데, 응답에 예상 못 한 문자가 하나만
+  // 섞여도 전체가 실패했습니다 — 실제로 삼성전자·현대차 등 21종목이 이것 때문에 죽었습니다.
+  // 그래서 필요한 열만 정규식으로 뽑습니다. 앞뒤에 뭐가 붙어 있든 영향받지 않습니다.
+  const rowRe = /\[\s*'?(\d{8})'?\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/g;
+  // 원화는 호가 단위가 1원이라 반올림해도 정보 손실이 없습니다. 지수는 소수점이 의미가 있습니다.
+  const round = t.market === 'IDX' ? (v => Math.round(v * 100) / 100) : Math.round;
 
   const out = [];
-  for (const row of rows.slice(1)) { // 첫 줄은 헤더
-    const ymd = String(row[0]);
-    const high = Number(row[2]);
-    const close = Number(row[4]);
-    if (!/^\d{8}$/.test(ymd) || !Number.isFinite(close) || close <= 0) continue;
-    out.push([epochDayFromYmd(ymd), Math.round(Number.isFinite(high) ? high : close), Math.round(close)]);
+  for (const m of text.matchAll(rowRe)) {
+    const high = Number(m[3]);
+    const close = Number(m[5]);
+    if (!Number.isFinite(close) || close <= 0) continue;
+    // 반올림 뒤 고가가 종가보다 낮아지는 경우가 생길 수 있어 max 로 맞춥니다.
+    // analyze() 가 고가를 최고점 계열로 쓰기 때문에 여기가 어긋나면 낙폭이 틀어집니다.
+    out.push([epochDayFromYmd(m[1]), Math.max(round(Number.isFinite(high) ? high : close), round(close)), round(close)]);
   }
-  if (out.length === 0) throw new Error('유효한 종가 없음');
+
+  if (out.length === 0) {
+    // 무엇 때문에 실패했는지 추측하지 않아도 되도록 응답 앞부분을 남깁니다.
+    throw new Error(`행을 찾지 못함 (응답 앞부분: ${text.replace(/\s+/g, ' ').slice(0, 160)})`);
+  }
 
   out.sort((a, b) => a[0] - b[0]); // 과거 → 최신
   return {
     source: 'naver',
-    currency: 'KRW',
+    currency: t.market === 'IDX' ? 'PT' : 'KRW', // PT = 지수 포인트 (통화 아님)
     d: out.map(r => r[0]),
     h: out.map(r => r[1]),
     c: out.map(r => r[2]),
@@ -127,7 +134,7 @@ async function fromYahoo(t) {
       }
       if (d.length === 0) throw new Error('유효한 종가 없음');
 
-      return { source: 'yahoo', currency: result.meta?.currency || 'KRW', d, h, c };
+      return { source: 'yahoo', currency: t.market === 'IDX' ? 'PT' : (result.meta?.currency || 'KRW'), d, h, c };
     } catch (err) {
       lastError = err;
     }

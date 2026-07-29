@@ -855,6 +855,7 @@ let STATE = {
   filtered: null,
   ticker: '',
   isKR: false,
+  currency: 'USD',
   mode: 'high',
   startDate: null,
   endDate: null,
@@ -1013,6 +1014,7 @@ async function loadData() {
     // 바뀌어 나가므로, 무엇이 조회됐는지 사용자가 확인할 수 있어야 합니다.
     STATE.ticker = (meta && meta.symbol) || (resolved && resolved.symbol) || ticker;
     STATE.isKR = !!(resolved && resolved.isKR);
+    STATE.currency = (meta && meta.currency) || (STATE.isKR ? 'KRW' : 'USD');
     setPreset(5);
     const latestDate = raw.length > 0 ? raw[raw.length-1].date : 'N/A';
 
@@ -1151,7 +1153,14 @@ function fmt(n, d=2) { return n==null || isNaN(n) ? '—' : Number(n).toLocaleSt
 
 // 조회한 종목이 한국 주식이면 원화로, 그 밖에는 달러로 표기합니다.
 // 원화는 호가 단위가 1원이라 소수점을 붙이지 않습니다.
-function money(n) { return STATE.isKR ? '₩' + fmt(n, 0) : '$' + fmt(n, 2); }
+// 표기 단위는 조회한 데이터가 알려주는 통화를 따릅니다.
+//   KRW = 원화(호가 단위가 1원이라 소수점 없음) / PT = 지수 포인트(통화가 아니므로 기호 없음)
+//   그 밖(미국 종목) = 달러
+function money(n) {
+  if (STATE.currency === 'PT') return fmt(n, 2);
+  if (STATE.currency === 'KRW') return '₩' + fmt(n, 0);
+  return '$' + fmt(n, 2);
+}
 function fmtPct(n, d=2) { return n==null || isNaN(n) ? '—' : Number(n).toFixed(d) + '%'; }
 
 // 사용자 입력(티커, 이메일, 에러 메시지 등)을 innerHTML에 넣기 전 이스케이프 처리 (XSS 방지)
