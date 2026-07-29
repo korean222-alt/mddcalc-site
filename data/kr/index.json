@@ -1,0 +1,226 @@
+{
+  "updated": "2026-07-29",
+  "count": 44,
+  "stocks": [
+    {
+      "code": "000660",
+      "name": "SK하이닉스",
+      "market": "KS"
+    },
+    {
+      "code": "373220",
+      "name": "LG에너지솔루션",
+      "market": "KS"
+    },
+    {
+      "code": "207940",
+      "name": "삼성바이오로직스",
+      "market": "KS"
+    },
+    {
+      "code": "068270",
+      "name": "셀트리온",
+      "market": "KS"
+    },
+    {
+      "code": "035420",
+      "name": "NAVER",
+      "market": "KS"
+    },
+    {
+      "code": "051910",
+      "name": "LG화학",
+      "market": "KS"
+    },
+    {
+      "code": "066570",
+      "name": "LG전자",
+      "market": "KS"
+    },
+    {
+      "code": "028260",
+      "name": "삼성물산",
+      "market": "KS"
+    },
+    {
+      "code": "034730",
+      "name": "SK",
+      "market": "KS"
+    },
+    {
+      "code": "402340",
+      "name": "SK스퀘어",
+      "market": "KS"
+    },
+    {
+      "code": "105560",
+      "name": "KB금융",
+      "market": "KS"
+    },
+    {
+      "code": "055550",
+      "name": "신한지주",
+      "market": "KS"
+    },
+    {
+      "code": "086790",
+      "name": "하나금융지주",
+      "market": "KS"
+    },
+    {
+      "code": "316140",
+      "name": "우리금융지주",
+      "market": "KS"
+    },
+    {
+      "code": "032830",
+      "name": "삼성생명",
+      "market": "KS"
+    },
+    {
+      "code": "323410",
+      "name": "카카오뱅크",
+      "market": "KS"
+    },
+    {
+      "code": "034020",
+      "name": "두산에너빌리티",
+      "market": "KS"
+    },
+    {
+      "code": "042660",
+      "name": "한화오션",
+      "market": "KS"
+    },
+    {
+      "code": "329180",
+      "name": "HD현대중공업",
+      "market": "KS"
+    },
+    {
+      "code": "047810",
+      "name": "한국항공우주",
+      "market": "KS"
+    },
+    {
+      "code": "096770",
+      "name": "SK이노베이션",
+      "market": "KS"
+    },
+    {
+      "code": "030200",
+      "name": "KT",
+      "market": "KS"
+    },
+    {
+      "code": "033780",
+      "name": "KT&G",
+      "market": "KS"
+    },
+    {
+      "code": "097950",
+      "name": "CJ제일제당",
+      "market": "KS"
+    },
+    {
+      "code": "139480",
+      "name": "이마트",
+      "market": "KS"
+    },
+    {
+      "code": "090430",
+      "name": "아모레퍼시픽",
+      "market": "KS"
+    },
+    {
+      "code": "259960",
+      "name": "크래프톤",
+      "market": "KS"
+    },
+    {
+      "code": "352820",
+      "name": "하이브",
+      "market": "KS"
+    },
+    {
+      "code": "251270",
+      "name": "넷마블",
+      "market": "KS"
+    },
+    {
+      "code": "042700",
+      "name": "한미반도체",
+      "market": "KS"
+    },
+    {
+      "code": "069500",
+      "name": "KODEX 200",
+      "market": "KS"
+    },
+    {
+      "code": "122630",
+      "name": "KODEX 레버리지",
+      "market": "KS"
+    },
+    {
+      "code": "247540",
+      "name": "에코프로비엠",
+      "market": "KQ"
+    },
+    {
+      "code": "086520",
+      "name": "에코프로",
+      "market": "KQ"
+    },
+    {
+      "code": "196170",
+      "name": "알테오젠",
+      "market": "KQ"
+    },
+    {
+      "code": "058470",
+      "name": "리노공업",
+      "market": "KQ"
+    },
+    {
+      "code": "277810",
+      "name": "레인보우로보틱스",
+      "market": "KQ"
+    },
+    {
+      "code": "263750",
+      "name": "펄어비스",
+      "market": "KQ"
+    },
+    {
+      "code": "293490",
+      "name": "카카오게임즈",
+      "market": "KQ"
+    },
+    {
+      "code": "041510",
+      "name": "에스엠",
+      "market": "KQ"
+    },
+    {
+      "code": "039030",
+      "name": "이오테크닉스",
+      "market": "KQ"
+    },
+    {
+      "code": "240810",
+      "name": "원익IPS",
+      "market": "KQ"
+    },
+    {
+      "code": "112040",
+      "name": "위메이드",
+      "market": "KQ"
+    },
+    {
+      "code": "066970",
+      "name": "엘앤에프",
+      "market": "KQ"
+    }
+  ]
+}
