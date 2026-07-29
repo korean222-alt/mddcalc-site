@@ -598,14 +598,18 @@ async function fetchPriceSeries(ticker, outputsize) {
   const key = resolved.symbol;
   const cached = PRICE_CACHE[key];
   if (cached && (Date.now() - cached.time) < PRICE_CACHE_TTL_MS && cached.values.length >= outputsize) {
-    return { fromCache: true, values: cached.values, metadata: null, meta: cached.meta || null, resolved };
+    // 캐시에 더 많이 들어 있어도 요청한 개수만 돌려줍니다. values 는 최신순이라 앞에서 자릅니다.
+    // (RSI 화면이 "최근 N일 기준"이라고 표시하므로 실제 개수가 N과 같아야 합니다.)
+    return { fromCache: true, values: cached.values.slice(0, outputsize), metadata: null, meta: cached.meta || null, resolved };
   }
 
   // 한국 종목은 정적 파일을 읽습니다. API 한도도, 실시간 호출 실패도 없습니다.
+  // 파일에는 전체 히스토리가 들어 있으므로 캐시에는 전부 담고, 반환은 요청한 개수만 합니다.
+  // 그래야 미국 종목(요청한 만큼만 받아옴)과 동작이 같아집니다.
   if (resolved.isKR) {
     const kr = await fetchKrSeries(resolved.code);
     PRICE_CACHE[key] = { values: kr.values, meta: kr.meta, time: Date.now() };
-    return { fromCache: false, values: kr.values, metadata: null, meta: kr.meta, resolved };
+    return { fromCache: false, values: kr.values.slice(0, outputsize), metadata: null, meta: kr.meta, resolved };
   }
 
   const res = await fetch('/api/twelve-data/time-series', {
