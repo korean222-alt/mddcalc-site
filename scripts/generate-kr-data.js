@@ -25,88 +25,138 @@ const { KR_TICKERS, yahooSymbol, normalizeKrName } = require('./kr-tickers');
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'kr');
 
-const HOSTS = ['https://query1.finance.yahoo.com', 'https://query2.finance.yahoo.com'];
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/124.0 Safari/537.36';
 
-const DELAY_MS = 700;   // 종목 간 간격. 한꺼번에 쏘면 429를 받습니다.
-const MAX_ROWS = 6000;  // 약 24년치. MDD 계산에는 충분합니다.
+const DELAY_MS = 700;             // 종목 간 간격. 한꺼번에 쏘면 429를 받습니다.
+const MAX_ROWS = 6000;            // 약 24년치. MDD 계산에는 충분합니다.
+const REQUEST_TIMEOUT_MS = 20000; // 아래 httpGet 주석 참고 — 이게 없으면 무한정 매달립니다.
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // 날짜를 "에포크 이후 일수"(정수)로 저장합니다. "2026-07-28"(12바이트)보다 훨씬 작고,
 // 종목당 수천 행이라 이 차이가 파일 크기에 그대로 반영됩니다.
-function toEpochDay(ts) {
-  return Math.floor(ts / 86400);
+const epochDayFromUnix = ts => Math.floor(ts / 86400);
+const epochDayFromYmd = ymd =>
+  Date.UTC(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8)) / 86400000;
+
+async function httpGet(url, extraHeaders) {
+  const res = await fetch(url, {
+    headers: { 'User-Agent': UA, ...(extraHeaders || {}) },
+    // Node 의 fetch 에는 기본 타임아웃이 없습니다. 이걸 안 걸면 상대가 응답을 주지도
+    // 끊지도 않을 때 영원히 매달립니다. 실제로 첫 실행이 이것 때문에 20분간 멈춰 있었습니다.
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res;
 }
 
-async function fetchOne(symbol) {
+// ── 시세 소스 ────────────────────────────────────────────────────────
+// 소스를 하나만 두면 그게 막히는 날 한국 주식 갱신이 통째로 멈춥니다. 순서대로 시도해서
+// 먼저 성공하는 것을 쓰고, 어느 소스가 쓰였는지 로그로 남깁니다.
+
+// 1) 네이버 금융이 자기 차트에 쓰는 공개 엔드포인트. 국내 종목 전용.
+//    응답이 작은따옴표를 쓴 JS 배열 리터럴이라 JSON 으로 고쳐서 파싱합니다.
+//    행: [날짜, 시가, 고가, 저가, 종가, 거래량, 외국인소진율]
+async function fromNaver(t) {
+  if (t.market === 'IDX') throw new Error('지수는 이 소스가 지원하지 않음');
+
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const url =
+    'https://api.finance.naver.com/siseJson.naver' +
+    `?symbol=${t.code}&requestType=1&startTime=19900101&endTime=${today}&timeframe=day`;
+
+  const text = await (await httpGet(url, { Referer: 'https://finance.naver.com/' })).text();
+
+  let rows;
+  try {
+    rows = JSON.parse(text.replace(/'/g, '"'));
+  } catch (err) {
+    throw new Error('응답 형식이 예상과 다름');
+  }
+  if (!Array.isArray(rows) || rows.length < 2) throw new Error('데이터 없음');
+
+  const out = [];
+  for (const row of rows.slice(1)) { // 첫 줄은 헤더
+    const ymd = String(row[0]);
+    const high = Number(row[2]);
+    const close = Number(row[4]);
+    if (!/^\d{8}$/.test(ymd) || !Number.isFinite(close) || close <= 0) continue;
+    out.push([epochDayFromYmd(ymd), Math.round(Number.isFinite(high) ? high : close), Math.round(close)]);
+  }
+  if (out.length === 0) throw new Error('유효한 종가 없음');
+
+  out.sort((a, b) => a[0] - b[0]); // 과거 → 최신
+  return {
+    source: 'naver',
+    currency: 'KRW',
+    d: out.map(r => r[0]),
+    h: out.map(r => r[1]),
+    c: out.map(r => r[2]),
+  };
+}
+
+// 2) 야후 파이낸스 chart 엔드포인트. 지수(^KS11)까지 되지만 비공식이라 429가 잦습니다.
+async function fromYahoo(t) {
+  const symbol = yahooSymbol(t);
+  const hosts = ['https://query1.finance.yahoo.com', 'https://query2.finance.yahoo.com'];
   let lastError = null;
 
-  for (const host of HOSTS) {
-    const url = `${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`;
-    let response;
+  for (const host of hosts) {
     try {
-      response = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+      const url = `${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=max`;
+      const json = await (await httpGet(url, { Accept: 'application/json' })).json();
+      const result = json?.chart?.result?.[0];
+      if (!result || !Array.isArray(result.timestamp)) {
+        throw new Error(json?.chart?.error?.description || '데이터 없음');
+      }
+
+      const quote = result.indicators?.quote?.[0] || {};
+      // 원화는 호가 단위가 1원이라 반올림해도 정보 손실이 없고 파일이 작아집니다.
+      // 지수는 소수점이 의미가 있어 두 자리까지 남깁니다.
+      const round = t.market === 'IDX' ? (v => Math.round(v * 100) / 100) : Math.round;
+
+      const d = [], h = [], c = [];
+      for (let i = 0; i < result.timestamp.length; i++) {
+        const close = quote.close?.[i];
+        if (close == null) continue; // 휴장·거래정지일
+        d.push(epochDayFromUnix(result.timestamp[i]));
+        h.push(round(quote.high?.[i] ?? close));
+        c.push(round(close));
+      }
+      if (d.length === 0) throw new Error('유효한 종가 없음');
+
+      return { source: 'yahoo', currency: result.meta?.currency || 'KRW', d, h, c };
     } catch (err) {
       lastError = err;
-      continue;
     }
+  }
+  throw lastError || new Error('알 수 없는 실패');
+}
 
-    if (response.status === 429) {
-      lastError = new Error('429 rate limited');
-      await sleep(5000); // 잠깐 쉬고 다른 호스트로
-      continue;
+const SOURCES = [fromNaver, fromYahoo];
+
+async function fetchOne(t) {
+  const errors = [];
+
+  for (const source of SOURCES) {
+    try {
+      const got = await source(t);
+      const from = Math.max(0, got.d.length - MAX_ROWS); // 오래된 쪽을 잘라냅니다
+      return {
+        ...got,
+        symbol: t.market === 'IDX' ? `^${t.code}` : `${t.code}.${t.market}`,
+        d: got.d.slice(from),
+        h: got.h.slice(from),
+        c: got.c.slice(from),
+      };
+    } catch (err) {
+      errors.push(`${source.name}: ${err.message}`);
     }
-    if (!response.ok) {
-      lastError = new Error(`HTTP ${response.status}`);
-      continue;
-    }
-
-    const json = await response.json();
-    const result = json?.chart?.result?.[0];
-    if (!result || !Array.isArray(result.timestamp)) {
-      lastError = new Error(json?.chart?.error?.description || '데이터 없음');
-      continue;
-    }
-
-    const quote = result.indicators?.quote?.[0] || {};
-    const d = [], h = [], c = [];
-
-    for (let i = 0; i < result.timestamp.length; i++) {
-      const close = quote.close?.[i];
-      if (close == null) continue; // 휴장·거래정지일
-      const high = quote.high?.[i] ?? close;
-      d.push(toEpochDay(result.timestamp[i]));
-      // 원화는 호가 단위가 1원이라 반올림해도 정보 손실이 없고, 파일이 눈에 띄게 작아집니다.
-      // 지수는 소수점이 의미가 있어 두 자리까지 남깁니다.
-      const round = result.meta?.currency === 'KRW' && !symbol.startsWith('^')
-        ? Math.round
-        : (v => Math.round(v * 100) / 100);
-      h.push(round(high));
-      c.push(round(close));
-    }
-
-    if (d.length === 0) {
-      lastError = new Error('유효한 종가 없음');
-      continue;
-    }
-
-    // 오래된 쪽을 잘라냅니다 (뒤쪽이 최신).
-    const from = Math.max(0, d.length - MAX_ROWS);
-
-    return {
-      symbol: result.meta?.symbol || symbol,
-      name: result.meta?.longName || result.meta?.shortName || null,
-      currency: result.meta?.currency || 'KRW',
-      d: d.slice(from),
-      h: h.slice(from),
-      c: c.slice(from),
-    };
   }
 
-  throw lastError || new Error('알 수 없는 실패');
+  throw new Error(errors.join(' / '));
 }
 
 // 15개 HTML 안의 KR_STOCKS 표를 실제 생성된 종목만으로 다시 씁니다.
@@ -232,10 +282,12 @@ async function main() {
   const ok = [];
   const failed = [];
 
+  const bySource = {};
+
   for (const t of KR_TICKERS) {
-    const symbol = yahooSymbol(t);
     try {
-      const data = await fetchOne(symbol);
+      const data = await fetchOne(t);
+      bySource[data.source] = (bySource[data.source] || 0) + 1;
       const payload = {
         code: t.code,
         symbol: data.symbol,
@@ -249,12 +301,12 @@ async function main() {
       };
       fs.writeFileSync(path.join(OUT_DIR, `${t.code}.json`), JSON.stringify(payload));
       ok.push(t);
-      console.log(`✅ ${t.name} (${symbol}) — ${data.d.length}행, 최신 ${payload.updated}`);
+      console.log(`✅ ${t.name} (${payload.symbol}) — ${data.d.length}행, 최신 ${payload.updated} [${data.source}]`);
     } catch (err) {
       // 한 종목이 실패해도 나머지는 계속 만듭니다. 이미 저장돼 있던 파일은 건드리지 않으므로
       // 그 종목은 지난번 데이터로 계속 서빙됩니다.
       failed.push({ ticker: t, reason: err.message });
-      console.warn(`⚠️  ${t.name} (${symbol}) 실패: ${err.message} — 기존 파일 유지`);
+      console.warn(`⚠️  ${t.name} (${t.code}) 실패: ${err.message} — 기존 파일 유지`);
     }
     await sleep(DELAY_MS);
   }
@@ -275,6 +327,7 @@ async function main() {
   );
 
   console.log(`\n조회 성공 ${ok.length} / 실패 ${failed.length} / 서빙 가능 ${usable.length}종목`);
+  console.log('소스별 성공:', Object.entries(bySource).map(([k, v]) => `${k} ${v}`).join(', ') || '없음');
   console.log(`HTML 갱신 — 종목명 표 ${updatedFiles}개 파일, 칩 ${updatedChips}개, 지원 목록 ${updatedList}개`);
 
   if (usable.length === 0) {
@@ -284,7 +337,12 @@ async function main() {
   // 일부 실패는 정상 종료입니다. 여기서 죽이면 나머지 성공분까지 커밋되지 않습니다.
 }
 
-main().catch(err => {
-  console.error('생성 실패:', err);
-  process.exit(1);
-});
+// 직접 실행할 때만 돌립니다. 테스트에서 개별 함수를 가져다 쓸 수 있게 하기 위함입니다.
+if (require.main === module) {
+  main().catch(err => {
+    console.error('생성 실패:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = { fromNaver, fromYahoo, fetchOne, syncNameTable, syncChips, syncSupportedList };
