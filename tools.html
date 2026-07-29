@@ -471,14 +471,65 @@ const CURRENT_PAGE = 'tools';
 const PRICE_CACHE = {};
 const PRICE_CACHE_TTL_MS = 10 * 60 * 1000;
 
+// ── 한국 주식(KRX) 종목표 ────────────────────────────────────────────
+// 한글 종목명으로도 찾을 수 있도록 두는 표입니다. 여기 없는 종목은 6자리 코드를
+// 그대로 입력하면 됩니다(서버가 코스피/코스닥을 판별합니다).
+// 키는 공백 제거 + 대문자로 정규화한 형태입니다.
+const KR_STOCKS = {
+  '삼성전자': '005930', 'SK하이닉스': '000660', 'LG에너지솔루션': '373220',
+  '삼성바이오로직스': '207940', '현대차': '005380', '기아': '000270',
+  '셀트리온': '068270', 'NAVER': '035420', '네이버': '035420', '카카오': '035720',
+  'LG화학': '051910', '삼성SDI': '006400', 'POSCO홀딩스': '005490', '포스코홀딩스': '005490',
+  '현대모비스': '012330', 'KB금융': '105560', '신한지주': '055550', '하나금융지주': '086790',
+  '우리금융지주': '316140', '기업은행': '024110', '한국전력': '015760', 'SK텔레콤': '017670',
+  'KT': '030200', 'KT&G': '033780', '두산에너빌리티': '034020', 'HMM': '011200',
+  '한화에어로스페이스': '012450', '고려아연': '010130', 'LG전자': '066570',
+  '삼성전기': '009150', '삼성생명': '032830', '삼성화재': '000810', 'SK이노베이션': '096770',
+  '삼성물산': '028260', '크래프톤': '259960', '하이브': '352820', '엔씨소프트': '036570',
+  '넷마블': '251270', '카카오뱅크': '323410', '한화오션': '042660',
+  'HD한국조선해양': '009540', 'HD현대중공업': '329180', '한국항공우주': '047810',
+  '대한항공': '003490', 'CJ제일제당': '097950', '이마트': '139480', '현대건설': '000720',
+  '아모레퍼시픽': '090430', '한미반도체': '042700', 'SK': '034730', 'LG': '003550',
+  'SK스퀘어': '402340', 'KODEX200': '069500', 'KODEX레버리지': '122630',
+  // 코스닥
+  '에코프로비엠': '247540', '에코프로': '086520', '알테오젠': '196170', 'HLB': '028300',
+  '리노공업': '058470', '레인보우로보틱스': '277810', '펄어비스': '263750',
+  '카카오게임즈': '293490', '에스엠': '041510', '이오테크닉스': '039030',
+  '원익IPS': '240810', '엘앤에프': '066970', '위메이드': '112040',
+  // 지수
+  '코스피': '^KS11', 'KOSPI': '^KS11', '코스닥': '^KQ11', 'KOSDAQ': '^KQ11',
+};
+
+function normalizeKrName(s) {
+  return String(s || '').trim().replace(/\s+/g, '').toUpperCase();
+}
+
+// 입력값을 실제로 조회할 심볼로 바꿉니다.
+//   "삼성전자" → 005930 (한국)   /   "005930", "005930.KS" → 그대로 (한국)
+//   "코스피" → ^KS11 (한국)      /   그 밖의 "TSLA" 등 → 미국
+// 한국 종목은 Twelve Data 무료 플랜에 포함되지 않아 /api/kr/time-series 로 보냅니다.
+function resolveSymbol(input) {
+  const raw = String(input || '').trim();
+  const byName = Object.prototype.hasOwnProperty.call(KR_STOCKS, normalizeKrName(raw)) ? KR_STOCKS[normalizeKrName(raw)] : null;
+  if (byName) return { symbol: byName, isKR: true, typed: raw };
+
+  const upper = raw.toUpperCase();
+  if (/^\d{6}(\.(KS|KQ))?$/.test(upper) || /^\^(KS11|KQ11)$/.test(upper)) {
+    return { symbol: upper, isKR: true, typed: raw };
+  }
+  return { symbol: upper, isKR: false, typed: raw };
+}
+
 async function fetchPriceSeries(ticker, outputsize) {
-  const key = ticker.toUpperCase();
+  const resolved = resolveSymbol(ticker);
+  const key = resolved.symbol;
   const cached = PRICE_CACHE[key];
   if (cached && (Date.now() - cached.time) < PRICE_CACHE_TTL_MS && cached.values.length >= outputsize) {
-    return { fromCache: true, values: cached.values, metadata: null };
+    return { fromCache: true, values: cached.values, metadata: null, meta: cached.meta || null, resolved };
   }
 
-  const res = await fetch('/api/twelve-data/time-series', {
+  const endpoint = resolved.isKR ? '/api/kr/time-series' : '/api/twelve-data/time-series';
+  const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ symbol: key, interval: '1day', outputsize })
@@ -486,8 +537,10 @@ async function fetchPriceSeries(ticker, outputsize) {
   const json = await res.json();
 
   if (res.status === 429) {
+    // 한국 시세는 하루 한도가 아니라 잠깐 몰린 것이므로 안내 문구가 다릅니다.
     const err = new Error(json.message || '오늘 사용량을 모두 사용했어요.');
-    err.rateLimited429 = true;
+    if (json.retryMinute) err.rateLimitedMinute = true;
+    else err.rateLimited429 = true;
     throw err;
   }
   if (json.status === 'error' && json.message && json.message.includes('rate limit')) {
@@ -500,8 +553,8 @@ async function fetchPriceSeries(ticker, outputsize) {
   if (json.status === 'error') throw new Error(json.message || 'API 오류');
   if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
 
-  PRICE_CACHE[key] = { values: json.values, time: Date.now() };
-  return { fromCache: false, values: json.values, metadata: json._metadata || null };
+  PRICE_CACHE[key] = { values: json.values, meta: json.meta || null, time: Date.now() };
+  return { fromCache: false, values: json.values, metadata: json._metadata || null, meta: json.meta || null, resolved };
 }
 
 // 벤치마크(SPY 등)는 하루 1회만 API를 쓰도록 localStorage에 날짜와 함께 저장해 재사용합니다.
@@ -665,7 +718,7 @@ async function loadData() {
   const ticker = document.getElementById('ticker').value.trim().toUpperCase();
   
   if (!ticker) return showStatus('❌ 티커를 입력해주세요', 'error');
-  if (!isValidTickerFormat(ticker)) return showStatus('❌ 티커 형식이 올바르지 않습니다 (영문/숫자/./- 만 가능, 최대 10자)', 'error');
+  if (!isValidTickerFormat(ticker)) return showStatus('❌ 종목 형식이 올바르지 않습니다 (미국 티커 TSLA, 한국 종목코드 005930 또는 종목명 삼성전자)', 'error');
 
   localStorage.setItem('td_last_ticker', ticker);
 
@@ -821,8 +874,10 @@ function escapeHtml(str) {
 }
 
 // 티커 형식 검증 (알파벳/숫자/점/하이픈만 허용, 최대 10자) — 이상한 값이 API까지 가는 것 자체를 차단
+// 미국 티커(TSLA)뿐 아니라 한국 종목 코드(005930 / 005930.KS), 지수(^KS11),
+// 한글 종목명("삼성전자")까지 받습니다.
 function isValidTickerFormat(t) {
-  return /^[A-Z0-9.\-]{1,10}$/.test(t);
+  return /^[A-Z0-9.\-^&가-힣 ]{1,20}$/.test(t);
 }
 
 function render() {
@@ -1347,7 +1402,7 @@ async function calcRSIByTicker() {
   const loading = document.getElementById('rsiLoading');
 
   if (!ticker) { result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 티커를 입력해주세요. 예: TSLA, NVDA, AAPL</div>'; return; }
-  if (!isValidTickerFormat(ticker)) { result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 티커 형식이 올바르지 않습니다 (영문/숫자/./- 만 가능, 최대 10자)</div>'; return; }
+  if (!isValidTickerFormat(ticker)) { result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 종목 형식이 올바르지 않습니다 (미국 티커 TSLA, 한국 종목코드 005930 또는 종목명 삼성전자)</div>'; return; }
 
   loading.style.display = 'block';
   result.innerHTML = '';
