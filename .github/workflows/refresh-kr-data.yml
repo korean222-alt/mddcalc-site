@@ -14,6 +14,12 @@ on:
   schedule:
     - cron: '30 9 * * 1-5' # 평일 09:30 UTC = 한국시간 18:30, 장 마감 뒤
   workflow_dispatch: {}
+  # 임시: main 병합 전에 이 브랜치에서 한 번 돌려 데이터가 실제로 만들어지는지 확인하기 위한
+  # 트리거입니다. (workflow_dispatch 는 기본 브랜치에 파일이 있어야만 쓸 수 있음)
+  # 확인이 끝나면 이 push 블록은 지웁니다.
+  push:
+    branches: ['claude/**']
+    paths: ['scripts/kr-tickers.js', 'scripts/generate-kr-data.js', '.github/workflows/refresh-kr-data.yml']
 
 permissions:
   contents: write
