@@ -38,6 +38,11 @@ jobs:
         with:
           node-version: 22
 
+      # 파서를 두 번 잘못 고쳐서 두 번 다 실행 로그를 보고서야 알았습니다.
+      # 실제 응답을 픽스처로 박아둔 테스트를 먼저 돌려, 망가진 파서로 60번 요청하는 일을 막습니다.
+      - name: Test the response parser
+        run: node scripts/test-kr-parse.js
+
       - name: Generate Korean stock data
         run: node scripts/generate-kr-data.js
 
