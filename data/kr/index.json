@@ -1,7 +1,12 @@
 {
   "updated": "2026-07-29",
-  "count": 44,
+  "count": 67,
   "stocks": [
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "market": "KS"
+    },
     {
       "code": "000660",
       "name": "SK하이닉스",
@@ -18,6 +23,16 @@
       "market": "KS"
     },
     {
+      "code": "005380",
+      "name": "현대차",
+      "market": "KS"
+    },
+    {
+      "code": "000270",
+      "name": "기아",
+      "market": "KS"
+    },
+    {
       "code": "068270",
       "name": "셀트리온",
       "market": "KS"
@@ -28,13 +43,38 @@
       "market": "KS"
     },
     {
+      "code": "035720",
+      "name": "카카오",
+      "market": "KS"
+    },
+    {
       "code": "051910",
       "name": "LG화학",
       "market": "KS"
     },
     {
+      "code": "006400",
+      "name": "삼성SDI",
+      "market": "KS"
+    },
+    {
+      "code": "005490",
+      "name": "POSCO홀딩스",
+      "market": "KS"
+    },
+    {
+      "code": "012330",
+      "name": "현대모비스",
+      "market": "KS"
+    },
+    {
       "code": "066570",
       "name": "LG전자",
+      "market": "KS"
+    },
+    {
+      "code": "009150",
+      "name": "삼성전기",
       "market": "KS"
     },
     {
@@ -45,6 +85,11 @@
     {
       "code": "034730",
       "name": "SK",
+      "market": "KS"
+    },
+    {
+      "code": "003550",
+      "name": "LG",
       "market": "KS"
     },
     {
@@ -73,8 +118,18 @@
       "market": "KS"
     },
     {
+      "code": "024110",
+      "name": "기업은행",
+      "market": "KS"
+    },
+    {
       "code": "032830",
       "name": "삼성생명",
+      "market": "KS"
+    },
+    {
+      "code": "000810",
+      "name": "삼성화재",
       "market": "KS"
     },
     {
@@ -83,13 +138,28 @@
       "market": "KS"
     },
     {
+      "code": "015760",
+      "name": "한국전력",
+      "market": "KS"
+    },
+    {
       "code": "034020",
       "name": "두산에너빌리티",
       "market": "KS"
     },
     {
+      "code": "012450",
+      "name": "한화에어로스페이스",
+      "market": "KS"
+    },
+    {
       "code": "042660",
       "name": "한화오션",
+      "market": "KS"
+    },
+    {
+      "code": "009540",
+      "name": "HD한국조선해양",
       "market": "KS"
     },
     {
@@ -103,8 +173,33 @@
       "market": "KS"
     },
     {
+      "code": "010130",
+      "name": "고려아연",
+      "market": "KS"
+    },
+    {
       "code": "096770",
       "name": "SK이노베이션",
+      "market": "KS"
+    },
+    {
+      "code": "011200",
+      "name": "HMM",
+      "market": "KS"
+    },
+    {
+      "code": "003490",
+      "name": "대한항공",
+      "market": "KS"
+    },
+    {
+      "code": "000720",
+      "name": "현대건설",
+      "market": "KS"
+    },
+    {
+      "code": "017670",
+      "name": "SK텔레콤",
       "market": "KS"
     },
     {
@@ -143,6 +238,11 @@
       "market": "KS"
     },
     {
+      "code": "036570",
+      "name": "엔씨소프트",
+      "market": "KS"
+    },
+    {
       "code": "251270",
       "name": "넷마블",
       "market": "KS"
@@ -175,6 +275,11 @@
     {
       "code": "196170",
       "name": "알테오젠",
+      "market": "KQ"
+    },
+    {
+      "code": "028300",
+      "name": "HLB",
       "market": "KQ"
     },
     {
@@ -221,6 +326,16 @@
       "code": "066970",
       "name": "엘앤에프",
       "market": "KQ"
+    },
+    {
+      "code": "KS11",
+      "name": "코스피",
+      "market": "IDX"
+    },
+    {
+      "code": "KQ11",
+      "name": "코스닥",
+      "market": "IDX"
     }
   ]
 }
