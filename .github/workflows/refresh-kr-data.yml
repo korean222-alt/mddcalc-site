@@ -1,0 +1,48 @@
+name: Refresh Korean stock data
+
+# scripts/generate-kr-data.js 를 돌려서 data/kr/*.json (한국 주식 일봉)을 갱신한다.
+# API 키가 필요 없다.
+#
+# 사용자 브라우저는 이 결과 파일만 읽는다. 즉 시세 소스가 불안정해도 그 영향은
+# 이 워크플로우 안에서 끝나고, 사이트는 항상 마지막으로 성공한 데이터를 서빙한다.
+# 일부 종목이 실패하면 그 종목만 지난 데이터를 유지하고 나머지는 갱신된다.
+#
+# 지금 바로 돌리려면: Actions 탭 > Refresh Korean stock data > Run workflow
+# (ref 를 골라 브랜치에서도 돌릴 수 있다)
+
+on:
+  schedule:
+    - cron: '30 9 * * 1-5' # 평일 09:30 UTC = 한국시간 18:30, 장 마감 뒤
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # ref 를 고정하지 않는다. workflow_dispatch 로 고른 브랜치에서 그대로 돌게 해서
+        # main 에 넣기 전에 브랜치에서 먼저 검증할 수 있도록 한다.
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate Korean stock data
+        run: node scripts/generate-kr-data.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/kr *.html
+          if git diff --cached --quiet; then
+            echo "변경 사항 없음 — 커밋하지 않음"
+          else
+            git commit -m "chore: refresh Korean stock data"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi

@@ -64,6 +64,10 @@
                 border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
                 font-family: inherit; transition: background 0.2s; }
   .quick-chip:hover { background: rgba(255,255,255,0.38); }
+  /* 조회 가능한 한국 종목 목록 (초록 패널 안) */
+  .kr-supported { margin-top: 10px; background: rgba(255,255,255,0.14); border-radius: 8px; padding: 8px 12px; }
+  .kr-supported > summary { font-size: 12px; font-weight: 700; cursor: pointer; }
+  .kr-supported .kr-name { white-space: nowrap; }
   .status { margin-top: 10px; padding: 12px 14px; border-radius: 6px; font-size: 13px;
             background: rgba(255,255,255,0.2); display: none; white-space: pre-wrap; line-height: 1.6; }
   .status.show { display: block; }
@@ -295,15 +299,21 @@
       <button type="button" class="quick-chip" onclick="loadFavoriteTicker('QQQ')">QQQ</button>
       <button type="button" class="quick-chip" onclick="loadFavoriteTicker('NVDA')">NVDA</button>
       <button type="button" class="quick-chip" onclick="loadFavoriteTicker('TSLA')">TSLA</button>
-      <button type="button" class="quick-chip" onclick="loadFavoriteTicker('삼성전자')">삼성전자</button>
-      <button type="button" class="quick-chip" onclick="loadFavoriteTicker('SK하이닉스')">SK하이닉스</button>
-      <button type="button" class="quick-chip" onclick="loadFavoriteTicker('현대차')">현대차</button>
-      <button type="button" class="quick-chip" onclick="loadFavoriteTicker('코스피')">코스피 지수</button>
+      <!-- KR_CHIPS_START 이 블록은 scripts/generate-kr-data.js 가 자동으로 씁니다 -->
+      <!-- KR_CHIPS_END -->
     </div>
     <div class="api-help">
-      💡 미국 티커(TSLA)뿐 아니라 <b>한국 종목코드(005930)나 종목명(삼성전자)</b>으로도 조회됩니다.
-      코스닥 종목도 6자리 코드를 그대로 넣으면 됩니다. (전일 종가 기준)
+      💡 미국 티커(TSLA)뿐 아니라 <b>한국 종목코드(005930)나 종목명(삼성전자)</b>으로도 조회됩니다. (전일 종가 기준)
     </div>
+    <details class="kr-supported">
+      <summary>🇰🇷 조회 가능한 한국 종목 보기</summary>
+      <!-- KR_SUPPORTED_START 이 블록은 scripts/generate-kr-data.js 가 자동으로 씁니다 -->
+      <div class="body" style="font-size:12px; line-height:1.9;">
+
+        <div style="margin-top:8px; color:#718096;">목록에 없는 종목도 6자리 코드로 요청해 주시면 추가합니다.</div>
+      </div>
+      <!-- KR_SUPPORTED_END -->
+    </details>
     <div id="status" class="status"></div>
   </div>
 
@@ -615,48 +625,68 @@ const PRICE_CACHE_TTL_MS = 10 * 60 * 1000;
 // 그대로 입력하면 됩니다(서버가 코스피/코스닥을 판별합니다).
 // 키는 공백 제거 + 대문자로 정규화한 형태입니다.
 const KR_STOCKS = {
-  '삼성전자': '005930', 'SK하이닉스': '000660', 'LG에너지솔루션': '373220',
-  '삼성바이오로직스': '207940', '현대차': '005380', '기아': '000270',
-  '셀트리온': '068270', 'NAVER': '035420', '네이버': '035420', '카카오': '035720',
-  'LG화학': '051910', '삼성SDI': '006400', 'POSCO홀딩스': '005490', '포스코홀딩스': '005490',
-  '현대모비스': '012330', 'KB금융': '105560', '신한지주': '055550', '하나금융지주': '086790',
-  '우리금융지주': '316140', '기업은행': '024110', '한국전력': '015760', 'SK텔레콤': '017670',
-  'KT': '030200', 'KT&G': '033780', '두산에너빌리티': '034020', 'HMM': '011200',
-  '한화에어로스페이스': '012450', '고려아연': '010130', 'LG전자': '066570',
-  '삼성전기': '009150', '삼성생명': '032830', '삼성화재': '000810', 'SK이노베이션': '096770',
-  '삼성물산': '028260', '크래프톤': '259960', '하이브': '352820', '엔씨소프트': '036570',
-  '넷마블': '251270', '카카오뱅크': '323410', '한화오션': '042660',
-  'HD한국조선해양': '009540', 'HD현대중공업': '329180', '한국항공우주': '047810',
-  '대한항공': '003490', 'CJ제일제당': '097950', '이마트': '139480', '현대건설': '000720',
-  '아모레퍼시픽': '090430', '한미반도체': '042700', 'SK': '034730', 'LG': '003550',
-  'SK스퀘어': '402340', 'KODEX200': '069500', 'KODEX레버리지': '122630',
-  // 코스닥
-  '에코프로비엠': '247540', '에코프로': '086520', '알테오젠': '196170', 'HLB': '028300',
-  '리노공업': '058470', '레인보우로보틱스': '277810', '펄어비스': '263750',
-  '카카오게임즈': '293490', '에스엠': '041510', '이오테크닉스': '039030',
-  '원익IPS': '240810', '엘앤에프': '066970', '위메이드': '112040',
-  // 지수
-  '코스피': '^KS11', 'KOSPI': '^KS11', '코스닥': '^KQ11', 'KOSDAQ': '^KQ11',
+  // 이 표는 scripts/generate-kr-data.js 가 자동으로 씁니다. 직접 고치지 마세요.
+  // 종목을 추가하려면 scripts/kr-tickers.js 에 넣고 생성기를 다시 돌리세요.
+
 };
 
 function normalizeKrName(s) {
   return String(s || '').trim().replace(/\s+/g, '').toUpperCase();
 }
 
-// 입력값을 실제로 조회할 심볼로 바꿉니다.
-//   "삼성전자" → 005930 (한국)   /   "005930", "005930.KS" → 그대로 (한국)
-//   "코스피" → ^KS11 (한국)      /   그 밖의 "TSLA" 등 → 미국
-// 한국 종목은 Twelve Data 무료 플랜에 포함되지 않아 /api/kr/time-series 로 보냅니다.
+// 입력값을 조회에 쓸 심볼로 바꿉니다.
+//   "삼성전자", "005930", "005930.KS" → 한국 (code 005930)
+//   "코스피" → 한국 (code KS11)
+//   그 밖의 "TSLA" 등 → 미국 (Twelve Data)
+// 한국 종목은 Twelve Data 무료 플랜에 없어서 미리 만들어 둔 정적 파일을 읽습니다.
 function resolveSymbol(input) {
   const raw = String(input || '').trim();
   const byName = Object.prototype.hasOwnProperty.call(KR_STOCKS, normalizeKrName(raw)) ? KR_STOCKS[normalizeKrName(raw)] : null;
-  if (byName) return { symbol: byName, isKR: true, typed: raw };
+  if (byName) return { symbol: byName, isKR: true, code: byName, typed: raw };
 
   const upper = raw.toUpperCase();
-  if (/^\d{6}(\.(KS|KQ))?$/.test(upper) || /^\^(KS11|KQ11)$/.test(upper)) {
-    return { symbol: upper, isKR: true, typed: raw };
+  const m = upper.match(/^(\d{6})(?:\.(?:KS|KQ))?$/);
+  if (m) return { symbol: m[1], isKR: true, code: m[1], typed: raw };
+  const idx = upper.match(/^\^?(KS11|KQ11)$/);
+  if (idx) return { symbol: idx[1], isKR: true, code: idx[1], typed: raw };
+
+  return { symbol: upper, isKR: false, code: null, typed: raw };
+}
+
+// 미리 만들어 둔 한국 주식 일봉을 읽습니다. (scripts/generate-kr-data.js 가 생성)
+//
+// 정적 파일이라 실패할 여지가 거의 없습니다. 시세 소스가 막히든 말든 사용자가 보는 것은
+// 저장소에 커밋된 파일이고, 갱신이 실패하면 지난번 데이터가 그대로 서빙됩니다.
+// 저장 형식은 용량을 줄이려고 배열로 눌러 놓았으므로 여기서 원래 형태로 되돌립니다.
+//   d: 에포크 이후 일수  h: 고가  c: 종가   (모두 과거 → 최신 순)
+async function fetchKrSeries(code) {
+  let res;
+  try {
+    res = await fetch('/data/kr/' + encodeURIComponent(code) + '.json');
+  } catch (e) {
+    throw new Error('네트워크 연결을 확인해주세요.');
   }
-  return { symbol: upper, isKR: false, typed: raw };
+  if (res.status === 404) {
+    const err = new Error('아직 지원하지 않는 한국 종목입니다.');
+    err.krUnsupported = true;
+    throw err;
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const j = await res.json();
+  if (!j || !Array.isArray(j.d) || j.d.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
+
+  // 기존 계산 코드가 쓰는 Twelve Data 형태(최신 날짜가 배열 앞)로 되돌립니다.
+  // open/low 는 MDD 계산에 쓰이지 않아 저장하지 않았으므로 종가로 채웁니다.
+  const values = [];
+  for (let i = j.d.length - 1; i >= 0; i--) {
+    const close = j.c[i];
+    values.push({
+      datetime: new Date(j.d[i] * 86400000).toISOString().slice(0, 10),
+      open: close, high: j.h[i], low: close, close,
+    });
+  }
+  return { values, meta: { symbol: j.symbol, name: j.name, currency: j.currency, updated: j.updated } };
 }
 
 async function fetchPriceSeries(ticker, outputsize) {
@@ -667,8 +697,14 @@ async function fetchPriceSeries(ticker, outputsize) {
     return { fromCache: true, values: cached.values, metadata: null, meta: cached.meta || null, resolved };
   }
 
-  const endpoint = resolved.isKR ? '/api/kr/time-series' : '/api/twelve-data/time-series';
-  const res = await fetch(endpoint, {
+  // 한국 종목은 정적 파일을 읽습니다. API 한도도, 실시간 호출 실패도 없습니다.
+  if (resolved.isKR) {
+    const kr = await fetchKrSeries(resolved.code);
+    PRICE_CACHE[key] = { values: kr.values, meta: kr.meta, time: Date.now() };
+    return { fromCache: false, values: kr.values, metadata: null, meta: kr.meta, resolved };
+  }
+
+  const res = await fetch('/api/twelve-data/time-series', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ symbol: key, interval: '1day', outputsize })
@@ -676,10 +712,8 @@ async function fetchPriceSeries(ticker, outputsize) {
   const json = await res.json();
 
   if (res.status === 429) {
-    // 한국 시세는 하루 한도가 아니라 잠깐 몰린 것이므로 안내 문구가 다릅니다.
     const err = new Error(json.message || '오늘 사용량을 모두 사용했어요.');
-    if (json.retryMinute) err.rateLimitedMinute = true;
-    else err.rateLimited429 = true;
+    err.rateLimited429 = true;
     throw err;
   }
   if (json.status === 'error' && json.message && json.message.includes('rate limit')) {
@@ -905,6 +939,8 @@ async function loadData() {
       userMsg = '⏳ 오늘 조회 한도를 모두 사용했어요. 내일 다시 시도해주세요.';
     } else if (e && e.rateLimitedMinute) {
       userMsg = '⏳ 잠시 요청이 몰렸어요. 1분 뒤에 다시 시도해주세요.';
+    } else if (e && e.krUnsupported) {
+      userMsg = "❌ 아직 지원하지 않는 한국 종목이에요. 지원 종목은 검색창 아래 버튼에서 확인하실 수 있습니다.";
     } else if (e && /데이터가 없습니다/.test(e.message || '')) {
       userMsg = `❌ '${ticker}' 종목을 찾지 못했어요. 티커를 다시 확인해주세요.`;
     } else {
