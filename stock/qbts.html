@@ -64,6 +64,14 @@
 </head>
 <body>
 <div class="container">
+  <!-- COUPANG_STATIC_START 쿠팡 파트너스 정적 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
+  <div style="text-align:center; margin-bottom:14px;">
+    <a href="https://link.coupang.com/a/fRIz0yZuTI" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
+      <img src="https://ads-partners.coupang.com/banners/1012739?trackingCode=AF9480830&subId=&traceId=V0-301-f5c692db558def48-I1012739&w=120&h=60" alt="" width="120" height="60" style="border-radius:6px;">
+    </a>
+    <p style="margin-top:4px; font-size:10px; color:#a0aec0;">쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</p>
+  </div>
+  <!-- COUPANG_STATIC_END -->
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/tools.html">도구 모음</a> &gt; QBTS</nav>
 
   <div class="card">
@@ -202,5 +210,47 @@
     <p class="note">본 페이지는 정보 제공 목적이며 투자 자문이 아닙니다. 데이터 출처: Twelve Data. 오류 제보: <a href="mailto:gktgkt2309@gmail.com">gktgkt2309@gmail.com</a></p>
   </div>
 </div>
+<!-- COUPANG_PARTNERS_START 쿠팡 파트너스 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
+<div class="container" id="coupangAdWrap" style="margin-top:4px;">
+  <div id="coupangAd" style="display:none; background:#fff; border-radius:14px; padding:14px 16px 16px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+    <div style="max-width:100%; overflow-x:hidden; display:flex; justify-content:center;">
+      <script src="https://ads-partners.coupang.com/g.js"></script>
+      <script>
+      (function () {
+        // 쿠팡 배너는 픽셀 고정 크기라 화면마다 다른 배너를 써야 합니다.
+        // 쿠팡 파트너스에 배너를 두 개 만들어 두고, 화면 폭에 맞는 쪽을 고릅니다.
+        //   PC/태블릿 : 1012747 (680x140)
+        //   모바일     : 1012749 (329x140)
+        // 폭이 모자라면 그만큼 줄여서 넣습니다. 그대로 넣으면 가로 스크롤이 생기는데,
+        // 애드센스 심사자는 모바일을 먼저 보기 때문에 그게 그대로 감점이 됩니다.
+        if (typeof PartnersCoupang === 'undefined') return; // 차단됐으면 고지 문구까지 통째로 숨김
+        var box = document.getElementById('coupangAd');
+        // 배너를 담을 카드는 아직 display:none 이라 폭을 잴 수 없습니다(0 이 나옵니다).
+        // 항상 보이는 바깥 컨테이너를 재고 카드 좌우 패딩(16px x 2)을 뺍니다.
+        var wrap = document.getElementById('coupangAdWrap');
+        var outer = (wrap && wrap.clientWidth) || document.documentElement.clientWidth || 320;
+        var avail = Math.floor(outer) - 32;
+        var DESKTOP = { id: 1012747, width: 680 };
+        var MOBILE  = { id: 1012749, width: 329 };
+        var pick = avail >= DESKTOP.width ? DESKTOP : MOBILE;
+        var width = Math.max(240, Math.min(pick.width, avail));
+        try {
+          new PartnersCoupang.G({
+            id: pick.id, template: 'carousel', trackingCode: 'AF9480830',
+            width: String(width), height: '140', tsource: ''
+          });
+          box.style.display = 'block';
+        } catch (e) {
+          console.error('[coupang] 배너 생성 실패:', e);
+        }
+      })();
+      </script>
+    </div>
+    <p style="margin-top:10px; font-size:11px; color:#a0aec0; line-height:1.6; text-align:center;">
+      이 영역은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+    </p>
+  </div>
+</div>
+<!-- COUPANG_PARTNERS_END -->
 </body>
 </html>
