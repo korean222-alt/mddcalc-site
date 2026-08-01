@@ -326,13 +326,73 @@
     </ul>
     <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">이 시뮬레이터로 확인할 수 있는 것</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">이 도구는 기초지수의 일별 흐름을 바탕으로 레버리지 배수를 적용했을 때의 누적 성과와 MDD를 시뮬레이션합니다. "지수가 결국 회복하면 레버리지도 회복하겠지"라는 직관이 왜 자주 틀리는지, 변동성 잠식이 실제 수치로 얼마나 되는지를 직접 확인해 보세요.</p>
-    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
+    
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">숫자로 따라가 보기</h3>
+    <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
+      <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">지수가 하루 −10% 빠진 뒤 다음 날 +11.1% 올라 <b>정확히 제자리로</b> 돌아온 상황을 3배 ETF와 비교해 보겠습니다.</p>
+      <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">지수 첫날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>100 → 90 (−10%)</strong></td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">지수 둘째 날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>90 → 100 (+11.1%) — 본전</strong></td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">3배 ETF 첫날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>100 → 70 (−30%)</strong></td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">3배 ETF 둘째 날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>70 → 93.3 (+33.3%)</strong></td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">이틀 뒤 결과</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>지수 0%, 3배 ETF <b>−6.7%</b></strong></td></tr>
+      </table>
+      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">지수는 본전인데 3배 상품만 손실이 남았습니다. 매일 배수를 다시 맞추기 때문에 생기는 현상이고, 이것을 변동성 감쇠(volatility decay)라고 합니다. 등락이 반복될수록 손실이 쌓이므로, 3배 상품의 장기 수익률은 지수 수익률의 3배가 아닙니다.</p>
+    </div>
+<h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 레버리지 ETF는 장기 투자에 적합한가요?</strong><br>일반적으로 레버리지 ETF는 단기 트레이딩 도구로 설계되었으며, 운용사들도 장기 보유 시 기초지수 배수와 괴리가 커질 수 있음을 명시하고 있습니다. 장기 보유를 고려한다면 변동성 잠식과 최대 -80~-90%에 이를 수 있는 하락폭을 감내할 수 있는지 신중히 판단해야 합니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 곱버스(인버스 레버리지)도 같은 원리인가요?</strong><br>네. 하락에 베팅하는 인버스·레버리지 상품도 일 단위 리셋 구조라 변동성 잠식의 영향을 동일하게 받으며, 장기 보유 시 손실이 누적되기 쉽습니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 그럼 레버리지 ETF는 오래 들고 있으면 안 되나요?</strong><br>방향이 한쪽으로 꾸준히 이어지면 장기 보유가 배수보다 더 큰 수익을 내기도 합니다. 문제는 <b>오르내림이 반복되는 구간</b>입니다. 위 예시처럼 지수가 제자리여도 손실이 남기 때문에, 횡보장이 길어질수록 불리해집니다. 방향을 확신할 수 없다면 보유 기간이 길수록 위험이 커집니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 3배 상품이 −90% 빠지면 어떻게 되나요?</strong><br>원금을 되찾으려면 저점에서 +900%가 필요합니다. 실제로 SOXL은 2021년 12월 고점에서 −90.5%까지 빠졌고, 전고점을 회복하는 데 1,274일이 걸렸습니다. 기초지수가 회복해도 감쇠 때문에 레버리지 상품의 회복은 훨씬 오래 걸립니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 인버스(−3배)는 하락장에서 안전한가요?</strong><br>아닙니다. 인버스도 같은 감쇠를 겪고, 방향이 반대일 뿐입니다. 게다가 주식시장이 장기적으로 우상향해 온 만큼 인버스는 시간이 갈수록 구조적으로 불리합니다. 하락을 맞혀도 시점이 어긋나면 손실이 납니다.</p>
     <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 레버리지 상품은 원금 대부분을 잃을 수 있는 고위험 상품입니다. 본 도구의 결과는 교육 목적의 시뮬레이션이며 투자 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->
+
+<!-- COUPANG_PARTNERS_START 쿠팡 파트너스 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
+<div class="container" id="coupangAdWrap" style="margin-top:4px;">
+  <div id="coupangAd" style="display:none; background:#fff; border-radius:14px; padding:14px 16px 16px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+    <div style="max-width:100%; overflow-x:hidden; display:flex; justify-content:center;">
+      <script src="https://ads-partners.coupang.com/g.js"></script>
+      <script>
+      (function () {
+        // 쿠팡 배너는 픽셀 고정 크기라 화면마다 다른 배너를 써야 합니다.
+        // 쿠팡 파트너스에 배너를 두 개 만들어 두고, 화면 폭에 맞는 쪽을 고릅니다.
+        //   PC/태블릿 : 1012747 (680x140)
+        //   모바일     : 1012749 (329x140)
+        // 폭이 모자라면 그만큼 줄여서 넣습니다. 그대로 넣으면 가로 스크롤이 생기는데,
+        // 애드센스 심사자는 모바일을 먼저 보기 때문에 그게 그대로 감점이 됩니다.
+        if (typeof PartnersCoupang === 'undefined') return; // 차단됐으면 고지 문구까지 통째로 숨김
+        var box = document.getElementById('coupangAd');
+        // 배너를 담을 카드는 아직 display:none 이라 폭을 잴 수 없습니다(0 이 나옵니다).
+        // 항상 보이는 바깥 컨테이너를 재고 카드 좌우 패딩(16px x 2)을 뺍니다.
+        var wrap = document.getElementById('coupangAdWrap');
+        var outer = (wrap && wrap.clientWidth) || document.documentElement.clientWidth || 320;
+        var avail = Math.floor(outer) - 32;
+        var DESKTOP = { id: 1012747, width: 680 };
+        var MOBILE  = { id: 1012749, width: 329 };
+        var pick = avail >= DESKTOP.width ? DESKTOP : MOBILE;
+        var width = Math.max(240, Math.min(pick.width, avail));
+        try {
+          new PartnersCoupang.G({
+            id: pick.id, template: 'carousel', trackingCode: 'AF9480830',
+            width: String(width), height: '140', tsource: ''
+          });
+          box.style.display = 'block';
+        } catch (e) {
+          console.error('[coupang] 배너 생성 실패:', e);
+        }
+      })();
+      </script>
+    </div>
+    <p style="margin-top:10px; font-size:11px; color:#a0aec0; line-height:1.6; text-align:center;">
+      이 영역은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+    </p>
+  </div>
+</div>
+<!-- COUPANG_PARTNERS_END -->
 
 <footer class="site-footer">
   <div class="footer-inner">
