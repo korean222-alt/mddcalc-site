@@ -1297,12 +1297,24 @@ function render() {
   document.getElementById('dataStart').textContent = A.dates[0];
   document.getElementById('totalDays').textContent = A.n.toLocaleString() + '일';
 
-  drawDDChart(A);
-  drawPriceChart(A);
-  renderRecovery(A);
-  renderTV(t);
-  renderDeepAnalysis();
-  renderBenchmarkComparison();
+  // 화면 조각은 하나씩 독립적으로 그립니다. 예전에는 여기서 난 예외가 loadData 의 catch까지
+  // 올라가는 바람에, 시세는 멀쩡히 받아왔는데도 "데이터를 불러오지 못했어요"라는 엉뚱한
+  // 메시지가 뜨고 결과 전체가 사라졌습니다. (차트 CDN이 광고 차단기·사내 방화벽에 막히면 발생)
+  renderStep('하락률 차트', () => drawDDChart(A));
+  renderStep('주가 차트', () => drawPriceChart(A));
+  renderStep('회복률 표', () => renderRecovery(A));
+  renderStep('TradingView 차트', () => renderTV(t));
+  renderStep('심층 분석', () => renderDeepAnalysis());
+  renderStep('벤치마크 비교', () => renderBenchmarkComparison());
+}
+
+// 한 조각이 실패해도 나머지 화면은 그대로 그립니다. 원인은 콘솔에만 남깁니다.
+function renderStep(label, fn) {
+  try {
+    fn();
+  } catch (e) {
+    console.error('[render] ' + label + ' 실패:', e);
+  }
 }
 
 
@@ -1565,7 +1577,20 @@ async function renderBenchmarkComparison() {
   }
 }
 
+// 차트 라이브러리(chart.js)는 CDN에서 받아옵니다. 광고 차단기나 사내 방화벽에 막히면
+// 로드되지 않는데, 그렇다고 MDD 숫자까지 못 보여줄 이유는 없습니다. 캔버스 자리에
+// 안내만 남기고 나머지 분석은 그대로 보여줍니다.
+function chartUnavailable(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || !canvas.parentElement) return;
+  canvas.parentElement.innerHTML =
+    '<div style="display:flex; align-items:center; justify-content:center; height:100%; ' +
+    'color:#718096; font-size:13px; text-align:center; padding:16px;">' +
+    '차트를 불러오지 못했습니다 (광고 차단기·네트워크 차단). 아래 숫자 분석은 정상입니다.</div>';
+}
+
 function drawDDChart(A) {
+  if (typeof Chart === 'undefined') return chartUnavailable('ddChart');
   if (STATE.ddChart) STATE.ddChart.destroy();
   const step = Math.max(1, Math.floor(A.n / 600));
   const pts = [];
@@ -1595,6 +1620,7 @@ function drawDDChart(A) {
 }
 
 function drawPriceChart(A) {
+  if (typeof Chart === 'undefined') return chartUnavailable('priceChart');
   if (STATE.priceChart) STATE.priceChart.destroy();
   const step = Math.max(1, Math.floor(A.n / 600));
   const pts = [];
