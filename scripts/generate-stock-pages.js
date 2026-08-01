@@ -89,6 +89,30 @@ function labelOf(symbol) {
   const kor = TICKER_NAMES[symbol];
   return kor ? `${symbol}(${kor})` : symbol;
 }
+// 종목 성격별 분류. 69개 페이지가 전부 똑같은 섹션 구성이면 실제 데이터가 들어 있어도
+// "한 틀로 찍어낸 페이지"로 보인다. 성격에 따라 실제로 필요한 설명이 다르므로
+// (레버리지는 변동성 감쇠, 커버드콜은 배당 제외 문제) 분류별로 다른 섹션을 붙인다.
+const CATEGORY = {
+  TQQQ: 'leveraged', SOXL: 'leveraged', SPXL: 'leveraged', UPRO: 'leveraged',
+  TSLL: 'leveraged', NVDL: 'leveraged', CONL: 'leveraged', QLD: 'leveraged',
+  FNGU: 'leveraged', TECL: 'leveraged',
+  SQQQ: 'inverse', SOXS: 'inverse',
+  SCHD: 'income', JEPI: 'income', JEPQ: 'income',
+  SPY: 'index', QQQ: 'index', VOO: 'index', VTI: 'index', IVV: 'index', SOXX: 'index',
+  TLT: 'asset', GLD: 'asset',
+};
+function categoryOf(symbol) { return CATEGORY[symbol] || 'stock'; }
+
+// S&P500 을 그대로 추종하는 ETF 들. 서로 비교해봐야 "0.0%p 더 깊었습니다" 같은
+// 무의미한 문장만 나오므로 벤치마크 비교를 건너뛴다.
+const SP500_TRACKERS = new Set(['SPY', 'VOO', 'IVV']);
+
+// 배수 상품의 표시용 배수. 변동성 감쇠 설명에 쓴다.
+const LEVERAGE_FACTOR = {
+  TQQQ: 3, SOXL: 3, SPXL: 3, UPRO: 3, FNGU: 3, TECL: 3,
+  TSLL: 2, NVDL: 2, CONL: 2, QLD: 2, SQQQ: -3, SOXS: -3,
+};
+
 const BENCHMARK = 'SPY'; // 상대 비교 기준 지수
 
 const REFRESH_CYCLE_DAYS = 7; // 매주 자동 갱신 (.github/workflows/refresh-stock-pages.yml)
@@ -333,6 +357,97 @@ function buildRelatedBlogHtml(symbol) {
     </div>`;
 }
 
+// 낙폭에서 원금을 되찾으려면 몇 % 올라야 하는지. -50%는 +100%가 있어야 본전이다.
+// 하락률과 회복률이 대칭이 아니라는 점이 MDD를 봐야 하는 이유 자체라, 종목마다 실제
+// 숫자로 보여준다.
+function recoveryGainPct(declinePct) {
+  return (1 / (1 + declinePct / 100) - 1) * 100;
+}
+
+// 분류별로 다른 섹션. 같은 틀에 숫자만 바뀐 페이지가 69개 있는 것보다,
+// 종목 성격에 실제로 필요한 설명이 붙는 편이 읽는 사람에게도 낫다.
+function buildCategorySectionHtml(symbol, a, spyA) {
+  const cat = categoryOf(symbol);
+  const worst = a.worstDrawdownPct;
+  const needGain = recoveryGainPct(worst);
+  const curNeedGain = a.isAtAth ? null : recoveryGainPct(a.currentDrawdownPct);
+  const factor = LEVERAGE_FACTOR[symbol];
+  const worstEp = a.topDrawdowns[0];
+  const worstRecovery = worstEp && worstEp.recoveryDays != null
+    ? `실제로 이 낙폭을 회복하는 데 <strong>${worstEp.recoveryDays.toLocaleString()}일</strong>이 걸렸습니다.`
+    : '이 낙폭은 이 분석 시점까지 아직 회복되지 않았습니다.';
+
+  // 어느 분류에나 공통으로 쓰는 "회복에 필요한 상승률" 문단.
+  const gainBlock = `
+      <p>최대 낙폭 <strong>${fmtPct(worst)}</strong>에서 원금을 되찾으려면 저점 대비 <strong>+${needGain.toFixed(0)}%</strong> 상승이 필요합니다.
+      ${worstRecovery}${curNeedGain != null ? ` 현재 낙폭 <strong>${fmtPct(a.currentDrawdownPct)}</strong> 기준으로는 <strong>+${curNeedGain.toFixed(1)}%</strong>가 필요합니다.` : ''}</p>`;
+
+  if (cat === 'leveraged' || cat === 'inverse') {
+    const isInverse = cat === 'inverse';
+    return `
+    <div class="card">
+      <h2>⚠️ ${Math.abs(factor || 3)}배 ${isInverse ? '인버스' : '레버리지'} 상품이라 낙폭을 다르게 읽어야 합니다</h2>
+      <p>${symbol}는 기초지수의 <strong>일간</strong> 수익률을 ${Math.abs(factor || 3)}배${isInverse ? ' 반대로' : ''} 따라가도록 만들어진 상품입니다.
+      매일 배수를 다시 맞추기 때문에 <strong>보유 기간이 길어질수록 기초지수 수익률의 ${Math.abs(factor || 3)}배와 벌어집니다</strong>.
+      지수가 올랐다 내렸다를 반복하며 제자리로 돌아와도 이 상품은 손실이 남는데, 이것을 변동성 감쇠(volatility decay)라고 합니다.</p>
+      ${gainBlock}
+      <p>연환산 변동성이 <strong>${a.volatility.toFixed(1)}%</strong>로 높다는 점이 이 감쇠를 키웁니다.
+      ${isInverse ? '특히 인버스 상품은 시장이 장기적으로 우상향하면 구조적으로 불리해, 장기 보유보다 단기 대응 목적에 쓰이는 상품입니다.' : '이 표의 하락 구간들은 기초지수가 같은 폭으로 빠졌다는 뜻이 아니라, 배수와 감쇠가 함께 작용한 결과입니다.'}</p>
+    </div>`;
+  }
+
+  if (cat === 'income') {
+    return `
+    <div class="card">
+      <h2>💵 이 수치는 분배금을 뺀 주가 기준입니다</h2>
+      <p>${symbol}는 분배금(배당) 지급이 수익의 큰 부분을 차지하는 상품입니다.
+      이 페이지의 낙폭은 <strong>주가만으로 계산</strong>한 값이라, 분배금을 다시 반영한 총수익(Total Return) 기준으로는
+      실제 손실이 여기 표시된 것보다 얕습니다. 분배금을 지급하면 그만큼 주가가 내려가므로,
+      주가 차트만 보면 하락이 실제보다 커 보이는 것이 정상입니다.</p>
+      ${gainBlock}
+      <p>연환산 변동성은 <strong>${a.volatility.toFixed(1)}%</strong>입니다.
+      커버드콜 방식의 상품이라면 상승 구간에서 수익이 제한되는 대신 변동성이 낮아지는 특성도 함께 고려해야 합니다.</p>
+    </div>`;
+  }
+
+  if (cat === 'index') {
+    return `
+    <div class="card">
+      <h2>🧺 지수를 통째로 담는 ETF의 낙폭입니다</h2>
+      <p>${symbol}는 개별 기업이 아니라 지수 전체를 담습니다. 편입 종목 하나가 무너져도 지수가 알아서 교체하므로,
+      개별 종목처럼 <strong>전고점을 영영 회복하지 못하는 상황은 상대적으로 드뭅니다</strong>.
+      아래 회복 통계에서 대부분의 하락 구간이 결국 회복된 것도 그래서입니다.</p>
+      ${gainBlock}
+      <p>다만 시장 전체가 빠지는 국면에서는 분산이 도움이 되지 않습니다.
+      연환산 변동성 <strong>${a.volatility.toFixed(1)}%</strong>는 이 ETF가 담고 있는 시장의 평상시 등락 폭으로 보시면 됩니다.</p>
+    </div>`;
+  }
+
+  if (cat === 'asset') {
+    return `
+    <div class="card">
+      <h2>🪙 주식과 다른 자산군입니다</h2>
+      <p>${symbol}는 주식이 아니라 ${symbol === 'GLD' ? '금' : '채권'} 가격을 따라갑니다.
+      주가지수와 하락 시점이 겹치지 않는 경우가 많아, 낙폭의 깊이만으로 주식과 직접 비교하기는 어렵습니다.
+      ${symbol === 'TLT' ? '특히 장기채는 금리가 오르면 가격이 내려가므로, 주식과는 다른 이유로 하락합니다.' : '금은 실물 자산이라 기업 실적이 아니라 금리·달러·안전자산 수요에 따라 움직입니다.'}</p>
+      ${gainBlock}
+      <p>연환산 변동성은 <strong>${a.volatility.toFixed(1)}%</strong>입니다.
+      포트폴리오에 섞었을 때의 효과를 보려면 낙폭의 크기보다 <strong>주식과 언제 같이 빠졌는지</strong>를 함께 봐야 합니다.</p>
+    </div>`;
+  }
+
+  // 개별 종목
+  return `
+    <div class="card">
+      <h2>🏢 개별 기업이라 회복이 보장되지 않습니다</h2>
+      <p>지수 ETF와 달리 개별 기업은 사업이 무너지면 <strong>전고점을 영영 회복하지 못할 수 있습니다</strong>.
+      아래 회복 통계는 과거에 실제로 회복했던 기록일 뿐, 앞으로도 회복한다는 근거가 아닙니다.
+      실적·경쟁 환경·재무 상태가 과거와 같은지 함께 확인하셔야 합니다.</p>
+      ${gainBlock}
+      <p>연환산 변동성은 <strong>${a.volatility.toFixed(1)}%</strong>${spyA ? `로, 같은 기간 ${BENCHMARK}(${spyA.volatility.toFixed(1)}%)와 비교해 보시면 이 종목이 평소 얼마나 크게 흔들리는지 가늠할 수 있습니다` : '입니다'}.</p>
+    </div>`;
+}
+
 function buildPage(symbol, a, spyA, generatedDate) {
   const canonical = `https://mddcalc.com/stock/${symbol.toLowerCase()}.html`;
   const label = labelOf(symbol);
@@ -354,17 +469,28 @@ function buildPage(symbol, a, spyA, generatedDate) {
     : `${label}의 현재 고점 대비 하락률은 ${fmtPct(a.currentDrawdownPct)}입니다. 역대 최대 낙폭(MDD) ${fmtPct(a.worstDrawdownPct)}, 주요 하락 구간과 전고점 회복까지 걸린 기간을 실제 시세로 계산해 정리했습니다.`;
 
   let spyCompareHtml = '';
-  if (symbol !== BENCHMARK && spyA) {
+  // SPY·VOO·IVV 는 같은 지수를 추종해서 서로 비교하면 "0.0%p 더 깊었습니다",
+  // "17.1%로 SPY(17.1%)보다 높았습니다" 같은 무의미한 문장이 나온다. 아예 건너뛴다.
+  if (symbol !== BENCHMARK && spyA && !SP500_TRACKERS.has(symbol)) {
     const diff = a.worstDrawdownPct - spyA.worstDrawdownPct;
-    const deeper = diff < 0;
+    const volDiff = a.volatility - spyA.volatility;
+    // 차이가 0.1%p 도 안 되면 "더 깊다/얕다"로 단정하지 않는다.
+    const ddPhrase = Math.abs(diff) < 0.1
+      ? `${BENCHMARK}와 <strong>사실상 같은 수준</strong>이었습니다`
+      : `${BENCHMARK}보다 <strong>${Math.abs(diff).toFixed(1)}%p ${diff < 0 ? '더 깊었습니다' : '더 얕았습니다'}</strong>`;
+    const volPhrase = Math.abs(volDiff) < 0.1
+      ? `${BENCHMARK}(${spyA.volatility.toFixed(1)}%)와 거의 같았습니다`
+      : `${BENCHMARK}(${spyA.volatility.toFixed(1)}%)보다 ${volDiff > 0 ? '높았습니다' : '낮았습니다'}`;
     spyCompareHtml = `
     <div class="card">
       <h2>📊 ${BENCHMARK}(시장 전체) 대비 비교</h2>
       <p>같은 기간(${spyA.startDate} ~ ${spyA.endDate}) 동안 ${BENCHMARK}의 최대 낙폭은 <strong>${fmtPct(spyA.worstDrawdownPct)}</strong>였습니다.
-      ${symbol}의 최대 낙폭 <strong>${fmtPct(a.worstDrawdownPct)}</strong>은 ${BENCHMARK}보다 <strong>${Math.abs(diff).toFixed(1)}%p ${deeper ? '더 깊었습니다' : '더 얕았습니다'}</strong>.
-      연환산 변동성도 ${symbol}가 ${a.volatility.toFixed(1)}%로 ${BENCHMARK}(${spyA.volatility.toFixed(1)}%)보다 ${a.volatility > spyA.volatility ? '높았습니다' : '낮았습니다'}.</p>
+      ${symbol}의 최대 낙폭 <strong>${fmtPct(a.worstDrawdownPct)}</strong>은 ${ddPhrase}.
+      연환산 변동성은 ${symbol}가 ${a.volatility.toFixed(1)}%로 ${volPhrase}.</p>
     </div>`;
   }
+
+  const categoryHtml = buildCategorySectionHtml(symbol, a, spyA);
 
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -487,6 +613,8 @@ function buildPage(symbol, a, spyA, generatedDate) {
     <h2>⏱ 회복 통계</h2>
     ${buildRecoveryStatsHtml(symbol, a)}
   </div>
+  ${categoryHtml}
+
   ${spyCompareHtml}
 
   <div class="card">

@@ -426,19 +426,26 @@
       <script src="https://ads-partners.coupang.com/g.js"></script>
       <script>
       (function () {
-        // 쿠팡 배너는 픽셀 고정 크기라, PC 기준 680px 를 그대로 넣으면 모바일(390~430px)에서
-        // 화면 밖으로 넘쳐 가로 스크롤이 생깁니다. 애드센스 심사자는 모바일을 먼저 보므로
-        // 실제 사용 가능한 폭을 재서 그 값으로 배너를 만듭니다.
+        // 쿠팡 배너는 픽셀 고정 크기라 화면마다 다른 배너를 써야 합니다.
+        // 쿠팡 파트너스에 배너를 두 개 만들어 두고, 화면 폭에 맞는 쪽을 고릅니다.
+        //   PC/태블릿 : 1012747 (680x140)
+        //   모바일     : 1012749 (329x140)
+        // 폭이 모자라면 그만큼 줄여서 넣습니다. 그대로 넣으면 가로 스크롤이 생기는데,
+        // 애드센스 심사자는 모바일을 먼저 보기 때문에 그게 그대로 감점이 됩니다.
         if (typeof PartnersCoupang === 'undefined') return; // 차단됐으면 고지 문구까지 통째로 숨김
         var box = document.getElementById('coupangAd');
         // 배너를 담을 카드는 아직 display:none 이라 폭을 잴 수 없습니다(0 이 나옵니다).
         // 항상 보이는 바깥 컨테이너를 재고 카드 좌우 패딩(16px x 2)을 뺍니다.
         var wrap = document.getElementById('coupangAdWrap');
         var outer = (wrap && wrap.clientWidth) || document.documentElement.clientWidth || 320;
-        var width = Math.max(240, Math.min(Math.floor(outer) - 32, 680));
+        var avail = Math.floor(outer) - 32;
+        var DESKTOP = { id: 1012747, width: 680 };
+        var MOBILE  = { id: 1012749, width: 329 };
+        var pick = avail >= DESKTOP.width ? DESKTOP : MOBILE;
+        var width = Math.max(240, Math.min(pick.width, avail));
         try {
           new PartnersCoupang.G({
-            id: 1012747, template: 'carousel', trackingCode: 'AF9480830',
+            id: pick.id, template: 'carousel', trackingCode: 'AF9480830',
             width: String(width), height: '140', tsource: ''
           });
           box.style.display = 'block';
