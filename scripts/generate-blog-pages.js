@@ -29,18 +29,10 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-// 쿠팡 파트너스 배너 두 종류. index.html 등 계산기 페이지들과 완전히 같은 마크업을 써서
-// 한쪽만 손보고 다른 쪽을 깜빡하는 일이 없게 한다. 제거하려면 이 두 상수를 쓰는 자리를
-// 지우면 된다 (COUPANG_STATIC_START/END, COUPANG_PARTNERS_START/END 주석 참고).
-const COUPANG_STATIC_BANNER = `  <!-- COUPANG_STATIC_START 쿠팡 파트너스 정적 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
-  <div style="text-align:center; margin-bottom:14px;">
-    <a href="https://link.coupang.com/a/fRIz0yZuTI" target="_blank" rel="noopener" referrerpolicy="unsafe-url">
-      <img src="https://ads-partners.coupang.com/banners/1012739?trackingCode=AF9480830&subId=&traceId=V0-301-f5c692db558def48-I1012739&w=120&h=60" alt="" width="120" height="60" style="border-radius:6px;">
-    </a>
-    <p style="margin-top:4px; font-size:10px; color:#a0aec0;">쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</p>
-  </div>
-  <!-- COUPANG_STATIC_END -->`;
-
+// 쿠팡 파트너스 배너. index.html 등 계산기 페이지들과 완전히 같은 마크업을 써서
+// 한쪽만 손보고 다른 쪽을 깜빡하는 일이 없게 한다. 제거하려면 이 상수를 쓰는 자리를
+// 지우면 된다 (COUPANG_PARTNERS_START/END 주석 참고).
+// 상단 정적 배너는 뺐다 — 글 본문 아래 캐러셀 배너 하나만 쓴다.
 const COUPANG_RESPONSIVE_BANNER = `<!-- COUPANG_PARTNERS_START 쿠팡 파트너스 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
 <div class="container" id="coupangAdWrap" style="margin-top:4px;">
   <div id="coupangAd" style="display:none; background:#fff; border-radius:14px; padding:14px 16px 16px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
@@ -222,7 +214,6 @@ function buildPostPage(post, related) {
 </head>
 <body>
 <div class="container">
-${COUPANG_STATIC_BANNER}
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/blog.html">블로그</a></nav>
   <div class="card">
     <article>${post.content}</article>
