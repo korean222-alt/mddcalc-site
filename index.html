@@ -8,6 +8,7 @@
 <meta name="robots" content="index, follow">
 <meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
 <link rel="canonical" href="https://mddcalc.com/">
+<link rel="alternate" type="application/rss+xml" title="MDD 분석기 블로그" href="https://mddcalc.com/rss.xml">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MDD 계산기 — 고점 대비 하락률 분석기">
@@ -132,6 +133,26 @@
   .share-img-btn:hover { background: #2b6cb0; }
   .share-status { font-size: 12px; color: #38a169; }
   .share-hint { font-size: 11px; color: #a0aec0; margin-top: 6px; }
+
+  /* 캡처 미리보기 창. 캡처가 끝난 뒤 여기서 한 번 더 눌러 저장/공유한다.
+     이렇게 나눠둔 이유: iOS 사파리는 navigator.share 를 사용자가 누른 직후에만 허용하는데,
+     캡처는 비동기라 그 사이에 제스처가 풀린다. 미리보기의 버튼이 새 제스처가 되어준다. */
+  .share-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.72);
+                 display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .share-modal-inner { background: #fff; border-radius: 14px; width: 100%; max-width: 460px;
+                       max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+  .share-modal-head { display: flex; align-items: center; justify-content: space-between;
+                      padding: 12px 14px; border-bottom: 1px solid #e2e8f0;
+                      font-size: 15px; font-weight: 800; color: #2d3748; }
+  .share-modal-close { background: none; border: none; font-size: 18px; cursor: pointer;
+                       color: #718096; padding: 4px 8px; line-height: 1; }
+  .share-modal-body { overflow-y: auto; background: #eef2f7; padding: 10px; flex: 1;
+                      -webkit-overflow-scrolling: touch; }
+  .share-modal-body img { display: block; width: 100%; height: auto; border-radius: 8px;
+                          box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .share-modal-foot { padding: 12px 14px; border-top: 1px solid #e2e8f0;
+                      display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .share-modal-foot .share-hint { margin-top: 0; flex-basis: 100%; }
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
   .stat-box { background: #f7fafc; padding: 14px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
@@ -358,7 +379,7 @@
   <div id="result" class="hidden">
 
     <!-- 사용법 가이드 -->
-    <details class="card" style="background:#ebf8ff;">
+    <details class="card no-capture" style="background:#ebf8ff;">
       <summary>💡 처음이신가요? MDD 보는 법 (클릭해서 펼치기)</summary>
       <div class="body">
         <b>MDD(Maximum Drawdown)</b>는 <b>"과거 최고가 대비 현재 얼마나 내려왔는가"</b> 입니다.<br>
@@ -376,7 +397,7 @@
     </details>
 
     <!-- 설정: ATH 기준 & 기간 -->
-    <div class="card">
+    <div class="card no-capture">
       <h2 class="section">⚙️ 조회 설정</h2>
       <div class="controls" style="margin-bottom:12px;">
         <label>ATH 기준:</label>
@@ -433,11 +454,11 @@
         <div class="signal-title" id="signalTitle">—</div>
         <div class="signal-desc" id="signalDesc">—</div>
       </div>
-      <div class="share-row">
-        <button class="btn btn-sm share-img-btn" onclick="shareResultImage()">🖼️ 결과 이미지로 저장 · 공유</button>
+      <div class="share-row no-capture">
+        <button class="btn btn-sm share-img-btn" onclick="shareResultImage()">🖼️ 결과 전체 캡처해서 저장 · 공유</button>
         <span id="shareStatus" class="share-status"></span>
       </div>
-      <div class="share-hint">차트와 요약이 담긴 이미지 한 장으로 저장됩니다. 휴대폰에서는 공유 버튼으로 갤러리에 바로 저장할 수 있습니다.</div>
+      <div class="share-hint no-capture">화면에 보이는 결과를 세로로 길게 한 장에 담습니다. 휴대폰에서는 공유 버튼으로 갤러리에 바로 저장할 수 있습니다.</div>
     </div>
 
     <!-- 참고 가격대 -->
@@ -559,7 +580,7 @@
     </div>
 
     <!-- TradingView (지연 로드: 차트 표시 버튼 클릭 시에만 로드) -->
-    <div class="card">
+    <div class="card no-capture">
       <h2 class="section">📺 TradingView 실시간 차트 (참고)</h2>
       <div id="tvContainer" style="height:400px; display:flex; align-items:center; justify-content:center; background:#f7fafc; border-radius:8px;">
         <button onclick="loadTVChart()" style="padding:12px 24px; background:#4299e1; color:white; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">📊 TradingView 차트 로드</button>
@@ -653,6 +674,24 @@
   </div>
 </div>
 <!-- COUPANG_PARTNERS_END -->
+
+<!-- 캡처 미리보기 (결과 캡처 버튼을 누르면 열린다) -->
+<div id="shareModal" class="share-modal hidden" role="dialog" aria-modal="true" aria-label="결과 이미지 미리보기">
+  <div class="share-modal-inner">
+    <div class="share-modal-head">
+      <span>🖼️ 결과 이미지</span>
+      <button type="button" class="share-modal-close" onclick="closeShareModal()" aria-label="닫기">✕</button>
+    </div>
+    <div class="share-modal-body">
+      <img id="shareModalImg" alt="캡처된 분석 결과 미리보기">
+    </div>
+    <div class="share-modal-foot">
+      <button type="button" id="shareModalShareBtn" class="btn btn-sm share-img-btn" onclick="doShareCaptured()">📤 공유하기</button>
+      <button type="button" class="btn btn-sm" style="background:#718096; color:#fff;" onclick="doDownloadCaptured()">💾 이미지 저장</button>
+      <span id="shareModalNote" class="share-hint"></span>
+    </div>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="footer-inner">
@@ -1818,52 +1857,208 @@ function dataURLToFile(dataURL, fileName) {
   return new File([buf], fileName, { type: mime });
 }
 
-function downloadShareFile(file, fileName, statusEl) {
-  const url = URL.createObjectURL(file);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  statusEl.textContent = '✅ 이미지를 저장했습니다.';
-  setTimeout(() => { statusEl.textContent = ''; }, 4000);
+// ---------- 결과 화면을 그대로 세로로 길게 캡처 ----------
+// 원하는 건 "화면에 보이는 결과를 길게 찍은 사진"이므로 카드를 새로 그리지 않고 #result 를
+// 그대로 캡처한다. 위의 buildShareCard 는 캡처 라이브러리를 못 받아왔을 때 쓰는 예비 수단이다.
+//
+// html2canvas 는 클릭했을 때만 받아온다. 첫 화면 로딩을 200KB 무겁게 만들 이유가 없다.
+//
+// CDN 이 아니라 우리 도메인에서 받는다(vendor/html2canvas.min.js). chart.js 를 CDN 에서
+// 받다가 광고 차단기·방화벽에 막혀 터졌던 전례가 있어서, 같은 실패를 반복하지 않으려고
+// 파일을 저장소에 넣어뒀다. 같은 출처라 차단당할 여지가 없다.
+const HTML2CANVAS_SRC = '/vendor/html2canvas.min.js';
+let h2cPromise = null;
+
+function loadHtml2Canvas() {
+  if (typeof window.html2canvas === 'function') return Promise.resolve(window.html2canvas);
+  if (h2cPromise) return h2cPromise;
+  h2cPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = HTML2CANVAS_SRC;
+    s.async = true;
+    const timer = setTimeout(() => reject(new Error('캡처 라이브러리 로드 시간 초과')), 12000);
+    s.onload = () => {
+      clearTimeout(timer);
+      if (typeof window.html2canvas === 'function') resolve(window.html2canvas);
+      else reject(new Error('캡처 라이브러리를 불러오지 못했습니다'));
+    };
+    s.onerror = () => { clearTimeout(timer); reject(new Error('캡처 라이브러리를 불러오지 못했습니다')); };
+    document.head.appendChild(s);
+  });
+  // 실패했으면 다음 클릭 때 다시 시도할 수 있게 캐시를 비운다.
+  h2cPromise.catch(() => { h2cPromise = null; });
+  return h2cPromise;
 }
 
-function shareResultImage() {
+// iOS 사파리는 캔버스 전체 픽셀 수가 약 1,600만을 넘으면 빈 이미지를 돌려준다.
+// 넉넉히 1,200만으로 잡고, 결과가 길수록 배율을 낮춰 그 선 아래로 유지한다.
+// 한 변 길이 제한은 넓게 둔다 — 세로로 긴 캡처가 목적이라 높이 때문에 배율이 깎이면
+// 글자가 뭉개진다. 실제로 걸리는 건 위의 전체 픽셀 수 쪽이다.
+const MAX_CAPTURE_PIXELS = 12e6;
+const MAX_CAPTURE_DIM = 16384;
+
+// 차트(Chart.js 캔버스)는 html2canvas 가 알아서 그대로 옮겨준다. 캡처 전에 <img> 로
+// 바꿔치기하는 흔한 우회법이 있는데, 넣은 것과 뺀 것이 완전히 같은 이미지를 내놓는 걸
+// 확인해서 쓰지 않는다.
+async function captureResultElement() {
+  const h2c = await loadHtml2Canvas();
+  const target = document.getElementById('result');
+  const w = target.scrollWidth || target.offsetWidth || 800;
+  const h = target.scrollHeight || target.offsetHeight || 1000;
+  const scale = Math.max(0.5, Math.min(
+    2,
+    MAX_CAPTURE_DIM / w,
+    MAX_CAPTURE_DIM / h,
+    Math.sqrt(MAX_CAPTURE_PIXELS / (w * h))
+  ));
+  return h2c(target, {
+    backgroundColor: '#eef2f7',
+    scale,
+    useCORS: true,
+    logging: false,
+    // 광고·설정 입력·도움말·TradingView(외부 iframe 이라 어차피 빈칸으로 찍힌다)·
+    // 캡처 버튼 자신은 사진에서 뺀다.
+    ignoreElements: el => !!(el.classList && el.classList.contains('no-capture')),
+  });
+}
+
+// 캡처한 이미지 아래에 출처 띠를 덧붙인다. 이미지가 어디로 퍼지든 도메인이 같이 가야 한다.
+function addCaptureFooter(src) {
+  const w = src.width;
+  const band = Math.max(64, Math.round(w * 0.085));
+  const out = document.createElement('canvas');
+  out.width = w;
+  out.height = src.height + band;
+  const ctx = out.getContext('2d');
+  ctx.drawImage(src, 0, 0);
+  ctx.fillStyle = '#1a202c';
+  ctx.fillRect(0, src.height, w, band);
+
+  const mid = src.height + band / 2;
+  const pad = Math.round(band * 0.35);
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.font = shareFont(800, Math.round(band * 0.40));
+  ctx.fillStyle = '#63b3ed';
+  ctx.fillText(shareDomain(), pad, mid);
+  ctx.textAlign = 'right';
+  ctx.font = shareFont(500, Math.round(band * 0.24));
+  ctx.fillStyle = '#a0aec0';
+  ctx.fillText('무료 주식 MDD 계산기 · 투자 조언 아님', w - pad, mid);
+  return out;
+}
+
+function canvasToFile(canvas, fileName) {
+  return new Promise((resolve, reject) => {
+    if (canvas.toBlob) {
+      canvas.toBlob(
+        b => (b ? resolve(new File([b], fileName, { type: SHARE_MIME })) : reject(new Error('이미지 변환 실패'))),
+        SHARE_MIME, SHARE_QUALITY
+      );
+    } else {
+      try { resolve(dataURLToFile(canvas.toDataURL(SHARE_MIME, SHARE_QUALITY), fileName)); }
+      catch (e) { reject(e); }
+    }
+  });
+}
+
+let CAPTURED = null; // { file, fileName, url }
+
+function clearCaptured(revokeDelayMs) {
+  if (!CAPTURED) return;
+  const url = CAPTURED.url;
+  CAPTURED = null;
+  // 저장 직후 바로 revoke 하면 브라우저가 다운로드를 마치기 전에 URL 이 사라질 수 있다.
+  if (url) setTimeout(() => URL.revokeObjectURL(url), revokeDelayMs || 0);
+}
+
+async function shareResultImage() {
   const statusEl = document.getElementById('shareStatus');
   if (!STATE.filtered) {
     statusEl.textContent = '❌ 먼저 종목을 조회해주세요.';
     return;
   }
-  let file, fileName;
+  const btn = document.querySelector('.share-img-btn');
+  if (btn) btn.disabled = true;
+  statusEl.textContent = '⏳ 결과를 캡처하는 중…';
+
+  let canvas = null, usedFallback = false;
   try {
-    const A = analyze(STATE.filtered, STATE.mode);
-    const cv = buildShareCard(A, STATE.ticker);
-    fileName = ('MDD_' + STATE.ticker + '_' + A.currentDate + '.' + SHARE_EXT).replace(/[^\w.\-]/g, '_');
-    file = dataURLToFile(cv.toDataURL(SHARE_MIME, SHARE_QUALITY), fileName);
+    canvas = addCaptureFooter(await captureResultElement());
   } catch (err) {
-    statusEl.textContent = '❌ 이미지를 만들지 못했어요. 다시 시도해주세요.';
-    return;
+    // 캡처가 안 되면(라이브러리 차단 등) 직접 그린 요약 카드로 대체한다.
+    try {
+      canvas = buildShareCard(analyze(STATE.filtered, STATE.mode), STATE.ticker);
+      usedFallback = true;
+    } catch (e2) {
+      statusEl.textContent = '❌ 이미지를 만들지 못했어요. 다시 시도해주세요.';
+      if (btn) btn.disabled = false;
+      return;
+    }
   }
 
-  // 모바일에서는 공유 시트의 "이미지 저장"으로 갤러리에 바로 들어간다.
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    navigator.share({
-      files: [file],
-      title: STATE.ticker + ' 고점 대비 하락률',
-      text: STATE.ticker + ' 고점 대비 하락률 분석 · ' + shareOrigin(),
-    }).then(() => {
-      statusEl.textContent = '';
-    }).catch(err => {
-      // 사용자가 공유 시트를 닫은 것뿐이면 조용히 넘어가고, 그 외 실패는 다운로드로 대체한다.
-      if (err && err.name === 'AbortError') { statusEl.textContent = ''; return; }
-      downloadShareFile(file, fileName, statusEl);
-    });
-    return;
+  try {
+    const A = analyze(STATE.filtered, STATE.mode);
+    const fileName = ('MDD_' + STATE.ticker + '_' + A.currentDate + '.' + SHARE_EXT).replace(/[^\w.\-]/g, '_');
+    const file = await canvasToFile(canvas, fileName);
+    clearCaptured();
+    CAPTURED = { file, fileName, url: URL.createObjectURL(file) };
+    openShareModal(usedFallback);
+    statusEl.textContent = '';
+  } catch (err) {
+    statusEl.textContent = '❌ 이미지를 만들지 못했어요. 다시 시도해주세요.';
+  } finally {
+    if (btn) btn.disabled = false;
   }
-  downloadShareFile(file, fileName, statusEl);
+}
+
+function openShareModal(usedFallback) {
+  document.getElementById('shareModalImg').src = CAPTURED.url;
+  document.getElementById('shareModalNote').textContent = usedFallback
+    ? '화면 캡처를 하지 못해 요약 카드로 만들었어요.'
+    : '휴대폰에서는 이미지를 길게 눌러 저장할 수도 있습니다.';
+  const shareBtn = document.getElementById('shareModalShareBtn');
+  const canShare = !!(navigator.canShare && navigator.canShare({ files: [CAPTURED.file] }));
+  shareBtn.classList.toggle('hidden', !canShare);
+  document.getElementById('shareModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeShareModal(revokeDelayMs) {
+  document.getElementById('shareModal').classList.add('hidden');
+  document.getElementById('shareModalImg').removeAttribute('src');
+  document.body.style.overflow = '';
+  clearCaptured(revokeDelayMs);
+}
+
+function doShareCaptured() {
+  if (!CAPTURED) return;
+  const file = CAPTURED.file;
+  navigator.share({
+    files: [file],
+    title: STATE.ticker + ' 고점 대비 하락률',
+    text: STATE.ticker + ' 고점 대비 하락률 분석 · ' + shareOrigin(),
+  }).then(() => {
+    closeShareModal(2000);
+  }).catch(err => {
+    // 공유 시트를 그냥 닫은 것뿐이면 미리보기를 그대로 열어둔다.
+    if (err && err.name === 'AbortError') return;
+    doDownloadCaptured();
+  });
+}
+
+function doDownloadCaptured() {
+  if (!CAPTURED) return;
+  const a = document.createElement('a');
+  a.href = CAPTURED.url;
+  a.download = CAPTURED.fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  const statusEl = document.getElementById('shareStatus');
+  statusEl.textContent = '✅ 이미지를 저장했습니다.';
+  setTimeout(() => { statusEl.textContent = ''; }, 4000);
+  closeShareModal(5000);
 }
 
 // ========== S&P500(SPY) 대비 비교 (SPY는 하루 1회만 API 호출) ==========

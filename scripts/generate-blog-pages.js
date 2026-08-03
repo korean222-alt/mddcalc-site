@@ -22,7 +22,9 @@ const SITE_ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(SITE_ROOT, 'blog');
 const SITEMAP_PATH = path.join(SITE_ROOT, 'sitemap.xml');
 const ADSENSE_CLIENT = 'ca-pub-5583100002281558';
-// 전체 글을 마지막으로 검토·수정한 날짜. 내용을 손볼 때마다 갱신한다.
+// sitemap 에 처음 써넣는 임시 lastmod 값. 이 스크립트 끝에서 scripts/sitemap-lastmod.js 가
+// 각 파일의 실제 git 커밋 날짜로 다시 덮어쓰므로, 결과물에는 보통 이 날짜가 남지 않는다.
+// (아직 한 번도 커밋되지 않은 새 글에만 남는다.)
 const REVIEWED_DATE = '2026-07-25';
 
 function escapeHtml(str) {
@@ -330,6 +332,15 @@ function main() {
 
   const { patchedFiles, patchedLinks } = patchInternalLinks();
   console.log(`✅ 내부 링크 치환: ${patchedFiles}개 파일에서 총 ${patchedLinks}개 링크를 /blog.html?post=N → /blog/N.html 로 변경`);
+
+  // RSS 피드도 같은 BLOG_POSTS 를 쓴다. 여기서 같이 돌려야 글을 고쳤을 때 피드가 뒤처지지 않는다.
+  const run = script =>
+    require('child_process').execFileSync(process.execPath, [path.join(__dirname, script)], { stdio: 'inherit' });
+  run('generate-rss.js');
+
+  // 위 updateSitemap 은 lastmod 를 REVIEWED_DATE 로 일괄로 찍어놓는다. 그대로 두면 손대지도
+  // 않은 페이지 40개의 수정일이 거짓이 되므로, 마지막에 실제 커밋 날짜로 되돌린다.
+  run('sitemap-lastmod.js');
 }
 
 main();
