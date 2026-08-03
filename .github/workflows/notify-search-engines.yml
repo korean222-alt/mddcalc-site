@@ -1,0 +1,93 @@
+name: Notify search engines
+
+# main 에 페이지가 올라갈 때마다
+#   1) sitemap.xml 의 lastmod 를 실제 커밋 날짜로 맞추고
+#   2) 이번에 바뀐 페이지만 골라 IndexNow(빙·네이버·얀덱스)로 알린다.
+#
+# 구글은 IndexNow 를 받지 않는다. 구글 쪽은 lastmod 가 정확한 sitemap 을 보고 판단하므로
+# 1번이 구글 담당, 2번이 나머지 검색엔진 담당이다.
+#
+# 수동 실행(Actions 탭 > Run workflow)하면 sitemap 의 전체 URL 을 다시 알린다.
+# 색인이 통째로 밀렸을 때 쓰면 된다. 평소에는 바뀐 페이지만 간다.
+#
+# 참고: GITHUB_TOKEN 으로 push 한 커밋은 새 워크플로를 트리거하지 않는다.
+# 아래에서 sitemap.xml 을 커밋해도 무한 루프가 생기지 않는 이유다.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.html'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# 종목/블로그 갱신 워크플로도 sitemap.xml 을 건드린다. 동시에 돌면서 서로의 커밋을
+# 덮어쓰지 않도록 한 번에 하나만 돌린다.
+concurrency:
+  group: sitemap-writer
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0 # lastmod 를 커밋 이력에서 읽으므로 전체 history 가 필요하다
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Collect changed pages
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=all" >> "$GITHUB_OUTPUT"
+            echo "수동 실행 — sitemap 전체를 알립니다."
+            exit 0
+          fi
+
+          BEFORE="${{ github.event.before }}"
+          # 브랜치 최초 푸시나 force push 면 before 가 0000... 이라 비교 기준이 못 된다.
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            BEFORE="HEAD~1"
+          fi
+
+          # 삭제된 파일(D)은 알릴 대상이 아니다.
+          git diff --name-only --diff-filter=d "$BEFORE" HEAD -- '*.html' > changed.txt || true
+          echo "이번 푸시에서 바뀐 HTML:"
+          cat changed.txt
+          echo "mode=changed" >> "$GITHUB_OUTPUT"
+
+      - name: Refresh sitemap lastmod
+        run: node scripts/sitemap-lastmod.js
+
+      - name: Commit sitemap if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          if git diff --cached --quiet; then
+            echo "sitemap 변경 없음 — 커밋하지 않음"
+          else
+            git commit -m "chore: sitemap lastmod 자동 갱신"
+            git pull --rebase origin main
+            git push origin main
+          fi
+
+      - name: Submit to IndexNow
+        run: |
+          if [ "${{ steps.changed.outputs.mode }}" = "all" ]; then
+            node scripts/submit-indexnow.js --all
+          elif [ -s changed.txt ]; then
+            xargs -a changed.txt node scripts/submit-indexnow.js
+          else
+            echo "바뀐 HTML 이 없어 알릴 것이 없습니다."
+          fi

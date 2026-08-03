@@ -15,9 +15,18 @@
 <meta property="og:url" content="https://mddcalc.com/">
 <meta property="og:site_name" content="MDD 분석기">
 <meta property="og:locale" content="ko_KR">
-<meta name="twitter:card" content="summary">
+<!-- 미리보기 썸네일. 원본은 scripts/og-template.html 이고 node scripts/generate-og-image.js 로 다시 굽는다.
+     카카오톡·네이버는 절대 URL만 읽으므로 경로를 상대경로로 바꾸지 말 것. -->
+<meta property="og:image" content="https://mddcalc.com/og-image.jpg">
+<meta property="og:image:secure_url" content="https://mddcalc.com/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="MDD 분석기 — 고점 대비 얼마나 떨어졌을까?">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MDD 계산기 — 고점 대비 하락률 분석기">
 <meta name="twitter:description" content="TSLA, NVDA 등 미국 주식의 고점 대비 하락률(MDD)을 무료로 계산하는 주식 하락 및 회복 패턴 분석 도구입니다.">
+<meta name="twitter:image" content="https://mddcalc.com/og-image.jpg">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -117,6 +126,12 @@
   .signal-emoji { font-size: 40px; margin-bottom: 6px; }
   .signal-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
   .signal-desc { font-size: 14px; color: #4a5568; }
+
+  .share-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .share-img-btn { background: #3182ce; color: #fff; font-size: 13px; padding: 9px 16px; }
+  .share-img-btn:hover { background: #2b6cb0; }
+  .share-status { font-size: 12px; color: #38a169; }
+  .share-hint { font-size: 11px; color: #a0aec0; margin-top: 6px; }
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
   .stat-box { background: #f7fafc; padding: 14px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
@@ -418,6 +433,11 @@
         <div class="signal-title" id="signalTitle">—</div>
         <div class="signal-desc" id="signalDesc">—</div>
       </div>
+      <div class="share-row">
+        <button class="btn btn-sm share-img-btn" onclick="shareResultImage()">🖼️ 결과 이미지로 저장 · 공유</button>
+        <span id="shareStatus" class="share-status"></span>
+      </div>
+      <div class="share-hint">차트와 요약이 담긴 이미지 한 장으로 저장됩니다. 휴대폰에서는 공유 버튼으로 갤러리에 바로 저장할 수 있습니다.</div>
     </div>
 
     <!-- 참고 가격대 -->
@@ -1546,6 +1566,304 @@ function copyResultSummary() {
   } else {
     statusEl.textContent = '❌ 이 브라우저에서는 복사 기능을 지원하지 않아요.';
   }
+}
+
+// ========== 결과 이미지 카드 ==========
+// 분석 결과를 이미지 한 장으로 만들어 저장·공유하게 한다. 카드 아래쪽에 도메인을 박아두므로
+// 사용자가 카톡이나 커뮤니티에 이미지를 올릴 때 출처가 함께 따라간다.
+//
+// 차트는 Chart.js 인스턴스에서 가져오지 않고 여기서 직접 그린다. 광고 차단기나 방화벽에
+// CDN이 막혀 Chart.js가 없는 환경에서도(=chartUnavailable로 빠지는 경우) 이미지 카드는
+// 똑같이 나와야 하기 때문이다.
+const SHARE_W = 1080, SHARE_H = 1350;
+const SHARE_FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Pretendard, "Malgun Gothic", sans-serif';
+
+function shareFont(weight, size) { return weight + ' ' + size + 'px ' + SHARE_FONT; }
+
+// 카드에 박히는 출처. 도메인이 비어 있으면 이미지를 만드는 의미가 없으므로(로컬 파일로 열었거나
+// 미리보기 도메인인 경우) 정식 도메인으로 되돌린다.
+const SHARE_DOMAIN = 'mddcalc.com';
+function shareDomain() {
+  const h = location.hostname || '';
+  return (h && h !== 'localhost' && h.indexOf('.') !== -1) ? h.replace(/^www\./, '') : SHARE_DOMAIN;
+}
+function shareOrigin() { return 'https://' + shareDomain() + '/'; }
+
+// 긴 종목명("KODEX 200선물인버스2X" 같은 20자짜리 한글 이름)이 카드 밖으로 삐져나가지 않게
+// 폭에 맞을 때까지 글자 크기를 줄여서 ctx.font 에 걸어둔다.
+function fitShareFont(ctx, text, maxW, weight, startSize, minSize) {
+  let size = startSize;
+  ctx.font = shareFont(weight, size);
+  while (size > minSize && ctx.measureText(text).width > maxW) {
+    size -= 2;
+    ctx.font = shareFont(weight, size);
+  }
+}
+
+// roundRect은 비교적 최근에 추가된 API라 없는 브라우저를 위해 arcTo로 대체한다.
+function roundRectPath(ctx, x, y, w, h, r) {
+  if (typeof ctx.roundRect === 'function') { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// 하락률 추이를 카드 안에 들어갈 크기로 축약해 그린다.
+// boxX/boxY/boxW/boxH 는 배경 박스 기준이고, 실제 선은 왼쪽에 축 눈금 자리를 비워둔
+// 안쪽 영역에만 그린다. 그래야 눈금 글자가 박스 테두리나 선과 겹치지 않는다.
+function drawShareDDChart(ctx, A, boxX, boxY, boxW, boxH) {
+  const AXIS_W = 72, TOP_PAD = 30, BOT_PAD = 90, RIGHT_PAD = 24;
+  const x = boxX + AXIS_W;
+  const y = boxY + TOP_PAD;
+  const w = boxW - AXIS_W - RIGHT_PAD;
+  const h = boxH - TOP_PAD - BOT_PAD;
+
+  let minDD = 0;
+  for (let i = 0; i < A.n; i++) if (A.dd[i] < minDD) minDD = A.dd[i];
+  const range = Math.min(minDD, -5); // 하락이 거의 없는 종목도 축이 찌그러지지 않게 최소 -5%는 확보
+  const px = i => x + (A.n <= 1 ? 0 : (i / (A.n - 1)) * w);
+  const py = v => y + (v / range) * h;
+  const step = Math.max(1, Math.floor(A.n / w));
+
+  roundRectPath(ctx, boxX, boxY, boxW, boxH, 20);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fill();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y - 4, w, h + 8);
+  ctx.clip();
+
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(0));
+  for (let i = 0; i < A.n; i += step) ctx.lineTo(px(i), py(A.dd[i]));
+  ctx.lineTo(px(A.n - 1), py(A.dd[A.n - 1]));
+  ctx.lineTo(px(A.n - 1), py(0));
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, y, 0, y + h);
+  grad.addColorStop(0, 'rgba(99,179,237,0.55)');
+  grad.addColorStop(1, 'rgba(99,179,237,0.05)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(A.dd[0]));
+  for (let i = 0; i < A.n; i += step) ctx.lineTo(px(i), py(A.dd[i]));
+  ctx.lineTo(px(A.n - 1), py(A.dd[A.n - 1]));
+  ctx.strokeStyle = '#63b3ed';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.restore();
+
+  // 0% 기준선
+  ctx.beginPath();
+  ctx.moveTo(x, py(0));
+  ctx.lineTo(x + w, py(0));
+  ctx.strokeStyle = 'rgba(255,255,255,0.20)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.font = shareFont(600, 22);
+  ctx.fillStyle = '#a0aec0';
+  ctx.textAlign = 'right';
+  ctx.fillText('0%', x - 14, py(0) + 8);
+  ctx.fillText(range.toFixed(0) + '%', x - 14, y + h + 8);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#718096';
+  ctx.fillText(A.dates[0] + '  ~  ' + A.dates[A.n - 1], boxX + boxW / 2, y + h + 52);
+  ctx.textAlign = 'left';
+}
+
+function buildShareCard(A, ticker) {
+  const cv = document.createElement('canvas');
+  cv.width = SHARE_W;
+  cv.height = SHARE_H;
+  const ctx = cv.getContext('2d');
+  const PAD = 64;
+
+  const bg = ctx.createLinearGradient(0, 0, SHARE_W, SHARE_H);
+  bg.addColorStop(0, '#1a202c');
+  bg.addColorStop(1, '#2d3748');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+  ctx.font = shareFont(700, 32);
+  ctx.fillStyle = '#a0aec0';
+  ctx.fillText('📊 MDD 분석기', PAD, 84);
+  ctx.textAlign = 'right';
+  ctx.font = shareFont(700, 30);
+  ctx.fillStyle = '#63b3ed';
+  ctx.fillText(shareDomain(), SHARE_W - PAD, 84);
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ffffff';
+  fitShareFont(ctx, ticker, SHARE_W - PAD * 2 - 40, 800, 62, 34);
+  ctx.fillText(ticker, PAD, 164);
+  ctx.font = shareFont(500, 26);
+  ctx.fillStyle = '#a0aec0';
+  ctx.fillText(
+    (STATE.mode === 'high' ? '장중 최고가 기준' : '종가 기준') + ' · 기준일 ' + A.currentDate,
+    PAD, 206
+  );
+
+  // 본문 흰 카드
+  const cardX = PAD, cardY = 240, cardW = SHARE_W - PAD * 2, cardH = 600;
+  roundRectPath(ctx, cardX, cardY, cardW, cardH, 32);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  const inX = cardX + 48;
+
+  ctx.font = shareFont(700, 30);
+  ctx.fillStyle = '#718096';
+  ctx.fillText('고점 대비 하락률', inX, 318);
+
+  const ddColor = A.currentDD > -5 ? '#38a169' : A.currentDD > -15 ? '#d69e2e' : '#e53e3e';
+  ctx.font = shareFont(800, 150);
+  ctx.fillStyle = ddColor;
+  ctx.fillText(fmtPct(A.currentDD), inX, 480);
+
+  const interp = A.currentDD > -3 ? '고점 근처'
+               : A.currentDD > -10 ? '소폭 조정'
+               : A.currentDD > -20 ? '조정 진행 중'
+               : A.currentDD > -30 ? '약세장 진입'
+               : '심한 하락';
+  ctx.font = shareFont(600, 32);
+  ctx.fillStyle = '#4a5568';
+  ctx.fillText(interp, inX, 540);
+
+  const line = yy => {
+    ctx.beginPath();
+    ctx.moveTo(inX, yy);
+    ctx.lineTo(cardX + cardW - 48, yy);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  };
+  line(580);
+  line(730);
+
+  const colR = cardX + cardW / 2 + 8;
+  ctx.font = shareFont(600, 26);
+  ctx.fillStyle = '#718096';
+  ctx.fillText('지금 가격', inX, 632);
+  ctx.fillText('구간 최고가 (ATH)', colR, 632);
+  const colW = cardW / 2 - 56;
+  ctx.fillStyle = '#1a202c';
+  fitShareFont(ctx, money(A.currentPrice), colW, 800, 44, 26);
+  ctx.fillText(money(A.currentPrice), inX, 690);
+  fitShareFont(ctx, money(A.athPrice), colW, 800, 44, 26);
+  ctx.fillText(money(A.athPrice), colR, 690);
+
+  ctx.font = shareFont(500, 22);
+  ctx.fillStyle = '#a0aec0';
+  ctx.fillText(A.currentDate, inX, 716);
+  ctx.fillText(A.athDate, colR, 716);
+
+  const sig = A.currentDD <= -30 ? ['🔥', '역대급 하락 구간']
+            : A.currentDD <= -20 ? ['🟠', '주요 조정 구간']
+            : A.currentDD <= -10 ? ['🟡', '통상적 조정 구간']
+            : A.currentDD <= -3  ? ['🙂', '단기 변동 구간']
+            : ['⏸️', '신고가 근처 구간'];
+  ctx.font = shareFont(400, 40);
+  ctx.fillText(sig[0], inX, 796);
+  ctx.font = shareFont(800, 34);
+  ctx.fillStyle = '#2d3748';
+  ctx.fillText(sig[1], inX + 58, 794);
+
+  ctx.font = shareFont(700, 28);
+  ctx.fillStyle = '#a0aec0';
+  ctx.fillText('📉 하락률 추이 (전체 구간)', PAD, 890);
+  drawShareDDChart(ctx, A, PAD, 910, SHARE_W - PAD * 2, 260);
+
+  ctx.font = shareFont(600, 28);
+  ctx.fillStyle = '#cbd5e0';
+  ctx.fillText('역대 최대 하락 ' + fmtPct(A.maxDD) + ' (' + A.maxDDDate + ')', PAD, 1212);
+
+  // 하단 출처 띠 — 이미지가 어디로 퍼지든 도메인이 같이 간다
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fillRect(0, 1242, SHARE_W, SHARE_H - 1242);
+  ctx.font = shareFont(800, 46);
+  ctx.fillStyle = '#63b3ed';
+  ctx.fillText(shareDomain(), PAD, 1296);
+  ctx.font = shareFont(500, 24);
+  ctx.fillStyle = '#a0aec0';
+  ctx.fillText('무료 주식 MDD · RSI · 배당 계산기', PAD, 1328);
+  ctx.textAlign = 'right';
+  ctx.font = shareFont(500, 24);
+  ctx.fillStyle = '#718096';
+  ctx.fillText('투자 조언 아님 · 참고용 데이터', SHARE_W - PAD, 1312);
+
+  return cv;
+}
+
+// toBlob은 비동기라 await하는 순간 사용자 제스처가 끊겨 일부 브라우저(특히 iOS Safari)에서
+// navigator.share가 거부된다. dataURL을 동기로 만들어 그 자리에서 File로 바꾼다.
+//
+// 포맷은 JPEG. 같은 카드가 PNG로는 780KB인데 JPEG(q92)로는 116KB이고 눈으로는 차이가 없다.
+// 휴대폰에서 공유하는 이미지라 용량 차이가 그대로 체감된다.
+const SHARE_MIME = 'image/jpeg', SHARE_QUALITY = 0.92, SHARE_EXT = 'jpg';
+
+function dataURLToFile(dataURL, fileName) {
+  const comma = dataURL.indexOf(',');
+  const mime = /:(.*?);/.exec(dataURL.slice(0, comma))[1];
+  const bin = atob(dataURL.slice(comma + 1));
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return new File([buf], fileName, { type: mime });
+}
+
+function downloadShareFile(file, fileName, statusEl) {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  statusEl.textContent = '✅ 이미지를 저장했습니다.';
+  setTimeout(() => { statusEl.textContent = ''; }, 4000);
+}
+
+function shareResultImage() {
+  const statusEl = document.getElementById('shareStatus');
+  if (!STATE.filtered) {
+    statusEl.textContent = '❌ 먼저 종목을 조회해주세요.';
+    return;
+  }
+  let file, fileName;
+  try {
+    const A = analyze(STATE.filtered, STATE.mode);
+    const cv = buildShareCard(A, STATE.ticker);
+    fileName = ('MDD_' + STATE.ticker + '_' + A.currentDate + '.' + SHARE_EXT).replace(/[^\w.\-]/g, '_');
+    file = dataURLToFile(cv.toDataURL(SHARE_MIME, SHARE_QUALITY), fileName);
+  } catch (err) {
+    statusEl.textContent = '❌ 이미지를 만들지 못했어요. 다시 시도해주세요.';
+    return;
+  }
+
+  // 모바일에서는 공유 시트의 "이미지 저장"으로 갤러리에 바로 들어간다.
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({
+      files: [file],
+      title: STATE.ticker + ' 고점 대비 하락률',
+      text: STATE.ticker + ' 고점 대비 하락률 분석 · ' + shareOrigin(),
+    }).then(() => {
+      statusEl.textContent = '';
+    }).catch(err => {
+      // 사용자가 공유 시트를 닫은 것뿐이면 조용히 넘어가고, 그 외 실패는 다운로드로 대체한다.
+      if (err && err.name === 'AbortError') { statusEl.textContent = ''; return; }
+      downloadShareFile(file, fileName, statusEl);
+    });
+    return;
+  }
+  downloadShareFile(file, fileName, statusEl);
 }
 
 // ========== S&P500(SPY) 대비 비교 (SPY는 하루 1회만 API 호출) ==========

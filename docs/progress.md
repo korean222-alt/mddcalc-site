@@ -198,6 +198,75 @@ for (const f of ["index.html","tools.html","rsi-calculator.html","dividend-calcu
 
 ---
 
+## 4-1. 홍보/노출 자동화 (2026-08-03 추가)
+
+"사이트를 자동으로 홍보해달라"는 요청으로 넣은 것들이다.
+**커뮤니티에 글을 자동으로 올리는 기능은 넣지 않았다.** 각 플랫폼 약관 위반이고,
+도메인이 스팸으로 찍히면 애드센스 재신청이 더 어려워진다. 대신 "사용자가 자발적으로
+퍼뜨릴 때 출처가 따라가게" + "검색엔진이 빨리 알게" 두 갈래로 만들었다.
+
+### (1) 결과 이미지 카드 — `index.html`
+
+분석 결과 밑에 `🖼️ 결과 이미지로 저장 · 공유` 버튼이 생겼다. 1080x1350 JPEG 한 장에
+종목명·하락률·차트·`mddcalc.com` 이 함께 들어간다. 카톡에 올리면 도메인이 같이 간다.
+
+- 휴대폰: `navigator.share` 공유 시트 → "이미지 저장"으로 갤러리에 바로 들어감
+- PC / 공유 미지원 브라우저: 자동으로 다운로드로 대체
+- 관련 함수: `buildShareCard` / `drawShareDDChart` / `shareResultImage`
+- 차트는 Chart.js 를 쓰지 않고 캔버스에 직접 그린다. **광고 차단기로 CDN 이 막혀도
+  이미지 카드는 나와야 하기 때문이다.** Chart.js 인스턴스에서 가져오도록 바꾸지 말 것.
+- PNG 가 아니라 JPEG(q92)다. 같은 카드가 PNG 780KB / JPEG 116KB 인데 눈으로 차이가 없다.
+- `navigator.share` 는 사용자 제스처가 살아있는 동안만 호출할 수 있어서, 비동기 `toBlob`
+  대신 동기 `toDataURL` → `File` 로 만든다. **`await` 를 끼워넣으면 iOS 에서 깨진다.**
+
+### (2) 미리보기 썸네일 (og:image) — 메인 페이지만
+
+지금까지 109개 페이지 전부 `og:image` 가 없어서 링크를 공유해도 썸네일이 안 떴다.
+메인만 붙였다(요청 범위).
+
+```bash
+node scripts/generate-og-image.js   # scripts/og-template.html → og-image.jpg (1200x630)
+```
+
+- npm 의존성 없이 로컬 크롬의 헤드리스 스크린샷만 쓴다. 못 찾으면 `CHROME_PATH` 로 알려주면 된다.
+- 헤드리스 크롬의 `--window-size` 는 창 크기라 뷰포트가 85px쯤 작게 잡힌다. 그래서
+  넉넉하게 찍고 위쪽 1200x630 만 잘라낸다. 이 크롭을 빼면 아래가 흰 띠로 잘린다.
+- 문구를 바꾸려면 `scripts/og-template.html` 을 고치고 위 명령을 다시 돌린다.
+- 카톡·네이버는 썸네일을 캐시한다. 바꾼 뒤 바로 반영이 안 되면
+  [카카오 디버거](https://developers.kakao.com/tool/debugger/sharing) 에서 캐시를 지운다.
+
+### (3) 검색엔진 자동 통보 — `.github/workflows/notify-search-engines.yml`
+
+main 에 HTML 이 올라가면 자동으로 돈다.
+
+```bash
+node scripts/sitemap-lastmod.js            # lastmod 를 실제 커밋 날짜로 교정
+node scripts/sitemap-lastmod.js --check    # 어긋난 게 있는지만 확인 (있으면 종료코드 1)
+node scripts/submit-indexnow.js a.html b.html   # 지정 페이지를 IndexNow 로 통보
+node scripts/submit-indexnow.js --all           # sitemap 전체 통보
+node scripts/submit-indexnow.js --dry-run ...   # 보내지 않고 목록만 확인
+```
+
+- **IndexNow 를 받는 곳은 빙·네이버·얀덱스다. 구글은 IndexNow 를 쓰지 않는다.**
+  구글 쪽은 `lastmod` 가 정확한 sitemap 이 담당한다. 그래서 두 개가 한 세트다.
+- 기존 sitemap 의 lastmod 15개가 `2026-07-25` 로 굳어 있던 것을 전부 교정했다.
+  크롤러는 lastmod 가 거짓이라고 판단하면 그 뒤로 아예 무시한다.
+- 키 파일 `3a437d1698d094bb66ae274682805aa8.txt` 는 **비밀이 아니다.** 사이트 루트에
+  그대로 올라가 있어야 소유 검증이 되고, 지우면 403 으로 전부 거부된다.
+- 수동 실행(Actions 탭 > Run workflow)하면 전체 URL 을 다시 통보한다. 색인이 밀렸을 때 쓴다.
+
+> ⚠️ **배포 후 한 번 확인할 것**: `https://mddcalc.com/3a437d1698d094bb66ae274682805aa8.txt`
+> 가 열려야 한다. 안 열리면 IndexNow 가 403 으로 전부 거부된다(워크플로는 실패시키지 않고
+> 경고만 남기므로 로그를 봐야 안다).
+
+### 아직 안 한 것
+
+- 나머지 108개 페이지의 `og:image` (메인만 해달라는 요청이었음)
+- 블로그 RSS 피드
+- 커뮤니티 홍보 문구/가이드 문서
+
+---
+
 ## 5. 개발 메모
 
 ### 빌드 스크립트
