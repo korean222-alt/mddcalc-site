@@ -588,13 +588,18 @@ async function fetchKrSeries(code) {
 }
 
 async function fetchPriceSeries(ticker, outputsize) {
+  // outputsize 에 'max' 를 넘기면 받을 수 있는 전체 히스토리를 가져옵니다.
+  // (미국 종목은 서버가 5000봉씩 나눠 받아 합쳐줍니다. 한국 종목은 파일에 이미 전체가 들어 있습니다.)
+  const wantAll = outputsize === 'max';
   const resolved = resolveSymbol(ticker);
   const key = resolved.symbol;
   const cached = PRICE_CACHE[key];
-  if (cached && (Date.now() - cached.time) < PRICE_CACHE_TTL_MS && cached.values.length >= outputsize) {
+  const cacheFresh = cached && (Date.now() - cached.time) < PRICE_CACHE_TTL_MS;
+  // 전체를 원할 때는 "전체로 받아둔 캐시"만 재사용합니다. 5000봉짜리 캐시를 쓰면 다시 2006년에서 끊깁니다.
+  if (cacheFresh && (wantAll ? cached.full : cached.values.length >= outputsize)) {
     // 캐시에 더 많이 들어 있어도 요청한 개수만 돌려줍니다. values 는 최신순이라 앞에서 자릅니다.
     // (RSI 화면이 "최근 N일 기준"이라고 표시하므로 실제 개수가 N과 같아야 합니다.)
-    return { fromCache: true, values: cached.values.slice(0, outputsize), metadata: null, meta: cached.meta || null, resolved };
+    return { fromCache: true, values: wantAll ? cached.values : cached.values.slice(0, outputsize), metadata: null, meta: cached.meta || null, resolved };
   }
 
   // 한국 종목은 정적 파일을 읽습니다. API 한도도, 실시간 호출 실패도 없습니다.
@@ -602,8 +607,8 @@ async function fetchPriceSeries(ticker, outputsize) {
   // 그래야 미국 종목(요청한 만큼만 받아옴)과 동작이 같아집니다.
   if (resolved.isKR) {
     const kr = await fetchKrSeries(resolved.code);
-    PRICE_CACHE[key] = { values: kr.values, meta: kr.meta, time: Date.now() };
-    return { fromCache: false, values: kr.values.slice(0, outputsize), metadata: null, meta: kr.meta, resolved };
+    PRICE_CACHE[key] = { values: kr.values, meta: kr.meta, time: Date.now(), full: true };
+    return { fromCache: false, values: wantAll ? kr.values : kr.values.slice(0, outputsize), metadata: null, meta: kr.meta, resolved };
   }
 
   const res = await fetch('/api/twelve-data/time-series', {
@@ -628,7 +633,7 @@ async function fetchPriceSeries(ticker, outputsize) {
   if (json.status === 'error') throw new Error(json.message || 'API 오류');
   if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
 
-  PRICE_CACHE[key] = { values: json.values, meta: json.meta || null, time: Date.now() };
+  PRICE_CACHE[key] = { values: json.values, meta: json.meta || null, time: Date.now(), full: wantAll };
   return { fromCache: false, values: json.values, metadata: json._metadata || null, meta: json.meta || null, resolved };
 }
 
@@ -648,7 +653,7 @@ async function fetchBenchmarkSeries(symbol) {
     }
   } catch (e) { /* localStorage 접근 불가(사파리 시크릿모드 등) 시 그냥 API로 진행 */ }
 
-  const { values } = await fetchPriceSeries(symbol, 5000);
+  const { values } = await fetchPriceSeries(symbol, 'max');
   try {
     localStorage.setItem(cacheKey, JSON.stringify({ date: today, values }));
   } catch (e) { /* 저장 실패(용량 초과 등)는 기능에 지장 없으므로 무시 */ }
@@ -803,7 +808,7 @@ async function loadData() {
   try {
     showStatus('⏳ 데이터 불러오는 중...', 'info');
 
-    const { values, fromCache, metadata } = await fetchPriceSeries(ticker, 5000);
+    const { values, fromCache, metadata } = await fetchPriceSeries(ticker, 'max');
 
     const raw = values.map(v => ({
       date: v.datetime,
