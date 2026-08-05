@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="canonical" href="https://mddcalc.com/">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
@@ -355,19 +355,23 @@ async function loadData() {
 
     if (STATE.useBackendApi && !apiKey) {
       // 백엔드 프록시 사용 (API 키 없을 때)
+      //
+      // 예전에는 tRPC 경로(/api/trpc/twelvedata.timeSeries)로 GET 했지만 그 서버는 없어졌고,
+      // 지금 실제로 존재하는 것은 아래 POST 엔드포인트 하나뿐이다(api/twelve-data/time-series.js).
+      // 옛 주소를 그대로 두는 바람에 이 페이지는 계속 404 를 받아 아무것도 못 그리고 있었다.
       showStatus('⏳ 데이터 불러오는 중... (백엔드 API 사용)', 'info');
-      
-      const res = await fetch('/api/trpc/twelvedata.timeSeries?input=' + encodeURIComponent(JSON.stringify({
-        symbol: ticker,
-        interval: '1day',
-        outputsize: 5000
-      })));
-      
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      json = data.result?.data;
-      
+
+      const res = await fetch('/api/twelve-data/time-series', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol: ticker, interval: '1day', outputsize: 5000 })
+      });
+
+      json = await res.json().catch(() => null);
       if (!json) throw new Error('응답 형식 오류');
+      if (res.status === 429) throw new Error(json.message || '요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.');
+      if (json.error) throw new Error(json.error);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
     } else {
       // 직접 API 사용 (API 키 있을 때 또는 폴백)
       if (!apiKey) return showStatus('❌ API 키를 입력해주세요', 'error');

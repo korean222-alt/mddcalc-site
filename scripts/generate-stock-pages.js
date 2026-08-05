@@ -128,6 +128,18 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// <script type="application/ld+json"> 안은 HTML 이 아니라 JSON 이다. 그 안에서는 &amp; 같은
+// HTML 엔티티가 풀리지 않기 때문에, escapeHtml() 을 쓰면 "S&P500" 이 "S&amp;P500" 그대로
+// 구조화 데이터에 실려 구글이 그렇게 읽는다. 값은 JSON 규칙으로 인코딩하고, 문자열 안의
+// </script> 로 블록이 일찍 닫히는 것만 따로 막는다. 따옴표까지 포함해 반환하므로
+// 템플릿에서는 "${...}" 가 아니라 ${...} 로 쓴다.
+function jsonLd(value) {
+  return JSON.stringify(String(value))
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+}
+
 // 쿠팡 파트너스 배너. generate-blog-pages.js와 완전히 같은 마크업을 써서
 // 한쪽만 손보고 다른 쪽을 깜빡하는 일이 없게 한다. 제거하려면 이 상수를 쓰는 자리를
 // 지우면 된다 (COUPANG_PARTNERS_START/END 주석 참고).
@@ -559,8 +571,8 @@ function buildPage(symbol, a, spyA, generatedDate) {
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "${escapeHtml(label)} MDD·고점 대비 하락률 리포트",
-  "description": "${escapeHtml(description)}",
+  "name": ${jsonLd(`${label} MDD·고점 대비 하락률 리포트`)},
+  "description": ${jsonLd(description)},
   "url": "${canonical}",
   "dateModified": "${generatedDate}",
   "inLanguage": "ko"
