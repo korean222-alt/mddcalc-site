@@ -103,7 +103,43 @@
         <li><strong>감내 가능한 하락폭의 사전 점검</strong>: 매수 전에 그 자산의 과거 MDD를 확인해 두면, "이 정도까지 빠져도 계획을 유지할 수 있는가"를 미리 자문할 수 있습니다. 감내하기 어려운 수준이라면 비중 자체를 조정하는 것이 하나의 방법입니다. 적정한 손실 제한 기준은 개인의 투자 기간·자금 성격에 따라 달라지므로 일률적인 정답은 없습니다.</li>
         <li><strong>포트폴리오 재조정</strong>: 포트폴리오 내 각 자산의 MDD를 주기적으로 검토하여, 과도한 위험에 노출된 자산을 줄이거나 안정적인 자산으로 교체하는 등의 재조정을 할 수 있습니다.</li>
       </ul>
-      <p>다만, 모든 종목과 시장 상황에 일률적으로 적용할 수 있는 만능 전략은 없습니다. 종목마다 역사적 회복률과 시장 특성이 다르므로, MDD 데이터를 참고하되 반드시 실제 데이터를 기반으로 신중하게 판단하는 것이 중요합니다. MDD 분석기는 이러한 판단을 돕기 위한 유용한 도구입니다.</p>
+      <p>다만, 모든 종목과 시장 상황에 일률적으로 적용할 수 있는 만능 전략은 없습니다. 종목마다 역사적 회복률과 시장 특성이 다르므로, MDD 데이터를 참고하되 반드시 실제 데이터를 기반으로 신중하게 판단하는 것이 중요합니다.</p>
+
+      <h2>숫자로 보는 코스피의 하락과 회복</h2>
+      <p>개념 설명만으로는 MDD가 실제로 어떤 경험인지 잘 와닿지 않습니다.
+      아래는 이 사이트가 매 거래일 갱신하는 코스피 지수 데이터(2002년 4월 ~ 현재, 약 6,000거래일)에서
+      <strong>−20% 이상 하락한 구간을 직접 세어 계산한 값</strong>입니다. 종가 기준이며, 전고점을 다시 넘어선 날을 회복으로 봤습니다.</p>
+
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;">
+          <th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0;">고점</th>
+          <th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0;">저점</th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">낙폭</th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">전고점 회복까지</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10-31</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-24</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−54.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,160일 (약 3.2년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-04-18</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-03-17</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−45.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,026일 (약 2.8년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-01-29</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−43.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,029일 (약 2.8년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-07-06</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2022-09-30</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−34.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,527일 (약 4.2년)</td></tr>
+          <tr><td style="padding:8px;">2011-05-02</td><td style="padding:8px;">2011-09-26</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700;">−25.9%</td><td style="padding:8px; text-align:right;">2,194일 (약 6.0년)</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>여기서 <strong>낙폭의 깊이와 회복 기간이 비례하지 않는다</strong>는 점이 드러납니다.
+      가장 깊었던 2008년(−54.5%)은 3.2년 만에 회복했지만, 절반도 안 되는 2011년의 −25.9%는 회복까지 6년이 걸렸습니다.
+      "많이 빠졌으니 크게 오를 것"이라는 식의 대칭을 데이터가 지지하지 않는다는 뜻입니다.</p>
+
+      <p>같은 방식으로 −10% 이상 하락한 구간까지 넓히면 이 기간 동안 11번이 있었고,
+      그중 회복한 10번의 <strong>회복 소요 기간 중앙값은 656일</strong>이었습니다.
+      지수 기준으로도 한 번 빠지면 되돌아오는 데 평균 1년 반 이상이 걸렸다는 뜻입니다.
+      개별 종목은 지수와 달리 사업이 무너지면 회복하지 못할 수도 있으므로, 이 숫자를 개별 종목에 그대로 적용할 수는 없습니다.</p>
+
+      <p class="muted" style="font-size:13px; color:#718096;">위 수치는 이 사이트가 보유한 코스피 일별 종가 데이터로 계산한 값입니다.
+      집계 방식(종가 기준 / 장중가 기준)과 데이터 출처에 따라 몇 %p 차이가 날 수 있습니다.
+      본인이 관심 있는 종목의 같은 계산은 <a href="/">MDD 계산기</a>에서 직접 확인하실 수 있습니다.</p>
     </article>
     
     <div class="cta-box">
@@ -125,7 +161,7 @@
     </div>
     <div class="related">
       <div class="related-title">다른 글도 보기</div>
-      <a href="/blog/2.html" class="related-chip">TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라</a><a href="/blog/3.html" class="related-chip">고점 대비 -30% 하락 시 시장은 어떻게 움직였나: 과거 데이터 분석</a><a href="/blog/4.html" class="related-chip">S&amp;P 500 역대 MDD 분석: 각 위기마다 얼마나 하락했나</a>
+      <a href="/blog/15.html" class="related-chip">MDD 분석기 100% 활용하는 방법</a><a href="/blog/4.html" class="related-chip">S&amp;P 500 역대 MDD 분석: 각 위기마다 얼마나 하락했나</a><a href="/blog/2.html" class="related-chip">TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라</a>
     </div>
     
     <p class="note">

@@ -101,7 +101,50 @@
       </ul>
       <h2>RSI 계산기 사용법</h2>
       <p>우리 사이트의 RSI 계산기는 사용자가 입력한 종가 데이터를 기반으로 자동으로 RSI 값을 계산하고, 현재 주가가 과매수/과매도 구간에 있는지 직관적으로 보여줍니다. 이를 통해 복잡한 계산 없이도 RSI 지표를 활용한 투자 결정을 내리는 데 도움을 받을 수 있습니다. 도구 페이지에서 직접 종가 데이터를 입력하여 RSI를 계산하고, 자신만의 판단 기준을 세우는 데 참고할 수 있습니다.</p>
-      <p>RSI는 시장의 과열과 침체를 판단하는 데 유용한 도구이지만, 맹신하기보다는 보조 지표로 활용하는 것이 현명합니다. 항상 다양한 정보를 종합적으로 분석하고, 자신의 투자 원칙에 따라 신중하게 투자 결정을 내리시길 바랍니다.</p>
+      <h2>"RSI 30 아래는 과매도"를 코스피 24년 데이터로 검증해봤습니다</h2>
+      <p>RSI를 설명하는 글은 대부분 "30 아래는 과매도 구간"이라는 문장에서 끝납니다.
+      그런데 실제로 그 구간에 들어간 뒤 어떻게 됐는지를 숫자로 보여주는 글은 드뭅니다.
+      이 사이트가 갖고 있는 코스피 데이터(2002년 4월 ~ 현재, 약 6,000거래일)로 직접 세어봤습니다.</p>
+
+      <p>기준은 이렇습니다. RSI(14)가 <strong>30 위에 있다가 처음으로 30 아래로 내려간 날</strong>을 진입 시점으로 잡았습니다.
+      이미 30 아래에 머무는 동안의 날들을 전부 세면 같은 하락 구간이 중복 집계되기 때문입니다.
+      그렇게 잡힌 날이 이 기간 동안 <strong>70번</strong>이었습니다.</p>
+
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;">
+          <th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0;">이후 기간</th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">RSI 30 진입일에 샀다면<br><span style="font-weight:400; font-size:12px;">(수익률 중앙값 / 플러스 비율)</span></th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">아무 날이나 샀다면<br><span style="font-weight:400; font-size:12px;">(수익률 중앙값 / 플러스 비율)</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">3개월 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+3.2% / 61%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+2.2% / 62%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">6개월 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+5.1% / 67%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+3.0% / 60%</td></tr>
+          <tr><td style="padding:8px;">1년 뒤</td><td style="padding:8px; text-align:right;">+8.4% / 67%</td><td style="padding:8px; text-align:right;">+6.7% / 67%</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>결과를 그대로 읽으면 이렇습니다. <strong>차이가 거의 없습니다.</strong>
+      3개월 기준으로 RSI 30 진입일에 산 경우의 중앙값이 +3.2%, 아무 날이나 산 경우가 +2.2%로 1%p 차이이고,
+      플러스로 끝난 비율은 오히려 아무 날이나 산 쪽이 1%p 높습니다. 1년으로 늘리면 플러스 비율은 67%로 완전히 같아집니다.</p>
+
+      <p>더 눈여겨볼 것은 <strong>진폭</strong>입니다. RSI 30 진입 후 3개월 수익률은 최악 −25.2%에서 최고 +36.7%까지 벌어졌고,
+      1년으로 늘리면 최악 −42.3%, 최고 +167.1%였습니다.
+      "과매도니까 반등한다"는 문장이 감추고 있는 것이 이 폭입니다.
+      RSI가 30 아래로 내려갔다는 사실은 <strong>그 뒤가 어느 쪽인지에 대해 알려주는 것이 거의 없었습니다</strong>.</p>
+
+      <p>그렇다면 RSI가 쓸모없다는 뜻일까요? 그렇게 읽기보다는, <strong>RSI는 방향을 예측하는 지표가 아니라 현재 상태를 요약하는 지표</strong>라고
+      보는 편이 데이터에 맞습니다. "최근 상승분에 비해 하락분이 컸다"는 사실을 한 숫자로 압축해 주는 것이지,
+      그 다음에 무슨 일이 일어날지를 담고 있지는 않습니다.
+      이 글 위쪽에서 설명한 다이버전스나 추세 확인 같은 보조적 활용이 강조되는 이유도 여기에 있습니다.</p>
+
+      <p class="muted" style="font-size:13px; color:#718096;">위 계산은 이 사이트가 보유한 코스피 일별 종가로 수행했습니다.
+      RSI는 Wilder 방식(지수 평활, 기간 14)을 따랐고, 수익률은 배당과 거래비용을 제외한 지수 가격 기준입니다.
+      표본이 70회이므로 통계적으로 확정적인 결론을 내리기에는 부족하며, 다른 시장이나 개별 종목에서는 다른 결과가 나올 수 있습니다.
+      같은 계산을 본인이 보는 종목으로 해보시려면 <a href="/rsi-calculator.html">RSI 계산기</a>에서 종목을 조회해 보세요.</p>
+
+      <p>RSI는 시장의 과열과 침체를 요약해 주는 유용한 도구이지만, 위 결과처럼 단독으로 매매 판단의 근거가 되기는 어렵습니다. 다양한 정보를 함께 확인하고, 자신의 투자 원칙에 따라 신중하게 판단하시길 바랍니다.</p>
     </article>
     
     <div class="cta-box">
@@ -123,7 +166,7 @@
     </div>
     <div class="related">
       <div class="related-title">다른 글도 보기</div>
-      <a href="/blog/1.html" class="related-chip">MDD란 무엇인가? 고점 대비 하락률 완전 가이드</a><a href="/blog/2.html" class="related-chip">TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라</a><a href="/blog/3.html" class="related-chip">고점 대비 -30% 하락 시 시장은 어떻게 움직였나: 과거 데이터 분석</a>
+      <a href="/blog/3.html" class="related-chip">고점 대비 -30% 하락 시 시장은 어떻게 움직였나: 과거 데이터 분석</a><a href="/blog/6.html" class="related-chip">배당 재투자(DRIP)의 마술: 10년 후 얼마나 달라지나</a><a href="/blog/9.html" class="related-chip">마이크로소프트(MSFT) 하락·회복 패턴 분석</a>
     </div>
     
     <p class="note">

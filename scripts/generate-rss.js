@@ -16,7 +16,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { BLOG_POSTS } = require('./posts-data.js');
+const { BLOG_POSTS, RETIRED_POSTS } = require('./posts-data.js');
 
 const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'rss.xml');
@@ -50,7 +50,11 @@ function main() {
   }
 
   // 최신 글이 위로 오게 정렬한다. 날짜가 같으면 id 가 큰 쪽이 최신이다.
-  const posts = [...BLOG_POSTS]
+  // 내린 글(RETIRED_POSTS)은 /blog/{id}.html 자체가 생성되지 않으므로 피드에서도 뺀다.
+  // 빼지 않으면 구독자에게 404 로 가는 링크를 보내게 된다.
+  const retired = RETIRED_POSTS || new Set();
+  const posts = BLOG_POSTS
+    .filter(p => !retired.has(p.id))
     .sort((a, b) => (a.date === b.date ? b.id - a.id : (a.date < b.date ? 1 : -1)))
     .slice(0, MAX_ITEMS);
 

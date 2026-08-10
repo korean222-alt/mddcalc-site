@@ -41,7 +41,43 @@ const BLOG_POSTS = [
         <li><strong>감내 가능한 하락폭의 사전 점검</strong>: 매수 전에 그 자산의 과거 MDD를 확인해 두면, "이 정도까지 빠져도 계획을 유지할 수 있는가"를 미리 자문할 수 있습니다. 감내하기 어려운 수준이라면 비중 자체를 조정하는 것이 하나의 방법입니다. 적정한 손실 제한 기준은 개인의 투자 기간·자금 성격에 따라 달라지므로 일률적인 정답은 없습니다.</li>
         <li><strong>포트폴리오 재조정</strong>: 포트폴리오 내 각 자산의 MDD를 주기적으로 검토하여, 과도한 위험에 노출된 자산을 줄이거나 안정적인 자산으로 교체하는 등의 재조정을 할 수 있습니다.</li>
       </ul>
-      <p>다만, 모든 종목과 시장 상황에 일률적으로 적용할 수 있는 만능 전략은 없습니다. 종목마다 역사적 회복률과 시장 특성이 다르므로, MDD 데이터를 참고하되 반드시 실제 데이터를 기반으로 신중하게 판단하는 것이 중요합니다. MDD 분석기는 이러한 판단을 돕기 위한 유용한 도구입니다.</p>
+      <p>다만, 모든 종목과 시장 상황에 일률적으로 적용할 수 있는 만능 전략은 없습니다. 종목마다 역사적 회복률과 시장 특성이 다르므로, MDD 데이터를 참고하되 반드시 실제 데이터를 기반으로 신중하게 판단하는 것이 중요합니다.</p>
+
+      <h2>숫자로 보는 코스피의 하락과 회복</h2>
+      <p>개념 설명만으로는 MDD가 실제로 어떤 경험인지 잘 와닿지 않습니다.
+      아래는 이 사이트가 매 거래일 갱신하는 코스피 지수 데이터(2002년 4월 ~ 현재, 약 6,000거래일)에서
+      <strong>−20% 이상 하락한 구간을 직접 세어 계산한 값</strong>입니다. 종가 기준이며, 전고점을 다시 넘어선 날을 회복으로 봤습니다.</p>
+
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;">
+          <th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0;">고점</th>
+          <th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0;">저점</th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">낙폭</th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">전고점 회복까지</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10-31</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-24</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−54.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,160일 (약 3.2년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-04-18</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-03-17</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−45.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,026일 (약 2.8년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-01-29</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−43.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,029일 (약 2.8년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-07-06</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2022-09-30</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−34.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,527일 (약 4.2년)</td></tr>
+          <tr><td style="padding:8px;">2011-05-02</td><td style="padding:8px;">2011-09-26</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700;">−25.9%</td><td style="padding:8px; text-align:right;">2,194일 (약 6.0년)</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>여기서 <strong>낙폭의 깊이와 회복 기간이 비례하지 않는다</strong>는 점이 드러납니다.
+      가장 깊었던 2008년(−54.5%)은 3.2년 만에 회복했지만, 절반도 안 되는 2011년의 −25.9%는 회복까지 6년이 걸렸습니다.
+      "많이 빠졌으니 크게 오를 것"이라는 식의 대칭을 데이터가 지지하지 않는다는 뜻입니다.</p>
+
+      <p>같은 방식으로 −10% 이상 하락한 구간까지 넓히면 이 기간 동안 11번이 있었고,
+      그중 회복한 10번의 <strong>회복 소요 기간 중앙값은 656일</strong>이었습니다.
+      지수 기준으로도 한 번 빠지면 되돌아오는 데 평균 1년 반 이상이 걸렸다는 뜻입니다.
+      개별 종목은 지수와 달리 사업이 무너지면 회복하지 못할 수도 있으므로, 이 숫자를 개별 종목에 그대로 적용할 수는 없습니다.</p>
+
+      <p class="muted" style="font-size:13px; color:#718096;">위 수치는 이 사이트가 보유한 코스피 일별 종가 데이터로 계산한 값입니다.
+      집계 방식(종가 기준 / 장중가 기준)과 데이터 출처에 따라 몇 %p 차이가 날 수 있습니다.
+      본인이 관심 있는 종목의 같은 계산은 <a href="/">MDD 계산기</a>에서 직접 확인하실 수 있습니다.</p>
     `
   },
   {
@@ -197,7 +233,50 @@ const BLOG_POSTS = [
       </ul>
       <h2>RSI 계산기 사용법</h2>
       <p>우리 사이트의 RSI 계산기는 사용자가 입력한 종가 데이터를 기반으로 자동으로 RSI 값을 계산하고, 현재 주가가 과매수/과매도 구간에 있는지 직관적으로 보여줍니다. 이를 통해 복잡한 계산 없이도 RSI 지표를 활용한 투자 결정을 내리는 데 도움을 받을 수 있습니다. 도구 페이지에서 직접 종가 데이터를 입력하여 RSI를 계산하고, 자신만의 판단 기준을 세우는 데 참고할 수 있습니다.</p>
-      <p>RSI는 시장의 과열과 침체를 판단하는 데 유용한 도구이지만, 맹신하기보다는 보조 지표로 활용하는 것이 현명합니다. 항상 다양한 정보를 종합적으로 분석하고, 자신의 투자 원칙에 따라 신중하게 투자 결정을 내리시길 바랍니다.</p>
+      <h2>"RSI 30 아래는 과매도"를 코스피 24년 데이터로 검증해봤습니다</h2>
+      <p>RSI를 설명하는 글은 대부분 "30 아래는 과매도 구간"이라는 문장에서 끝납니다.
+      그런데 실제로 그 구간에 들어간 뒤 어떻게 됐는지를 숫자로 보여주는 글은 드뭅니다.
+      이 사이트가 갖고 있는 코스피 데이터(2002년 4월 ~ 현재, 약 6,000거래일)로 직접 세어봤습니다.</p>
+
+      <p>기준은 이렇습니다. RSI(14)가 <strong>30 위에 있다가 처음으로 30 아래로 내려간 날</strong>을 진입 시점으로 잡았습니다.
+      이미 30 아래에 머무는 동안의 날들을 전부 세면 같은 하락 구간이 중복 집계되기 때문입니다.
+      그렇게 잡힌 날이 이 기간 동안 <strong>70번</strong>이었습니다.</p>
+
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;">
+          <th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0;">이후 기간</th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">RSI 30 진입일에 샀다면<br><span style="font-weight:400; font-size:12px;">(수익률 중앙값 / 플러스 비율)</span></th>
+          <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">아무 날이나 샀다면<br><span style="font-weight:400; font-size:12px;">(수익률 중앙값 / 플러스 비율)</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">3개월 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+3.2% / 61%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+2.2% / 62%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">6개월 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+5.1% / 67%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">+3.0% / 60%</td></tr>
+          <tr><td style="padding:8px;">1년 뒤</td><td style="padding:8px; text-align:right;">+8.4% / 67%</td><td style="padding:8px; text-align:right;">+6.7% / 67%</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>결과를 그대로 읽으면 이렇습니다. <strong>차이가 거의 없습니다.</strong>
+      3개월 기준으로 RSI 30 진입일에 산 경우의 중앙값이 +3.2%, 아무 날이나 산 경우가 +2.2%로 1%p 차이이고,
+      플러스로 끝난 비율은 오히려 아무 날이나 산 쪽이 1%p 높습니다. 1년으로 늘리면 플러스 비율은 67%로 완전히 같아집니다.</p>
+
+      <p>더 눈여겨볼 것은 <strong>진폭</strong>입니다. RSI 30 진입 후 3개월 수익률은 최악 −25.2%에서 최고 +36.7%까지 벌어졌고,
+      1년으로 늘리면 최악 −42.3%, 최고 +167.1%였습니다.
+      "과매도니까 반등한다"는 문장이 감추고 있는 것이 이 폭입니다.
+      RSI가 30 아래로 내려갔다는 사실은 <strong>그 뒤가 어느 쪽인지에 대해 알려주는 것이 거의 없었습니다</strong>.</p>
+
+      <p>그렇다면 RSI가 쓸모없다는 뜻일까요? 그렇게 읽기보다는, <strong>RSI는 방향을 예측하는 지표가 아니라 현재 상태를 요약하는 지표</strong>라고
+      보는 편이 데이터에 맞습니다. "최근 상승분에 비해 하락분이 컸다"는 사실을 한 숫자로 압축해 주는 것이지,
+      그 다음에 무슨 일이 일어날지를 담고 있지는 않습니다.
+      이 글 위쪽에서 설명한 다이버전스나 추세 확인 같은 보조적 활용이 강조되는 이유도 여기에 있습니다.</p>
+
+      <p class="muted" style="font-size:13px; color:#718096;">위 계산은 이 사이트가 보유한 코스피 일별 종가로 수행했습니다.
+      RSI는 Wilder 방식(지수 평활, 기간 14)을 따랐고, 수익률은 배당과 거래비용을 제외한 지수 가격 기준입니다.
+      표본이 70회이므로 통계적으로 확정적인 결론을 내리기에는 부족하며, 다른 시장이나 개별 종목에서는 다른 결과가 나올 수 있습니다.
+      같은 계산을 본인이 보는 종목으로 해보시려면 <a href="/rsi-calculator.html">RSI 계산기</a>에서 종목을 조회해 보세요.</p>
+
+      <p>RSI는 시장의 과열과 침체를 요약해 주는 유용한 도구이지만, 위 결과처럼 단독으로 매매 판단의 근거가 되기는 어렵습니다. 다양한 정보를 함께 확인하고, 자신의 투자 원칙에 따라 신중하게 판단하시길 바랍니다.</p>
     `
   },
   {
@@ -458,11 +537,31 @@ const BLOG_POSTS = [
       <p>엔비디아는 AI 시대의 선두 주자로서 여전히 높은 성장 잠재력을 가지고 있습니다. 하지만 과거의 MDD 사례에서 볼 수 있듯이, 투자에는 항상 위험이 따릅니다. 엔비디아에 투자할 때 다음과 같은 점들을 고려해야 합니다.</p>
       <ul>
         <li><strong>높은 변동성 이해</strong>: 고성장 기술주는 시장 상황이나 산업 트렌드 변화에 따라 주가 변동성이 매우 클 수 있습니다. 이러한 변동성을 이해하고 감내할 수 있는 투자자에게 적합합니다.</li>
-        <li><strong>장기적인 관점 유지</strong>: 단기적인 주가 등락에 일희일비하기보다는, AI 산업의 장기적인 성장과 엔비디아의 기술 리더십을 믿고 장기적인 관점에서 접근하는 것이 중요합니다.</li>
+        <li><strong>투자 기간과 감내 범위의 확인</strong>: 이 종목의 과거 하락 구간은 회복까지 수백 일이 걸린 사례가 여럿입니다. 그 기간 동안 자금을 다른 용도로 써야 할 상황이 생기면 회복을 기다릴 수 없게 됩니다. 감내 범위는 종목이 아니라 본인의 자금 성격에서 정해집니다.</li>
         <li><strong>분산 투자</strong>: 엔비디아와 같은 개별 종목에 대한 집중 투자는 높은 수익을 가져다줄 수 있지만, 동시에 높은 위험을 수반합니다. 포트폴리오의 일부로 엔비디아를 편입하고, 다른 자산군이나 산업에 분산 투자하여 위험을 관리하는 것이 현명합니다.</li>
         <li><strong>지속적인 기업 분석</strong>: 엔비디아의 실적 발표, 신제품 출시, 경쟁 환경 변화, AI 산업 트렌드 등을 지속적으로 모니터링하여 기업의 펀더멘털에 변화가 없는지 확인해야 합니다.</li>
       </ul>
-      <p>엔비디아는 AI 혁명의 최전선에 있는 매력적인 투자 대상이지만, 그만큼 높은 변동성을 동반합니다. MDD 분석을 통해 엔비디아의 위험 특성을 정확히 이해하고, 자신만의 투자 원칙을 세워 현명하게 투자하시길 바랍니다.</p>`
+      <h2>이 종목의 오래된 낙폭 기록을 그대로 읽으면 안 되는 이유</h2>
+      <p>엔비디아의 하락 이력을 볼 때 가장 많이 놓치는 것은, <strong>그 기록들이 사실상 서로 다른 회사의 기록</strong>이라는 점입니다.
+      이 회사는 오랫동안 게임용 그래픽카드를 파는 회사였고, 데이터센터가 매출의 중심이 된 것은 비교적 최근입니다.
+      중간에는 암호화폐 채굴 수요가 꺼지면서 그래픽카드 재고가 한꺼번에 남아 크게 빠진 구간도 있습니다.</p>
+
+      <p>그래서 "이 종목은 과거에 −50%를 몇 번 겪고도 회복했다"는 문장은 <strong>그 시절의 사업 구조에서 회복했다</strong>는 뜻이지,
+      지금의 사업 구조에서도 같은 일이 반복된다는 근거가 되지 않습니다.
+      게임용 그래픽카드 재고가 소진되면서 풀린 하락과, 데이터센터 투자 사이클이 꺾여서 오는 하락은 회복의 조건 자체가 다릅니다.</p>
+
+      <p>반대로 <strong>지금은 과거에 없던 성격의 위험</strong>이 하나 생겼습니다. 매출이 소수의 대형 고객에 크게 몰려 있다는 점입니다.
+      게임용 그래픽카드는 수많은 개인 소비자에게 팔렸지만, 데이터센터용 칩은 소수의 대형 기업이 대부분을 사갑니다.
+      그 기업들이 투자 계획을 조정하거나 자체 칩으로 옮겨가면 매출에 미치는 영향이 과거와는 다른 방식으로 나타납니다.
+      과거 낙폭 데이터에는 이 위험이 겪어본 기록으로 들어 있지 않습니다.</p>
+
+      <p>따라서 이 종목의 하락 구간표를 보실 때는 <strong>하락 시점이 어느 사업 구조에서 일어난 일인지</strong>를 함께 확인하시는 편이 정확합니다.
+      실제 시세로 계산한 구간별 하락률과 회복 기간, 그리고 반도체 지수 대비 비교는
+      <a href="/stock/nvda.html">NVDA MDD 실데이터 리포트</a>에서 매주 갱신된 값으로 확인하실 수 있습니다.
+      같은 업종 안에서 성격이 어떻게 다른지 보시려면 <a href="/stock/soxx.html">반도체 지수 ETF(SOXX)</a>나
+      <a href="/stock/mu.html">메모리 반도체(MU)</a> 리포트와 나란히 놓고 보시면 차이가 드러납니다.</p>
+
+      <p>엔비디아는 변동성이 큰 종목이고, 그 변동성의 원인이 시기마다 달랐습니다. MDD 분석은 그 차이를 구분해서 보기 위한 도구이며, 과거 수치가 미래를 보장하지는 않습니다.</p>`
   },
   {
     id: 13,
@@ -635,7 +734,43 @@ const BLOG_POSTS = [
         <li><strong>투자 원칙 준수</strong>: 미리 세운 분할매수 계획을 감정적인 요인에 흔들리지 않고 꾸준히 지키는 것이 중요합니다.</li>
         <li><strong>기업 분석 병행</strong>: 단순히 가격이 하락했다고 무조건 매수하기보다는, 기업의 펀더멘털이 여전히 견고한지 확인하는 과정이 필요합니다.</li>
       </ul>
-      <p>분할매수는 시장의 불확실성 속에서도 투자자가 안정적으로 자산을 증식시킬 수 있도록 돕는 현명한 투자 전략입니다. MDD 분석기와 분할매수 계획 계산기를 활용하여 자신만의 투자 원칙을 세우고, 성공적인 투자 여정을 이어가시길 바랍니다.</p>`
+      <h2>분할매수가 정말 유리한가: 코스피 10년 구간 166개 전수 비교</h2>
+      <p>분할매수를 설명하는 글은 대체로 "평균 단가를 낮춰 준다"에서 멈춥니다.
+      그런데 <strong>목돈이 이미 있는 상태에서</strong> 한 번에 넣는 것과 나눠 넣는 것 중 어느 쪽이 더 나았는지는 실제로 세어 보면 답이 나옵니다.
+      이 사이트의 코스피 데이터로 계산해봤습니다.</p>
+
+      <p>방식은 이렇습니다. 시작일을 한 달씩 옮겨 가며 <strong>10년짜리 구간 166개</strong>를 만들고,
+      각 구간마다 (가) 시작일에 전액을 한 번에 넣는 경우와 (나) 같은 총액을 120개월에 나눠 매달 같은 금액씩 넣는 경우의
+      최종 평가액을 비교했습니다. 두 경우의 투입 원금 총액은 같습니다.</p>
+
+      <div class="highlight-box">
+        <p>📊 결과: <strong>166개 구간 중 분할매수가 일시투자를 앞선 경우는 7번(4%)</strong>이었습니다.
+        수익 배수 차이의 중앙값은 <strong>−0.26배</strong>로, 분할매수 쪽이 대체로 뒤처졌습니다.</p>
+      </div>
+
+      <p>이유는 단순합니다. 시장이 장기적으로 우상향한 구간에서는 <strong>돈이 시장에 들어가 있던 시간</strong>이 길수록 유리한데,
+      분할매수는 정의상 자금의 절반가량이 뒤늦게 들어갑니다.
+      평균 단가를 낮춰 주는 효과보다 늦게 들어간 손해가 더 컸다는 뜻입니다.</p>
+
+      <p>그렇다면 분할매수는 하지 말아야 할까요? 이 계산이 답하지 않는 것이 두 가지 있습니다.</p>
+      <ul>
+        <li><strong>대부분의 사람에게는 "지금 넣을 목돈"이 없습니다.</strong> 월급에서 매달 떼어 투자하는 경우라면
+        애초에 일시투자라는 선택지가 존재하지 않습니다. 그때의 분할매수는 전략이 아니라 현금흐름의 결과입니다.
+        위 비교는 목돈이 이미 있는 경우에만 해당합니다.</li>
+        <li><strong>이 계산은 수익률만 비교했지 감내 가능성은 비교하지 않았습니다.</strong>
+        전액을 넣은 직후 −40% 구간을 만나면 평균적으로는 유리했더라도 계획을 유지하지 못하고 중간에 파는 일이 생깁니다.
+        분할매수의 실제 효용은 수익률이 아니라 <strong>최악의 시점에 전부를 넣을 확률을 없애는 것</strong>에 가깝습니다.
+        이 글 위쪽에서 설명한 심리적 부담 완화가 바로 그 이야기입니다.</li>
+      </ul>
+
+      <p>정리하면, 분할매수는 <strong>기대 수익을 높이는 방법이라기보다 결과의 폭을 좁히는 방법</strong>이라고 보는 편이 데이터에 맞습니다.
+      "평균적으로 더 번다"는 근거로 선택하면 위 숫자와 어긋나고, "최악을 피한다"는 근거로 선택하면 데이터와 맞습니다.</p>
+
+      <p class="muted" style="font-size:13px; color:#718096;">위 계산은 코스피 지수 일별 종가 기준이며, 배당·세금·거래비용을 반영하지 않았습니다.
+      시장과 기간이 달라지면 결과도 달라집니다. 특히 장기간 하락한 시장에서는 반대 결과가 나옵니다.
+      본인의 조건으로 직접 시뮬레이션해 보시려면 <a href="/dca-planner.html">분할매수 계획 계산기</a>를 이용하실 수 있습니다.</p>
+
+      <p>분할매수는 시장의 불확실성 속에서 투자자가 계획을 유지하도록 돕는 도구입니다. MDD 분석기와 분할매수 계획 계산기를 활용해 자신의 조건에 맞는 기준을 세워 보시기 바랍니다.</p>`
   },
   {
     id: 18,
@@ -1053,7 +1188,26 @@ const CTA_MAP = {
 // generate-stock-pages.js와 generate-blog-pages.js가 공유하는 단일 원본.
 const TICKER_RELATED_POSTS = {
   TSLA: [2], SPY: [4, 25], MSFT: [9], NVDA: [12], AAPL: [20],
-  QQQ: [7, 16], VTI: [23],
+  QQQ: [16, 23], VTI: [23],
 };
 
-module.exports = { BLOG_POSTS, RELATED_POSTS, CTA_MAP, TICKER_RELATED_POSTS };
+// 2026-08-10: 내린 글.
+//
+// 25편 중 8편을 내렸다. 본문은 여기 그대로 남겨둔다 — 되살릴 수 있게 하기 위해서다.
+// generate-blog-pages.js 가 이 목록에 있는 id 를 건너뛰므로 /blog/{id}.html 은 만들어지지
+// 않고, 사이트맵·목록·RSS 에서도 빠진다. 이미 색인된 URL 은 vercel.json 이 301 로
+// 대체 글로 보낸다(404 로 두면 색인 오류로 남는다).
+//
+// 내린 이유:
+//   7  SPY vs QQQ        -> 23번(SPY·QQQ·VTI 비교)이 같은 내용을 더 넓게 다룬다
+//   8  투자 심리학        -> 22번(심리적 편향 7가지)과 손실회피·확증편향·앵커링이 중복
+//   10 스톱로스 설정 방법  -> 매도 시점을 지시하는 성격이 강하고, 확장 과정에서 같은
+//                            내용("세 가지 방식")을 한 글 안에서 두 번 설명하고 있었다
+//   11 장기투자와 MDD     -> 24번(10년 장기투자자가 MDD를 대하는 방법)과 중복
+//   13 포트폴리오 분산     -> 자체 데이터 없는 일반론. 24번이 자산배분을 함께 다룬다
+//   14 경기 사이클과 MDD  -> 자체 데이터 없는 일반론. 4번이 위기별 낙폭을 실제로 다룬다
+//   18 환율과 수익률      -> 본문에 "가상의 예시"로 만든 수치가 들어 있었다. fx-calculator.html 로 보낸다
+//   19 수익률 계산법      -> roi-calculator.html 의 설명이 더 정확하고 계산기까지 있다
+const RETIRED_POSTS = new Set([7, 8, 10, 11, 13, 14, 18, 19]);
+
+module.exports = { BLOG_POSTS, RELATED_POSTS, CTA_MAP, TICKER_RELATED_POSTS, RETIRED_POSTS };

@@ -56,22 +56,6 @@
       <description>애플(AAPL)이 지난 25년간 겪은 주요 하락 구간과 회복 기간을 정리하고, 대형 우량주의 MDD를 읽는 방법을 알아봅니다.</description>
     </item>
     <item>
-      <title>주식 수익률 계산법: 매수가와 매도가로 실제 수익률 계산하기</title>
-      <link>https://mddcalc.com/blog/19.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/19.html</guid>
-      <pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate>
-      <category>수익률 계산</category>
-      <description>주식 수익률을 정확하게 계산하는 방법. 수수료, 세금, 환율까지 포함한 실제 수익률을 계산해보세요.</description>
-    </item>
-    <item>
-      <title>미국 주식 투자 시 환율이 수익률에 미치는 영향</title>
-      <link>https://mddcalc.com/blog/18.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/18.html</guid>
-      <pubDate>Wed, 15 Apr 2026 00:00:00 GMT</pubDate>
-      <category>환율 투자</category>
-      <description>원화/달러 환율 변동이 미국 주식 수익률에 어떻게 영향을 미치는지, 환율 리스크를 관리하는 방법을 알아보세요.</description>
-    </item>
-    <item>
       <title>분할매수(DCA) 완전 가이드: 언제, 얼마나, 어떻게 나누어 살 것인가</title>
       <link>https://mddcalc.com/blog/17.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/17.html</guid>
@@ -96,22 +80,6 @@
       <description>MDD 분석기의 모든 기능을 실제 투자에 어떻게 적용할지 단계별로 안내합니다.</description>
     </item>
     <item>
-      <title>경기 사이클과 MDD: 국면별 시장 하락 패턴 읽기</title>
-      <link>https://mddcalc.com/blog/14.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/14.html</guid>
-      <pubDate>Wed, 25 Mar 2026 00:00:00 GMT</pubDate>
-      <category>시장 사이클</category>
-      <description>경기 사이클의 각 단계에서 MDD가 어떻게 변하는지, 하락 및 회복 패턴에 어떻게 활용할지 알아보세요.</description>
-    </item>
-    <item>
-      <title>포트폴리오 분산으로 MDD 줄이는 방법</title>
-      <link>https://mddcalc.com/blog/13.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/13.html</guid>
-      <pubDate>Fri, 20 Mar 2026 00:00:00 GMT</pubDate>
-      <category>분산 투자</category>
-      <description>여러 자산에 분산 투자하면 전체 포트폴리오의 MDD를 얼마나 줄일 수 있는지 알아보세요.</description>
-    </item>
-    <item>
       <title>NVDA 역대 최대 하락률: AI 시대의 엔비디아</title>
       <link>https://mddcalc.com/blog/12.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/12.html</guid>
@@ -120,44 +88,12 @@
       <description>엔비디아의 맹스러운 상승과 하락 역사를 MDD로 분석합니다.</description>
     </item>
     <item>
-      <title>장기 투자에서 MDD가 중요한 이유</title>
-      <link>https://mddcalc.com/blog/11.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/11.html</guid>
-      <pubDate>Tue, 10 Mar 2026 00:00:00 GMT</pubDate>
-      <category>장기 투자</category>
-      <description>장기 투자자일수록 MDD를 이해하는 것이 얼마나 중요한지 설명합니다.</description>
-    </item>
-    <item>
-      <title>주식 투자에서 스톱로스 설정하는 방법</title>
-      <link>https://mddcalc.com/blog/10.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/10.html</guid>
-      <pubDate>Thu, 05 Mar 2026 00:00:00 GMT</pubDate>
-      <category>위험 관리</category>
-      <description>MDD를 활용한 스톱로스 설정으로 손실을 최소화하는 실질적 방법을 안내합니다.</description>
-    </item>
-    <item>
       <title>마이크로소프트(MSFT) 하락·회복 패턴 분석</title>
       <link>https://mddcalc.com/blog/9.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/9.html</guid>
       <pubDate>Sun, 01 Mar 2026 00:00:00 GMT</pubDate>
       <category>상승장 전략</category>
       <description>MSFT의 역사적 MDD와 회복 패턴을 분석하여 과거 데이터를 살펴보세요.</description>
-    </item>
-    <item>
-      <title>주식 투자의 심리학: 하락장에서 매수하지 못하는 이유</title>
-      <link>https://mddcalc.com/blog/8.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/8.html</guid>
-      <pubDate>Fri, 20 Feb 2026 00:00:00 GMT</pubDate>
-      <category>심리 투자</category>
-      <description>주가가 하락할수록 매수하기 더 어려워지는 심리적 이유를 분석합니다.</description>
-    </item>
-    <item>
-      <title>SPY vs QQQ: 어떤 ETF의 MDD가 더 난폭한가?</title>
-      <link>https://mddcalc.com/blog/7.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/7.html</guid>
-      <pubDate>Sun, 15 Feb 2026 00:00:00 GMT</pubDate>
-      <category>ETF 분석</category>
-      <description>S&amp;P 500 ETF(SPY)와 나스닥100 ETF(QQQ)의 MDD를 비교합니다.</description>
     </item>
     <item>
       <title>배당 재투자(DRIP)의 마술: 10년 후 얼마나 달라지나</title>

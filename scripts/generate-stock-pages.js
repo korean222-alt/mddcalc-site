@@ -42,18 +42,36 @@ if (!API_KEY) {
 // **종목명 + mdd** 형태였다. 이미 있는 종목만으로 노출이 잡히고 있다는 뜻이라,
 // 같은 패턴으로 검색될 만한 종목(양자컴퓨팅·원전·개별 2배 레버리지 등 국내에서
 // 많이 찾는 것들)을 늘린다.
+// 2026-08-10: 69개 -> 20개로 줄였다.
+//
+// 왜 줄였나. 69개일 때 이 종목 페이지들이 사이트 전체 URL 109개 중 63%를 차지했다.
+// 페이지 하나하나에는 실제로 계산한 데이터가 들어 있었지만, 문장 틀이 전부 같아서
+// 사이트 전체가 "자동 생성 페이지 위에 손으로 만든 페이지 몇 개를 얹은 것"처럼 보였다.
+// 구글이 2024년에 명문화한 대량 생성 콘텐츠(scaled content) 정책이 겨냥하는 형태다.
+//
+// 그래서 (1) 개수를 줄이고 (2) 남긴 종목에는 ticker-notes.js 의 해설을 하나씩 붙였다.
+// 종목당 사람이 쓴 문단이 있어야 이 페이지가 "그 종목에 대한 문서"가 된다.
+//
+// 남길 종목은 검색 실적(노출이 잡히던 SCHD·QQQ·SOXL 등)과, 해설이 서로 겹치지 않도록
+// 성격이 다른 묶음(지수 / 배당 / 커버드콜 / 레버리지 / 반도체 / 빅테크 / 고변동성)을
+// 기준으로 골랐다. 지운 49개는 vercel.json 에서 301 로 이 목록의 가까운 종목이나
+// 허브로 보낸다 — 404 로 두면 예전에 색인된 URL 이 색인 오류로 남는다.
+//
+// 종목을 다시 늘리려면 여기에 티커를 넣고 ticker-notes.js 에 해설을 함께 써야 한다.
+// 해설 없이 티커만 늘리면 줄이기 전 상태로 돌아간다.
 const TICKERS = [
-  'AAPL', 'TSLA', 'NVDA', 'MSFT', 'GOOGL', 'AMZN', 'META',
-  'SPY', 'QQQ', 'VOO', 'VTI', 'SCHD', 'TQQQ', 'SOXL', 'AMD',
-  // 아래 24개는 예전에 색인됐다가 404가 된 URL 복구분
-  'NFLX', 'SPXL', 'UPRO', 'SQQQ', 'SOXS', 'FNGU', 'TECL', 'JEPI',
-  'JEPQ', 'AVGO', 'SMCI', 'ARM', 'MU', 'TSM', 'INTC', 'PLTR',
-  'COIN', 'MSTR', 'RIVN', 'LCID', 'NIO', 'BABA', 'DIS', 'BA',
-  // 아래 30개가 2026-07 확장분
-  'IONQ', 'RGTI', 'QBTS', 'OKLO', 'SMR', 'VST', 'CEG',
-  'TSLL', 'NVDL', 'CONL', 'QLD', 'SOXX', 'IVV', 'TLT', 'GLD',
-  'HOOD', 'SOFI', 'APP', 'ORCL', 'ASML', 'MRVL', 'CRWD', 'ANET',
-  'RKLB', 'JOBY', 'MARA', 'LLY', 'COST', 'UNH', 'V',
+  // 지수 추종 (VTI 는 blog/23.html 이 본문에서 다루므로 상호 링크를 위해 유지)
+  'SPY', 'QQQ', 'VOO', 'VTI',
+  // 배당 · 커버드콜
+  'SCHD', 'JEPQ',
+  // 레버리지 (변동성 감쇠 설명이 필요한 상품)
+  'TQQQ', 'SOXL',
+  // 반도체
+  'SOXX', 'NVDA', 'AVGO', 'TSM', 'MU',
+  // 빅테크
+  'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META',
+  // 고변동성 개별주
+  'TSLA', 'PLTR', 'COIN',
 ];
 
 // 한국어 검색어를 잡기 위한 종목명. 서학개미는 "테슬라 하락률", "엔비디아 mdd" 처럼
@@ -119,6 +137,10 @@ const REFRESH_CYCLE_DAYS = 7; // 매주 자동 갱신 (.github/workflows/refresh
 const TOP_N_DRAWDOWNS = 5;
 // 회복 통계에서 "하락 구간"으로 셀 최소 낙폭(%). 이 밑은 일상적인 등락으로 보고 제외한다.
 const MEANINGFUL_DRAWDOWN_PCT = 10;
+
+// 종목별 해설. 숫자는 여기에 없고(표가 담당한다) "왜 이런 모양인지"만 들어 있다.
+// 자세한 작성 원칙은 ticker-notes.js 상단 주석 참고.
+const { TICKER_NOTES } = require('./ticker-notes.js');
 
 // 이 리포트가 다루는 종목과 겹치는 블로그 글이 있으면 서로 링크한다.
 // generate-blog-pages.js도 같은 매핑을 반대 방향으로 써서 상호 링크를 만든다.
@@ -389,9 +411,12 @@ function buildRelatedTickersHtml(symbol) {
 }
 
 function buildRelatedBlogHtml(symbol) {
-  const ids = TICKER_RELATED_POSTS[symbol] || [];
+  const { BLOG_POSTS, RETIRED_POSTS } = require('./posts-data.js');
+  // 내려간 글로는 링크하지 않는다. 그 글의 파일은 더 이상 생성되지 않으므로
+  // 그대로 두면 종목 페이지에서 404 로 나가는 링크가 된다.
+  const retired = RETIRED_POSTS || new Set();
+  const ids = (TICKER_RELATED_POSTS[symbol] || []).filter(id => !retired.has(id));
   if (!ids.length) return '';
-  const { BLOG_POSTS } = require('./posts-data.js');
   const links = ids.map(id => {
     const p = BLOG_POSTS.find(x => x.id === id);
     return p ? `<a href="/blog/${id}.html" class="chip">${escapeHtml(p.title)}</a>` : '';
@@ -493,6 +518,21 @@ function buildCategorySectionHtml(symbol, a, spyA) {
       ${gainBlock}
       <p>연환산 변동성은 <strong>${a.volatility.toFixed(1)}%</strong>${spyA ? `로, 같은 기간 ${BENCHMARK}(${spyA.volatility.toFixed(1)}%)와 비교해 보시면 이 종목이 평소 얼마나 크게 흔들리는지 가늠할 수 있습니다` : '입니다'}.</p>
     </div>`;
+}
+
+// 종목 해설 카드. 해설이 없는 종목이면 빈 문자열을 돌려주므로 빈 카드가 생기지 않는다.
+// 위치는 히어로 카드 바로 뒤 — 이 페이지에서 유일하게 이 종목에만 해당하는 내용이라
+// 표보다 먼저 읽히는 자리에 둔다.
+function buildTickerNoteHtml(symbol) {
+  const note = TICKER_NOTES[symbol];
+  if (!note) return '';
+  const label = labelOf(symbol);
+  return `
+  <div class="card note-card">
+    <h2>🔎 ${escapeHtml(label)}의 낙폭은 왜 이런 모양인가</h2>
+    <p>${note.trim()}</p>
+  </div>
+`;
 }
 
 function buildPage(symbol, a, spyA, generatedDate) {
@@ -601,6 +641,8 @@ function buildPage(symbol, a, spyA, generatedDate) {
           border-radius: 20px; font-size: 13px; font-weight: 600; margin: 0 6px 6px 0; text-decoration: none; }
   .freshness { font-size: 12px; color: #718096; background: #f7fafc; border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
   .note { font-size: 12px; color: #a0aec0; margin-top: 16px; line-height: 1.7; }
+  .note-card { background: #fffdf7; border-left: 4px solid #d69e2e; }
+  .note-card p { font-size: 14.5px; line-height: 1.85; color: #3d4852; margin-bottom: 0; }
 </style>
 </head>
 <body>
@@ -632,7 +674,7 @@ function buildPage(symbol, a, spyA, generatedDate) {
     분석 기간(${yearsLabel}년) 동안 가장 크게 하락했던 구간은 <strong>${a.topDrawdowns[0].declinePct.toFixed(1)}%</strong> 하락한 사례로,
     ${a.topDrawdowns[0].peakDate}부터 ${a.topDrawdowns[0].troughDate}까지 낙폭이 커졌${a.topDrawdowns[0].recoveryDate ? `고, 이후 ${a.topDrawdowns[0].recoveryDays.toLocaleString()}일 만에 이전 고점을 회복했습니다.` : `으며, 이 분석 시점까지 아직 이전 고점을 회복하지 못한 상태입니다.`}</p>
   </div>
-
+${buildTickerNoteHtml(symbol)}
   <div class="card">
     <h2>📋 역대 주요 하락 구간 (하락률 상위 ${a.topDrawdowns.length}개)</h2>
     <div style="overflow-x:auto;">

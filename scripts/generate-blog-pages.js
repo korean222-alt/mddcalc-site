@@ -80,7 +80,7 @@ const COUPANG_RESPONSIVE_BANNER = `<!-- COUPANG_PARTNERS_START 쿠팡 파트너�
 
 // 글 데이터의 단일 원본. 예전에는 blog.html 인라인 JS에서 배열을 긁어왔지만,
 // 그 60KB짜리 블록을 모든 페이지에서 걷어내고 scripts/posts-data.js 로 분리했다.
-const { BLOG_POSTS, CTA_MAP, TICKER_RELATED_POSTS } = require('./posts-data.js');
+const { BLOG_POSTS, RELATED_POSTS, CTA_MAP, TICKER_RELATED_POSTS, RETIRED_POSTS } = require('./posts-data.js');
 
 // TICKER_RELATED_POSTS(티커 → 글 id[])를 반대로 뒤집어서 글 id → 티커[] 로.
 // generate-stock-pages.js가 만드는 /stock/{ticker}.html 쪽에서 이 글로 링크하니,
@@ -95,7 +95,33 @@ function extractPosts() {
   if (!Array.isArray(BLOG_POSTS) || !BLOG_POSTS.length) {
     throw new Error('scripts/posts-data.js 에서 BLOG_POSTS 를 읽지 못했습니다.');
   }
-  return BLOG_POSTS;
+  // 내린 글은 페이지를 만들지 않는다. 이유는 posts-data.js 의 RETIRED_POSTS 주석 참고.
+  const retired = RETIRED_POSTS || new Set();
+  const live = BLOG_POSTS.filter(p => !retired.has(p.id));
+  if (!live.length) throw new Error('살아 있는 글이 하나도 없습니다 — RETIRED_POSTS 를 확인하세요.');
+  return live;
+}
+
+// 글 하단 "다른 글도 보기".
+//
+// 예전에는 posts.filter(...).slice(0, 3) 이라 모든 글이 1·2·3번만 가리켰다. RELATED_POSTS
+// 라는 매핑이 있는데도 쓰이지 않고 있었던 것이다. 종목 페이지에서 고쳤던 링크 편중과 같은
+// 문제 — 뒤쪽 글로는 들어오는 링크가 아예 생기지 않는다.
+// 이제 RELATED_POSTS 를 쓰되, 거기 적힌 글이 내려갔으면 건너뛰고 순환식으로 채운다.
+function pickRelated(post, posts) {
+  const liveIds = new Set(posts.map(p => p.id));
+  const byId = new Map(posts.map(p => [p.id, p]));
+  const picked = [];
+  for (const id of (RELATED_POSTS[post.id] || [])) {
+    if (id !== post.id && liveIds.has(id) && !picked.includes(id)) picked.push(id);
+  }
+  // 3개가 안 되면 자기 다음 글부터 순환식으로 채운다.
+  const i = posts.findIndex(p => p.id === post.id);
+  for (let k = 1; picked.length < 3 && k <= posts.length; k++) {
+    const cand = posts[(i + k) % posts.length];
+    if (cand.id !== post.id && !picked.includes(cand.id)) picked.push(cand.id);
+  }
+  return picked.slice(0, 3).map(id => byId.get(id));
 }
 
 // index.html의 PAGE_URLS와 같은 매핑. 글 안 CTA가 'page' 타입일 때 실제 주소로 바꾸는 데 쓴다.
@@ -317,12 +343,21 @@ function main() {
   const posts = extractPosts();
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
+  // 내린 글의 파일이 남아 있으면 지운다. 남겨두면 사이트맵·목록에는 없는데 URL 로는
+  // 열리는 상태가 되어, 크롤러가 어디서도 링크되지 않는 페이지를 계속 들고 있게 된다.
+  const retired = RETIRED_POSTS || new Set();
+  let removed = 0;
+  for (const id of retired) {
+    const p = path.join(OUT_DIR, `${id}.html`);
+    if (fs.existsSync(p)) { fs.unlinkSync(p); removed++; }
+  }
+  if (removed) console.log(`🗑  내린 글 파일 ${removed}개 삭제 (vercel.json 이 301 로 대체 글에 연결)`);
+
   for (const post of posts) {
-    const related = posts.filter(p => p.id !== post.id).slice(0, 3);
-    const html = buildPostPage(post, related);
+    const html = buildPostPage(post, pickRelated(post, posts));
     fs.writeFileSync(path.join(OUT_DIR, `${post.id}.html`), html);
   }
-  console.log(`✅ ${posts.length}개 블로그 글 정적 페이지 생성 완료 (/blog/1.html ~ /blog/${posts.length}.html)`);
+  console.log(`✅ ${posts.length}개 블로그 글 정적 페이지 생성 완료 (내린 글 ${retired.size}개 제외)`);
 
   updateBlogIndex(posts);
   console.log('✅ blog.html 정적 글 목록 갱신 완료');

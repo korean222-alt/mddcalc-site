@@ -383,12 +383,14 @@
       <summary>💡 처음이신가요? MDD 보는 법 (클릭해서 펼치기)</summary>
       <div class="body">
         <b>MDD(Maximum Drawdown)</b>는 <b>"과거 최고가 대비 현재 얼마나 내려왔는가"</b> 입니다.<br>
-        📌 <b>-10% = 고점 대비 10% 할인</b>, <b>-30% = 고점 대비 30% 할인</b><br><br>
-        <b>📊 하락률 구간 참고표</b><br>
-        🙂 <b>0% ~ -10%</b> : 고점 근처 — 관망 또는 소량 분할매수<br>
-        🟡 <b>-15% ~ -20%</b> : 조정장 — 분할 하락 대응 구간<br>
-        🟠 <b>-20% ~ -30%</b> : 약세장 진입 — 주요 조정 구간<br>
-        🔥 <b>-30% 이하</b> : 역대급 하락 구간 (단, 기업가치 확인 필수)<br><br>
+        📌 <b>-10%</b>는 고점보다 10% 낮은 가격, <b>-30%</b>는 고점보다 30% 낮은 가격이라는 뜻입니다.<br><br>
+        <b>📊 하락률 구간이 보통 어떻게 불리는가</b><br>
+        🙂 <b>0% ~ -10%</b> : 고점 근처 — 대부분의 종목이 가장 오래 머무는 구간<br>
+        🟡 <b>-10% ~ -20%</b> : 흔히 조정(correction)이라고 부르는 범위<br>
+        🟠 <b>-20% ~ -30%</b> : 흔히 약세장(bear market)이라고 부르는 범위<br>
+        🔥 <b>-30% 이하</b> : 과거 사례가 드문 깊은 하락 범위<br>
+        <span style="color:#718096;">구간 이름은 시장에서 통용되는 명칭일 뿐이고, 어느 구간이 매수·매도에 적절한지를 뜻하지 않습니다.
+        같은 −20%라도 종목마다 얼마나 자주 일어나는 일인지가 크게 다르므로, 아래 <b>구간별 회복률</b>과 <b>역대 낙폭 Top 5</b>에서 이 종목의 실제 이력을 확인하세요.</span><br><br>
         <b>⚠️ 수치가 네이버/Yahoo와 살짝 다른 이유</b><br>
         1. <b>종가 vs 장중고가</b>: 네이버는 보통 장중고가(High), API도 High 제공 → 이 앱은 <b>기본 High 기준</b><br>
         2. <b>배당/분할 조정</b>: Twelve Data 무료플랜은 분할만 조정 (Yahoo Adj Close와 미세 차이)<br>
@@ -463,22 +465,24 @@
 
     <!-- 참고 가격대 -->
     <div class="card">
-      <h2 class="section">📊 ATH 대비 할인 가격 (참고 가격대)</h2>
+      <h2 class="section">📊 고점 대비 하락률별 환산 가격</h2>
+      <p style="font-size:13px; color:#718096; margin:0 0 12px;">구간 최고가를 기준으로 각 하락률에 해당하는 가격이 얼마인지 계산한 값입니다.
+      "✅ 지나감"은 조회 기간 중 실제로 그 가격 아래로 내려간 적이 있다는 뜻이며, 매수·매도 가격을 제시하는 것이 아닙니다.</p>
       <div class="target-grid">
         <div class="target-box t-15">
-          <div class="pct">🟢 -15% 할인 <span id="r15" class="reached hidden">✅ 도달</span></div>
+          <div class="pct">🟢 -15% 지점 <span id="r15" class="reached hidden">✅ 지나감</span></div>
           <div class="price" id="t15">—</div>
-          <div class="note">가벼운 조정 구간</div>
+          <div class="note">흔히 조정이라 부르는 범위</div>
         </div>
         <div class="target-box t-20">
-          <div class="pct">🟡 -20% 할인 <span id="r20" class="reached hidden">✅ 도달</span></div>
+          <div class="pct">🟡 -20% 지점 <span id="r20" class="reached hidden">✅ 지나감</span></div>
           <div class="price" id="t20">—</div>
-          <div class="note">약세장 진입 구간</div>
+          <div class="note">흔히 약세장이라 부르는 범위</div>
         </div>
         <div class="target-box t-30">
-          <div class="pct">🟠 -30% 할인 <span id="r30" class="reached hidden">✅ 도달</span></div>
+          <div class="pct">🟠 -30% 지점 <span id="r30" class="reached hidden">✅ 지나감</span></div>
           <div class="price" id="t30">—</div>
-          <div class="note">역대급 하락 구간 · 기업가치 확인</div>
+          <div class="note">과거 사례가 드문 깊은 하락</div>
         </div>
       </div>
     </div>
@@ -701,7 +705,7 @@
         <p>고점 대비 하락률(MDD)으로 하락 및 회복 패턴을 찾아주는 무료 주식 분석 도구입니다.</p>
       </div>
       <div class="footer-col">
-        <h4>프리미엄 도구</h4>
+        <h4>무료 계산기</h4>
         <a href="/" onclick="navigate('home'); return false;">📊 MDD 계산기</a>
         <a href="/rsi-calculator.html" onclick="navigate('rsi'); return false;">📈 RSI 계산기</a>
         <a href="/dividend-calculator.html" onclick="navigate('dividend'); return false;">💰 배당 수익률 계산기</a>
@@ -1389,12 +1393,21 @@ function render() {
                : '심한 하락';
   document.getElementById('ddInterpret').textContent = interp;
 
+  // 이 카드는 "무엇을 하라"가 아니라 "지금 낙폭이 이 종목 역사에서 어디쯤인가"만 말한다.
+  // 조회된 시세에서 직접 세는 값이라 종목마다 다른 답이 나온다.
+  let deeperDays = 0;
+  for (let i = 0; i < A.n; i++) if (A.dd[i] < A.currentDD) deeperDays++;
+  const deeperPct = A.n ? (deeperDays / A.n) * 100 : 0;
+  const deepTxt = deeperDays === 0
+    ? '조회 기간 중 지금보다 더 깊이 내려간 날은 없었습니다. 현재가 이 기간의 최저점입니다.'
+    : `조회 기간 ${A.n.toLocaleString()}거래일 중 지금보다 더 깊이 내려가 있던 날은 ${deeperDays.toLocaleString()}일(${deeperPct.toFixed(1)}%)이었습니다.`;
+
   let sig;
-  if (A.currentDD <= -30) sig = { cls:'signal-strong', e:'🔥', t:'역대급 하락 구간', d:'과거 데이터상 매우 깊은 하락 수준에 도달했습니다. 기업의 본질적 가치와 시장 상황을 함께 검토할 시점입니다.' };
-  else if (A.currentDD <= -20) sig = { cls:'signal-mid', e:'🟠', t:'주요 조정 구간', d:'주가가 고점 대비 유의미하게 하락한 구간입니다. 과거 사례에서는 이 시점부터 자금을 나누어 대응하는 방식이 활용되기도 했습니다.' };
-  else if (A.currentDD <= -10) sig = { cls:'signal-mid', e:'🟡', t:'통상적 조정 구간', d:'시장의 통상적인 조정 범위 내에 있습니다. 과거 데이터를 통해 현재 하락의 깊이를 확인해보시기 바랍니다.' };
-  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'단기 변동 구간', d:'단기적인 가격 변동이 진행 중인 구간입니다. 추세 변화 여부를 모니터링하며 대응할 수 있습니다.' };
-  else sig = { cls:'signal-none', e:'⏸️', t:'신고가 근처 구간', d:'현재 주가가 역사적 신고가 부근에 위치해 있습니다. 과거 데이터상으로는 이 구간에서 변동성이 커지는 경향이 있었습니다.' };
+  if (A.currentDD <= -30) sig = { cls:'signal-strong', e:'🔥', t:'깊은 하락 구간', d:`고점 대비 -30%보다 깊은 위치입니다. ${deepTxt}` };
+  else if (A.currentDD <= -20) sig = { cls:'signal-mid', e:'🟠', t:'약세장이라 부르는 범위', d:`고점 대비 -20% ~ -30% 구간입니다. ${deepTxt}` };
+  else if (A.currentDD <= -10) sig = { cls:'signal-mid', e:'🟡', t:'조정이라 부르는 범위', d:`고점 대비 -10% ~ -20% 구간입니다. ${deepTxt}` };
+  else if (A.currentDD <= -3) sig = { cls:'signal-mild', e:'🙂', t:'고점 부근', d:`고점 대비 -10% 이내입니다. ${deepTxt}` };
+  else sig = { cls:'signal-none', e:'⏸️', t:'신고가 부근', d:`고점 대비 -3% 이내로, 사실상 신고가 부근입니다. ${deepTxt}` };
 
   const sc = document.getElementById('signalCard');
   sc.className = 'signal-card ' + sig.cls;
