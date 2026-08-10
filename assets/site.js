@@ -3,9 +3,10 @@
 // 다시 내려받게 되고 이용약관·개인정보처리방침처럼 계산기가 없는 페이지까지 계산 엔진을
 // 싣고 있었기 때문에 외부 파일 하나로 분리했습니다. 브라우저가 한 번만 받아 캐시합니다.
 //
-// 페이지는 이 파일을 불러오기 전에 window.CURRENT_PAGE 를 설정합니다.
-//   <script>window.CURRENT_PAGE = 'terms';</script>
-//   <script src="/assets/site.js"></script>
+// 페이지는 이 파일을 불러오기 전에 window.CURRENT_PAGE 를 설정합니다. 페이지 끝의 두 줄이
+// 각각 (1) window.CURRENT_PAGE 를 대입하는 인라인 script, (2) 이 파일을 부르는 script 입니다.
+// (주석 안에서도 script 종료 태그를 글자 그대로 쓰지 않습니다. 이 파일을 HTML 에 인라인할 때
+//  그 문자열이 script 블록을 조기 종료시켜 나머지가 통째로 실행되지 않게 됩니다.)
 // index.html 은 이 파일을 쓰지 않습니다 — 통화 표기·공유 이미지 등 홈 전용 기능이 더해진
 // 별도 버전을 인라인으로 갖고 있습니다.
 const CURRENT_PAGE = (typeof window !== 'undefined' && window.CURRENT_PAGE) || '';

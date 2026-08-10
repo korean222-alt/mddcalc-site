@@ -16,7 +16,7 @@ const BLOG_POSTS = [
     title: 'MDD란 무엇인가? 고점 대비 하락률 완전 가이드',
     excerpt: 'Maximum Drawdown의 정의와 투자에서 왜 중요한지, 실제 사례로 쉽게 설명합니다.',
     date: '2026-01-15',
-    readTime: '4분',
+    readTime: '6분',
     content: `
       <h1>MDD란 무엇인가? 고점 대비 하락률 완전 가이드</h1>
       <div class="article-meta">📅 2026년 1월 15일 &nbsp;&bull;&nbsp; ⏱ 4분 읽기</div>
@@ -210,7 +210,7 @@ const BLOG_POSTS = [
     title: 'RSI 지표 완전 가이드: 과매수/과매도 판단법',
     excerpt: 'RSI 14일 기준으로 매수/매도 시점을 판단하는 방법을 실제 사례로 설명합니다.',
     date: '2026-02-05',
-    readTime: '4분',
+    readTime: '6분',
     content: `
       <h1>RSI 지표 완전 가이드: 과매수/과매도 판단법과 활용 전략</h1>
       <div class="article-meta">📅 2026년 2월 5일 &nbsp;&bull;&nbsp; ⏱ 4분 읽기</div>
@@ -520,7 +520,7 @@ const BLOG_POSTS = [
     title: 'NVDA 역대 최대 하락률: AI 시대의 엔비디아',
     excerpt: '엔비디아의 맹스러운 상승과 하락 역사를 MDD로 분석합니다.',
     date: '2026-03-15',
-    readTime: '4분',
+    readTime: '6분',
     content: `
       <h1>NVDA 역대 최대 하락률: AI 시대의 엔비디아, 고위험 고수익의 양면성</h1>
       <div class="article-meta">📅 2026년 3월 15일 &nbsp;&bull;&nbsp; ⏱ 4분 읽기</div>
@@ -702,7 +702,7 @@ const BLOG_POSTS = [
     title: '분할매수(DCA) 완전 가이드: 언제, 얼마나, 어떻게 나누어 살 것인가',
     excerpt: '분할매수의 3가지 전략(균등/계단식/후반집중)을 MDD와 함께 활용하는 방법을 알아보세요.',
     date: '2026-04-10',
-    readTime: '4분',
+    readTime: '7분',
     content: `
       <h1>분할매수(DCA) 완전 가이드: 언제, 얼마나, 어떻게 나누어 살 것인가</h1>
       <div class="article-meta">📅 2026년 4월 10일 &nbsp;&bull;&nbsp; ⏱ 4분 읽기</div>
