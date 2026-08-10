@@ -150,9 +150,17 @@ function buildCtaHtml(postId) {
     </div>`;
 }
 
+// 글 안의 "⏱ N분 읽기" 는 본문 HTML 에 글자 그대로 박혀 있고, 목록 카드가 쓰는 readTime 은
+// 별도 필드다. 두 곳을 따로 관리하면 반드시 어긋난다 — 실제로 글을 늘렸을 때 목록은 6분,
+// 글은 4분으로 갈라졌다. 페이지를 만들 때 본문 쪽을 readTime 필드로 덮어써서 하나로 맞춘다.
+function syncReadTime(html, readTime) {
+  return html.replace(/⏱\s*\d+\s*분\s*읽기/g, `⏱ ${readTime} 읽기`);
+}
+
 function buildPostPage(post, related) {
   const canonical = `https://mddcalc.com/blog/${post.id}.html`;
   const description = post.excerpt;
+  const content = syncReadTime(post.content, post.readTime);
   const relatedHtml = related.map(p =>
     `<a href="/blog/${p.id}.html" class="related-chip">${escapeHtml(p.title)}</a>`
   ).join('');
@@ -244,7 +252,7 @@ function buildPostPage(post, related) {
 <div class="container">
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/blog.html">블로그</a></nav>
   <div class="card">
-    <article>${post.content}</article>
+    <article>${content}</article>
     ${buildCtaHtml(post.id)}
     <div class="author-box">
       <div class="author-avatar">📊</div>
