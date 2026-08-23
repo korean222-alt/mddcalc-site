@@ -1,7 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
-  "//": "시세 데이터는 매 거래일 갱신됩니다. 캐시가 오래 붙어 있으면 갱신 뒤에도 어제 숫자가 보입니다. max-age=0, must-revalidate 는 매번 서버에 확인하되 안 바뀌었으면 304 로 끝내므로 트래픽은 늘지 않습니다.",
   "headers": [
     {
       "source": "/data/(.*)",
