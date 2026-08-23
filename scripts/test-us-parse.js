@@ -105,6 +105,38 @@ const TD_REJECT = [
     }
   }
 
+  // outputsize 상한. 이걸 넘기면 Twelve Data 가 HTTP 400 을 주고 미국 데이터가 통째로 빕니다.
+  // 실제로 6000 을 넘겨 22심볼이 전부 400 이었습니다. 숫자가 다시 올라가지 못하게 막습니다.
+  {
+    let seen = null;
+    global.fetch = async (url) => { seen = String(url); return { ok: true, status: 200, json: async () => JSON.parse(TD_OK) }; };
+    try {
+      await fromTwelveData('SPY');
+      const size = Number(new URL(seen).searchParams.get('outputsize'));
+      assert.ok(size <= 5000, `outputsize ${size} 는 무료 플랜 상한 5000 을 넘습니다`);
+      console.log('✅ [TD] outputsize 가 무료 플랜 상한을 넘지 않는다');
+    } catch (err) {
+      console.error(`❌ [TD] outputsize 상한\n   ${err.message}`);
+      failed++;
+    }
+  }
+
+  // 400 의 원인은 본문에만 있습니다. 상태코드만 남기면 로그를 봐도 왜 실패했는지 모릅니다.
+  {
+    global.fetch = async () => ({ ok: false, status: 400,
+      json: async () => ({ code: 400, message: 'outputsize is greater than the maximum allowed', status: 'error' }) });
+    try {
+      await fromTwelveData('SPY');
+      console.error('❌ [TD] HTTP 400 인데 성공으로 처리됨');
+      failed++;
+    } catch (err) {
+      try {
+        assert.ok(err.message.includes('outputsize'), `실패 메시지에 본문이 없습니다: ${err.message}`);
+        console.log('✅ [TD] HTTP 400 이면 응답 본문의 이유까지 남긴다');
+      } catch (e) { console.error(`❌ [TD] ${e.message}`); failed++; }
+    }
+  }
+
   for (const { label, body } of TD_REJECT) {
     global.fetch = async () => ({ ok: true, status: 200, json: async () => JSON.parse(body) });
     try {
@@ -146,6 +178,6 @@ const TD_REJECT = [
     }
   }
 
-  console.log(failed ? `\n${failed}개 실패` : `\n${CASES.length + REJECT.length + TD_CASES.length + TD_REJECT.length}개 모두 통과`);
+  console.log(failed ? `\n${failed}개 실패` : `\n${CASES.length + REJECT.length + TD_CASES.length + TD_REJECT.length + 2}개 모두 통과`);
   process.exit(failed ? 1 : 0);
 })();

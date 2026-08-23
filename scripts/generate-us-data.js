@@ -33,9 +33,18 @@ const TAIL_ROWS = 520;  // 거래량은 최근분만. (generate-kr-data.js 와 �
 
 const API_KEY = process.env.TWELVE_DATA_API_KEY || '';
 
+// Twelve Data 무료 플랜의 outputsize 상한입니다. MAX_ROWS(6000)를 그대로 넘겼다가
+// 22심볼이 전부 HTTP 400 을 받았습니다. api/twelve-data/time-series.js 도 5000 을 씁니다.
+const TD_MAX_OUTPUTSIZE = 5000;
+
 // Twelve Data 무료 플랜은 분당 8회입니다. 22심볼이면 8.5초 간격으로 약 3분 걸립니다.
 // 키가 없어 무료 소스로 떨어질 때는 KR 쪽과 같은 700ms 를 씁니다.
 const DELAY_MS = API_KEY ? 8500 : 700;
+
+const UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
+  '(KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+const REQUEST_TIMEOUT_MS = 20000; // Node 의 fetch 에는 기본 타임아웃이 없습니다.
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const round2 = v => Math.round(v * 100) / 100;
@@ -50,14 +59,29 @@ async function fromTwelveData(symbol) {
   const url = new URL('https://api.twelvedata.com/time_series');
   url.searchParams.set('symbol', symbol);
   url.searchParams.set('interval', '1day');
-  url.searchParams.set('outputsize', String(MAX_ROWS));
+  url.searchParams.set('outputsize', String(Math.min(MAX_ROWS, TD_MAX_OUTPUTSIZE)));
   url.searchParams.set('apikey', API_KEY);
 
-  const json = await (await httpGet(url.toString())).json();
+  // httpGet 을 쓰지 않고 직접 fetch 합니다. httpGet 은 !res.ok 면 "HTTP 400" 만 던지고
+  // 본문을 버리는데, Twelve Data 는 무엇이 잘못됐는지를 그 본문에 담아 보냅니다.
+  // 실제로 outputsize 상한을 넘겨 400 을 받았을 때 로그에 이유가 하나도 남지 않았습니다.
+  const res = await fetch(url.toString(), {
+    headers: { 'User-Agent': UA, Accept: 'application/json' },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
 
-  // 한도 초과·잘못된 심볼도 HTTP 200 에 status:"error" 로 옵니다. 이걸 안 보면
-  // 빈 결과를 정상으로 착각해 멀쩡한 기존 파일을 덮어씁니다.
-  if (json.status === 'error') throw new Error(`${json.code || ''} ${json.message || '알 수 없는 오류'}`.trim());
+  let json;
+  try {
+    json = await res.json();
+  } catch {
+    throw new Error(`HTTP ${res.status} — JSON 아님`);
+  }
+
+  // 잘못된 요청은 HTTP 400 으로도, HTTP 200 + status:"error" 로도 옵니다. 둘 다 봐야
+  // 합니다. 후자를 놓치면 빈 결과를 정상으로 착각해 멀쩡한 기존 파일을 덮어씁니다.
+  if (!res.ok || json.status === 'error') {
+    throw new Error(`HTTP ${res.status} ${json.code || ''} ${json.message || ''}`.trim());
+  }
   if (!Array.isArray(json.values) || json.values.length === 0) throw new Error('values 비어 있음');
 
   const d = [], h = [], c = [], v = [];
