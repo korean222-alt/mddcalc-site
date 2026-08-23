@@ -1036,7 +1036,7 @@ const PAGE_URLS = {
   blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
   disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
   compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
-  sector: '/sector-rs.html'
+  sector: '/sector-rs.html', heatmap: '/heatmap.html'
 };
 
 function navigate(page) {
@@ -1893,4 +1893,255 @@ function drawSectorChart(s, m) {
 
 if (CURRENT_PAGE === 'sector') {
   document.addEventListener('DOMContentLoaded', initSectorPage);
+}
+
+// ========== 섹터 히트맵 ==========
+// heatmap.html 전용입니다. 섹터 RS 화면과 같은 data/sectors.json 을 읽습니다.
+//
+// 칸 크기 = 거래대금 비중, 색 = 등락률. 캔버스가 아니라 절대배치 div 로 그립니다.
+// 그래야 글자가 그대로 검색·선택되고, 화면 크기가 바뀌어도 다시 그리기만 하면 됩니다.
+
+const HM = { data: null, market: null, period: '1m', size: 'turn', tiles: [] };
+
+// 색을 어디서 최대로 진하게 만들지는 기간마다 달라야 합니다. 12개월 수익률에 ±5% 기준을
+// 쓰면 거의 모든 칸이 새빨갛거나 새파래져서 아무것도 구분되지 않습니다.
+const HM_CLAMP = { '1w': 5, '1m': 10, '3m': 20, '6m': 30, '12m': 50 };
+
+// 하락 ← 보합 → 상승. 사이트 팔레트의 빨강·초록을 양 끝으로 씁니다.
+const HM_STOPS = [
+  [-1, [155, 44, 44]],   // 진한 빨강
+  [-0.5, [229, 62, 62]],
+  [0, [203, 213, 224]],  // 보합
+  [0.5, [56, 161, 105]],
+  [1, [34, 84, 61]],     // 진한 초록
+];
+
+function hmColor(v, clamp) {
+  if (v == null) return { bg: '#edf2f7', fg: '#a0aec0' };
+  const t = Math.max(-1, Math.min(1, v / clamp));
+  let lo = HM_STOPS[0], hi = HM_STOPS[HM_STOPS.length - 1];
+  for (let i = 0; i < HM_STOPS.length - 1; i++) {
+    if (t >= HM_STOPS[i][0] && t <= HM_STOPS[i + 1][0]) { lo = HM_STOPS[i]; hi = HM_STOPS[i + 1]; break; }
+  }
+  const span = hi[0] - lo[0];
+  const k = span === 0 ? 0 : (t - lo[0]) / span;
+  const rgb = [0, 1, 2].map(i => Math.round(lo[1][i] + (hi[1][i] - lo[1][i]) * k));
+  // 배경이 어두우면 흰 글자, 밝으면 검은 글자. 대비를 눈대중하지 않고 휘도로 정합니다.
+  const lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+  return { bg: `rgb(${rgb.join(',')})`, fg: lum > 0.6 ? '#1a202c' : '#ffffff' };
+}
+
+// 트리맵 배치. 값이 큰 순으로 정렬된 항목을 절반씩 갈라 긴 변 쪽으로 나눕니다.
+// 정식 squarified 보다 짧고, 이 정도 개수(섹터 19개 / 종목 100개)에서는 결과가 거의 같습니다.
+function hmLayout(items, x, y, w, h, out) {
+  if (items.length === 0 || w <= 0 || h <= 0) return;
+  if (items.length === 1) { out.push({ item: items[0], x, y, w, h }); return; }
+
+  const total = items.reduce((a, i) => a + i.value, 0);
+  if (total <= 0) { // 값이 전부 0이면 균등 분할로 떨어뜨립니다
+    const half = Math.ceil(items.length / 2);
+    if (w >= h) {
+      hmLayout(items.slice(0, half), x, y, w / 2, h, out);
+      hmLayout(items.slice(half), x + w / 2, y, w / 2, h, out);
+    } else {
+      hmLayout(items.slice(0, half), x, y, w, h / 2, out);
+      hmLayout(items.slice(half), x, y + h / 2, w, h / 2, out);
+    }
+    return;
+  }
+
+  // 앞쪽 묶음이 절반을 넘을 때까지 담습니다. 최소 하나는 담고, 뒤쪽도 최소 하나는 남깁니다.
+  let acc = 0, i = 0;
+  do { acc += items[i].value; i++; } while (i < items.length - 1 && acc < total / 2);
+
+  const frac = acc / total;
+  if (w >= h) {
+    hmLayout(items.slice(0, i), x, y, w * frac, h, out);
+    hmLayout(items.slice(i), x + w * frac, y, w * (1 - frac), h, out);
+  } else {
+    hmLayout(items.slice(0, i), x, y, w, h * frac, out);
+    hmLayout(items.slice(i), x, y + h * frac, w, h * (1 - frac), out);
+  }
+}
+
+function hmMarketData() { return HM.data.markets[HM.market]; }
+function hmPeriodLabel() { return (RS_PERIODS.find(p => p.key === HM.period) || {}).label || HM.period; }
+
+async function initHeatmapPage() {
+  const loading = document.getElementById('hmLoading');
+  const errBox = document.getElementById('hmError');
+  try {
+    const res = await fetch('/data/sectors.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    HM.data = await res.json();
+  } catch (e) {
+    loading.classList.remove('show');
+    errBox.style.display = 'block';
+    errBox.className = 'status error show';
+    errBox.textContent = '히트맵 데이터를 불러오지 못했습니다. 잠시 뒤 새로고침해 주세요.';
+    return;
+  }
+
+  const keys = Object.keys(HM.data.markets || {});
+  if (keys.length === 0) {
+    loading.classList.remove('show');
+    errBox.style.display = 'block';
+    errBox.className = 'status error show';
+    errBox.textContent = '표시할 시장이 없습니다.';
+    return;
+  }
+  HM.market = keys.includes('KR') ? 'KR' : keys[0];
+
+  loading.classList.remove('show');
+  document.getElementById('hmBody').classList.remove('hidden');
+  renderHeatmapControls();
+  renderHeatmap();
+
+  // 폭이 바뀌면 칸 비율이 달라지므로 다시 그립니다. 연속 호출은 한 번으로 묶습니다.
+  let timer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(timer);
+    timer = setTimeout(renderHeatmap, 150);
+  });
+}
+
+function renderHeatmapControls() {
+  const flags = { KR: '🇰🇷', US: '🇺🇸' };
+  document.getElementById('hmMarketToggle').innerHTML = Object.keys(HM.data.markets)
+    .map(k => `<button type="button" class="${k === HM.market ? 'active' : ''}" onclick="setHeatmapMarket('${k}')">${flags[k] || ''} ${rsEsc(HM.data.markets[k].label)}</button>`)
+    .join('');
+  document.getElementById('hmPeriodBtns').innerHTML = RS_PERIODS
+    .map(p => `<button type="button" class="preset-btn ${p.key === HM.period ? 'active' : ''}" onclick="setHeatmapPeriod('${p.key}')">${p.label}</button>`)
+    .join('');
+  document.querySelectorAll('#hmSizeToggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.size === HM.size);
+  });
+}
+
+function setHeatmapMarket(k) { if (HM.market === k) return; HM.market = k; renderHeatmapControls(); renderHeatmap(); }
+function setHeatmapPeriod(k) { HM.period = k; renderHeatmapControls(); renderHeatmap(); }
+function setHeatmapSize(k) { HM.size = k; renderHeatmapControls(); renderHeatmap(); }
+
+function hmShowTip(text) { document.getElementById('hmTip').innerHTML = text; }
+
+function renderHeatmap() {
+  const m = hmMarketData();
+  const P = HM.period;
+  const clamp = HM_CLAMP[P] || 10;
+  const canvas = document.getElementById('hmCanvas');
+  if (!canvas) return;
+
+  document.getElementById('hmMeta').innerHTML =
+    `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · ` +
+    `${hmPeriodLabel()} 등락률 · 수록 ${m.universeCount}종목 / ${m.sectors.length}섹터` +
+    ` · 색 최대 ±${clamp}%`;
+
+  // 섹터 → 그 안의 종목. 값이 없는 종목은 그리지 않습니다(상장폐지·데이터 없음).
+  const sectors = m.sectors.map(s => {
+    const members = s.members
+      .filter(mem => mem.ret[P] != null)
+      .map(mem => ({
+        name: mem.name, code: mem.code, ret: mem.ret[P],
+        turn: mem.turn ? mem.turn[P] : null,
+        sector: s.name,
+        value: HM.size === 'equal' ? 1 : Math.max(mem.turn && mem.turn[P] ? mem.turn[P] : 0, 0.0001),
+      }))
+      .sort((a, b) => b.value - a.value);
+    return { name: s.name, members, value: members.reduce((a, x) => a + x.value, 0) };
+  }).filter(s => s.members.length > 0).sort((a, b) => b.value - a.value);
+
+  if (sectors.length === 0) { canvas.innerHTML = ''; return; }
+
+  const W = canvas.clientWidth;
+  const H = canvas.clientHeight;
+  const HEADER = 17; // 섹터 이름 띠
+
+  const boxes = [];
+  hmLayout(sectors, 0, 0, W, H, boxes);
+
+  const html = [];
+  HM.tiles = [];
+
+  for (const box of boxes) {
+    const s = box.item;
+    html.push(
+      `<div style="position:absolute; left:${box.x}px; top:${box.y}px; width:${box.w}px; height:${box.h}px; ` +
+      `border:1px solid #fff; box-sizing:border-box; overflow:hidden;">` +
+      (box.h > HEADER + 8
+        ? `<div style="height:${HEADER}px; line-height:${HEADER}px; background:#2d3748; color:#fff; ` +
+          `font-size:10px; font-weight:700; padding:0 5px; white-space:nowrap; overflow:hidden;">${rsEsc(s.name)}</div>`
+        : '') +
+      `</div>`
+    );
+
+    const innerY = box.h > HEADER + 8 ? HEADER : 0;
+    const innerH = box.h - innerY;
+    const cells = [];
+    hmLayout(s.members, box.x, box.y + innerY, box.w, innerH, cells);
+
+    for (const cell of cells) {
+      const it = cell.item;
+      const { bg, fg } = hmColor(it.ret, clamp);
+      const sign = it.ret > 0 ? '+' : '';
+      const label = cell.w > 46 && cell.h > 26;
+      const small = cell.w > 30 && cell.h > 14 && !label;
+      const idx = HM.tiles.length;
+      HM.tiles.push(it);
+
+      html.push(
+        `<div data-tile="${idx}" title="${rsEsc(it.sector)} · ${rsEsc(it.name)}  ${sign}${it.ret.toFixed(1)}%" ` +
+        `style="position:absolute; left:${cell.x}px; top:${cell.y}px; width:${cell.w}px; height:${cell.h}px; ` +
+        `background:${bg}; color:${fg}; border:1px solid rgba(255,255,255,0.85); box-sizing:border-box; ` +
+        `display:flex; flex-direction:column; align-items:center; justify-content:center; ` +
+        `overflow:hidden; cursor:default; font-size:11px; line-height:1.25; padding:1px;">` +
+        (label
+          ? `<span style="font-weight:700; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${rsEsc(it.name)}</span>` +
+            `<span style="font-size:10px; opacity:0.95;">${sign}${it.ret.toFixed(1)}%</span>`
+          : small
+            ? `<span style="font-size:9px; opacity:0.95;">${sign}${it.ret.toFixed(0)}%</span>`
+            : '') +
+        `</div>`
+      );
+    }
+  }
+
+  canvas.innerHTML = html.join('');
+
+  // 기간·시장을 바꾸면 설명줄을 비웁니다. 그대로 두면 지도는 12개월인데 설명줄만
+  // "1개월 -9.8%" 로 남아, 화면 안에서 두 기간이 섞여 보입니다.
+  hmShowTip('칸에 마우스를 올리거나 터치하면 자세한 값이 여기에 나옵니다.');
+
+  // 마우스와 터치 양쪽에서 같은 설명을 띄웁니다. 칸이 작아 글자를 못 넣은 경우가 많아
+  // 이 줄이 사실상 유일한 확인 수단입니다.
+  const onPick = e => {
+    const el = e.target.closest('[data-tile]');
+    if (!el) return;
+    const it = HM.tiles[Number(el.dataset.tile)];
+    if (!it) return;
+    const sign = it.ret > 0 ? '+' : '';
+    const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
+    hmShowTip(
+      `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
+      `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
+      (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '')
+    );
+  };
+  canvas.addEventListener('mousemove', onPick);
+  canvas.addEventListener('click', onPick);
+
+  // 범례
+  const steps = [-clamp, -clamp / 2, 0, clamp / 2, clamp];
+  document.getElementById('hmLegend').innerHTML =
+    '<span>하락</span>' +
+    steps.map(v => {
+      const { bg, fg } = hmColor(v, clamp);
+      return `<span style="background:${bg}; color:${fg}; padding:3px 8px; border-radius:4px; font-weight:600;">` +
+        `${v > 0 ? '+' : ''}${v}%</span>`;
+    }).join('') +
+    '<span>상승</span>' +
+    `<span style="margin-left:8px;">· 칸 크기 = ${HM.size === 'equal' ? '균등' : '거래대금 비중'}</span>`;
+}
+
+if (CURRENT_PAGE === 'heatmap') {
+  document.addEventListener('DOMContentLoaded', initHeatmapPage);
 }

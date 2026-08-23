@@ -185,6 +185,7 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
 
   // 기간별 지표. rating 은 섹터들끼리의 순위이므로 시장 단위로 한 번에 계산합니다.
   const perPeriod = {};
+  const memberTurn = {};
   for (const P of PERIODS) {
     const rets = sectors.map(s => periodReturn(s.idx, P.days));
     const retsPrev = sectors.map(s => periodReturn(s.idx, P.days, last - RANK_LAG));
@@ -195,6 +196,15 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
     // 거래대금 비중: 최근 P일 vs 그 직전 P일. 기간을 바꾸면 비교 창도 함께 움직입니다.
     const curTotal = universeList.reduce((a, s) => a + turnoverSum(s, axis, last + 1 - P.days, last + 1), 0);
     const prevTotal = universeList.reduce((a, s) => a + turnoverSum(s, axis, last + 1 - P.days * 2, last + 1 - P.days), 0);
+
+    // 히트맵은 타일 크기를 거래대금으로 정합니다. 섹터 합계만으로는 그릴 수 없어
+    // 종목별 비중도 같이 담아 둡니다. (섹터별 합계는 아래에서 그대로 재사용)
+    memberTurn[P.key] = sectors.map(s =>
+      s.members.map(m => {
+        const own = turnoverSum(m, axis, last + 1 - P.days, last + 1);
+        return curTotal > 0 ? round2((own / curTotal) * 100) : null;
+      })
+    );
 
     perPeriod[P.key] = sectors.map((s, i) => {
       const cur = s.members.reduce((a, m) => a + turnoverSum(m, axis, last + 1 - P.days, last + 1), 0);
@@ -249,12 +259,14 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
         const a = s.aligned[mi];
         const end = a.length - 1;
         const ret = {};
+        const turn = {};
         for (const P of PERIODS) {
           const from = a[end - P.days];
           const to = a[end];
           ret[P.key] = (from == null || to == null || from <= 0) ? null : round2((to / from - 1) * 100);
+          turn[P.key] = memberTurn[P.key][i][mi];
         }
-        return { code: m.code, name: nameOf(m), ret };
+        return { code: m.code, name: nameOf(m), ret, turn };
       }),
     };
   });

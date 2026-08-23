@@ -66,6 +66,20 @@ check('navigate() 가 부르는 페이지가 모두 표에 있다', () => {
   assert.deepStrictEqual([...new Set(missing)], [], '표에 없는 페이지를 부릅니다');
 });
 
+// 페이지를 기존 페이지에서 복제해 만들 때, 이미 들어 있는 링크를 한 번 더 넣기 쉽습니다.
+// 실제로 히트맵 페이지에 "섹터 RS" 링크가 두 개 들어가 네비게이션에 같은 항목이 두 번
+// 보였습니다. id 가 중복되면 document.getElementById 도 앞의 것만 집습니다.
+check('네비게이션 id 가 페이지마다 한 번씩만 나온다', () => {
+  const dups = [];
+  for (const file of fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))) {
+    const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    const counts = {};
+    for (const m of src.matchAll(/id="(nav-[\w-]+)"/g)) counts[m[1]] = (counts[m[1]] || 0) + 1;
+    for (const [id, n] of Object.entries(counts)) if (n > 1) dups.push(`${file}: ${id} × ${n}`);
+  }
+  assert.deepStrictEqual(dups, [], '중복된 네비게이션 id');
+});
+
 check('표의 주소에 해당하는 파일이 실제로 있다', () => {
   const missing = [];
   for (const [key, url] of Object.entries(shared)) {
