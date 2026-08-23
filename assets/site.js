@@ -1599,8 +1599,8 @@ const RS_COLS = [
   { key: 'ret', label: '수익률' },
   { key: 'alpha', label: '벤치마크 대비' },
   { key: 'rankChg', label: '순위 변화', hint: '1개월 전 대비' },
-  { key: 'turnShare', label: '거래대금 비중' },
-  { key: 'foreignChg', label: '외국인 소진율', krOnly: true },
+  { key: 'turnShare', label: '거래대금 비중', needs: 'hasTurnover' },
+  { key: 'foreignChg', label: '외국인 소진율', needs: 'hasForeign' },
 ];
 
 const rsEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1728,15 +1728,26 @@ function renderSectorSummary() {
     tile('가장 약한 섹터', rsEsc(weakest.name),
       rsNum(weakest.periods[RS.period].alpha, 1, '%p'), '벤치마크 대비'),
   ];
-  html.push(inflow
-    ? tile('수급이 몰린 섹터', rsEsc(inflow.name), rsNum(inflow.periods[RS.period].turnShareChg, 2, '%p'), '거래대금 비중 변화')
-    : tile('수급이 몰린 섹터', '—', '<span style="color:#cbd5e0;">거래대금 데이터 준비 중</span>', ''));
+  if (m.hasTurnover && inflow) {
+    html.push(tile('수급이 몰린 섹터', rsEsc(inflow.name),
+      rsNum(inflow.periods[RS.period].turnShareChg, 2, '%p'), '거래대금 비중 변화'));
+  } else if (m.hasTurnover) {
+    html.push(tile('수급이 몰린 섹터', '—', '<span style="color:#cbd5e0;">거래대금 데이터 준비 중</span>', ''));
+  } else {
+    // 거래대금을 비교할 수 없는 시장에서는 대신 "가장 빠르게 올라오는 섹터"를 보여줍니다.
+    // 자리를 비워 두는 것보다, 같은 질문(어디로 가고 있나)에 답하는 다른 숫자가 낫습니다.
+    const rising = rows.filter(s => s.periods[RS.period].rankChg != null)
+      .sort((a, b) => b.periods[RS.period].rankChg - a.periods[RS.period].rankChg)[0];
+    html.push(rising
+      ? tile('순위가 가장 오른 섹터', rsEsc(rising.name), rsRankChg(rising.periods[RS.period].rankChg), '1개월 전 대비')
+      : tile('순위가 가장 오른 섹터', '—', '', ''));
+  }
   box.innerHTML = html.join('');
 }
 
 function renderSectorTable() {
   const m = rsMarketData();
-  const cols = RS_COLS.filter(c => !c.krOnly || m.hasForeign);
+  const cols = RS_COLS.filter(c => !c.needs || m[c.needs]);
 
   document.getElementById('rsHead').innerHTML = cols.map(c => {
     const active = RS.sortKey === c.key ? (RS.sortDir === -1 ? ' ▼' : ' ▲') : '';
@@ -2005,6 +2016,11 @@ async function initHeatmapPage() {
   });
 }
 
+// 거래대금을 비교할 수 없는 시장(미국: 섹터 ETF 와 개별 종목이 섞여 있음)에서는
+// 칸 크기를 균등으로 고정합니다. 비교가 성립하지 않는 값으로 칸 크기를 정하면
+// 화면이 그럴듯하게 틀립니다 — 표에서 숫자를 지우는 것보다 눈에 안 띄어서 더 나쁩니다.
+function hmSizeMode() { return hmMarketData().hasTurnover ? HM.size : 'equal'; }
+
 function renderHeatmapControls() {
   const flags = { KR: '🇰🇷', US: '🇺🇸' };
   document.getElementById('hmMarketToggle').innerHTML = Object.keys(HM.data.markets)
@@ -2013,8 +2029,12 @@ function renderHeatmapControls() {
   document.getElementById('hmPeriodBtns').innerHTML = RS_PERIODS
     .map(p => `<button type="button" class="preset-btn ${p.key === HM.period ? 'active' : ''}" onclick="setHeatmapPeriod('${p.key}')">${p.label}</button>`)
     .join('');
+  const comparable = hmMarketData().hasTurnover;
   document.querySelectorAll('#hmSizeToggle button').forEach(b => {
-    b.classList.toggle('active', b.dataset.size === HM.size);
+    b.classList.toggle('active', b.dataset.size === hmSizeMode());
+    b.disabled = !comparable;
+    b.style.opacity = comparable ? '' : '0.45';
+    b.style.cursor = comparable ? '' : 'not-allowed';
   });
 }
 
@@ -2034,7 +2054,10 @@ function renderHeatmap() {
   document.getElementById('hmMeta').innerHTML =
     `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · ` +
     `${hmPeriodLabel()} 등락률 · 수록 ${m.universeCount}종목 / ${m.sectors.length}섹터` +
-    ` · 색 최대 ±${clamp}%`;
+    ` · 색 최대 ±${clamp}%` +
+    // 거래대금을 비교할 수 없는 시장에서는 칸 크기가 균등이라는 걸 화면에 밝힙니다.
+    // 크기가 아무 의미 없는데 의미 있어 보이는 것이 이 화면에서 가장 위험한 오해입니다.
+    (m.hasTurnover ? '' : ' · 이 시장은 섹터 ETF 와 개별 종목이 섞여 있어 거래대금을 서로 비교할 수 없습니다 — <b>칸 크기는 균등</b>입니다');
 
   // 섹터 → 그 안의 종목. 값이 없는 종목은 그리지 않습니다(상장폐지·데이터 없음).
   const sectors = m.sectors.map(s => {
@@ -2044,7 +2067,7 @@ function renderHeatmap() {
         name: mem.name, code: mem.code, ret: mem.ret[P],
         turn: mem.turn ? mem.turn[P] : null,
         sector: s.name,
-        value: HM.size === 'equal' ? 1 : Math.max(mem.turn && mem.turn[P] ? mem.turn[P] : 0, 0.0001),
+        value: hmSizeMode() === 'equal' ? 1 : Math.max(mem.turn && mem.turn[P] ? mem.turn[P] : 0, 0.0001),
       }))
       .sort((a, b) => b.value - a.value);
     return { name: s.name, members, value: members.reduce((a, x) => a + x.value, 0) };
@@ -2139,7 +2162,7 @@ function renderHeatmap() {
         `${v > 0 ? '+' : ''}${v}%</span>`;
     }).join('') +
     '<span>상승</span>' +
-    `<span style="margin-left:8px;">· 칸 크기 = ${HM.size === 'equal' ? '균등' : '거래대금 비중'}</span>`;
+    `<span style="margin-left:8px;">· 칸 크기 = ${hmSizeMode() === 'equal' ? '균등' : '거래대금 비중'}</span>`;
 }
 
 if (CURRENT_PAGE === 'heatmap') {

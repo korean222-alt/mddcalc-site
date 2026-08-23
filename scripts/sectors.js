@@ -69,6 +69,15 @@ const US_NAMES = {
   SPY: 'S&P 500',
 };
 
+// 거래대금 비중을 시장 안에서 비교해도 되는가.
+//
+// 한국은 전부 개별 종목이라 서로 비교됩니다.
+// 미국은 대부분 섹터 ETF 인데 "메모리 반도체"만 개별 종목 바스켓입니다. 개별 대형주는
+// ETF 보다 거래대금이 훨씬 크기 때문에, 섞어서 비중을 내면 메모리 하나가 70% 를 차지하는
+// 허수가 나옵니다. 실제로 그렇게 나왔습니다. 비교가 성립하지 않는 숫자는 아예 만들지
+// 않습니다 — 화면에 나오면 누군가는 그걸 읽습니다.
+const TURNOVER_COMPARABLE = { KR: true, US: false };
+
 // 벤치마크. RS 는 "무엇 대비 강한가"이므로 이 값이 지표의 기준점입니다.
 const BENCHMARKS = {
   KR: { code: 'KS11', name: '코스피' },
@@ -92,4 +101,4 @@ const PERIODS = [
   { key: '12m', label: '12개월', days: 250 },
 ];
 
-module.exports = { KR_SECTORS, US_SECTORS, US_NAMES, BENCHMARKS, usSymbols, PERIODS };
+module.exports = { KR_SECTORS, US_SECTORS, US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, usSymbols, PERIODS };

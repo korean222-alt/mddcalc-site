@@ -16,7 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { KR_TICKERS } = require('./kr-tickers');
-const { KR_SECTORS, US_SECTORS, US_NAMES, BENCHMARKS, usSymbols, PERIODS } = require('./sectors');
+const { KR_SECTORS, US_SECTORS, US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, usSymbols, PERIODS } = require('./sectors');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_FILE = path.join(ROOT, 'data', 'sectors.json');
@@ -146,6 +146,7 @@ function foreignAt(series, axis, index) {
 
 // ── 한 시장 계산 ──────────────────────────────────────────────────────
 function buildMarket(marketKey, dir, sectorDefs, nameOf) {
+  const hasTurnover = TURNOVER_COMPARABLE[marketKey] !== false;
   const bench = BENCHMARKS[marketKey];
   const benchSeries = readSeries(dir, bench.code);
   if (!benchSeries) throw new Error(`벤치마크 ${bench.code} 데이터가 없습니다 (data/${dir}/${bench.code}.json)`);
@@ -202,15 +203,15 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
     memberTurn[P.key] = sectors.map(s =>
       s.members.map(m => {
         const own = turnoverSum(m, axis, last + 1 - P.days, last + 1);
-        return curTotal > 0 ? round2((own / curTotal) * 100) : null;
+        return (hasTurnover && curTotal > 0) ? round2((own / curTotal) * 100) : null;
       })
     );
 
     perPeriod[P.key] = sectors.map((s, i) => {
       const cur = s.members.reduce((a, m) => a + turnoverSum(m, axis, last + 1 - P.days, last + 1), 0);
       const prev = s.members.reduce((a, m) => a + turnoverSum(m, axis, last + 1 - P.days * 2, last + 1 - P.days), 0);
-      const share = curTotal > 0 ? (cur / curTotal) * 100 : null;
-      const sharePrev = prevTotal > 0 ? (prev / prevTotal) * 100 : null;
+      const share = (hasTurnover && curTotal > 0) ? (cur / curTotal) * 100 : null;
+      const sharePrev = (hasTurnover && prevTotal > 0) ? (prev / prevTotal) * 100 : null;
 
       // 외국인소진율은 종목별 변화폭을 먼저 구한 뒤 평균냅니다. 절대 수준을 평균하면
       // 그 사이에 값이 생기거나 사라진 종목 때문에 변화폭이 엉뚱하게 튑니다.
@@ -282,6 +283,7 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
     market: {
       label: marketKey === 'KR' ? '한국' : '미국',
       hasForeign: marketKey === 'KR',
+      hasTurnover,
       benchmark: { code: bench.code, name: bench.name, ret: benchPeriods },
       updated: new Date(axis[last] * 86400000).toISOString().slice(0, 10),
       universeCount: universeList.length,
