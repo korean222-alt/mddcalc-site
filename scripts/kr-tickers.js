@@ -15,6 +15,7 @@ const KR_TICKERS = [
   // ── 코스피 대형주 ──
   { code: '005930', name: '삼성전자', market: 'KS' },
   { code: '000660', name: 'SK하이닉스', market: 'KS' },
+  { code: '000990', name: 'DB하이텍', market: 'KS' },
   { code: '373220', name: 'LG에너지솔루션', market: 'KS' },
   { code: '207940', name: '삼성바이오로직스', market: 'KS' },
   { code: '005380', name: '현대차', market: 'KS', aliases: ['현대자동차'] },
@@ -26,6 +27,8 @@ const KR_TICKERS = [
   { code: '006400', name: '삼성SDI', market: 'KS' },
   { code: '005490', name: 'POSCO홀딩스', market: 'KS', aliases: ['포스코홀딩스', '포스코'] },
   { code: '012330', name: '현대모비스', market: 'KS' },
+  { code: '204320', name: 'HL만도', market: 'KS', aliases: ['만도'] },
+  { code: '161390', name: '한국타이어앤테크놀로지', market: 'KS', aliases: ['한국타이어'] },
   { code: '066570', name: 'LG전자', market: 'KS' },
   { code: '009150', name: '삼성전기', market: 'KS' },
   { code: '028260', name: '삼성물산', market: 'KS' },
@@ -42,6 +45,10 @@ const KR_TICKERS = [
   { code: '032830', name: '삼성생명', market: 'KS' },
   { code: '000810', name: '삼성화재', market: 'KS' },
   { code: '323410', name: '카카오뱅크', market: 'KS' },
+  { code: '006800', name: '미래에셋증권', market: 'KS' },
+  { code: '016360', name: '삼성증권', market: 'KS' },
+  { code: '071050', name: '한국금융지주', market: 'KS' },
+  { code: '039490', name: '키움증권', market: 'KS' },
 
   // ── 에너지·산업재·방산 ──
   { code: '015760', name: '한국전력', market: 'KS', aliases: ['한전'] },
@@ -56,14 +63,34 @@ const KR_TICKERS = [
   { code: '011200', name: 'HMM', market: 'KS' },
   { code: '003490', name: '대한항공', market: 'KS' },
   { code: '000720', name: '현대건설', market: 'KS' },
+  { code: '064350', name: '현대로템', market: 'KS' },
+  { code: '079550', name: 'LIG넥스원', market: 'KS' },
+  { code: '010140', name: '삼성중공업', market: 'KS' },
+  { code: '010620', name: 'HD현대미포', market: 'KS' },
+  { code: '267260', name: 'HD현대일렉트릭', market: 'KS' },
+  { code: '298040', name: '효성중공업', market: 'KS' },
+  { code: '010120', name: 'LS ELECTRIC', market: 'KS', aliases: ['LS일렉트릭'] },
+  { code: '047040', name: '대우건설', market: 'KS' },
+  { code: '006360', name: 'GS건설', market: 'KS' },
+  { code: '011170', name: '롯데케미칼', market: 'KS' },
+  { code: '011780', name: '금호석유', market: 'KS', aliases: ['금호석유화학'] },
+  { code: '004020', name: '현대제철', market: 'KS' },
+  { code: '028670', name: '팬오션', market: 'KS' },
 
   // ── 통신·소비재 ──
   { code: '017670', name: 'SK텔레콤', market: 'KS', aliases: ['SKT'] },
   { code: '030200', name: 'KT', market: 'KS' },
+  { code: '032640', name: 'LG유플러스', market: 'KS', aliases: ['LGU+', 'LG유플'] },
   { code: '033780', name: 'KT&G', market: 'KS' },
   { code: '097950', name: 'CJ제일제당', market: 'KS' },
   { code: '139480', name: '이마트', market: 'KS' },
   { code: '090430', name: '아모레퍼시픽', market: 'KS' },
+  { code: '161890', name: '한국콜마', market: 'KS' },
+  { code: '192820', name: '코스맥스', market: 'KS' },
+  { code: '012510', name: '더존비즈온', market: 'KS' },
+  { code: '128940', name: '한미약품', market: 'KS' },
+  { code: '000100', name: '유한양행', market: 'KS' },
+  { code: '454910', name: '두산로보틱스', market: 'KS' },
 
   // ── 게임·엔터 ──
   { code: '259960', name: '크래프톤', market: 'KS' },
@@ -92,6 +119,13 @@ const KR_TICKERS = [
   { code: '240810', name: '원익IPS', market: 'KQ' },
   { code: '112040', name: '위메이드', market: 'KQ' },
   { code: '066970', name: '엘앤에프', market: 'KQ' },
+  { code: '095340', name: 'ISC', market: 'KQ' },
+  { code: '403870', name: 'HPSP', market: 'KQ' },
+  { code: '053800', name: '안랩', market: 'KQ' },
+  { code: '030520', name: '한글과컴퓨터', market: 'KQ', aliases: ['한컴'] },
+  { code: '122870', name: '와이지엔터테인먼트', market: 'KQ', aliases: ['YG엔터', 'YG'] },
+  { code: '035900', name: 'JYP Ent.', market: 'KQ', aliases: ['JYP엔터', 'JYP'] },
+  { code: '108490', name: '로보티즈', market: 'KQ' },
 
   // ── 지수 ──
   { code: 'KS11', name: '코스피', market: 'IDX', aliases: ['KOSPI'] },
@@ -100,6 +134,7 @@ const KR_TICKERS = [
 
 // 야후 파이낸스에서 쓰는 심볼로 바꿉니다. (005930 → 005930.KS, KS11 → ^KS11)
 function yahooSymbol(t) {
+  if (t.market === 'US') return t.code; // 미국 종목은 접미사가 없습니다. (AAPL, XLV …)
   return t.market === 'IDX' ? `^${t.code}` : `${t.code}.${t.market}`;
 }
 

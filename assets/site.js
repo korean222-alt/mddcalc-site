@@ -1035,7 +1035,8 @@ const PAGE_URLS = {
   home: '/', tools: '/tools.html', rsi: '/rsi-calculator.html', dividend: '/dividend-calculator.html',
   blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
   disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
-  compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html'
+  compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
+  sector: '/sector-rs.html'
 };
 
 function navigate(page) {
@@ -1563,3 +1564,333 @@ document.addEventListener('DOMContentLoaded', () => {
   calcCompound();
 });
 
+
+// ========== 섹터 상대강도(RS) ==========
+// sector-rs.html 전용입니다. 다른 페이지에서는 아래 초기화가 그냥 지나갑니다.
+//
+// 데이터는 data/sectors.json 하나뿐입니다. 시장·기간을 바꿔도 다시 받지 않습니다
+// (계산은 scripts/generate-sector-rs.js 가 빌드 시점에 이미 끝내 둡니다).
+//
+// 용어 주의: 이 파일 위쪽의 computeRSI 는 RSI(한 종목의 과열도)이고, 여기 RS 는
+// "벤치마크 대비 강도"입니다. 이름만 비슷하고 다른 지표입니다.
+
+const RS = {
+  data: null,
+  market: null,
+  period: '3m',
+  sortKey: 'rating',
+  sortDir: -1,   // -1 내림차순
+  openKey: null,
+  chart: null,
+};
+
+const RS_PERIODS = [
+  { key: '1w', label: '1주' },
+  { key: '1m', label: '1개월' },
+  { key: '3m', label: '3개월' },
+  { key: '6m', label: '6개월' },
+  { key: '12m', label: '12개월' },
+];
+
+// krOnly 열은 외국인 소진율이 있는 시장(한국)에서만 그립니다.
+const RS_COLS = [
+  { key: 'name', label: '섹터', align: 'left' },
+  { key: 'rating', label: 'RS 점수', hint: '1~99, 높을수록 강함' },
+  { key: 'ret', label: '수익률' },
+  { key: 'alpha', label: '벤치마크 대비' },
+  { key: 'rankChg', label: '순위 변화', hint: '1개월 전 대비' },
+  { key: 'turnShare', label: '거래대금 비중' },
+  { key: 'foreignChg', label: '외국인 소진율', krOnly: true },
+];
+
+const rsEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const rsUp = '#38a169', rsDown = '#e53e3e', rsFlat = '#a0aec0';
+
+// null 과 0 은 다릅니다. 데이터가 없으면 0% 라고 우기지 말고 — 로 둡니다.
+function rsNum(v, digits, unit) {
+  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  const sign = v > 0 ? '+' : '';
+  const color = v > 0 ? rsUp : (v < 0 ? rsDown : rsFlat);
+  return `<span style="color:${color}; font-weight:600;">${sign}${v.toFixed(digits)}${unit}</span>`;
+}
+
+function rsPlain(v, digits, unit) {
+  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  return `${v.toFixed(digits)}${unit}`;
+}
+
+function rsRankChg(v) {
+  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  if (v === 0) return `<span style="color:${rsFlat};">— 0</span>`;
+  const arrow = v > 0 ? '▲' : '▼';
+  return `<span style="color:${v > 0 ? rsUp : rsDown}; font-weight:600;">${arrow} ${Math.abs(v)}</span>`;
+}
+
+function rsMarketData() { return RS.data.markets[RS.market]; }
+function rsPeriodLabel() { return (RS_PERIODS.find(p => p.key === RS.period) || {}).label || RS.period; }
+
+async function initSectorPage() {
+  const loading = document.getElementById('rsLoading');
+  const errBox = document.getElementById('rsError');
+  try {
+    const res = await fetch('/data/sectors.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    RS.data = await res.json();
+  } catch (e) {
+    loading.classList.remove('show');
+    errBox.style.display = 'block';
+    errBox.className = 'status error show';
+    errBox.textContent = '섹터 데이터를 불러오지 못했습니다. 잠시 뒤 새로고침해 주세요.';
+    return;
+  }
+
+  const keys = Object.keys(RS.data.markets || {});
+  if (keys.length === 0) {
+    loading.classList.remove('show');
+    errBox.style.display = 'block';
+    errBox.className = 'status error show';
+    errBox.textContent = '표시할 시장이 없습니다.';
+    return;
+  }
+  RS.market = keys.includes('KR') ? 'KR' : keys[0];
+
+  loading.classList.remove('show');
+  document.getElementById('rsBody').classList.remove('hidden');
+  renderSectorControls();
+  renderSectorAll();
+}
+
+// 시장 탭은 데이터에 실제로 들어 있는 시장만 그립니다. 수집이 실패해 한쪽이 비어도
+// 없는 탭을 눌러 빈 화면을 보는 일이 없게 합니다.
+function renderSectorControls() {
+  const flags = { KR: '🇰🇷', US: '🇺🇸' };
+  document.getElementById('rsMarketToggle').innerHTML = Object.keys(RS.data.markets)
+    .map(k => `<button type="button" class="${k === RS.market ? 'active' : ''}" onclick="setSectorMarket('${k}')">${flags[k] || ''} ${rsEsc(RS.data.markets[k].label)}</button>`)
+    .join('');
+
+  document.getElementById('rsPeriodBtns').innerHTML = RS_PERIODS
+    .map(p => `<button type="button" class="preset-btn ${p.key === RS.period ? 'active' : ''}" onclick="setSectorPeriod('${p.key}')">${p.label}</button>`)
+    .join('');
+}
+
+function setSectorMarket(key) {
+  if (RS.market === key) return;
+  RS.market = key;
+  RS.openKey = null;
+  renderSectorControls();
+  renderSectorAll();
+}
+
+function setSectorPeriod(key) {
+  RS.period = key;
+  renderSectorControls();
+  renderSectorAll();
+}
+
+function renderSectorAll() {
+  const m = rsMarketData();
+  const benchRet = m.benchmark.ret[RS.period];
+
+  document.getElementById('rsMeta').innerHTML =
+    `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> ` +
+    `${rsPeriodLabel()} ${benchRet == null ? '—' : (benchRet > 0 ? '+' : '') + benchRet.toFixed(1) + '%'} · ` +
+    `수록 ${m.universeCount}종목 / ${m.sectors.length}섹터`;
+  document.getElementById('rsSummaryPeriod').textContent = rsPeriodLabel();
+
+  renderSectorSummary();
+  renderSectorTable();
+  renderSectorDetail();
+}
+
+function renderSectorSummary() {
+  const m = rsMarketData();
+  const rows = m.sectors.filter(s => s.periods[RS.period].rating != null);
+  const box = document.getElementById('rsSummary');
+  if (rows.length === 0) { box.innerHTML = '<div class="stat-box"><div class="value">데이터 부족</div></div>'; return; }
+
+  const byRating = [...rows].sort((a, b) => b.periods[RS.period].rating - a.periods[RS.period].rating);
+  const strongest = byRating[0];
+  const weakest = byRating[byRating.length - 1];
+
+  const flows = rows.filter(s => s.periods[RS.period].turnShareChg != null)
+    .sort((a, b) => b.periods[RS.period].turnShareChg - a.periods[RS.period].turnShareChg);
+  const inflow = flows[0];
+
+  const tile = (label, name, value, note) =>
+    `<div class="stat-box"><div class="label">${label}</div>` +
+    `<div class="value" style="font-size:16px;">${name}</div>` +
+    `<div style="font-size:13px; margin-top:4px;">${value}</div>` +
+    `<div style="font-size:11px; color:#718096; margin-top:2px;">${note}</div></div>`;
+
+  const html = [
+    tile('가장 강한 섹터', rsEsc(strongest.name),
+      rsNum(strongest.periods[RS.period].alpha, 1, '%p'), '벤치마크 대비'),
+    tile('가장 약한 섹터', rsEsc(weakest.name),
+      rsNum(weakest.periods[RS.period].alpha, 1, '%p'), '벤치마크 대비'),
+  ];
+  html.push(inflow
+    ? tile('수급이 몰린 섹터', rsEsc(inflow.name), rsNum(inflow.periods[RS.period].turnShareChg, 2, '%p'), '거래대금 비중 변화')
+    : tile('수급이 몰린 섹터', '—', '<span style="color:#cbd5e0;">거래대금 데이터 준비 중</span>', ''));
+  box.innerHTML = html.join('');
+}
+
+function renderSectorTable() {
+  const m = rsMarketData();
+  const cols = RS_COLS.filter(c => !c.krOnly || m.hasForeign);
+
+  document.getElementById('rsHead').innerHTML = cols.map(c => {
+    const active = RS.sortKey === c.key ? (RS.sortDir === -1 ? ' ▼' : ' ▲') : '';
+    return `<th style="cursor:pointer; text-align:${c.align || 'center'}; white-space:nowrap;" onclick="sortSectorTable('${c.key}')">` +
+      `${c.label}${active}` +
+      (c.hint ? `<div style="font-weight:400; color:#a0aec0; font-size:10px;">${c.hint}</div>` : '') +
+      `</th>`;
+  }).join('');
+
+  const rows = [...m.sectors].sort((a, b) => {
+    if (RS.sortKey === 'name') return a.name.localeCompare(b.name) * -RS.sortDir;
+    const av = a.periods[RS.period][RS.sortKey];
+    const bv = b.periods[RS.period][RS.sortKey];
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;   // 값 없는 행은 정렬 방향과 무관하게 아래로
+    if (bv == null) return -1;
+    return (av - bv) * RS.sortDir;
+  });
+
+  document.getElementById('rsRows').innerHTML = rows.map(s => {
+    const p = s.periods[RS.period];
+    const open = RS.openKey === s.key;
+    const cells = cols.map(c => {
+      if (c.key === 'name') {
+        return `<td style="text-align:left; white-space:nowrap;"><b>${rsEsc(s.name)}</b> <span style="color:#a0aec0;">${open ? '▲' : '▼'}</span></td>`;
+      }
+      if (c.key === 'rating') {
+        const v = p.rating;
+        if (v == null) return '<td><span style="color:#cbd5e0;">—</span></td>';
+        // 막대는 표를 훑을 때 눈이 먼저 잡는 부분입니다. 강한 쪽 파랑, 약한 쪽 회색.
+        const fill = v >= 50 ? '' : ' zero';
+        return `<td><div style="display:flex; align-items:center; gap:8px; min-width:120px;">` +
+          `<b style="width:26px; text-align:right;">${v}</b>` +
+          `<div class="bar-container" style="flex:1;"><div class="bar-fill${fill}" style="width:${v}%;"></div></div></div></td>`;
+      }
+      if (c.key === 'ret') return `<td>${rsNum(p.ret, 1, '%')}</td>`;
+      if (c.key === 'alpha') return `<td>${rsNum(p.alpha, 1, '%p')}</td>`;
+      if (c.key === 'rankChg') return `<td>${rsRankChg(p.rankChg)}</td>`;
+      if (c.key === 'turnShare') {
+        return `<td style="white-space:nowrap;">${rsPlain(p.turnShare, 1, '%')}<br>` +
+          `<span style="font-size:11px;">${rsNum(p.turnShareChg, 2, '%p')}</span></td>`;
+      }
+      if (c.key === 'foreignChg') {
+        return `<td style="white-space:nowrap;">${rsPlain(p.foreign, 1, '%')}<br>` +
+          `<span style="font-size:11px;">${rsNum(p.foreignChg, 2, '%p')}</span></td>`;
+      }
+      return '<td></td>';
+    }).join('');
+    return `<tr style="cursor:pointer;${open ? ' background:#ebf8ff;' : ''}" onclick="toggleSectorDetail('${s.key}')">${cells}</tr>`;
+  }).join('');
+}
+
+function sortSectorTable(key) {
+  if (RS.sortKey === key) RS.sortDir = -RS.sortDir;
+  else { RS.sortKey = key; RS.sortDir = key === 'name' ? 1 : -1; }
+  renderSectorTable();
+}
+
+function toggleSectorDetail(key) {
+  RS.openKey = RS.openKey === key ? null : key;
+  renderSectorTable();
+  renderSectorDetail();
+  if (RS.openKey) document.getElementById('rsDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderSectorDetail() {
+  const card = document.getElementById('rsDetail');
+  if (!RS.openKey) { card.classList.add('hidden'); return; }
+
+  const m = rsMarketData();
+  const s = m.sectors.find(x => x.key === RS.openKey);
+  if (!s) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+
+  document.getElementById('rsDetailTitle').textContent = `📈 ${s.name} — ${m.benchmark.name} 대비 RS`;
+
+  const members = [...s.members].sort((a, b) => {
+    const av = a.ret[RS.period], bv = b.ret[RS.period];
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    return bv - av;
+  });
+  document.getElementById('rsMembers').innerHTML =
+    `<h3 style="font-size:14px; color:#4a5568; margin-bottom:8px;">구성 종목 ${rsPeriodLabel()} 수익률</h3>` +
+    `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
+    members.map(mem => {
+      const v = mem.ret[RS.period];
+      const color = v == null ? rsFlat : (v > 0 ? rsUp : rsDown);
+      return `<span class="fav-chip" style="cursor:default;">${rsEsc(mem.name)} ` +
+        `<b style="color:${color};">${v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + '%'}</b></span>`;
+    }).join('') + '</div>';
+
+  drawSectorChart(s, m);
+}
+
+// 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 표와 숫자는 멀쩡해야 하므로
+// 캔버스만 안내 문구로 바꾸고 나머지는 그대로 둡니다. (홈 화면과 같은 처리)
+function sectorChartUnavailable(msg) {
+  const wrap = document.getElementById('rsChartWrap');
+  if (!wrap) return;
+  wrap.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; ` +
+    `background:#f7fafc; border-radius:10px; color:#718096; font-size:13px; text-align:center; padding:16px;">` +
+    `${msg}<br><span style="font-size:12px; color:#a0aec0;">아래 표와 숫자는 정상입니다.</span></div>`;
+}
+
+function drawSectorChart(s, m) {
+  const wrap = document.getElementById('rsChartWrap');
+  if (typeof Chart === 'undefined') {
+    sectorChartUnavailable('차트를 불러오지 못했습니다. (광고 차단 확장 프로그램이 원인일 수 있습니다)');
+    return;
+  }
+  // 이전에 안내 문구로 바꿔 놓았다면 캔버스를 되살립니다.
+  if (!document.getElementById('rsChart')) wrap.innerHTML = '<canvas id="rsChart"></canvas>';
+
+  try {
+    if (RS.chart) RS.chart.destroy();
+    const labels = m.dates.map(d => new Date(d * 86400000).toISOString().slice(0, 10));
+    RS.chart = new Chart(document.getElementById('rsChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: `${s.name} RS`,
+            data: s.rs,
+            borderColor: '#3182ce',
+            backgroundColor: 'rgba(49,130,206,0.15)',
+            fill: true, pointRadius: 0, borderWidth: 1.8, tension: 0.1,
+          },
+          {
+            label: `${m.benchmark.name} 기준선`,
+            data: s.rs.map(() => 100),
+            borderColor: '#a0aec0',
+            borderDash: [5, 4], pointRadius: 0, borderWidth: 1, fill: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } } },
+        scales: {
+          x: { ticks: { maxTicksLimit: 8, font: { size: 10 } }, grid: { display: false } },
+          y: { ticks: { font: { size: 10 } } },
+        },
+      },
+    });
+  } catch (e) {
+    // 차트 하나가 죽는다고 페이지 전체가 멈추면 안 됩니다.
+    console.error('[sector] 차트 렌더 실패:', e);
+    sectorChartUnavailable('차트를 그리지 못했습니다.');
+  }
+}
+
+if (CURRENT_PAGE === 'sector') {
+  document.addEventListener('DOMContentLoaded', initSectorPage);
+}
