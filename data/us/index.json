@@ -1,0 +1,116 @@
+{
+  "updated": "2026-08-23",
+  "count": 22,
+  "stocks": [
+    {
+      "code": "SPY",
+      "name": "S&P 500",
+      "market": "US"
+    },
+    {
+      "code": "MU",
+      "name": "마이크론",
+      "market": "US"
+    },
+    {
+      "code": "WDC",
+      "name": "웨스턴디지털",
+      "market": "US"
+    },
+    {
+      "code": "STX",
+      "name": "씨게이트",
+      "market": "US"
+    },
+    {
+      "code": "SMH",
+      "name": "VanEck 반도체",
+      "market": "US"
+    },
+    {
+      "code": "IGV",
+      "name": "iShares 소프트웨어",
+      "market": "US"
+    },
+    {
+      "code": "XLV",
+      "name": "SPDR 헬스케어",
+      "market": "US"
+    },
+    {
+      "code": "XBI",
+      "name": "SPDR 바이오텍",
+      "market": "US"
+    },
+    {
+      "code": "XLK",
+      "name": "SPDR 기술",
+      "market": "US"
+    },
+    {
+      "code": "XLC",
+      "name": "SPDR 커뮤니케이션",
+      "market": "US"
+    },
+    {
+      "code": "XLF",
+      "name": "SPDR 금융",
+      "market": "US"
+    },
+    {
+      "code": "XLE",
+      "name": "SPDR 에너지",
+      "market": "US"
+    },
+    {
+      "code": "XLI",
+      "name": "SPDR 산업재",
+      "market": "US"
+    },
+    {
+      "code": "XLB",
+      "name": "SPDR 소재",
+      "market": "US"
+    },
+    {
+      "code": "XLP",
+      "name": "SPDR 필수소비재",
+      "market": "US"
+    },
+    {
+      "code": "XLY",
+      "name": "SPDR 경기소비재",
+      "market": "US"
+    },
+    {
+      "code": "XLU",
+      "name": "SPDR 유틸리티",
+      "market": "US"
+    },
+    {
+      "code": "XLRE",
+      "name": "SPDR 부동산",
+      "market": "US"
+    },
+    {
+      "code": "ITA",
+      "name": "iShares 방산·우주",
+      "market": "US"
+    },
+    {
+      "code": "CIBR",
+      "name": "First Trust 사이버보안",
+      "market": "US"
+    },
+    {
+      "code": "URA",
+      "name": "Global X 우라늄",
+      "market": "US"
+    },
+    {
+      "code": "BOTZ",
+      "name": "Global X 로봇·AI",
+      "market": "US"
+    }
+  ]
+}

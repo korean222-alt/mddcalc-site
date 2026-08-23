@@ -31,6 +31,11 @@ const UA =
 
 const DELAY_MS = 700;             // 종목 간 간격. 한꺼번에 쏘면 429를 받습니다.
 const MAX_ROWS = 6000;            // 약 24년치. MDD 계산에는 충분합니다.
+// 거래량·외국인소진율은 "최근 것만" 저장합니다. 6000행을 전부 담으면 종목당 파일이 두 배가
+// 되는데, 이 두 값을 쓰는 곳(섹터 수급 계산)이 필요로 하는 구간은 최근 1년 남짓뿐입니다.
+// 520행 ≈ 2.1년. 12개월 거래대금 비중을 "직전 12개월"과 비교하려면 250×2 행이 필요합니다.
+// 정렬 규칙: v[k] 는 d[d.length - v.length + k] 에 대응합니다. (뒤에서부터 맞춥니다)
+const TAIL_ROWS = 520;
 const REQUEST_TIMEOUT_MS = 20000; // 아래 httpGet 주석 참고 — 이게 없으면 무한정 매달립니다.
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -80,7 +85,10 @@ async function fromNaver(t) {
   // 그 종목의 히스토리 전체가 버려졌습니다. 1990년대부터 상장된 21종목이 전부 이것 때문에 죽었습니다.
   // 그래서 필요한 열만 정규식으로 뽑습니다. 뒤쪽 열이 비어 있든 앞뒤에 뭐가 붙어 있든 무관합니다.
   // 따옴표는 두 종류가 섞여 오므로 둘 다 받습니다.
-  const rowRe = /\[\s*["']?(\d{8})["']?\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/g;
+  // 6열(거래량)과 7열(외국인소진율)은 옵셔널 그룹으로 받습니다. 위 예시의 `4757, ]` 처럼
+  // 옛 행은 7열이 비어 있고, 아주 옛 행은 열 자체가 없기도 합니다. 필수로 잡으면 그런 행이
+  // 통째로 버려집니다 — 이 파일이 이미 한 번 겪은 실패와 같은 종류입니다.
+  const rowRe = /\[\s*["']?(\d{8})["']?\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]*)\s*(?:,\s*([\d.]*)\s*)?)?/g;
   // 원화는 호가 단위가 1원이라 반올림해도 정보 손실이 없습니다. 지수는 소수점이 의미가 있습니다.
   const round = t.market === 'IDX' ? (v => Math.round(v * 100) / 100) : Math.round;
 
@@ -91,7 +99,17 @@ async function fromNaver(t) {
     if (!Number.isFinite(close) || close <= 0) continue;
     // 반올림 뒤 고가가 종가보다 낮아지는 경우가 생길 수 있어 max 로 맞춥니다.
     // analyze() 가 고가를 최고점 계열로 쓰기 때문에 여기가 어긋나면 낙폭이 틀어집니다.
-    out.push([epochDayFromYmd(m[1]), Math.max(round(Number.isFinite(high) ? high : close), round(close)), round(close)]);
+    // 거래량이 없으면 0. 외국인소진율은 "없음"과 "0%"를 구분해야 하므로 null 로 둡니다.
+    // 지수(코스피/코스닥)는 이 값이 늘 0.0 으로 오는데 의미가 없으므로 마찬가지로 null 입니다.
+    const volume = m[6] ? Math.round(Number(m[6])) : 0;
+    const foreign = (t.market !== 'IDX' && m[7]) ? Math.round(Number(m[7]) * 100) / 100 : null;
+    out.push([
+      epochDayFromYmd(m[1]),
+      Math.max(round(Number.isFinite(high) ? high : close), round(close)),
+      round(close),
+      Number.isFinite(volume) ? volume : 0,
+      Number.isFinite(foreign) ? foreign : null,
+    ]);
   }
 
   if (out.length === 0) {
@@ -106,6 +124,8 @@ async function fromNaver(t) {
     d: out.map(r => r[0]),
     h: out.map(r => r[1]),
     c: out.map(r => r[2]),
+    v: out.map(r => r[3]),
+    f: out.map(r => r[4]),
   };
 }
 
@@ -126,20 +146,30 @@ async function fromYahoo(t) {
 
       const quote = result.indicators?.quote?.[0] || {};
       // 원화는 호가 단위가 1원이라 반올림해도 정보 손실이 없고 파일이 작아집니다.
-      // 지수는 소수점이 의미가 있어 두 자리까지 남깁니다.
-      const round = t.market === 'IDX' ? (v => Math.round(v * 100) / 100) : Math.round;
+      // 지수와 미국 종목(달러·센트)은 소수점이 의미가 있어 두 자리까지 남깁니다.
+      const round = (t.market === 'IDX' || t.market === 'US')
+        ? (v => Math.round(v * 100) / 100)
+        : Math.round;
 
-      const d = [], h = [], c = [];
+      const d = [], h = [], c = [], v = [];
       for (let i = 0; i < result.timestamp.length; i++) {
         const close = quote.close?.[i];
         if (close == null) continue; // 휴장·거래정지일
         d.push(epochDayFromUnix(result.timestamp[i]));
         h.push(round(quote.high?.[i] ?? close));
         c.push(round(close));
+        v.push(Math.round(quote.volume?.[i] ?? 0));
       }
       if (d.length === 0) throw new Error('유효한 종가 없음');
 
-      return { source: 'yahoo', currency: t.market === 'IDX' ? 'PT' : (result.meta?.currency || 'KRW'), d, h, c };
+      // 야후에는 외국인소진율이 없습니다. f 를 주지 않으므로, 어떤 종목이 야후로 폴백하면
+      // 그 종목만 외국인 지표가 빠집니다. 섹터 계산부는 이 결측을 견디도록 되어 있습니다.
+      const fallbackCurrency = t.market === 'US' ? 'USD' : 'KRW';
+      return {
+        source: 'yahoo',
+        currency: t.market === 'IDX' ? 'PT' : (result.meta?.currency || fallbackCurrency),
+        d, h, c, v,
+      };
     } catch (err) {
       lastError = err;
     }
@@ -156,12 +186,21 @@ async function fetchOne(t) {
     try {
       const got = await source(t);
       const from = Math.max(0, got.d.length - MAX_ROWS); // 오래된 쪽을 잘라냅니다
+      const tail = Math.max(0, got.d.length - TAIL_ROWS); // 거래량·외국인은 최근분만
+
+      // 외국인소진율이 한 행도 없으면(지수, 야후 폴백) 키를 아예 넣지 않습니다.
+      // null 만 520개 들어 있는 배열을 저장할 이유가 없습니다.
+      const f = got.f ? got.f.slice(tail) : null;
+      const hasForeign = f && f.some(x => x != null);
+
       return {
         ...got,
-        symbol: t.market === 'IDX' ? `^${t.code}` : `${t.code}.${t.market}`,
+        symbol: t.market === 'US' ? t.code : (t.market === 'IDX' ? `^${t.code}` : `${t.code}.${t.market}`),
         d: got.d.slice(from),
         h: got.h.slice(from),
         c: got.c.slice(from),
+        v: got.v ? got.v.slice(tail) : [],
+        f: hasForeign ? f : null,
       };
     } catch (err) {
       errors.push(`${source.name}: ${err.message}`);
@@ -310,6 +349,10 @@ async function main() {
         d: data.d,
         h: data.h,
         c: data.c,
+        // v(거래량)·f(외국인소진율)는 최근 TAIL_ROWS 행만 담깁니다.
+        // v[k] 는 d[d.length - v.length + k] 에 대응합니다.
+        v: data.v,
+        ...(data.f ? { f: data.f } : {}),
       };
       fs.writeFileSync(path.join(OUT_DIR, `${t.code}.json`), JSON.stringify(payload));
       ok.push(t);
@@ -357,4 +400,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { fromNaver, fromYahoo, fetchOne, syncNameTable, syncChips, syncSupportedList };
+module.exports = { fromNaver, fromYahoo, fetchOne, syncNameTable, syncChips, syncSupportedList, httpGet, epochDayFromYmd };

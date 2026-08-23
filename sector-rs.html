@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>섹터 상대강도(RS) — 어느 섹터에 돈이 몰리나 | MDD 분석기</title>
+<meta name="description" content="1주부터 12개월까지 기간을 골라 한국·미국 섹터를 상대강도(RS) 순으로 줄 세웁니다. 거래대금 비중과 외국인 소진율로 수급까지 함께 봅니다.">
+<meta name="robots" content="index, follow">
+<meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
+<link rel="canonical" href="https://mddcalc.com/sector-rs.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="섹터 상대강도(RS) | MDD 분석기">
+<meta property="og:description" content="기간을 고르면 어느 섹터로 돈이 몰리고 어디서 빠지는지 한 줄로 세워 보여줍니다.">
+<meta property="og:url" content="https://mddcalc.com/sector-rs.html">
+<meta property="og:site_name" content="MDD 분석기">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="섹터 상대강도(RS) | MDD 분석기">
+<meta name="twitter:description" content="기간을 고르면 어느 섹터로 돈이 몰리고 어디서 빠지는지 한 줄로 세워 보여줍니다.">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
+      <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
+      <a href="/heatmap.html" onclick="navigate('heatmap'); return false;" id="nav-heatmap">🔥 히트맵</a>
+      <a href="/tools.html" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
+      <a href="/blog.html" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
+      <a href="/about.html" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
+      <a href="/contact.html" onclick="navigate('contact'); return false;" id="nav-contact">✉️ 문의</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+
+<div id="page-sector" class="page active">
+  <div class="page-hero">
+    <div class="inner">
+      <h1>📊 섹터 상대강도(RS)</h1>
+      <p>기간을 고르면 어느 섹터로 돈이 몰리고 어디서 빠지는지 한 줄로 세워 보여줍니다</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="controls" style="margin-bottom:0;">
+      <div class="mode-toggle" id="rsMarketToggle"></div>
+      <label style="margin-left:8px;">기간</label>
+      <div id="rsPeriodBtns" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    </div>
+    <div id="rsMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
+  </div>
+
+  <div id="rsLoading" class="loading show">⏳ 섹터 데이터 불러오는 중...</div>
+  <div id="rsError" class="status" style="display:none;"></div>
+
+  <div id="rsBody" class="hidden">
+    <div class="card">
+      <h2 class="section">🔥 <span id="rsSummaryPeriod"></span> 요약</h2>
+      <div class="stats-grid" id="rsSummary"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section">📋 섹터 순위</h2>
+      <div style="font-size:12px; color:#718096; margin-bottom:10px;">
+        행을 누르면 그 섹터의 RS 흐름과 구성 종목이 펼쳐집니다. 열 제목을 누르면 정렬됩니다.
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="rsTable">
+          <thead><tr id="rsHead"></tr></thead>
+          <tbody id="rsRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card hidden" id="rsDetail">
+      <h2 class="section" id="rsDetailTitle"></h2>
+      <div style="font-size:12px; color:#718096; margin-bottom:10px;">
+        RS 선은 <b>섹터지수 ÷ 벤치마크</b>를 1년 전 = 100 으로 맞춘 값입니다.
+        선이 올라가면 벤치마크보다 강해지는 중, 내려가면 약해지는 중입니다.
+      </div>
+      <div class="chart-wrap" id="rsChartWrap"><canvas id="rsChart"></canvas></div>
+      <div id="rsMembers" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="card" style="background:#f7fafc;">
+    <h2 class="section">📖 이 화면, 이렇게만 알면 됩니다</h2>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8;">
+      <strong>상대강도(RS)</strong>는 "이 섹터가 시장 전체보다 강한가"를 보는 지표입니다.
+      코스피가 10% 빠졌는데 어떤 섹터가 3%만 빠졌다면, 그 섹터는 <strong>떨어졌지만 강한</strong> 겁니다.
+      돈은 대개 이런 섹터로 먼저 들어옵니다.
+    </p>
+    <div class="info-banner" style="margin-top:12px;">
+      ⚠️ 이름이 비슷하지만 <a href="/rsi-calculator.html" onclick="navigate('rsi'); return false;">RSI</a>와는 다른 지표입니다.
+      RSI는 한 종목이 <b>스스로의 과거 대비</b> 과열됐는지를 보고, RS는 <b>다른 섹터·시장 대비</b> 강한지를 봅니다.
+    </div>
+    <div class="stats-grid" style="margin-top:12px;">
+      <div class="stat-box">
+        <div class="label">RS 점수</div>
+        <div class="value">1 ~ 99</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">같은 기간 섹터들 사이의 순위. 99면 그 시장에서 가장 강했다는 뜻입니다.</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">벤치마크 대비</div>
+        <div class="value">%p</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">섹터 수익률에서 코스피(또는 S&amp;P 500) 수익률을 뺀 값. 양수면 시장을 이겼습니다.</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">순위 변화</div>
+        <div class="value">▲ ▼</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">한 달 전 같은 기준으로 매긴 순위와의 차이. 올라가는 중인지 식는 중인지가 여기서 드러납니다.</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">거래대금 비중</div>
+        <div class="value">수급</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">수록 종목 전체 거래대금에서 그 섹터가 차지하는 몫. 늘고 있으면 돈이 실제로 들어오는 중입니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">📚 조금 더 깊이</h2>
+
+    <details open>
+      <summary>왜 "떨어졌는데 강하다"가 중요한가요?</summary>
+      <div class="body">
+        시장이 전체적으로 빠지는 구간에서는 거의 모든 섹터의 수익률이 마이너스입니다. 이때 수익률만 보면
+        전부 똑같이 나빠 보이지만, 실제로는 <b>덜 빠진 곳</b>과 <b>더 빠진 곳</b>이 갈립니다.
+        시장이 돌아설 때 먼저 튀어 오르는 쪽은 대개 하락장에서 덜 빠진 쪽이었습니다.
+        RS 점수는 절대 수익률이 아니라 순위이기 때문에 이런 구간에서도 순서가 또렷하게 보입니다.
+      </div>
+    </details>
+
+    <details>
+      <summary>거래대금 비중과 외국인 소진율은 무엇인가요?</summary>
+      <div class="body">
+        <p><b>거래대금 비중</b>은 이 화면에 수록된 종목 전체의 거래대금 중 그 섹터가 차지하는 비율입니다.
+        고른 기간의 평균을 <b>그 직전 같은 길이의 기간</b>과 비교해 변화를 표시합니다.
+        가격이 아직 안 움직였는데 비중이 먼저 늘고 있다면, 사람들이 그 섹터를 들여다보기 시작했다는 신호로 읽습니다.</p>
+        <p style="margin-top:8px;"><b>외국인 소진율</b>은 외국인이 살 수 있는 한도 중 실제로 채운 비율입니다.
+        지분율 자체는 아니지만 방향은 같이 움직이므로, 오르면 외국인이 순매수 쪽이었다고 봅니다.
+        한국 종목에만 있는 값이라 미국 탭에서는 표시되지 않습니다.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>섹터 지수는 어떻게 만들었나요?</summary>
+      <div class="body">
+        구성 종목의 <b>일간 수익률을 동일가중 평균</b>해 이어 붙인 지수입니다.
+        시가총액 가중을 쓰지 않은 이유는 간단합니다. 그렇게 하면 "반도체·메모리"를 삼성전자 하나가
+        거의 전부 설명해 버려서 섹터 지표로서 의미가 없어집니다.
+        구성 종목 중 하나가 거래정지되거나 아직 상장 전이면, 그 종목은 해당 구간 계산에서만 빠집니다.
+      </div>
+    </details>
+
+    <details>
+      <summary>데이터 출처와 한계</summary>
+      <div class="body">
+        <p>한국은 네이버 금융, 미국은 야후 파이낸스의 일봉을 매 거래일 장 마감 뒤 받아 정적 파일로 저장합니다.
+        <b>전일 종가 기준</b>이며 실시간이 아닙니다. 미국 데이터는 한국 시각 기준으로 한 거래일 늦게 반영됩니다.</p>
+        <p style="margin-top:8px;">한계를 분명히 해 둡니다. 여기서 말하는 "시장 전체"는 거래소 전체가 아니라
+        <b>이 화면에 수록된 종목들</b>입니다. 섹터 구성도 공식 산업분류가 아니라 투자자들이 실제로 묶어 부르는
+        테마 기준으로 저희가 정한 것입니다. 그래서 절대 수치보다 <b>섹터들 사이의 순서와 방향</b>을 보는 데
+        쓰는 것이 맞습니다.</p>
+        <p style="margin-top:8px;">이 화면은 정보 제공용이며 투자 권유가 아닙니다.</p>
+      </div>
+    </details>
+  </section>
+</div>
+
+</div><!-- end container -->
+
+<!-- COUPANG_PARTNERS_START 쿠팡 파트너스 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
+<div class="container" id="coupangAdWrap" style="margin-top:4px;">
+  <div id="coupangAd" style="display:none; background:#fff; border-radius:14px; padding:14px 16px 16px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+    <div style="max-width:100%; overflow-x:hidden; display:flex; justify-content:center;">
+      <script src="https://ads-partners.coupang.com/g.js"></script>
+      <script>
+      (function () {
+        // 쿠팡 배너는 픽셀 고정 크기라 화면마다 다른 배너를 써야 합니다.
+        // 쿠팡 파트너스에 배너를 두 개 만들어 두고, 화면 폭에 맞는 쪽을 고릅니다.
+        //   PC/태블릿 : 1012747 (680x140)
+        //   모바일     : 1012749 (329x140)
+        // 폭이 모자라면 그만큼 줄여서 넣습니다. 그대로 넣으면 가로 스크롤이 생기는데,
+        // 애드센스 심사자는 모바일을 먼저 보기 때문에 그게 그대로 감점이 됩니다.
+        if (typeof PartnersCoupang === 'undefined') return; // 차단됐으면 고지 문구까지 통째로 숨김
+        var box = document.getElementById('coupangAd');
+        // 배너를 담을 카드는 아직 display:none 이라 폭을 잴 수 없습니다(0 이 나옵니다).
+        // 항상 보이는 바깥 컨테이너를 재고 카드 좌우 패딩(16px x 2)을 뺍니다.
+        var wrap = document.getElementById('coupangAdWrap');
+        var outer = (wrap && wrap.clientWidth) || document.documentElement.clientWidth || 320;
+        var avail = Math.floor(outer) - 32;
+        var DESKTOP = { id: 1012747, width: 680 };
+        var MOBILE  = { id: 1012749, width: 329 };
+        var pick = avail >= DESKTOP.width ? DESKTOP : MOBILE;
+        var width = Math.max(240, Math.min(pick.width, avail));
+        try {
+          new PartnersCoupang.G({
+            id: pick.id, template: 'carousel', trackingCode: 'AF9480830',
+            width: String(width), height: '140', tsource: ''
+          });
+          box.style.display = 'block';
+        } catch (e) {
+          console.error('[coupang] 배너 생성 실패:', e);
+        }
+      })();
+      </script>
+    </div>
+    <p style="margin-top:10px; font-size:11px; color:#a0aec0; line-height:1.6; text-align:center;">
+      이 영역은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+    </p>
+  </div>
+</div>
+<!-- COUPANG_PARTNERS_END -->
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>📊 MDD 분석기</h4>
+        <p>고점 대비 하락률(MDD)으로 하락 및 회복 패턴을 찾아주는 무료 주식 분석 도구입니다.</p>
+      </div>
+      <div class="footer-col">
+        <h4>무료 계산기</h4>
+        <a href="/" onclick="navigate('home'); return false;">📊 MDD 계산기</a>
+        <a href="/rsi-calculator.html" onclick="navigate('rsi'); return false;">📈 RSI 계산기</a>
+        <a href="/dividend-calculator.html" onclick="navigate('dividend'); return false;">💰 배당 수익률 계산기</a>
+        <a href="/fx-calculator.html" onclick="navigate('fx'); return false;">💱 환율 계산기</a>
+        <a href="/roi-calculator.html" onclick="navigate('roi'); return false;">💹 수익률 계산기</a>
+        <a href="/compound-calculator.html" onclick="navigate('compound'); return false;">🧮 복리 계산기</a>
+        <a href="/leverage-etf-simulator.html" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
+        <a href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
+        <a href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 섹터 히트맵</a>
+        <a href="/dca-planner.html" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
+        <a href="/tools.html" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
+      </div>
+      <div class="footer-col">
+        <h4>투자 가이드</h4>
+        <a href="/blog.html" onclick="navigate('blog'); return false;">📚 모든 가이드 보기</a>
+        <a href="/blog/1.html">MDD란 무엇인가?</a>
+        <a href="/blog/3.html">-30% 하락 시 하락 대응 패턴</a>
+        <a href="/blog/5.html">RSI 완전 가이드</a>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <a href="/about.html" onclick="navigate('about'); return false;">ℹ️ 소개</a>
+        <a href="/contact.html" onclick="navigate('contact'); return false;">✉️ 문의하기</a>
+        <a href="/privacy.html" onclick="navigate('privacy'); return false;">🔒 개인정보 처리방침</a>
+        <a href="/terms.html" onclick="navigate('terms'); return false;">📋 이용약관</a>
+        <a href="/disclaimer.html" onclick="navigate('disclaimer'); return false;">⚠️ 면책조항</a>
+        <a href="mailto:gktgkt2309@gmail.com">📧 gktgkt2309@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MDD 분석기. All rights reserved.</p>
+      <p class="footer-disclaimer">⚠️ 이 사이트에서 제공하는 모든 정보는 교육적 목적으로만 제공되며, 투자 권유나 재정 조언이 아닙니다. 주식 투자는 원금 손실의 위험이 있으며, 모든 투자 결정은 본인의 신중한 판단에 따라 진행하시기 바랍니다.</p>
+    </div>
+  </div>
+</footer>
+
+
+<script>window.CURRENT_PAGE = 'sector';</script>
+<script src="/assets/site.js"></script>
+</body>
+</html>

@@ -28,6 +28,8 @@
     <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
+      <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
+      <a href="/heatmap.html" onclick="navigate('heatmap'); return false;" id="nav-heatmap">🔥 히트맵</a>
       <a href="/tools.html" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
       <a href="/blog.html" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
       <a href="/about.html" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
@@ -50,6 +52,18 @@
       <div class="tool-icon">📊</div>
       <h3>MDD 계산기</h3>
       <p>고점 대비 하락률(Maximum Drawdown)을 계산하여 하락 및 회복 패턴을 찾아보세요. 회복률 분석과 데이터 기반 지표 제공.</p>
+      <span class="tool-badge">✅ 무료 이용</span>
+    </div>
+    <div class="tool-card" onclick="navigate('sector')">
+      <div class="tool-icon">📊</div>
+      <h3>섹터 상대강도(RS)</h3>
+      <p>1주~12개월 기간을 골라 한국·미국 섹터를 강한 순으로 줄 세웁니다. 거래대금 비중과 외국인 소진율로 어디에 돈이 몰리는지까지 확인하세요.</p>
+      <span class="tool-badge">✅ 무료 이용</span>
+    </div>
+    <div class="tool-card" onclick="navigate('heatmap')">
+      <div class="tool-icon">🔥</div>
+      <h3>섹터 히트맵</h3>
+      <p>칸 크기는 거래대금, 색은 등락률. 어느 종목에 돈이 얼마나 몰려 있고 그게 오르는지 내리는지를 한 화면에서 봅니다.</p>
       <span class="tool-badge">✅ 무료 이용</span>
     </div>
     <div class="tool-card" onclick="navigate('rsi')">
@@ -106,7 +120,7 @@
 
   <section class="card" style="background:#f7fafc;">
     <h2 class="section">🧭 어떤 상황에 어떤 도구를 쓰면 좋을까요?</h2>
-    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">도구가 8가지나 되다 보니 무엇부터 써야 할지 막막할 수 있습니다. 투자 과정의 단계별로 정리해 봤습니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">도구가 10가지나 되다 보니 무엇부터 써야 할지 막막할 수 있습니다. 투자 과정의 단계별로 정리해 봤습니다.</p>
     <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">① 시장이 많이 빠졌을 때 — MDD 계산기</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">지금 하락이 이 종목의 과거 기준으로 흔한 수준인지 드문 수준인지 확인하고 싶을 때 사용합니다. 고점 대비 하락률과 과거 하락 구간별 회복 이력을 보여줍니다.</p>
     <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">② 단기 과열·침체가 궁금할 때 — RSI 계산기</h3>
@@ -123,6 +137,10 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">매수가·매도가에 수수료와 세금까지 반영한 실수익률을 계산합니다. 연환산 수익률로 서로 다른 투자를 공정하게 비교할 수 있습니다.</p>
     <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">⑧ 고위험 상품을 이해하고 싶을 때 — 레버리지 ETF 시뮬레이터</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">레버리지 상품의 일일 배수 리셋과 변동성 잠식이 장기 성과에 미치는 영향을 시뮬레이션합니다. 매수 전 위험을 숫자로 확인하는 용도입니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">⑨ 어디에 돈이 몰리는지 궁금할 때 — 섹터 상대강도(RS)</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">종목 하나가 아니라 업종 전체를 봅니다. 기간을 고르면 반도체·바이오·조선 같은 테마를 시장 대비 강한 순으로 줄 세워 주고, 한 달 전 순위와 비교해 지금 올라오는 중인지 식는 중인지를 화살표로 보여줍니다. RSI가 "이 종목이 과열됐나"를 본다면, RS는 "지금 돈이 어디로 가고 있나"를 봅니다.</p>
+    <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">⑩ 시장 전체를 한눈에 훑고 싶을 때 — 섹터 히트맵</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;">표를 읽는 대신 그림으로 봅니다. 칸이 클수록 그 종목에 돈이 많이 오갔다는 뜻이고, 초록이면 올랐고 빨강이면 빠졌습니다. 섹터끼리 붙어 있어서 "반도체는 통째로 빨간데 바이오만 초록" 같은 게 바로 보입니다. 섹터 RS 화면과 같은 데이터를 다른 방식으로 보여줍니다.</p>
     <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 모든 도구의 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
   </section>
 
@@ -214,6 +232,8 @@
         <a href="/roi-calculator.html" onclick="navigate('roi'); return false;">💹 수익률 계산기</a>
         <a href="/compound-calculator.html" onclick="navigate('compound'); return false;">🧮 복리 계산기</a>
         <a href="/leverage-etf-simulator.html" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
+        <a href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
+        <a href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 섹터 히트맵</a>
         <a href="/dca-planner.html" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
         <a href="/tools.html" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
       </div>

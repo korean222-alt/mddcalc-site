@@ -305,6 +305,8 @@
     <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
+      <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
+      <a href="/heatmap.html" onclick="navigate('heatmap'); return false;" id="nav-heatmap">🔥 히트맵</a>
       <a href="/tools.html" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
       <a href="/blog.html" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
       <a href="/about.html" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
@@ -350,8 +352,8 @@
       <summary>🇰🇷 조회 가능한 한국 종목 보기</summary>
       <!-- KR_SUPPORTED_START 이 블록은 scripts/generate-kr-data.js 가 자동으로 씁니다 -->
       <div class="body" style="font-size:12px; line-height:1.9;">
-        <div style="margin-bottom:8px;"><b>코스피</b> (52) — <span class="kr-name">삼성전자</span>, <span class="kr-name">SK하이닉스</span>, <span class="kr-name">LG에너지솔루션</span>, <span class="kr-name">삼성바이오로직스</span>, <span class="kr-name">현대차</span>, <span class="kr-name">기아</span>, <span class="kr-name">셀트리온</span>, <span class="kr-name">NAVER</span>, <span class="kr-name">카카오</span>, <span class="kr-name">LG화학</span>, <span class="kr-name">삼성SDI</span>, <span class="kr-name">POSCO홀딩스</span>, <span class="kr-name">현대모비스</span>, <span class="kr-name">LG전자</span>, <span class="kr-name">삼성전기</span>, <span class="kr-name">삼성물산</span>, <span class="kr-name">SK</span>, <span class="kr-name">LG</span>, <span class="kr-name">SK스퀘어</span>, <span class="kr-name">KB금융</span>, <span class="kr-name">신한지주</span>, <span class="kr-name">하나금융지주</span>, <span class="kr-name">우리금융지주</span>, <span class="kr-name">기업은행</span>, <span class="kr-name">삼성생명</span>, <span class="kr-name">삼성화재</span>, <span class="kr-name">카카오뱅크</span>, <span class="kr-name">한국전력</span>, <span class="kr-name">두산에너빌리티</span>, <span class="kr-name">한화에어로스페이스</span>, <span class="kr-name">한화오션</span>, <span class="kr-name">HD한국조선해양</span>, <span class="kr-name">HD현대중공업</span>, <span class="kr-name">한국항공우주</span>, <span class="kr-name">고려아연</span>, <span class="kr-name">SK이노베이션</span>, <span class="kr-name">HMM</span>, <span class="kr-name">대한항공</span>, <span class="kr-name">현대건설</span>, <span class="kr-name">SK텔레콤</span>, <span class="kr-name">KT</span>, <span class="kr-name">KT&G</span>, <span class="kr-name">CJ제일제당</span>, <span class="kr-name">이마트</span>, <span class="kr-name">아모레퍼시픽</span>, <span class="kr-name">크래프톤</span>, <span class="kr-name">하이브</span>, <span class="kr-name">엔씨소프트</span>, <span class="kr-name">넷마블</span>, <span class="kr-name">한미반도체</span>, <span class="kr-name">KODEX 200</span>, <span class="kr-name">KODEX 레버리지</span></div>
-        <div style="margin-bottom:8px;"><b>코스닥</b> (13) — <span class="kr-name">에코프로비엠</span>, <span class="kr-name">에코프로</span>, <span class="kr-name">알테오젠</span>, <span class="kr-name">HLB</span>, <span class="kr-name">리노공업</span>, <span class="kr-name">레인보우로보틱스</span>, <span class="kr-name">펄어비스</span>, <span class="kr-name">카카오게임즈</span>, <span class="kr-name">에스엠</span>, <span class="kr-name">이오테크닉스</span>, <span class="kr-name">원익IPS</span>, <span class="kr-name">위메이드</span>, <span class="kr-name">엘앤에프</span></div>
+        <div style="margin-bottom:8px;"><b>코스피</b> (79) — <span class="kr-name">삼성전자</span>, <span class="kr-name">SK하이닉스</span>, <span class="kr-name">DB하이텍</span>, <span class="kr-name">LG에너지솔루션</span>, <span class="kr-name">삼성바이오로직스</span>, <span class="kr-name">현대차</span>, <span class="kr-name">기아</span>, <span class="kr-name">셀트리온</span>, <span class="kr-name">NAVER</span>, <span class="kr-name">카카오</span>, <span class="kr-name">LG화학</span>, <span class="kr-name">삼성SDI</span>, <span class="kr-name">POSCO홀딩스</span>, <span class="kr-name">현대모비스</span>, <span class="kr-name">HL만도</span>, <span class="kr-name">한국타이어앤테크놀로지</span>, <span class="kr-name">LG전자</span>, <span class="kr-name">삼성전기</span>, <span class="kr-name">삼성물산</span>, <span class="kr-name">SK</span>, <span class="kr-name">LG</span>, <span class="kr-name">SK스퀘어</span>, <span class="kr-name">KB금융</span>, <span class="kr-name">신한지주</span>, <span class="kr-name">하나금융지주</span>, <span class="kr-name">우리금융지주</span>, <span class="kr-name">기업은행</span>, <span class="kr-name">삼성생명</span>, <span class="kr-name">삼성화재</span>, <span class="kr-name">카카오뱅크</span>, <span class="kr-name">미래에셋증권</span>, <span class="kr-name">삼성증권</span>, <span class="kr-name">한국금융지주</span>, <span class="kr-name">키움증권</span>, <span class="kr-name">한국전력</span>, <span class="kr-name">두산에너빌리티</span>, <span class="kr-name">한화에어로스페이스</span>, <span class="kr-name">한화오션</span>, <span class="kr-name">HD한국조선해양</span>, <span class="kr-name">HD현대중공업</span>, <span class="kr-name">한국항공우주</span>, <span class="kr-name">고려아연</span>, <span class="kr-name">SK이노베이션</span>, <span class="kr-name">HMM</span>, <span class="kr-name">대한항공</span>, <span class="kr-name">현대건설</span>, <span class="kr-name">현대로템</span>, <span class="kr-name">LIG넥스원</span>, <span class="kr-name">삼성중공업</span>, <span class="kr-name">HD현대미포</span>, <span class="kr-name">HD현대일렉트릭</span>, <span class="kr-name">효성중공업</span>, <span class="kr-name">LS ELECTRIC</span>, <span class="kr-name">대우건설</span>, <span class="kr-name">GS건설</span>, <span class="kr-name">롯데케미칼</span>, <span class="kr-name">금호석유</span>, <span class="kr-name">현대제철</span>, <span class="kr-name">팬오션</span>, <span class="kr-name">SK텔레콤</span>, <span class="kr-name">KT</span>, <span class="kr-name">LG유플러스</span>, <span class="kr-name">KT&G</span>, <span class="kr-name">CJ제일제당</span>, <span class="kr-name">이마트</span>, <span class="kr-name">아모레퍼시픽</span>, <span class="kr-name">한국콜마</span>, <span class="kr-name">코스맥스</span>, <span class="kr-name">더존비즈온</span>, <span class="kr-name">한미약품</span>, <span class="kr-name">유한양행</span>, <span class="kr-name">두산로보틱스</span>, <span class="kr-name">크래프톤</span>, <span class="kr-name">하이브</span>, <span class="kr-name">엔씨소프트</span>, <span class="kr-name">넷마블</span>, <span class="kr-name">한미반도체</span>, <span class="kr-name">KODEX 200</span>, <span class="kr-name">KODEX 레버리지</span></div>
+        <div style="margin-bottom:8px;"><b>코스닥</b> (20) — <span class="kr-name">에코프로비엠</span>, <span class="kr-name">에코프로</span>, <span class="kr-name">알테오젠</span>, <span class="kr-name">HLB</span>, <span class="kr-name">리노공업</span>, <span class="kr-name">레인보우로보틱스</span>, <span class="kr-name">펄어비스</span>, <span class="kr-name">카카오게임즈</span>, <span class="kr-name">에스엠</span>, <span class="kr-name">이오테크닉스</span>, <span class="kr-name">원익IPS</span>, <span class="kr-name">위메이드</span>, <span class="kr-name">엘앤에프</span>, <span class="kr-name">ISC</span>, <span class="kr-name">HPSP</span>, <span class="kr-name">안랩</span>, <span class="kr-name">한글과컴퓨터</span>, <span class="kr-name">와이지엔터테인먼트</span>, <span class="kr-name">JYP Ent.</span>, <span class="kr-name">로보티즈</span></div>
         <div style="margin-bottom:8px;"><b>지수</b> (2) — <span class="kr-name">코스피</span>, <span class="kr-name">코스닥</span></div>
         <div style="margin-top:8px; color:#718096;">목록에 없는 종목도 6자리 코드로 요청해 주시면 추가합니다.</div>
       </div>
@@ -713,6 +715,8 @@
         <a href="/roi-calculator.html" onclick="navigate('roi'); return false;">💹 수익률 계산기</a>
         <a href="/compound-calculator.html" onclick="navigate('compound'); return false;">🧮 복리 계산기</a>
         <a href="/leverage-etf-simulator.html" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
+        <a href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
+        <a href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 섹터 히트맵</a>
         <a href="/dca-planner.html" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
         <a href="/tools.html" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
       </div>
@@ -758,6 +762,7 @@ const KR_STOCKS = {
   // 종목을 추가하려면 scripts/kr-tickers.js 에 넣고 생성기를 다시 돌리세요.
   "삼성전자": "005930",
   "SK하이닉스": "000660",
+  "DB하이텍": "000990",
   "LG에너지솔루션": "373220",
   "삼성바이오로직스": "207940",
   "현대차": "005380",
@@ -774,6 +779,10 @@ const KR_STOCKS = {
   "포스코홀딩스": "005490",
   "포스코": "005490",
   "현대모비스": "012330",
+  "HL만도": "204320",
+  "만도": "204320",
+  "한국타이어앤테크놀로지": "161390",
+  "한국타이어": "161390",
   "LG전자": "066570",
   "삼성전기": "009150",
   "삼성물산": "028260",
@@ -788,6 +797,10 @@ const KR_STOCKS = {
   "삼성생명": "032830",
   "삼성화재": "000810",
   "카카오뱅크": "323410",
+  "미래에셋증권": "006800",
+  "삼성증권": "016360",
+  "한국금융지주": "071050",
+  "키움증권": "039490",
   "한국전력": "015760",
   "한전": "015760",
   "두산에너빌리티": "034020",
@@ -802,13 +815,37 @@ const KR_STOCKS = {
   "HMM": "011200",
   "대한항공": "003490",
   "현대건설": "000720",
+  "현대로템": "064350",
+  "LIG넥스원": "079550",
+  "삼성중공업": "010140",
+  "HD현대미포": "010620",
+  "HD현대일렉트릭": "267260",
+  "효성중공업": "298040",
+  "LSELECTRIC": "010120",
+  "LS일렉트릭": "010120",
+  "대우건설": "047040",
+  "GS건설": "006360",
+  "롯데케미칼": "011170",
+  "금호석유": "011780",
+  "금호석유화학": "011780",
+  "현대제철": "004020",
+  "팬오션": "028670",
   "SK텔레콤": "017670",
   "SKT": "017670",
   "KT": "030200",
+  "LG유플러스": "032640",
+  "LGU+": "032640",
+  "LG유플": "032640",
   "KT&G": "033780",
   "CJ제일제당": "097950",
   "이마트": "139480",
   "아모레퍼시픽": "090430",
+  "한국콜마": "161890",
+  "코스맥스": "192820",
+  "더존비즈온": "012510",
+  "한미약품": "128940",
+  "유한양행": "000100",
+  "두산로보틱스": "454910",
   "크래프톤": "259960",
   "하이브": "352820",
   "HYBE": "352820",
@@ -835,12 +872,25 @@ const KR_STOCKS = {
   "원익IPS": "240810",
   "위메이드": "112040",
   "엘앤에프": "066970",
+  "ISC": "095340",
+  "HPSP": "403870",
+  "안랩": "053800",
+  "한글과컴퓨터": "030520",
+  "한컴": "030520",
+  "와이지엔터테인먼트": "122870",
+  "YG엔터": "122870",
+  "YG": "122870",
+  "JYPENT.": "035900",
+  "JYP엔터": "035900",
+  "JYP": "035900",
+  "로보티즈": "108490",
   "코스피": "KS11",
   "KOSPI": "KS11",
   "코스닥": "KQ11",
   "KOSDAQ": "KQ11",
   "005930": "005930",
   "000660": "000660",
+  "000990": "000990",
   "373220": "373220",
   "207940": "207940",
   "005380": "005380",
@@ -852,6 +902,8 @@ const KR_STOCKS = {
   "006400": "006400",
   "005490": "005490",
   "012330": "012330",
+  "204320": "204320",
+  "161390": "161390",
   "066570": "066570",
   "009150": "009150",
   "028260": "028260",
@@ -866,6 +918,10 @@ const KR_STOCKS = {
   "032830": "032830",
   "000810": "000810",
   "323410": "323410",
+  "006800": "006800",
+  "016360": "016360",
+  "071050": "071050",
+  "039490": "039490",
   "015760": "015760",
   "034020": "034020",
   "012450": "012450",
@@ -878,12 +934,32 @@ const KR_STOCKS = {
   "011200": "011200",
   "003490": "003490",
   "000720": "000720",
+  "064350": "064350",
+  "079550": "079550",
+  "010140": "010140",
+  "010620": "010620",
+  "267260": "267260",
+  "298040": "298040",
+  "010120": "010120",
+  "047040": "047040",
+  "006360": "006360",
+  "011170": "011170",
+  "011780": "011780",
+  "004020": "004020",
+  "028670": "028670",
   "017670": "017670",
   "030200": "030200",
+  "032640": "032640",
   "033780": "033780",
   "097950": "097950",
   "139480": "139480",
   "090430": "090430",
+  "161890": "161890",
+  "192820": "192820",
+  "012510": "012510",
+  "128940": "128940",
+  "000100": "000100",
+  "454910": "454910",
   "259960": "259960",
   "352820": "352820",
   "036570": "036570",
@@ -904,6 +980,13 @@ const KR_STOCKS = {
   "240810": "240810",
   "112040": "112040",
   "066970": "066970",
+  "095340": "095340",
+  "403870": "403870",
+  "053800": "053800",
+  "030520": "030520",
+  "122870": "122870",
+  "035900": "035900",
+  "108490": "108490",
   "KS11": "KS11",
   "KQ11": "KQ11",
 };
@@ -2307,7 +2390,8 @@ const PAGE_URLS = {
   home: '/', tools: '/tools.html', rsi: '/rsi-calculator.html', dividend: '/dividend-calculator.html',
   blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
   disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
-  compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html'
+  compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
+  sector: '/sector-rs.html', heatmap: '/heatmap.html'
 };
 
 function navigate(page) {

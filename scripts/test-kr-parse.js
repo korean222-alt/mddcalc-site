@@ -20,14 +20,17 @@ const CASES = [
     ticker: { code: '055550', market: 'KS' },
     // 데이터 행은 헤더와 달리 큰따옴표를 씁니다.
     body: H + `["20010910", 10797, 11324, 9885, 10894, 1254910, 42.17], ["20010911", 11037, 11277, 10894, 11181, 1239210, 42.01]]`,
-    expect: { rows: 2, close: [10894, 11181], high: [11324, 11277], currency: 'KRW' },
+    expect: { rows: 2, close: [10894, 11181], high: [11324, 11277], currency: 'KRW',
+               volume: [1254910, 1239210], foreign: [42.17, 42.01] },
   },
   {
     label: '옛 행의 외국인소진율이 빈 값 (기업은행)',
     ticker: { code: '024110', market: 'KS' },
     // `4757, ]` 처럼 마지막 값이 비어 있습니다. JSON.parse 로는 여기서 죽습니다.
     body: H + `["19980509", 5328, 5328, 5138, 5328, 4757, ], ["19980511", 4948, 5328, 4948, 4947, 10256, ]]`,
-    expect: { rows: 2, close: [5328, 4947], currency: 'KRW' },
+    // 7열이 비어 있어도 거래량(6열)은 살아 있어야 합니다. 외국인은 "없음" = null.
+    expect: { rows: 2, close: [5328, 4947], currency: 'KRW',
+              volume: [4757, 10256], foreign: [null, null] },
   },
   {
     label: '시/고/저가가 0인 행 (HD한국조선해양 상장일)',
@@ -35,13 +38,16 @@ const CASES = [
     body: H + `["19990823", 0, 0, 0, 70000, 0, ], ["19990824", 51705, 51705, 51705, 51706, 160810, 2.31]]`,
     // 고가 0 < 종가 70000 이므로 고가를 종가로 끌어올려야 합니다.
     // analyze() 가 고가를 최고점 계열로 쓰기 때문에 그대로 두면 낙폭이 어긋납니다.
-    expect: { rows: 2, close: [70000, 51706], high: [70000, 51706], currency: 'KRW' },
+    expect: { rows: 2, close: [70000, 51706], high: [70000, 51706], currency: 'KRW',
+              volume: [0, 160810], foreign: [null, 2.31] },
   },
   {
     label: '지수는 소수점 유지 (코스피)',
     ticker: { code: 'KS11', market: 'IDX' },
     body: H + `["19900104", 911.21, 933.24, 911.21, 928.82, 18094, 0.0], ["19900105", 926.56, 931.56, 913.66, 915.11, 22179, 0.0]]`,
-    expect: { rows: 2, close: [928.82, 915.11], currency: 'PT' },
+    // 지수의 외국인소진율은 늘 0.0 으로 오는데 의미가 없는 값이라 null 로 버립니다.
+    expect: { rows: 2, close: [928.82, 915.11], currency: 'PT',
+              volume: [18094, 22179], foreign: [null, null] },
   },
 ];
 
@@ -55,9 +61,13 @@ const CASES = [
       assert.strictEqual(got.d.length, expect.rows, `행 수`);
       assert.deepStrictEqual(got.c, expect.close, `종가`);
       if (expect.high) assert.deepStrictEqual(got.h, expect.high, `고가`);
+      if (expect.volume) assert.deepStrictEqual(got.v, expect.volume, `거래량`);
+      if (expect.foreign) assert.deepStrictEqual(got.f, expect.foreign, `외국인소진율`);
       assert.strictEqual(got.currency, expect.currency, `통화`);
       assert.ok(got.h.every((h, i) => h >= got.c[i]), '고가는 종가 이상이어야 함');
       assert.ok(got.d.every((d, i) => i === 0 || d > got.d[i - 1]), '날짜는 오름차순이어야 함');
+      assert.strictEqual(got.v.length, got.c.length, '거래량 길이는 종가와 같아야 함');
+      assert.strictEqual(got.f.length, got.c.length, '외국인소진율 길이는 종가와 같아야 함');
       console.log(`✅ ${label}`);
     } catch (err) {
       console.error(`❌ ${label}\n   ${err.message}`);
