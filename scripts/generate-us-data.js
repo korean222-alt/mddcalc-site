@@ -9,11 +9,16 @@
 //   필요하므로, 그 경로로 보내면 페이지뷰 40번이면 하루 한도가 끝납니다.
 //   그래서 한국 데이터와 똑같이 "빌드 시점에 받아 정적 파일로 커밋" 방식을 씁니다.
 //
-// 왜 야후가 1순위가 아닌가:
-//   2026-08-23 실행 로그에서 GitHub Actions 러너의 IP 로는 야후가 22심볼 전부에 대해
-//   첫 요청부터 HTTP 429 를 돌려줬습니다. 간격을 벌려도 소용이 없었습니다 — 요청 빈도가
-//   아니라 클라우드 IP 대역 자체를 막는 것으로 보입니다. 그래서 CI 에서 실제로 응답하는
-//   Stooq 를 1순위로 두고, 야후는 폴백으로 남깁니다. (로컬에서는 야후가 되는 경우가 있습니다)
+// 왜 Twelve Data 가 1순위인가:
+//   2026-08-23 실행 로그 기준으로 무료 소스는 둘 다 GitHub Actions 러너 IP 를 막습니다.
+//     야후  : 22심볼 전부 첫 요청부터 HTTP 429 (간격을 벌려도 동일 — IP 대역 차단)
+//     Stooq : CSV 대신 <noscript> 봇 차단 페이지
+//   반면 Twelve Data 는 이 저장소가 이미 키를 갖고 있고(refresh-stock-pages.yml 이 씁니다),
+//   무료 플랜 하루 800회 중 여기서 쓰는 건 22회뿐입니다. 그 800회 한도는 원래 "사용자가
+//   버튼을 누를 때마다 호출"하는 경로를 걱정한 것이지, 하루 한 번 도는 배치가 아닙니다.
+//
+//   무료 소스 둘은 폴백으로 남깁니다. 키가 없거나 만료된 환경에서는 그쪽이 살아날 수 있고,
+//   로컬에서는 야후가 되는 경우가 있습니다.
 
 const fs = require('fs');
 const path = require('path');
@@ -23,16 +28,56 @@ const { usSymbols, US_NAMES } = require('./sectors');
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'us');
 
-const DELAY_MS = 700;   // 한꺼번에 쏘면 막힙니다. KR 쪽과 같은 간격.
 const MAX_ROWS = 6000;
 const TAIL_ROWS = 520;  // 거래량은 최근분만. (generate-kr-data.js 와 같은 규칙)
+
+const API_KEY = process.env.TWELVE_DATA_API_KEY || '';
+
+// Twelve Data 무료 플랜은 분당 8회입니다. 22심볼이면 8.5초 간격으로 약 3분 걸립니다.
+// 키가 없어 무료 소스로 떨어질 때는 KR 쪽과 같은 700ms 를 씁니다.
+const DELAY_MS = API_KEY ? 8500 : 700;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const round2 = v => Math.round(v * 100) / 100;
 
 // ── 시세 소스 ────────────────────────────────────────────────────────
 
-// 1) Stooq 의 CSV 내보내기. 인증이 없고 전체 히스토리를 한 번에 줍니다.
+// 1) Twelve Data. 이 사이트가 미국 종목에 원래 쓰는 소스입니다.
+//    values 는 최신 날짜가 앞이라 뒤집어야 합니다. 숫자는 전부 문자열로 옵니다.
+async function fromTwelveData(symbol) {
+  if (!API_KEY) throw new Error('TWELVE_DATA_API_KEY 없음');
+
+  const url = new URL('https://api.twelvedata.com/time_series');
+  url.searchParams.set('symbol', symbol);
+  url.searchParams.set('interval', '1day');
+  url.searchParams.set('outputsize', String(MAX_ROWS));
+  url.searchParams.set('apikey', API_KEY);
+
+  const json = await (await httpGet(url.toString())).json();
+
+  // 한도 초과·잘못된 심볼도 HTTP 200 에 status:"error" 로 옵니다. 이걸 안 보면
+  // 빈 결과를 정상으로 착각해 멀쩡한 기존 파일을 덮어씁니다.
+  if (json.status === 'error') throw new Error(`${json.code || ''} ${json.message || '알 수 없는 오류'}`.trim());
+  if (!Array.isArray(json.values) || json.values.length === 0) throw new Error('values 비어 있음');
+
+  const d = [], h = [], c = [], v = [];
+  for (let i = json.values.length - 1; i >= 0; i--) { // 과거 → 최신으로 뒤집습니다
+    const row = json.values[i];
+    const close = Number(row.close);
+    if (!Number.isFinite(close) || close <= 0) continue;
+    const high = Number(row.high);
+    d.push(epochDayFromYmd(String(row.datetime).slice(0, 10).replace(/-/g, '')));
+    h.push(Math.max(round2(Number.isFinite(high) ? high : close), round2(close)));
+    c.push(round2(close));
+    const vol = Number(row.volume);
+    v.push(Number.isFinite(vol) ? Math.round(vol) : 0);
+  }
+  if (d.length === 0) throw new Error('유효한 행 없음');
+
+  return { source: 'twelvedata', currency: json.meta?.currency || 'USD', d, h, c, v };
+}
+
+// 2) Stooq 의 CSV 내보내기. 인증이 없고 전체 히스토리를 한 번에 줍니다.
 //    심볼은 소문자 + ".us" 입니다. (SPY → spy.us)
 //    응답 예:
 //      Date,Open,High,Low,Close,Volume
@@ -69,13 +114,13 @@ async function fromStooq(symbol) {
   return { source: 'stooq', currency: 'USD', d, h, c, v };
 }
 
-// 2) 야후 파이낸스. generate-kr-data.js 의 것을 그대로 씁니다 (타임아웃·호스트 폴백 포함).
+// 3) 야후 파이낸스. generate-kr-data.js 의 것을 그대로 씁니다 (타임아웃·호스트 폴백 포함).
 async function fromYahooUS(symbol) {
   const got = await fromYahoo({ code: symbol, market: 'US' });
   return { ...got, source: 'yahoo' };
 }
 
-const SOURCES = [fromStooq, fromYahooUS];
+const SOURCES = [fromTwelveData, fromStooq, fromYahooUS];
 
 async function fetchOne(symbol) {
   const errors = [];
@@ -91,6 +136,11 @@ async function fetchOne(symbol) {
 
 async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
+
+  if (!API_KEY) {
+    console.warn('::warning::TWELVE_DATA_API_KEY 가 없어 무료 소스로만 시도합니다. '
+      + 'GitHub Actions 러너에서는 무료 소스가 대부분 막히므로 미국 데이터가 비게 됩니다.');
+  }
 
   const symbols = usSymbols();
   const ok = [];
@@ -162,4 +212,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { fromStooq, fetchOne };
+module.exports = { fromStooq, fromTwelveData, fetchOne };

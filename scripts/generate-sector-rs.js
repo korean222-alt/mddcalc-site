@@ -55,17 +55,24 @@ function readSeries(dir, code) {
 
 // 거래일 축 위에 종가를 늘어놓습니다. 그 날 거래가 없으면 마지막으로 알려진 종가를 씁니다
 // (거래정지·휴장). 아직 상장 전이면 null 이고, 그 구간은 계산에서 제외됩니다.
+//
+// 중요: 시세가 끝난 날 이후로는 연장하지 않고 null 로 둡니다.
+// 앞으로 채우기는 데이터 "사이"의 구멍을 메우는 것이지, 없는 미래를 지어내는 게 아닙니다.
+// 끝까지 연장하면 상장폐지·합병된 종목이 "매일 0% 변동"으로 계산에 남아 섹터 지수를
+// 평평한 쪽으로 끌어당깁니다. 실제로 HD현대미포(2025-12-12 이후 시세 없음)가 조선 섹터
+// 수익률을 그만큼 부풀리고 있었습니다.
 function alignForward(series, axis) {
   const out = new Array(axis.length).fill(null);
+  const dates = series.dates;
+  const lastDate = dates[dates.length - 1];
   let last = null;
   let cursor = 0;
-  const dates = series.dates;
   for (let i = 0; i < axis.length; i++) {
     while (cursor < dates.length && dates[cursor] <= axis[i]) {
       last = series.close.get(dates[cursor]);
       cursor++;
     }
-    out[i] = last;
+    out[i] = axis[i] > lastDate ? null : last;
   }
   return out;
 }
@@ -148,6 +155,7 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
   const benchIdx = equalWeightIndex([alignForward(benchSeries, axis)]);
 
   const dropped = [];
+  const stale = [];
   const sectors = [];
   const universe = new Map(); // 거래대금 분모용. 같은 종목이 두 섹터에 있어도 한 번만 셉니다.
 
@@ -156,6 +164,10 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
     for (const code of def.codes) {
       const s = readSeries(dir, code);
       if (!s) { dropped.push(`${def.name}/${code}`); continue; }
+      // 시세가 축 끝까지 오지 않는 종목은 최근 구간 계산에서 자동으로 빠집니다(alignForward).
+      // 조용히 빠지면 왜 섹터 수치가 달라졌는지 알 수 없으므로 로그로 드러냅니다.
+      const lag = axis.filter(d => d > s.dates[s.dates.length - 1]).length;
+      if (lag > 0) stale.push(`${def.name}/${s.name} ${lag}거래일`);
       members.push(s);
       universe.set(code, s);
     }
@@ -232,9 +244,16 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
       rs,
       periods,
       members: s.members.map((m, mi) => {
-        const memberIdx = equalWeightIndex([s.aligned[mi]]);
+        // 정렬된 종가에서 직접 구합니다. 지수로 돌려 구하면 시세가 끊긴 종목이 "0%"로
+        // 나와 화면에 보합처럼 보입니다. 양 끝 중 하나라도 없으면 null 이어야 합니다.
+        const a = s.aligned[mi];
+        const end = a.length - 1;
         const ret = {};
-        for (const P of PERIODS) ret[P.key] = round2(periodReturn(memberIdx, P.days));
+        for (const P of PERIODS) {
+          const from = a[end - P.days];
+          const to = a[end];
+          ret[P.key] = (from == null || to == null || from <= 0) ? null : round2((to / from - 1) * 100);
+        }
         return { code: m.code, name: nameOf(m), ret };
       }),
     };
@@ -244,6 +263,8 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
   for (const P of PERIODS) benchPeriods[P.key] = round2(periodReturn(benchIdx, P.days));
 
   if (dropped.length) console.warn(`⚠️  ${marketKey}: 데이터 파일이 없어 제외한 구성 종목 ${dropped.length}개 — ${dropped.join(', ')}`);
+  if (stale.length) console.warn(`⚠️  ${marketKey}: 시세가 뒤처져 최근 구간에서 빠지는 종목 ${stale.length}개 — ${stale.join(', ')}\n`
+    + '     오래 뒤처진 종목은 상장폐지·합병일 수 있습니다. scripts/sectors.js 에서 빼는 것을 검토하세요.');
 
   return {
     market: {

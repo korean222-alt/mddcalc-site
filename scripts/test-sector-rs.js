@@ -60,7 +60,23 @@ check('periodReturn: 데이터보다 긴 기간을 요구하면 null', () => {
 
 check('alignForward: 거래 없는 날은 마지막 종가를 잇고, 상장 전은 null', () => {
   const series = { dates: [10, 12], close: new Map([[10, 100], [12, 120]]) };
-  assert.deepStrictEqual(alignForward(series, [9, 10, 11, 12, 13]), [null, 100, 100, 120, 120]);
+  // 11 은 시세 사이의 구멍이라 앞 값으로 메우고, 13 은 시세가 끝난 뒤라 null 입니다.
+  assert.deepStrictEqual(alignForward(series, [9, 10, 11, 12, 13]), [null, 100, 100, 120, null]);
+});
+
+check('alignForward: 시세가 끝난 뒤로는 연장하지 않는다', () => {
+  const series = { dates: [10], close: new Map([[10, 100]]) };
+  assert.deepStrictEqual(alignForward(series, [10, 11, 12]), [100, null, null]);
+});
+
+check('상장폐지된 멤버가 섹터 수익률을 끌어당기지 않는다', () => {
+  // 살아 있는 종목은 100 → 50 (-50%). 죽은 종목은 첫날 이후 시세가 없습니다.
+  // 연장해서 "매일 0%"로 남기면 섹터가 -25% 로 보여, 실제보다 덜 빠진 것처럼 보입니다.
+  const alive = { dates: [1, 2, 3], close: new Map([[1, 100], [2, 75], [3, 50]]) };
+  const dead = { dates: [1], close: new Map([[1, 100]]) };
+  const axis = [1, 2, 3];
+  const idx = equalWeightIndex([alignForward(alive, axis), alignForward(dead, axis)]);
+  assert.strictEqual(Math.round(periodReturn(idx, 2)), -50);
 });
 
 check('RS Rating: 최고 99, 최저 1', () => {
@@ -148,6 +164,15 @@ try {
   check('구성 종목 수익률이 들어 있다', () => {
     assert.strictEqual(by.up.members.length, 2);
     assert.ok(by.up.members[0].ret['3m'] > 0);
+  });
+
+  check('구성 종목 수익률은 종가에서 바로 구한다 (지수 경유 아님)', () => {
+    // UP1 은 창 전체에서 100 → 200 이므로 12개월(250일) 수익률이 계산 가능해야 하고,
+    // 축 길이(300)보다 긴 구간을 요구하면 null 이어야 합니다.
+    const m = by.up.members.find(x => x.name === 'UP1');
+    assert.ok(m.ret['12m'] > 0, `12m ${m.ret['12m']}`);
+    const expected = Math.round((((100 * (1 + 299 / 300)) / (100 * (1 + 49 / 300))) - 1) * 100);
+    assert.strictEqual(Math.round(m.ret['12m']), expected);
   });
 
   check('데이터 파일이 없는 구성 종목은 크래시 없이 빠진다', () => {

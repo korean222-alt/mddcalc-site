@@ -53,8 +53,14 @@ jobs:
       # 2026-08-23 실행에서 야후가 러너 IP를 막아 22심볼이 전부 429였는데, 그 실패가
       # 잡을 종료시켜 바로 앞에서 성공한 한국 101종목까지 커밋되지 못했습니다.
       # 스크립트 자체도 exit 1 하지 않지만, 예기치 못한 크래시까지 막으려고 한 겹 더 둡니다.
+      #
+      # 무료 소스(야후·Stooq)는 러너 IP 를 막습니다. Twelve Data 키가 있으면 그걸 씁니다.
+      # 하루 800회 한도 중 여기서 쓰는 건 22회뿐이라 사용자 몫을 거의 건드리지 않습니다.
+      # 키가 없어도 스텝은 통과합니다 — 그 경우 미국 탭이 뜨지 않을 뿐입니다.
       - name: Generate US sector data
         continue-on-error: true
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
         run: node scripts/generate-us-data.js
 
       # 위 두 단계가 만든 파일만 읽어 계산합니다. 네트워크를 쓰지 않습니다.
