@@ -175,6 +175,41 @@ try {
     assert.strictEqual(Math.round(m.ret['12m']), expected);
   });
 
+  // ── 1일 기간 ────────────────────────────────────────────────────────
+  // 하루짜리는 다른 기간과 규칙이 다릅니다. 조용히 어긋나기 쉬운 자리라 못 박아 둡니다.
+  check('1일: 하루 수익률이 들어 있고 순위가 매겨진다', () => {
+    const p = by.up.periods['1d'];
+    assert.ok(p.ret != null, '1d 수익률이 비어 있습니다');
+    assert.strictEqual(p.rating, 99, `상승 섹터가 1위여야 합니다 (${p.rating})`);
+    assert.strictEqual(by.down.periods['1d'].rating, 1);
+    // 벤치마크가 완전 횡보이므로 알파 = 수익률.
+    assert.strictEqual(p.ret, p.alpha);
+  });
+
+  check('1일: 거래대금 비중은 전 거래일 하루와 비교한다', () => {
+    // DOWN 만 최근 30일 거래량이 100배입니다. 마지막 이틀은 둘 다 급증 구간 안이라
+    // 하루 대 하루 비중은 거의 그대로여야 합니다 — 20일 창처럼 크게 튀면 안 됩니다.
+    const oneDay = Math.abs(by.down.periods['1d'].turnShareChg);
+    const oneMonth = Math.abs(by.down.periods['1m'].turnShareChg);
+    assert.ok(oneDay < oneMonth, `1일 ${oneDay} < 1개월 ${oneMonth} 이어야 합니다`);
+  });
+
+  check('1일: 외국인 소진율 변화폭은 내지 않는다 (결제일 뒤 확정)', () => {
+    // 소진율은 마지막 거래일 값이 전날 값 그대로 실려 오므로, 하루 차이는 늘 0 이 됩니다.
+    // 0 은 "변화 없음"으로 읽히므로, 없는 값은 null 로 둡니다.
+    assert.strictEqual(by.flat.periods['1d'].foreignChg, null);
+    // 수준(현재 소진율) 자체는 그대로 있어야 합니다.
+    assert.ok(by.flat.periods['1d'].foreign != null, '수준까지 지우면 안 됩니다');
+    // 더 긴 기간은 영향을 받지 않아야 합니다.
+    assert.ok(by.flat.periods['1m'].foreignChg > 0);
+  });
+
+  check('1일: 구성 종목에도 하루 수익률과 거래대금 비중이 있다', () => {
+    const m = by.up.members[0];
+    assert.ok(m.ret['1d'] != null, `구성 종목 1d 수익률이 비어 있습니다`);
+    assert.ok(m.turn['1d'] != null, `구성 종목 1d 거래대금 비중이 비어 있습니다`);
+  });
+
   check('데이터 파일이 없는 구성 종목은 크래시 없이 빠진다', () => {
     const withGhost = [{ key: 'g', name: '유령', codes: ['UP1', 'NOPE'] }];
     const r = buildMarket('KR', FIXTURE_DIR, withGhost, m => m.name);

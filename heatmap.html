@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>섹터 상대강도(RS) — 어느 섹터에 돈이 몰리나 | MDD 분석기</title>
-<meta name="description" content="칸 크기는 거래대금, 색은 등락률. 한국·미국 종목을 섹터별로 묶어 한 화면에 보여줍니다. 기간은 1주부터 12개월까지 고를 수 있습니다.">
+<title>섹터 히트맵 — 돈이 어디로 몰리고 무엇이 오르나 | MDD 분석기</title>
+<meta name="description" content="칸 크기는 거래대금, 색은 등락률. 한국·미국 종목을 섹터별로 묶어 한 화면에 보여줍니다. 기간은 하루부터 12개월까지 고를 수 있습니다.">
 <meta name="robots" content="index, follow">
 <meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
-<link rel="canonical" href="https://mddcalc.com/sector-rs.html">
+<link rel="canonical" href="https://mddcalc.com/heatmap.html">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="website">
-<meta property="og:title" content="섹터 상대강도(RS) | MDD 분석기">
-<meta property="og:description" content="기간을 고르면 어느 섹터로 돈이 몰리고 어디서 빠지는지 한 줄로 세워 보여줍니다.">
-<meta property="og:url" content="https://mddcalc.com/sector-rs.html">
+<meta property="og:title" content="섹터 히트맵 | MDD 분석기">
+<meta property="og:description" content="칸 크기는 거래대금, 색은 등락률 — 돈이 어디에 얼마나 있고 그게 오르는지 내리는지 한 화면에.">
+<meta property="og:url" content="https://mddcalc.com/heatmap.html">
 <meta property="og:site_name" content="MDD 분석기">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="섹터 상대강도(RS) | MDD 분석기">
-<meta name="twitter:description" content="기간을 고르면 어느 섹터로 돈이 몰리고 어디서 빠지는지 한 줄로 세워 보여줍니다.">
+<meta name="twitter:title" content="섹터 히트맵 | MDD 분석기">
+<meta name="twitter:description" content="칸 크기는 거래대금, 색은 등락률 — 돈이 어디에 얼마나 있고 그게 오르는지 내리는지 한 화면에.">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="/assets/site.css">
 </head>
@@ -57,6 +57,13 @@
         <button type="button" data-size="turn" class="active" onclick="setHeatmapSize('turn')">거래대금</button>
         <button type="button" data-size="equal" onclick="setHeatmapSize('equal')">균등</button>
       </div>
+      <!-- 좁은 화면에서는 종목 100개를 한 화면에 넣으면 칸이 손톱만 해져 이름이 안 보입니다.
+           섹터 19칸으로 묶으면 그대로도 읽힙니다. 기본값은 화면 폭에 따라 자동입니다. -->
+      <label style="margin-left:8px;">묶음</label>
+      <div class="mode-toggle" id="hmDepthToggle">
+        <button type="button" data-depth="sector" onclick="setHeatmapDepth('sector')">섹터</button>
+        <button type="button" data-depth="member" onclick="setHeatmapDepth('member')">종목</button>
+      </div>
     </div>
     <div id="hmMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
   </div>
@@ -69,7 +76,21 @@
       <div id="hmTip" style="font-size:13px; color:#4a5568; min-height:20px; margin-bottom:10px;">
         칸에 마우스를 올리거나 터치하면 자세한 값이 여기에 나옵니다.
       </div>
-      <div id="hmCanvas" style="position:relative; width:100%; height:560px; background:#f7fafc; border-radius:10px; overflow:hidden;"></div>
+      <!-- 확대하면 hmCanvas 가 뷰포트보다 커지고, 넘치는 만큼 이 상자 안에서 스크롤됩니다.
+           칸을 작게 만들어 두고 손가락으로 키워 보는 대신, 배율을 눌러 키운 뒤 밀어서 봅니다. -->
+      <div id="hmViewport" class="hm-viewport">
+        <div id="hmCanvas" style="position:relative; width:100%; height:100%;"></div>
+      </div>
+      <div class="hm-zoom">
+        <span>배율</span>
+        <div class="mode-toggle" id="hmZoomToggle">
+          <button type="button" data-zoom="1" onclick="setHeatmapZoom(1)">1x</button>
+          <button type="button" data-zoom="1.5" onclick="setHeatmapZoom(1.5)">1.5x</button>
+          <button type="button" data-zoom="2" onclick="setHeatmapZoom(2)">2x</button>
+          <button type="button" data-zoom="3" onclick="setHeatmapZoom(3)">3x</button>
+        </div>
+        <span id="hmZoomHint" style="color:#a0aec0;"></span>
+      </div>
       <div id="hmLegend" style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:11px; color:#718096; flex-wrap:wrap;"></div>
     </div>
   </div>
@@ -89,13 +110,18 @@
       </div>
       <div class="stat-box">
         <div class="label">묶음</div>
-        <div class="value">섹터</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">같은 테마끼리 붙어 있어, 섹터 전체가 초록인지 빨강인지가 바로 보입니다.</div>
+        <div class="value">섹터 / 종목</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">섹터는 19칸, 종목은 100칸입니다. 좁은 화면에서는 섹터로 시작합니다 — 종목 100칸은 칸이 너무 작아 이름이 안 들어갑니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">균등 모드</div>
         <div class="value">비교용</div>
         <div style="font-size:11px; color:#718096; margin-top:4px;">큰 종목이 화면을 다 차지해 나머지가 안 보일 때 칸을 같은 크기로 만듭니다.</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">배율</div>
+        <div class="value">확대</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">이름이 잘리면 배율을 올리세요. 지도가 커지고, 넘치는 부분은 지도 안에서 밀어 보면 됩니다.</div>
       </div>
     </div>
     <div class="info-banner" style="margin-top:12px;">
@@ -114,10 +140,29 @@
       </div>
     </details>
     <details>
+      <summary>휴대폰에서 기업 이름이 안 보입니다</summary>
+      <div class="body">
+        <p>트리맵은 칸의 <b>넓이</b>가 아니라 <b>면적</b>이 곧 글자가 들어갈 자리입니다.
+        좁은 화면에 종목 100칸을 넣으면 칸 하나가 손톱만 해져서 어떤 글자도 들어가지 않습니다.
+        칸을 작게 만들어 두고 손가락으로 키우는 방식은, 키우기 전까지는 아무것도 못 읽는다는
+        문제가 그대로 남습니다.</p>
+        <p style="margin-top:8px;">그래서 두 가지를 뒀습니다.
+        <b>묶음</b>을 섹터로 두면 19칸이라 그대로도 이름이 읽힙니다(좁은 화면 기본값입니다).
+        종목까지 봐야 하면 <b>배율</b>을 1.5x~3x 로 올리세요. 지도가 그만큼 커지고
+        넘치는 부분은 지도 안에서 밀어서 봅니다 — 페이지는 따라 움직이지 않습니다.</p>
+        <p style="margin-top:8px;">칸을 누르면 지도 위 설명줄에 이름·등락률·거래대금 비중이
+        그대로 나옵니다. 이름이 안 보이는 칸도 이렇게 확인할 수 있습니다.</p>
+      </div>
+    </details>
+    <details>
       <summary>데이터 출처와 한계</summary>
       <div class="body">
-        <p>한국은 네이버 금융, 미국은 Twelve Data 의 일봉을 매 거래일 장 마감 뒤 받아
-        정적 파일로 저장합니다. <b>전일 종가 기준</b>이며 실시간이 아닙니다.</p>
+        <p>한국은 네이버 금융, 미국은 Twelve Data 의 일봉을 매 거래일 <b>장 마감 뒤에 한 번</b> 받아
+        정적 파일로 저장합니다. 브라우저는 그 파일을 읽습니다. 즉 새로고침해도 장중 시세로 바뀌지
+        않고, 늘 <b>마지막으로 마감된 거래일의 종가</b>입니다. 화면 위에 적힌 기준일이 그 날짜입니다.
+        미국 데이터는 한국 시각 기준으로 한 거래일 늦게 반영됩니다.</p>
+        <p style="margin-top:8px;"><b>1일</b> 기간은 달력의 하루가 아니라 <b>거래일 하루</b>입니다.
+        월요일에 보면 금요일 종가 대비이고, 연휴 뒤에는 연휴 직전 종가 대비입니다.</p>
         <p style="margin-top:8px;">여기서 말하는 "전체"는 거래소 전체가 아니라 <b>이 화면에 수록된 종목들</b>입니다.
         섹터 구분도 공식 산업분류가 아니라 투자자들이 실제로 묶어 부르는 테마 기준으로 정한 것입니다.
         이 화면은 정보 제공용이며 투자 권유가 아닙니다.</p>
@@ -129,48 +174,6 @@
 
 </div><!-- end container -->
 
-<!-- COUPANG_PARTNERS_START 쿠팡 파트너스 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
-<div class="container" id="coupangAdWrap" style="margin-top:4px;">
-  <div id="coupangAd" style="display:none; background:#fff; border-radius:14px; padding:14px 16px 16px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-    <div style="max-width:100%; overflow-x:hidden; display:flex; justify-content:center;">
-      <script src="https://ads-partners.coupang.com/g.js"></script>
-      <script>
-      (function () {
-        // 쿠팡 배너는 픽셀 고정 크기라 화면마다 다른 배너를 써야 합니다.
-        // 쿠팡 파트너스에 배너를 두 개 만들어 두고, 화면 폭에 맞는 쪽을 고릅니다.
-        //   PC/태블릿 : 1012747 (680x140)
-        //   모바일     : 1012749 (329x140)
-        // 폭이 모자라면 그만큼 줄여서 넣습니다. 그대로 넣으면 가로 스크롤이 생기는데,
-        // 애드센스 심사자는 모바일을 먼저 보기 때문에 그게 그대로 감점이 됩니다.
-        if (typeof PartnersCoupang === 'undefined') return; // 차단됐으면 고지 문구까지 통째로 숨김
-        var box = document.getElementById('coupangAd');
-        // 배너를 담을 카드는 아직 display:none 이라 폭을 잴 수 없습니다(0 이 나옵니다).
-        // 항상 보이는 바깥 컨테이너를 재고 카드 좌우 패딩(16px x 2)을 뺍니다.
-        var wrap = document.getElementById('coupangAdWrap');
-        var outer = (wrap && wrap.clientWidth) || document.documentElement.clientWidth || 320;
-        var avail = Math.floor(outer) - 32;
-        var DESKTOP = { id: 1012747, width: 680 };
-        var MOBILE  = { id: 1012749, width: 329 };
-        var pick = avail >= DESKTOP.width ? DESKTOP : MOBILE;
-        var width = Math.max(240, Math.min(pick.width, avail));
-        try {
-          new PartnersCoupang.G({
-            id: pick.id, template: 'carousel', trackingCode: 'AF9480830',
-            width: String(width), height: '140', tsource: ''
-          });
-          box.style.display = 'block';
-        } catch (e) {
-          console.error('[coupang] 배너 생성 실패:', e);
-        }
-      })();
-      </script>
-    </div>
-    <p style="margin-top:10px; font-size:11px; color:#a0aec0; line-height:1.6; text-align:center;">
-      이 영역은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
-    </p>
-  </div>
-</div>
-<!-- COUPANG_PARTNERS_END -->
 
 <footer class="site-footer">
   <div class="footer-inner">

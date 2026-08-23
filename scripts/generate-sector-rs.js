@@ -188,8 +188,12 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
   const perPeriod = {};
   const memberTurn = {};
   for (const P of PERIODS) {
+    // 순위 변화의 비교 시점. 기본은 1개월 전이지만, 1일 기간에서 "한 달 전 그날 하루의
+    // 순위"와 비교하는 것은 아무 뜻이 없습니다. 하루짜리는 바로 전 거래일과 견줍니다.
+    // (화면 열 제목도 기간에 따라 다르게 씁니다 — assets/site.js 의 RS_COLS)
+    const lag = P.days === 1 ? 1 : RANK_LAG;
     const rets = sectors.map(s => periodReturn(s.idx, P.days));
-    const retsPrev = sectors.map(s => periodReturn(s.idx, P.days, last - RANK_LAG));
+    const retsPrev = sectors.map(s => periodReturn(s.idx, P.days, last - lag));
     const ratings = toRatings(rets);
     const ratingsPrev = toRatings(retsPrev);
     const benchRet = periodReturn(benchIdx, P.days);
@@ -215,13 +219,20 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
 
       // 외국인소진율은 종목별 변화폭을 먼저 구한 뒤 평균냅니다. 절대 수준을 평균하면
       // 그 사이에 값이 생기거나 사라진 종목 때문에 변화폭이 엉뚱하게 튑니다.
+      //
+      // 1일 기간에서는 변화폭을 내지 않습니다(null). 소진율은 결제일(T+2) 뒤에 확정돼서
+      // 마지막 거래일 값은 그 전날 값이 그대로 실려 옵니다 — 표본 40종목을 확인했더니
+      // 40개 전부 마지막 이틀이 같은 값이었고, 그 앞 이틀은 33개가 달랐습니다.
+      // 그대로 빼면 모든 섹터가 정확히 0.00%p 가 되어, "변화 없음"처럼 보이는 숫자가
+      // 실제로는 "아직 안 나옴"입니다. 없는 값은 0 이 아니라 없는 값으로 둡니다.
+      const foreignReady = P.days > 1;
       const nowVals = [];
       const deltas = [];
       for (const m of s.members) {
         const now = foreignAt(m, axis, last);
         const then = foreignAt(m, axis, last - P.days);
         if (now != null) nowVals.push(now);
-        if (now != null && then != null) deltas.push(now - then);
+        if (foreignReady && now != null && then != null) deltas.push(now - then);
       }
 
       return {

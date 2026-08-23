@@ -1584,13 +1584,24 @@ const RS = {
   chart: null,
 };
 
+// scripts/sectors.js 의 PERIODS 와 키가 같아야 합니다. 이 목록에만 있고 데이터에 없는
+// 키를 고르면 표 전체가 — 로 나옵니다. (거기 주석에 하루 기준의 정의를 적어 두었습니다)
 const RS_PERIODS = [
-  { key: '1w', label: '1주' },
-  { key: '1m', label: '1개월' },
-  { key: '3m', label: '3개월' },
-  { key: '6m', label: '6개월' },
-  { key: '12m', label: '12개월' },
+  { key: '1d',  label: '1일',    days: 1 },
+  { key: '1w',  label: '1주',    days: 5 },
+  { key: '1m',  label: '1개월',  days: 20 },
+  { key: '3m',  label: '3개월',  days: 60 },
+  { key: '6m',  label: '6개월',  days: 120 },
+  { key: '12m', label: '12개월', days: 250 },
 ];
+
+// 차트에 그릴 최소 점 개수. 1일을 고르면 창이 2점짜리가 되는데, 점 두 개는 흐름이
+// 아니라 그냥 선분입니다.
+//
+// 값을 6 으로 둔 것은 1주(5거래일 = 6점)를 건드리지 않기 위해서입니다.
+// "1주를 골랐는데 차트는 1주가 아니다"가 애초에 고치려던 문제라, 늘리는 것은
+// 그림이 아예 성립하지 않는 1일에만 적용돼야 합니다.
+const RS_CHART_MIN_ROWS = 6;
 
 // krOnly 열은 외국인 소진율이 있는 시장(한국)에서만 그립니다.
 const RS_COLS = [
@@ -1598,9 +1609,14 @@ const RS_COLS = [
   { key: 'rating', label: 'RS 점수', hint: '1~99, 높을수록 강함' },
   { key: 'ret', label: '수익률' },
   { key: 'alpha', label: '벤치마크 대비' },
-  { key: 'rankChg', label: '순위 변화', hint: '1개월 전 대비' },
+  // 하루짜리는 전 거래일과 견줍니다(generate-sector-rs.js 의 lag). 열 제목이 그대로
+  // "1개월 전 대비"면 화면이 계산과 다른 말을 하게 됩니다.
+  { key: 'rankChg', label: '순위 변화', hint: () => RS.period === '1d' ? '전 거래일 대비' : '1개월 전 대비' },
   { key: 'turnShare', label: '거래대금 비중', needs: 'hasTurnover' },
-  { key: 'foreignChg', label: '외국인 소진율', needs: 'hasForeign' },
+  // 1일에서는 변화폭이 비어 있습니다(소진율은 결제일 뒤 확정 — generate-sector-rs.js 참고).
+  // 왜 — 인지 화면에 적어 두지 않으면 데이터가 깨진 것처럼 보입니다.
+  { key: 'foreignChg', label: '외국인 소진율', needs: 'hasForeign',
+    hint: () => RS.period === '1d' ? '변화폭은 하루 뒤 확정' : null },
 ];
 
 const rsEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1628,12 +1644,47 @@ function rsRankChg(v) {
 
 function rsMarketData() { return RS.data.markets[RS.market]; }
 function rsPeriodLabel() { return (RS_PERIODS.find(p => p.key === RS.period) || {}).label || RS.period; }
+function rsRankBasis() { return RS.period === '1d' ? '전 거래일 대비' : '1개월 전 대비'; }
+function rsPeriodDays() { return (RS_PERIODS.find(p => p.key === RS.period) || {}).days || 60; }
+
+// 은/는, 이/가 같은 조사는 앞 글자의 받침에 따라 갈립니다. 기간 이름이 "1일"(받침 O)
+// 이거나 "1주"(받침 X)라서 한쪽으로 고정하면 문장이 어색해집니다.
+// 한글이 아닌 글자(숫자·영문)로 끝나면 안전한 쪽을 씁니다.
+function rsJosa(word, withBatchim, without) {
+  const ch = word.charCodeAt(word.length - 1);
+  if (ch < 0xac00 || ch > 0xd7a3) return withBatchim;
+  return (ch - 0xac00) % 28 === 0 ? without : withBatchim;
+}
+
+// 이 화면은 실시간이 아닙니다. 매 거래일 장 마감 뒤에 한 번 계산해 파일로 저장하고,
+// 브라우저는 그 파일을 읽습니다. 그래서 "지금 새로고침했으니 지금 시세"가 아니라
+// "마지막으로 마감된 거래일의 종가"입니다. 며칠 지난 데이터를 최신인 줄 알고 보는
+// 일이 없도록, 기준일이 오래됐으면 그 사실을 눈에 띄게 적습니다.
+function rsStaleNote(updated) {
+  const base = `장 마감 뒤 갱신되는 종가 데이터입니다. 장중 실시간 시세가 아닙니다.`;
+  const t = Date.parse(updated + 'T00:00:00Z');
+  if (!Number.isFinite(t)) return base;
+  const days = Math.floor((Date.now() - t) / 86400000);
+  if (days <= 4) return base;
+  return `⚠️ 기준일이 ${days}일 전입니다. 데이터 갱신이 밀렸을 수 있습니다. ${base}`;
+}
+
+// 차트에 실제로 그릴 구간. 고른 기간만큼 잘라 내되(사용자가 1주를 골랐으면 1주가
+// 보여야 합니다) 데이터가 모자라면 있는 만큼, 너무 짧으면 최소치까지 늘립니다.
+// 반환은 [시작 인덱스, 행 수].
+function rsChartWindow(len) {
+  const rows = Math.min(len, Math.max(rsPeriodDays() + 1, RS_CHART_MIN_ROWS));
+  return [len - rows, rows];
+}
 
 async function initSectorPage() {
   const loading = document.getElementById('rsLoading');
   const errBox = document.getElementById('rsError');
   try {
-    const res = await fetch('/data/sectors.json');
+    // cache: 'no-cache' — 브라우저 캐시에 있어도 서버에 "바뀌었나"를 반드시 물어봅니다.
+    // 안 바뀌었으면 304 라 내려받는 양은 그대로이고, 바뀌었으면 즉시 새 파일을 받습니다.
+    // 이게 없으면 갱신된 뒤에도 한동안 어제 숫자를 보고 있을 수 있습니다.
+    const res = await fetch('/data/sectors.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     RS.data = await res.json();
   } catch (e) {
@@ -1692,9 +1743,12 @@ function renderSectorAll() {
   const benchRet = m.benchmark.ret[RS.period];
 
   document.getElementById('rsMeta').innerHTML =
-    `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> ` +
+    `기준일 <b>${rsEsc(m.updated)}</b> 종가 · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> ` +
     `${rsPeriodLabel()} ${benchRet == null ? '—' : (benchRet > 0 ? '+' : '') + benchRet.toFixed(1) + '%'} · ` +
-    `수록 ${m.universeCount}종목 / ${m.sectors.length}섹터`;
+    `수록 ${m.universeCount}종목 / ${m.sectors.length}섹터` +
+    // 기준일이 오늘이 아닐 수 있다는 것을 화면에서 바로 알 수 있어야 합니다.
+    // "조회할 때마다 실시간"으로 오해하면 이 숫자로 장중 판단을 하게 됩니다.
+    `<br><span style="color:#a0aec0;">${rsStaleNote(m.updated)}</span>`;
   document.getElementById('rsSummaryPeriod').textContent = rsPeriodLabel();
 
   renderSectorSummary();
@@ -1739,7 +1793,7 @@ function renderSectorSummary() {
     const rising = rows.filter(s => s.periods[RS.period].rankChg != null)
       .sort((a, b) => b.periods[RS.period].rankChg - a.periods[RS.period].rankChg)[0];
     html.push(rising
-      ? tile('순위가 가장 오른 섹터', rsEsc(rising.name), rsRankChg(rising.periods[RS.period].rankChg), '1개월 전 대비')
+      ? tile('순위가 가장 오른 섹터', rsEsc(rising.name), rsRankChg(rising.periods[RS.period].rankChg), rsRankBasis())
       : tile('순위가 가장 오른 섹터', '—', '', ''));
   }
   box.innerHTML = html.join('');
@@ -1751,9 +1805,10 @@ function renderSectorTable() {
 
   document.getElementById('rsHead').innerHTML = cols.map(c => {
     const active = RS.sortKey === c.key ? (RS.sortDir === -1 ? ' ▼' : ' ▲') : '';
+    const hint = typeof c.hint === 'function' ? c.hint() : c.hint;
     return `<th style="cursor:pointer; text-align:${c.align || 'center'}; white-space:nowrap;" onclick="sortSectorTable('${c.key}')">` +
       `${c.label}${active}` +
-      (c.hint ? `<div style="font-weight:400; color:#a0aec0; font-size:10px;">${c.hint}</div>` : '') +
+      (hint ? `<div style="font-weight:400; color:#a0aec0; font-size:10px;">${hint}</div>` : '') +
       `</th>`;
   }).join('');
 
@@ -1843,11 +1898,33 @@ function renderSectorDetail() {
   drawSectorChart(s, m);
 }
 
+// 차트 위 설명줄. 그린 구간이 기간 버튼에 따라 달라지므로 글도 같이 달라져야 합니다.
+// 고정 문구로 두면 1주를 눌러도 "1년 전 = 100" 이라고 적혀 있어, 화면이 스스로 거짓말을
+// 하게 됩니다. 실제로 그 상태였습니다.
+function renderSectorChartNote(m, rows, firstDate) {
+  const el = document.getElementById('rsChartNote');
+  if (!el) return;
+  const days = rsPeriodDays();
+  const shown = rows - 1;
+  // 고른 기간보다 길게 그린 경우(1일)를 숨기지 않고 그대로 밝힙니다.
+  const label = rsPeriodLabel();
+  // 휴대폰에서는 이 줄이 차트만큼 자리를 먹습니다. 한 줄에 사실만, 설명은 그 아래 한 줄.
+  const stretched = shown > days
+    ? ` <span style="color:#a0aec0;">(${label}${rsJosa(label, '은', '는')} ${days}거래일뿐이라 늘렸습니다)</span>`
+    : '';
+  el.innerHTML =
+    `<b>섹터지수 ÷ ${rsEsc(m.benchmark.name)}</b> · 최근 <b>${shown}거래일</b>(${rsEsc(firstDate)}부터) · 첫날 = 100${stretched}<br>` +
+    `선이 100 위로 가면 이 구간에서 ${rsEsc(m.benchmark.name)}보다 강했다는 뜻입니다.`;
+}
+
 // 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 표와 숫자는 멀쩡해야 하므로
 // 캔버스만 안내 문구로 바꾸고 나머지는 그대로 둡니다. (홈 화면과 같은 처리)
 function sectorChartUnavailable(msg) {
   const wrap = document.getElementById('rsChartWrap');
   if (!wrap) return;
+  // 그리지 못했으면 설명줄도 그린 것처럼 말하면 안 됩니다.
+  const note = document.getElementById('rsChartNote');
+  if (note) note.innerHTML = 'RS 선은 <b>섹터지수 ÷ 벤치마크</b>이며, 고른 기간의 첫날을 100 으로 맞춰 그립니다.';
   wrap.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; ` +
     `background:#f7fafc; border-radius:10px; color:#718096; font-size:13px; text-align:center; padding:16px;">` +
     `${msg}<br><span style="font-size:12px; color:#a0aec0;">아래 표와 숫자는 정상입니다.</span></div>`;
@@ -1864,7 +1941,21 @@ function drawSectorChart(s, m) {
 
   try {
     if (RS.chart) RS.chart.destroy();
-    const labels = m.dates.map(d => new Date(d * 86400000).toISOString().slice(0, 10));
+
+    // 고른 기간만큼만 그립니다. 저장된 RS 선은 1년치 한 벌뿐이라, 잘라 낸 다음
+    // 창 첫날 = 100 으로 다시 맞춥니다. 그래야 기준선(100)이 "이 기간 시작점"이 되고
+    // 선이 위에 있으면 그 기간 동안 벤치마크를 이겼다는 뜻이 됩니다.
+    // 다시 맞추지 않으면 1주를 골라도 눈금이 108 근처에 붙어 있어 방향이 안 보입니다.
+    const [from, rows] = rsChartWindow(s.rs.length);
+    const base = s.rs[from];
+    const series = s.rs.slice(from)
+      .map(v => (v == null || base == null || base <= 0) ? null : Math.round((v / base) * 10000) / 100);
+    const labels = m.dates.slice(from).map(d => new Date(d * 86400000).toISOString().slice(0, 10));
+
+    // 창이 짧으면 점을 찍습니다. 거래일이 몇 개 없는데 선만 있으면 어디가 하루인지
+    // 읽을 수가 없습니다.
+    const dot = rows <= 26 ? 2.5 : 0;
+
     RS.chart = new Chart(document.getElementById('rsChart').getContext('2d'), {
       type: 'line',
       data: {
@@ -1872,14 +1963,14 @@ function drawSectorChart(s, m) {
         datasets: [
           {
             label: `${s.name} RS`,
-            data: s.rs,
+            data: series,
             borderColor: '#3182ce',
             backgroundColor: 'rgba(49,130,206,0.15)',
-            fill: true, pointRadius: 0, borderWidth: 1.8, tension: 0.1,
+            fill: true, pointRadius: dot, borderWidth: 1.8, tension: 0.1,
           },
           {
             label: `${m.benchmark.name} 기준선`,
-            data: s.rs.map(() => 100),
+            data: series.map(() => 100),
             borderColor: '#a0aec0',
             borderDash: [5, 4], pointRadius: 0, borderWidth: 1, fill: false,
           },
@@ -1895,6 +1986,8 @@ function drawSectorChart(s, m) {
         },
       },
     });
+
+    renderSectorChartNote(m, rows, labels[0]);
   } catch (e) {
     // 차트 하나가 죽는다고 페이지 전체가 멈추면 안 됩니다.
     console.error('[sector] 차트 렌더 실패:', e);
@@ -1912,11 +2005,18 @@ if (CURRENT_PAGE === 'sector') {
 // 칸 크기 = 거래대금 비중, 색 = 등락률. 캔버스가 아니라 절대배치 div 로 그립니다.
 // 그래야 글자가 그대로 검색·선택되고, 화면 크기가 바뀌어도 다시 그리기만 하면 됩니다.
 
-const HM = { data: null, market: null, period: '1m', size: 'turn', tiles: [] };
+// depth: 'sector' 는 섹터 19칸, 'member' 는 종목 100칸. null 이면 화면 폭에 맡깁니다.
+// zoom: 1 이면 창에 딱 맞고, 그보다 크면 판이 창보다 커져 창 안에서 스크롤됩니다.
+const HM = { data: null, market: null, period: '1m', size: 'turn', depth: null, zoom: 1, tiles: [], bound: false };
+
+// 좁은 화면 기준. 이 아래에서는 종목 100칸을 넣어 봐야 이름이 한 글자도 안 들어갑니다.
+const HM_NARROW = 640;
+function hmIsNarrow() { return (window.innerWidth || document.documentElement.clientWidth || 0) <= HM_NARROW; }
+function hmDepth() { return HM.depth || (hmIsNarrow() ? 'sector' : 'member'); }
 
 // 색을 어디서 최대로 진하게 만들지는 기간마다 달라야 합니다. 12개월 수익률에 ±5% 기준을
 // 쓰면 거의 모든 칸이 새빨갛거나 새파래져서 아무것도 구분되지 않습니다.
-const HM_CLAMP = { '1w': 5, '1m': 10, '3m': 20, '6m': 30, '12m': 50 };
+const HM_CLAMP = { '1d': 3, '1w': 5, '1m': 10, '3m': 20, '6m': 30, '12m': 50 };
 
 // 하락 ← 보합 → 상승. 사이트 팔레트의 빨강·초록을 양 끝으로 씁니다.
 const HM_STOPS = [
@@ -1982,7 +2082,10 @@ async function initHeatmapPage() {
   const loading = document.getElementById('hmLoading');
   const errBox = document.getElementById('hmError');
   try {
-    const res = await fetch('/data/sectors.json');
+    // cache: 'no-cache' — 브라우저 캐시에 있어도 서버에 "바뀌었나"를 반드시 물어봅니다.
+    // 안 바뀌었으면 304 라 내려받는 양은 그대로이고, 바뀌었으면 즉시 새 파일을 받습니다.
+    // 이게 없으면 갱신된 뒤에도 한동안 어제 숫자를 보고 있을 수 있습니다.
+    const res = await fetch('/data/sectors.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     HM.data = await res.json();
   } catch (e) {
@@ -2009,10 +2112,12 @@ async function initHeatmapPage() {
   renderHeatmap();
 
   // 폭이 바뀌면 칸 비율이 달라지므로 다시 그립니다. 연속 호출은 한 번으로 묶습니다.
+  // 컨트롤도 같이 다시 그려야 합니다 — 묶음 기본값이 화면 폭에 따라 달라지므로,
+  // 지도만 다시 그리면 버튼은 "종목"에 불이 켜져 있는데 지도는 섹터가 됩니다.
   let timer = null;
   window.addEventListener('resize', () => {
     clearTimeout(timer);
-    timer = setTimeout(renderHeatmap, 150);
+    timer = setTimeout(() => { renderHeatmapControls(); renderHeatmap(); }, 150);
   });
 }
 
@@ -2036,11 +2141,48 @@ function renderHeatmapControls() {
     b.style.opacity = comparable ? '' : '0.45';
     b.style.cursor = comparable ? '' : 'not-allowed';
   });
+  document.querySelectorAll('#hmDepthToggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.depth === hmDepth());
+  });
+  document.querySelectorAll('#hmZoomToggle button').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.zoom) === HM.zoom);
+  });
 }
 
 function setHeatmapMarket(k) { if (HM.market === k) return; HM.market = k; renderHeatmapControls(); renderHeatmap(); }
 function setHeatmapPeriod(k) { HM.period = k; renderHeatmapControls(); renderHeatmap(); }
 function setHeatmapSize(k) { HM.size = k; renderHeatmapControls(); renderHeatmap(); }
+function setHeatmapDepth(k) { HM.depth = k; renderHeatmapControls(); renderHeatmap(); }
+
+// 배율을 바꾸면 판 크기가 달라집니다. 스크롤을 그냥 두면 보고 있던 자리가 엉뚱한 데로
+// 튀므로, 창 한가운데가 가리키던 지점을 새 배율에서도 한가운데에 오도록 되돌립니다.
+function setHeatmapZoom(z) {
+  const vp = document.getElementById('hmViewport');
+  const before = HM.zoom;
+  let cx = 0.5, cy = 0.5;
+  if (vp && vp.scrollWidth > 0) {
+    cx = (vp.scrollLeft + vp.clientWidth / 2) / vp.scrollWidth;
+    cy = (vp.scrollTop + vp.clientHeight / 2) / vp.scrollHeight;
+  }
+  HM.zoom = z;
+  renderHeatmapControls();
+  renderHeatmap();
+  if (vp && z !== before) {
+    vp.scrollLeft = cx * vp.scrollWidth - vp.clientWidth / 2;
+    vp.scrollTop = cy * vp.scrollHeight - vp.clientHeight / 2;
+  }
+}
+
+// 이름이 칸에 실제로 들어가는 글자 크기. 한글은 대략 글자 크기만큼 폭을 먹으므로
+// (칸 너비 ÷ 글자 수) 가 곧 넣을 수 있는 최대 크기입니다. 눈대중으로 11px 을 박아 두면
+// 긴 이름은 잘리고 짧은 이름은 칸을 놀립니다.
+// 아주 긴 이름은 6글자까지만 셈에 넣고 나머지는 CSS 말줄임에 맡깁니다 —
+// 그렇게 안 하면 이름 하나 때문에 글자가 4px 이 됩니다.
+function hmFontFor(w, h, len) {
+  const byWidth = (w - 6) / Math.max(1, Math.min(len, 6));
+  const byHeight = (h - 13) / 1.35;
+  return Math.floor(Math.min(13, byWidth, byHeight));
+}
 
 function hmShowTip(text) { document.getElementById('hmTip').innerHTML = text; }
 
@@ -2049,83 +2191,116 @@ function renderHeatmap() {
   const P = HM.period;
   const clamp = HM_CLAMP[P] || 10;
   const canvas = document.getElementById('hmCanvas');
-  if (!canvas) return;
+  const viewport = document.getElementById('hmViewport');
+  if (!canvas || !viewport) return;
+
+  const byMember = hmDepth() === 'member';
 
   document.getElementById('hmMeta').innerHTML =
-    `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · ` +
+    `기준일 <b>${rsEsc(m.updated)}</b> 종가 · ` +
     `${hmPeriodLabel()} 등락률 · 수록 ${m.universeCount}종목 / ${m.sectors.length}섹터` +
     ` · 색 최대 ±${clamp}%` +
     // 거래대금을 비교할 수 없는 시장에서는 칸 크기가 균등이라는 걸 화면에 밝힙니다.
     // 크기가 아무 의미 없는데 의미 있어 보이는 것이 이 화면에서 가장 위험한 오해입니다.
-    (m.hasTurnover ? '' : ' · 이 시장은 섹터 ETF 와 개별 종목이 섞여 있어 거래대금을 서로 비교할 수 없습니다 — <b>칸 크기는 균등</b>입니다');
+    (m.hasTurnover ? '' : ' · 이 시장은 섹터 ETF 와 개별 종목이 섞여 있어 거래대금을 서로 비교할 수 없습니다 — <b>칸 크기는 균등</b>입니다') +
+    `<br><span style="color:#a0aec0;">${rsStaleNote(m.updated)}</span>`;
 
-  // 섹터 → 그 안의 종목. 값이 없는 종목은 그리지 않습니다(상장폐지·데이터 없음).
-  const sectors = m.sectors.map(s => {
-    const members = s.members
-      .filter(mem => mem.ret[P] != null)
-      .map(mem => ({
-        name: mem.name, code: mem.code, ret: mem.ret[P],
-        turn: mem.turn ? mem.turn[P] : null,
-        sector: s.name,
-        value: hmSizeMode() === 'equal' ? 1 : Math.max(mem.turn && mem.turn[P] ? mem.turn[P] : 0, 0.0001),
-      }))
-      .sort((a, b) => b.value - a.value);
-    return { name: s.name, members, value: members.reduce((a, x) => a + x.value, 0) };
-  }).filter(s => s.members.length > 0).sort((a, b) => b.value - a.value);
-
-  if (sectors.length === 0) { canvas.innerHTML = ''; return; }
-
-  const W = canvas.clientWidth;
-  const H = canvas.clientHeight;
-  const HEADER = 17; // 섹터 이름 띠
-
-  const boxes = [];
-  hmLayout(sectors, 0, 0, W, H, boxes);
+  // 판 크기 = 창 크기 × 배율. 배율이 1이면 창에 딱 맞아 스크롤이 없고, 그보다 크면
+  // 칸이 그만큼 커집니다. 트리맵은 칸 "면적"이 곧 글자 자리라, 이름이 잘릴 때
+  // 실제로 필요한 건 글자를 줄이는 게 아니라 판을 키우는 것입니다.
+  const W = Math.max(200, Math.round(viewport.clientWidth * HM.zoom));
+  const H = Math.max(200, Math.round(viewport.clientHeight * HM.zoom));
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
 
   const html = [];
   HM.tiles = [];
+  const HEADER = 17; // 섹터 이름 띠
 
-  for (const box of boxes) {
-    const s = box.item;
-    html.push(
-      `<div style="position:absolute; left:${box.x}px; top:${box.y}px; width:${box.w}px; height:${box.h}px; ` +
-      `border:1px solid #fff; box-sizing:border-box; overflow:hidden;">` +
-      (box.h > HEADER + 8
-        ? `<div style="height:${HEADER}px; line-height:${HEADER}px; background:#2d3748; color:#fff; ` +
-          `font-size:10px; font-weight:700; padding:0 5px; white-space:nowrap; overflow:hidden;">${rsEsc(s.name)}</div>`
+  // 한 칸 그리기. 섹터 묶음과 종목 묶음이 같은 함수를 씁니다 — 두 벌로 두면
+  // 한쪽만 고치게 됩니다.
+  const drawTile = (it, box) => {
+    const { bg, fg } = hmColor(it.ret, clamp);
+    const sign = it.ret > 0 ? '+' : '';
+    const idx = HM.tiles.length;
+    HM.tiles.push(it);
+
+    const fs = hmFontFor(box.w, box.h, it.name.length);
+    const showName = fs >= 8;
+    const showPct = box.w > 26 && box.h > 13;
+    const pctSize = showName ? Math.max(9, Math.min(fs - 1, 12)) : 9;
+
+    return `<div data-tile="${idx}" title="${rsEsc(it.sector)} · ${rsEsc(it.name)}  ${sign}${it.ret.toFixed(1)}%" ` +
+      `style="position:absolute; left:${box.x}px; top:${box.y}px; width:${box.w}px; height:${box.h}px; ` +
+      `background:${bg}; color:${fg}; border:1px solid rgba(255,255,255,0.85); box-sizing:border-box; ` +
+      `display:flex; flex-direction:column; align-items:center; justify-content:center; ` +
+      `overflow:hidden; cursor:default; line-height:1.25; padding:1px;">` +
+      (showName
+        ? `<span style="font-weight:700; font-size:${fs}px; max-width:100%; overflow:hidden; ` +
+          `text-overflow:ellipsis; white-space:nowrap;">${rsEsc(it.name)}</span>`
         : '') +
-      `</div>`
-    );
+      (showPct
+        ? `<span style="font-size:${pctSize}px; opacity:0.95;">${sign}${it.ret.toFixed(showName ? 1 : 0)}%</span>`
+        : '') +
+      `</div>`;
+  };
 
-    const innerY = box.h > HEADER + 8 ? HEADER : 0;
-    const innerH = box.h - innerY;
-    const cells = [];
-    hmLayout(s.members, box.x, box.y + innerY, box.w, innerH, cells);
+  if (byMember) {
+    // 섹터 → 그 안의 종목. 값이 없는 종목은 그리지 않습니다(상장폐지·데이터 없음).
+    const sectors = m.sectors.map(s => {
+      const members = s.members
+        .filter(mem => mem.ret[P] != null)
+        .map(mem => ({
+          name: mem.name, code: mem.code, ret: mem.ret[P],
+          turn: mem.turn ? mem.turn[P] : null,
+          sector: s.name,
+          value: hmSizeMode() === 'equal' ? 1 : Math.max(mem.turn && mem.turn[P] ? mem.turn[P] : 0, 0.0001),
+        }))
+        .sort((a, b) => b.value - a.value);
+      return { name: s.name, members, value: members.reduce((a, x) => a + x.value, 0) };
+    }).filter(s => s.members.length > 0).sort((a, b) => b.value - a.value);
 
-    for (const cell of cells) {
-      const it = cell.item;
-      const { bg, fg } = hmColor(it.ret, clamp);
-      const sign = it.ret > 0 ? '+' : '';
-      const label = cell.w > 46 && cell.h > 26;
-      const small = cell.w > 30 && cell.h > 14 && !label;
-      const idx = HM.tiles.length;
-      HM.tiles.push(it);
+    if (sectors.length === 0) { canvas.innerHTML = ''; return; }
 
+    const boxes = [];
+    hmLayout(sectors, 0, 0, W, H, boxes);
+
+    for (const box of boxes) {
+      const s = box.item;
       html.push(
-        `<div data-tile="${idx}" title="${rsEsc(it.sector)} · ${rsEsc(it.name)}  ${sign}${it.ret.toFixed(1)}%" ` +
-        `style="position:absolute; left:${cell.x}px; top:${cell.y}px; width:${cell.w}px; height:${cell.h}px; ` +
-        `background:${bg}; color:${fg}; border:1px solid rgba(255,255,255,0.85); box-sizing:border-box; ` +
-        `display:flex; flex-direction:column; align-items:center; justify-content:center; ` +
-        `overflow:hidden; cursor:default; font-size:11px; line-height:1.25; padding:1px;">` +
-        (label
-          ? `<span style="font-weight:700; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${rsEsc(it.name)}</span>` +
-            `<span style="font-size:10px; opacity:0.95;">${sign}${it.ret.toFixed(1)}%</span>`
-          : small
-            ? `<span style="font-size:9px; opacity:0.95;">${sign}${it.ret.toFixed(0)}%</span>`
-            : '') +
+        `<div style="position:absolute; left:${box.x}px; top:${box.y}px; width:${box.w}px; height:${box.h}px; ` +
+        `border:1px solid #fff; box-sizing:border-box; overflow:hidden;">` +
+        (box.h > HEADER + 8
+          ? `<div style="height:${HEADER}px; line-height:${HEADER}px; background:#2d3748; color:#fff; ` +
+            `font-size:10px; font-weight:700; padding:0 5px; white-space:nowrap; overflow:hidden;">${rsEsc(s.name)}</div>`
+          : '') +
         `</div>`
       );
+
+      const innerY = box.h > HEADER + 8 ? HEADER : 0;
+      const cells = [];
+      hmLayout(s.members, box.x, box.y + innerY, box.w, box.h - innerY, cells);
+      for (const cell of cells) html.push(drawTile(cell.item, cell));
     }
+  } else {
+    // 섹터 묶음. 칸이 19개뿐이라 좁은 화면에서도 이름이 그대로 들어갑니다.
+    // 수익률은 섹터 지수(구성 종목 동일가중)의 값이라 종목 칸의 평균과는 다릅니다.
+    const items = m.sectors
+      .filter(s => s.periods[P] && s.periods[P].ret != null)
+      .map(s => {
+        const share = s.periods[P].turnShare;
+        return {
+          name: s.name, code: s.key, ret: s.periods[P].ret, turn: share, sector: '섹터 지수',
+          value: hmSizeMode() === 'equal' ? 1 : Math.max(share || 0, 0.0001),
+        };
+      })
+      .sort((a, b) => b.value - a.value);
+
+    if (items.length === 0) { canvas.innerHTML = ''; return; }
+
+    const cells = [];
+    hmLayout(items, 0, 0, W, H, cells);
+    for (const cell of cells) html.push(drawTile(cell.item, cell));
   }
 
   canvas.innerHTML = html.join('');
@@ -2134,23 +2309,36 @@ function renderHeatmap() {
   // "1개월 -9.8%" 로 남아, 화면 안에서 두 기간이 섞여 보입니다.
   hmShowTip('칸에 마우스를 올리거나 터치하면 자세한 값이 여기에 나옵니다.');
 
+  // 배율 안내. 배율 1에서는 스크롤이 없으니 "밀어서 보세요"라고 하면 안 됩니다.
+  document.getElementById('hmZoomHint').textContent = HM.zoom > 1
+    ? '· 확대된 상태입니다. 지도 안을 밀어서 나머지를 보세요.'
+    : (hmDepth() === 'sector'
+      ? '· 섹터로 묶어 보는 중입니다. 종목까지 보려면 묶음을 종목으로 바꾸세요.'
+      : '· 이름이 잘리면 배율을 올리거나 묶음을 섹터로 바꾸세요.');
+
   // 마우스와 터치 양쪽에서 같은 설명을 띄웁니다. 칸이 작아 글자를 못 넣은 경우가 많아
   // 이 줄이 사실상 유일한 확인 수단입니다.
-  const onPick = e => {
-    const el = e.target.closest('[data-tile]');
-    if (!el) return;
-    const it = HM.tiles[Number(el.dataset.tile)];
-    if (!it) return;
-    const sign = it.ret > 0 ? '+' : '';
-    const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
-    hmShowTip(
-      `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
-      `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
-      (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '')
-    );
-  };
-  canvas.addEventListener('mousemove', onPick);
-  canvas.addEventListener('click', onPick);
+  //
+  // 한 번만 붙입니다. 예전에는 렌더할 때마다 붙여서, 기간 버튼을 열 번 누르면
+  // 같은 핸들러가 열 개 쌓였습니다(칸 하나 만질 때마다 열 번 실행).
+  if (!HM.bound) {
+    const onPick = e => {
+      const el = e.target.closest('[data-tile]');
+      if (!el) return;
+      const it = HM.tiles[Number(el.dataset.tile)];
+      if (!it) return;
+      const sign = it.ret > 0 ? '+' : '';
+      const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
+      hmShowTip(
+        `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
+        `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
+        (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '')
+      );
+    };
+    canvas.addEventListener('mousemove', onPick);
+    canvas.addEventListener('click', onPick);
+    HM.bound = true;
+  }
 
   // 범례
   const steps = [-clamp, -clamp / 2, 0, clamp / 2, clamp];
@@ -2162,7 +2350,8 @@ function renderHeatmap() {
         `${v > 0 ? '+' : ''}${v}%</span>`;
     }).join('') +
     '<span>상승</span>' +
-    `<span style="margin-left:8px;">· 칸 크기 = ${hmSizeMode() === 'equal' ? '균등' : '거래대금 비중'}</span>`;
+    `<span style="margin-left:8px;">· 칸 크기 = ${hmSizeMode() === 'equal' ? '균등' : '거래대금 비중'}` +
+    ` · 칸 = ${byMember ? '종목' : '섹터'}</span>`;
 }
 
 if (CURRENT_PAGE === 'heatmap') {

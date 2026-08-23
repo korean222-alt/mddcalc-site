@@ -168,33 +168,30 @@ Actions 탭 > Refresh stock report pages > Run workflow
 
 ---
 
-## 4. 쿠팡 배너 제거 방법
+## 4. 쿠팡 파트너스 (2026-08-23 전면 제거됨)
 
-각 페이지에서 아래 두 주석 **사이를 통째로** 지우면 된다. 다른 코드와 얽혀 있지 않다.
+애드센스 심사를 받으려고 전부 뺐다. 지금 저장소에 쿠팡 코드는 한 줄도 없다.
 
-```html
-<!-- COUPANG_PARTNERS_START ... -->
-...
-<!-- COUPANG_PARTNERS_END -->
-```
+지운 것:
 
-대상 9개 파일: `index.html`, `tools.html`, `rsi-calculator.html`,
-`dividend-calculator.html`, `compound-calculator.html`, `dca-planner.html`,
-`fx-calculator.html`, `roi-calculator.html`, `leverage-etf-simulator.html`
+- HTML 50개의 `COUPANG_PARTNERS_START ~ END` 블록 (직접 관리 페이지 + `blog/` + `stock/`)
+- `scripts/generate-blog-pages.js`, `scripts/generate-stock-pages.js` 의
+  `COUPANG_RESPONSIVE_BANNER` 상수와 그 사용처 — 여기를 안 지우면 생성기를 돌리는 순간
+  블로그·종목 페이지에 배너가 되살아난다
+- `privacy.html` 의 제3자 서비스 목록 항목, `terms.html` 의 제휴 고지 문단
 
-한 번에 지우려면:
+확인:
 
 ```bash
-node -e '
-const fs=require("fs");
-for (const f of ["index.html","tools.html","rsi-calculator.html","dividend-calculator.html",
-  "compound-calculator.html","dca-planner.html","fx-calculator.html","roi-calculator.html",
-  "leverage-etf-simulator.html"]) {
-  const h=fs.readFileSync(f,"utf8");
-  const out=h.replace(/<!-- COUPANG_PARTNERS_START[\s\S]*?COUPANG_PARTNERS_END -->\n*/g,"");
-  if(out!==h){ fs.writeFileSync(f,out); console.log("제거:",f); }
-}'
+grep -rniE "쿠팡|coupang|ads-partners" --include="*.html" --include="*.js" . | grep -v node_modules
 ```
+
+`docs/` 안의 기록(이 문서, `adsense-work-log.md`)에는 남아 있는데, 그건 배포되지 않는
+작업 기록이라 그대로 뒀다.
+
+다시 넣을 일이 생기면 이 커밋을 되돌리는 게 가장 빠르다. 단, 애드센스 승인 뒤에
+제휴 배너를 다시 붙일 거라면 `privacy.html`·`terms.html` 고지도 같이 되살려야 한다 —
+고지 없는 제휴 링크는 그 자체가 정책 위반이다.
 
 ---
 

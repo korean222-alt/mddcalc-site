@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>섹터 상대강도(RS) — 어느 섹터에 돈이 몰리나 | MDD 분석기</title>
-<meta name="description" content="1주부터 12개월까지 기간을 골라 한국·미국 섹터를 상대강도(RS) 순으로 줄 세웁니다. 거래대금 비중과 외국인 소진율로 수급까지 함께 봅니다.">
+<meta name="description" content="하루부터 12개월까지 기간을 골라 한국·미국 섹터를 상대강도(RS) 순으로 줄 세웁니다. 거래대금 비중과 외국인 소진율로 수급까지 함께 봅니다.">
 <meta name="robots" content="index, follow">
 <meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
 <link rel="canonical" href="https://mddcalc.com/sector-rs.html">
@@ -82,9 +82,10 @@
 
     <div class="card hidden" id="rsDetail">
       <h2 class="section" id="rsDetailTitle"></h2>
-      <div style="font-size:12px; color:#718096; margin-bottom:10px;">
-        RS 선은 <b>섹터지수 ÷ 벤치마크</b>를 1년 전 = 100 으로 맞춘 값입니다.
-        선이 올라가면 벤치마크보다 강해지는 중, 내려가면 약해지는 중입니다.
+      <!-- 이 줄은 assets/site.js 의 renderSectorChartNote() 가 채웁니다.
+           그린 구간이 기간 버튼에 따라 달라지므로 문구를 고정해 둘 수 없습니다. -->
+      <div id="rsChartNote" style="font-size:12px; color:#718096; margin-bottom:10px;">
+        RS 선은 <b>섹터지수 ÷ 벤치마크</b>이며, 고른 기간의 첫날을 100 으로 맞춰 그립니다.
       </div>
       <div class="chart-wrap" id="rsChartWrap"><canvas id="rsChart"></canvas></div>
       <div id="rsMembers" style="margin-top:16px;"></div>
@@ -116,7 +117,7 @@
       <div class="stat-box">
         <div class="label">순위 변화</div>
         <div class="value">▲ ▼</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">한 달 전 같은 기준으로 매긴 순위와의 차이. 올라가는 중인지 식는 중인지가 여기서 드러납니다.</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">한 달 전 같은 기준으로 매긴 순위와의 차이. 올라가는 중인지 식는 중인지가 여기서 드러납니다. (1일 기간에서는 전 거래일과 비교합니다)</div>
       </div>
       <div class="stat-box">
         <div class="label">거래대금 비중</div>
@@ -162,10 +163,28 @@
     </details>
 
     <details>
+      <summary>기간을 바꾸면 아래 차트도 같이 바뀌나요?</summary>
+      <div class="body">
+        <p>바뀝니다. 기간 버튼에서 고른 만큼만 잘라서 그리고, 그 <b>구간의 첫날을 100</b> 으로 맞춥니다.
+        그래서 점선(100)은 늘 "고른 기간의 시작점"이고, 선이 그 위에 있으면 그 기간 동안
+        벤치마크를 이겼다는 뜻입니다. 차트 위 설명줄에 실제로 그린 거래일 수와 시작 날짜가 적힙니다.</p>
+        <p style="margin-top:8px;"><b>1일</b>만 예외입니다. 하루는 점이 두 개뿐이라 선이 그려지지 않아
+        최근 5거래일까지 늘려 그리고, 그 사실을 설명줄에 밝힙니다. 표의 숫자는 고른 대로 하루치입니다.</p>
+      </div>
+    </details>
+
+    <details>
       <summary>데이터 출처와 한계</summary>
       <div class="body">
-        <p>한국은 네이버 금융, 미국은 야후 파이낸스의 일봉을 매 거래일 장 마감 뒤 받아 정적 파일로 저장합니다.
-        <b>전일 종가 기준</b>이며 실시간이 아닙니다. 미국 데이터는 한국 시각 기준으로 한 거래일 늦게 반영됩니다.</p>
+        <p>한국은 네이버 금융, 미국은 야후 파이낸스의 일봉을 매 거래일 <b>장 마감 뒤에 한 번</b> 받아
+        미리 계산해 정적 파일 하나로 저장합니다. 브라우저는 그 파일을 읽습니다.
+        즉 조회할 때마다 새로 계산하는 것이 아니라, <b>마지막으로 마감된 거래일의 종가</b>를 봅니다.
+        새로고침해도 장중 시세로 바뀌지 않습니다 — 화면 위에 적힌 기준일이 지금 보고 있는 날짜입니다.
+        미국 데이터는 한국 시각 기준으로 한 거래일 늦게 반영됩니다.</p>
+        <p style="margin-top:8px;"><b>1일</b> 기간은 달력의 하루가 아니라 <b>거래일 하루</b>입니다.
+        월요일에 보면 금요일 종가 대비이고, 연휴 뒤에는 연휴 직전 종가 대비입니다.
+        하루 수익률은 흔들림이 커서 순위가 매일 크게 뒤집힙니다. 방향을 볼 때는
+        1개월 이상과 함께 보는 편이 낫습니다.</p>
         <p style="margin-top:8px;">한계를 분명히 해 둡니다. 여기서 말하는 "시장 전체"는 거래소 전체가 아니라
         <b>이 화면에 수록된 종목들</b>입니다. 섹터 구성도 공식 산업분류가 아니라 투자자들이 실제로 묶어 부르는
         테마 기준으로 저희가 정한 것입니다. 그래서 절대 수치보다 <b>섹터들 사이의 순서와 방향</b>을 보는 데
@@ -178,48 +197,6 @@
 
 </div><!-- end container -->
 
-<!-- COUPANG_PARTNERS_START 쿠팡 파트너스 배너. 제거하려면 이 주석부터 END 주석까지 지우면 됩니다. -->
-<div class="container" id="coupangAdWrap" style="margin-top:4px;">
-  <div id="coupangAd" style="display:none; background:#fff; border-radius:14px; padding:14px 16px 16px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-    <div style="max-width:100%; overflow-x:hidden; display:flex; justify-content:center;">
-      <script src="https://ads-partners.coupang.com/g.js"></script>
-      <script>
-      (function () {
-        // 쿠팡 배너는 픽셀 고정 크기라 화면마다 다른 배너를 써야 합니다.
-        // 쿠팡 파트너스에 배너를 두 개 만들어 두고, 화면 폭에 맞는 쪽을 고릅니다.
-        //   PC/태블릿 : 1012747 (680x140)
-        //   모바일     : 1012749 (329x140)
-        // 폭이 모자라면 그만큼 줄여서 넣습니다. 그대로 넣으면 가로 스크롤이 생기는데,
-        // 애드센스 심사자는 모바일을 먼저 보기 때문에 그게 그대로 감점이 됩니다.
-        if (typeof PartnersCoupang === 'undefined') return; // 차단됐으면 고지 문구까지 통째로 숨김
-        var box = document.getElementById('coupangAd');
-        // 배너를 담을 카드는 아직 display:none 이라 폭을 잴 수 없습니다(0 이 나옵니다).
-        // 항상 보이는 바깥 컨테이너를 재고 카드 좌우 패딩(16px x 2)을 뺍니다.
-        var wrap = document.getElementById('coupangAdWrap');
-        var outer = (wrap && wrap.clientWidth) || document.documentElement.clientWidth || 320;
-        var avail = Math.floor(outer) - 32;
-        var DESKTOP = { id: 1012747, width: 680 };
-        var MOBILE  = { id: 1012749, width: 329 };
-        var pick = avail >= DESKTOP.width ? DESKTOP : MOBILE;
-        var width = Math.max(240, Math.min(pick.width, avail));
-        try {
-          new PartnersCoupang.G({
-            id: pick.id, template: 'carousel', trackingCode: 'AF9480830',
-            width: String(width), height: '140', tsource: ''
-          });
-          box.style.display = 'block';
-        } catch (e) {
-          console.error('[coupang] 배너 생성 실패:', e);
-        }
-      })();
-      </script>
-    </div>
-    <p style="margin-top:10px; font-size:11px; color:#a0aec0; line-height:1.6; text-align:center;">
-      이 영역은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
-    </p>
-  </div>
-</div>
-<!-- COUPANG_PARTNERS_END -->
 
 <footer class="site-footer">
   <div class="footer-inner">
