@@ -14,7 +14,16 @@ name: Refresh Korean stock data
 
 on:
   schedule:
-    - cron: '30 9 * * 1-5' # 평일 09:30 UTC = 한국시간 18:30, 장 마감 뒤
+    # 한국장 마감 뒤. 이 실행에서 한국 데이터가 당일 종가로 갱신된다.
+    - cron: '30 9 * * 1-5'  # 09:30 UTC = 한국시간 18:30
+    #
+    # 미국장 마감 뒤. 위 실행 시각(09:30 UTC)에는 미국장이 아직 열리지도 않아서,
+    # 그때 받는 미국 데이터는 늘 한 거래일 전 종가다. 그래서 한 번 더 돈다.
+    # 미국장 마감은 서머타임 20:00 UTC / 겨울 21:00 UTC 이므로 22:30 UTC 면 연중 안전하다.
+    - cron: '30 22 * * 1-5' # 22:30 UTC = 다음날 한국시간 07:30
+    #
+    # 두 번째 실행에서 한국 데이터는 대개 그대로다. 바뀐 게 없으면 커밋하지 않으므로
+    # (아래 "Commit and push if changed") 저장소가 불필요하게 커지지 않는다.
   workflow_dispatch: {}
 
 permissions:
@@ -84,5 +93,19 @@ jobs:
             echo "변경 사항 없음 — 커밋하지 않음"
           else
             git commit -m "chore: refresh Korean stock data"
-            git push origin HEAD:${GITHUB_REF_NAME}
+
+            # 이 잡은 5분 넘게 돕니다. 그 사이 누가 같은 브랜치에 푸시하면 여기서
+            # non-fast-forward 로 거부되고, 방금 받은 시세가 통째로 버려집니다.
+            # 실제로 한 번 그렇게 날렸습니다. 리베이스하고 다시 시도합니다.
+            # 우리가 만드는 건 생성물뿐이라 남의 커밋 위에 얹어도 충돌할 일이 없습니다.
+            for attempt in 1 2 3; do
+              if git push origin HEAD:${GITHUB_REF_NAME}; then
+                echo "푸시 성공 (시도 $attempt)"
+                exit 0
+              fi
+              echo "푸시 거부됨 — 원격을 받아 리베이스 후 재시도 ($attempt/3)"
+              git pull --rebase origin ${GITHUB_REF_NAME}
+            done
+            echo "::error::3번 시도했지만 푸시하지 못했습니다."
+            exit 1
           fi
