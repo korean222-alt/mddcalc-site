@@ -5,26 +5,89 @@
 //
 // 왜 별도 파이프라인인가:
 //   미국 종목은 이미 /api/twelve-data/time-series 로 조회할 수 있지만, 그쪽은 하루 800회
-//   한도를 MySQL 로 세는 유료 API 프록시입니다. 섹터 화면은 한 번 열 때 20개 넘는 심볼이
+//   한도를 MySQL 로 세는 API 프록시입니다. 섹터 화면은 한 번 열 때 20개 넘는 심볼이
 //   필요하므로, 그 경로로 보내면 페이지뷰 40번이면 하루 한도가 끝납니다.
 //   그래서 한국 데이터와 똑같이 "빌드 시점에 받아 정적 파일로 커밋" 방식을 씁니다.
 //
-// 수집기는 generate-kr-data.js 의 fromYahoo 를 그대로 가져다 씁니다. 재구현하지 않습니다.
-// 타임아웃·재시도·호스트 폴백이 이미 그 안에 들어 있습니다.
+// 왜 야후가 1순위가 아닌가:
+//   2026-08-23 실행 로그에서 GitHub Actions 러너의 IP 로는 야후가 22심볼 전부에 대해
+//   첫 요청부터 HTTP 429 를 돌려줬습니다. 간격을 벌려도 소용이 없었습니다 — 요청 빈도가
+//   아니라 클라우드 IP 대역 자체를 막는 것으로 보입니다. 그래서 CI 에서 실제로 응답하는
+//   Stooq 를 1순위로 두고, 야후는 폴백으로 남깁니다. (로컬에서는 야후가 되는 경우가 있습니다)
 
 const fs = require('fs');
 const path = require('path');
-const { fromYahoo } = require('./generate-kr-data');
+const { fromYahoo, httpGet, epochDayFromYmd } = require('./generate-kr-data');
 const { usSymbols, US_NAMES } = require('./sectors');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'us');
 
-const DELAY_MS = 700;   // 야후는 한꺼번에 쏘면 429 를 줍니다. KR 쪽과 같은 간격.
+const DELAY_MS = 700;   // 한꺼번에 쏘면 막힙니다. KR 쪽과 같은 간격.
 const MAX_ROWS = 6000;
 const TAIL_ROWS = 520;  // 거래량은 최근분만. (generate-kr-data.js 와 같은 규칙)
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const round2 = v => Math.round(v * 100) / 100;
+
+// ── 시세 소스 ────────────────────────────────────────────────────────
+
+// 1) Stooq 의 CSV 내보내기. 인증이 없고 전체 히스토리를 한 번에 줍니다.
+//    심볼은 소문자 + ".us" 입니다. (SPY → spy.us)
+//    응답 예:
+//      Date,Open,High,Low,Close,Volume
+//      1993-01-29,25.6314,25.6314,25.5028,25.5479,1003200
+async function fromStooq(symbol) {
+  const url = `https://stooq.com/q/d/l/?s=${encodeURIComponent(symbol.toLowerCase())}.us&i=d`;
+  const text = await (await httpGet(url)).text();
+
+  // Stooq 는 한도를 넘기거나 심볼을 모를 때도 HTTP 200 에 안내문 한 줄을 담아 보냅니다
+  // ("Exceeded the daily hits limit", "No data"). 헤더 줄이 없으면 데이터가 아닙니다.
+  // 이걸 확인하지 않으면 빈 결과를 정상으로 착각해 기존 파일을 지우게 됩니다.
+  if (!/^Date,Open,High,Low,Close,Volume/m.test(text)) {
+    throw new Error(`CSV 헤더 없음 (응답 앞부분: ${text.replace(/\s+/g, ' ').slice(0, 120)})`);
+  }
+
+  const d = [], h = [], c = [], v = [];
+  for (const line of text.split('\n')) {
+    const cols = line.trim().split(',');
+    if (cols.length < 5) continue;
+    const [date, , high, , close, volume] = cols;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue; // 헤더·빈 줄
+    const closeNum = Number(close);
+    if (!Number.isFinite(closeNum) || closeNum <= 0) continue;
+    const highNum = Number(high);
+    d.push(epochDayFromYmd(date.replace(/-/g, '')));
+    // 고가가 종가보다 낮게 들어오면 낙폭 계산이 어긋납니다. KR 쪽과 같은 보정.
+    h.push(Math.max(round2(Number.isFinite(highNum) ? highNum : closeNum), round2(closeNum)));
+    c.push(round2(closeNum));
+    const vol = Number(volume);
+    v.push(Number.isFinite(vol) ? Math.round(vol) : 0);
+  }
+
+  if (d.length === 0) throw new Error('유효한 행 없음');
+  return { source: 'stooq', currency: 'USD', d, h, c, v };
+}
+
+// 2) 야후 파이낸스. generate-kr-data.js 의 것을 그대로 씁니다 (타임아웃·호스트 폴백 포함).
+async function fromYahooUS(symbol) {
+  const got = await fromYahoo({ code: symbol, market: 'US' });
+  return { ...got, source: 'yahoo' };
+}
+
+const SOURCES = [fromStooq, fromYahooUS];
+
+async function fetchOne(symbol) {
+  const errors = [];
+  for (const source of SOURCES) {
+    try {
+      return await source(symbol);
+    } catch (err) {
+      errors.push(`${source.name}: ${err.message}`);
+    }
+  }
+  throw new Error(errors.join(' / '));
+}
 
 async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -32,11 +95,12 @@ async function main() {
   const symbols = usSymbols();
   const ok = [];
   const failed = [];
+  const bySource = {};
 
   for (const symbol of symbols) {
-    const t = { code: symbol, market: 'US' };
     try {
-      const got = await fromYahoo(t);
+      const got = await fetchOne(symbol);
+      bySource[got.source] = (bySource[got.source] || 0) + 1;
       const from = Math.max(0, got.d.length - MAX_ROWS);
       const tail = Math.max(0, got.d.length - TAIL_ROWS);
 
@@ -55,10 +119,9 @@ async function main() {
       };
       fs.writeFileSync(path.join(OUT_DIR, `${symbol}.json`), JSON.stringify(payload));
       ok.push(symbol);
-      console.log(`✅ ${symbol} (${payload.name}) — ${payload.d.length}행, 최신 ${payload.updated}`);
+      console.log(`✅ ${symbol} (${payload.name}) — ${payload.d.length}행, 최신 ${payload.updated} [${got.source}]`);
     } catch (err) {
-      // 한 심볼이 실패해도 나머지는 계속합니다. 기존 파일을 건드리지 않으므로
-      // 그 심볼은 지난번 데이터로 계속 서빙됩니다. (KR 쪽과 같은 정책)
+      // 기존 파일을 건드리지 않으므로 그 심볼은 지난번 데이터로 계속 서빙됩니다.
       failed.push({ symbol, reason: err.message });
       console.warn(`⚠️  ${symbol} 실패: ${err.message} — 기존 파일 유지`);
     }
@@ -67,27 +130,36 @@ async function main() {
 
   const usable = symbols.filter(s => fs.existsSync(path.join(OUT_DIR, `${s}.json`)));
 
-  fs.writeFileSync(
-    path.join(OUT_DIR, 'index.json'),
-    JSON.stringify({
-      updated: new Date().toISOString().slice(0, 10),
-      count: usable.length,
-      stocks: usable.map(s => ({ code: s, name: US_NAMES[s] || s, market: 'US' })),
-    }, null, 2)
-  );
+  if (usable.length > 0) {
+    fs.writeFileSync(
+      path.join(OUT_DIR, 'index.json'),
+      JSON.stringify({
+        updated: new Date().toISOString().slice(0, 10),
+        count: usable.length,
+        stocks: usable.map(s => ({ code: s, name: US_NAMES[s] || s, market: 'US' })),
+      }, null, 2)
+    );
+  }
 
   console.log(`\n조회 성공 ${ok.length} / 실패 ${failed.length} / 서빙 가능 ${usable.length}심볼`);
+  console.log('소스별 성공:', Object.entries(bySource).map(([k, n]) => `${k} ${n}`).join(', ') || '없음');
 
+  // 여기서 절대 exit 1 하지 않습니다.
+  //
+  // 처음에는 "한 심볼도 못 받으면 실패"로 두었는데, 그 때문에 야후가 러너를 막은 날
+  // 이 스텝이 잡을 죽였고 — 바로 앞 단계에서 성공한 한국 101종목이 커밋되지 못했습니다.
+  // 미국 데이터는 이 사이트의 부가 기능입니다. 못 받으면 미국 탭이 지난 데이터를 보여주거나
+  // 아예 안 뜰 뿐, 한국 쪽 갱신을 막을 이유가 없습니다.
   if (usable.length === 0) {
-    console.error('::error::단 한 심볼도 만들지 못했습니다. 야후가 막혔을 수 있습니다.');
-    process.exit(1);
+    console.warn('::warning::미국 심볼을 하나도 받지 못했습니다. 미국 탭은 표시되지 않습니다.');
   }
-  // 일부 실패는 정상 종료입니다. 여기서 죽이면 나머지 성공분까지 커밋되지 않습니다.
 }
 
 if (require.main === module) {
   main().catch(err => {
-    console.error('생성 실패:', err);
-    process.exit(1);
+    // 예기치 못한 예외도 마찬가지입니다. 로그만 남기고 후속 스텝을 살립니다.
+    console.warn('::warning::미국 데이터 생성 실패:', err.message);
   });
 }
+
+module.exports = { fromStooq, fetchOne };

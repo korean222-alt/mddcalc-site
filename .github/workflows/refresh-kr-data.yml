@@ -36,8 +36,10 @@ jobs:
 
       # 파서를 두 번 잘못 고쳐서 두 번 다 실행 로그를 보고서야 알았습니다.
       # 실제 응답을 픽스처로 박아둔 테스트를 먼저 돌려, 망가진 파서로 60번 요청하는 일을 막습니다.
-      - name: Test the response parser
-        run: node scripts/test-kr-parse.js
+      - name: Test the response parsers
+        run: |
+          node scripts/test-kr-parse.js
+          node scripts/test-us-parse.js
 
       # 섹터 RS 산식도 같은 이유로 먼저 검사합니다. 순위나 비중이 뒤집혀 있어도 화면에는
       # 그럴듯한 막대가 그려지기 때문에, 눈으로는 잘못된 걸 알 수 없습니다.
@@ -47,12 +49,18 @@ jobs:
       - name: Generate Korean stock data
         run: node scripts/generate-kr-data.js
 
-      # 미국 섹터 ETF. 실패해도 한국 데이터는 이미 갱신됐으므로 여기서 멈추지 않습니다.
+      # 미국 섹터 ETF. 이 스텝은 절대 잡을 죽이면 안 됩니다.
+      # 2026-08-23 실행에서 야후가 러너 IP를 막아 22심볼이 전부 429였는데, 그 실패가
+      # 잡을 종료시켜 바로 앞에서 성공한 한국 101종목까지 커밋되지 못했습니다.
+      # 스크립트 자체도 exit 1 하지 않지만, 예기치 못한 크래시까지 막으려고 한 겹 더 둡니다.
       - name: Generate US sector data
+        continue-on-error: true
         run: node scripts/generate-us-data.js
 
       # 위 두 단계가 만든 파일만 읽어 계산합니다. 네트워크를 쓰지 않습니다.
+      # 한쪽 시장 데이터가 없으면 그 시장만 건너뛰고 나머지로 만듭니다.
       - name: Compute sector relative strength
+        continue-on-error: true
         run: node scripts/generate-sector-rs.js
 
       - name: Commit and push if changed

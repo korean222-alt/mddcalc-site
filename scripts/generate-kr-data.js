@@ -400,4 +400,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { fromNaver, fromYahoo, fetchOne, syncNameTable, syncChips, syncSupportedList };
+module.exports = { fromNaver, fromYahoo, fetchOne, syncNameTable, syncChips, syncSupportedList, httpGet, epochDayFromYmd };
