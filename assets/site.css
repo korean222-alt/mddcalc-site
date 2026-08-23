@@ -220,24 +220,56 @@
   .contact-form .submit-btn:hover { background: #3182ce; }
 
   /* ── 섹터 히트맵 ─────────────────────────────────────────────────────
+     이 화면만 어둡습니다. 사이트 나머지는 흰 배경인데 여기만 검은 이유는,
+     히트맵의 "보합"이 어두운 회색이어야 하기 때문입니다. 밝은 배경에서 보합을
+     연회색으로 두면 안 움직인 칸이 제일 밝아서 가장 먼저 눈에 들어옵니다 —
+     읽으라는 것과 정확히 반대로 읽힙니다.
+
      확대(배율)를 지원하려면 "보이는 창"과 "그리는 판"이 따로 있어야 합니다.
      .hm-viewport 가 창이고, 그 안의 #hmCanvas 가 판입니다. 배율을 올리면 판이
      창보다 커지고 남는 만큼 이 안에서만 스크롤됩니다 — 페이지가 밀리지 않습니다.
 
      모바일에서 높이를 키운 이유: 트리맵은 넓이가 아니라 "면적"이 곧 글자 자리입니다.
      좁은 화면에서 560px 로 두면 칸 하나가 손톱만 해져 기업 이름이 전부 잘렸습니다. */
+  .hm-board { background: #14161c; border-radius: 10px; padding: 8px; }
   .hm-viewport {
     position: relative;
     width: 100%;
-    height: 560px;
+    height: 620px;
     overflow: auto;
-    background: #f7fafc;
-    border-radius: 10px;
+    background: #14161c;
+    border-radius: 6px;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain; /* 끝까지 밀었을 때 페이지가 따라 움직이지 않게 */
   }
   .hm-zoom { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: #718096; flex-wrap: wrap; }
 
+  /* 칸을 짚으면 뜨는 설명창. 칸이 작아 이름이 안 들어간 종목도 여기서는 다 읽힙니다. */
+  .hm-panel {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    min-width: 232px;
+    max-width: 300px;
+    background: #1b1f27;
+    border: 1px solid #333a47;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+    padding: 8px 0 4px;
+    pointer-events: none;   /* 창이 커서를 가로채면 그 아래 칸을 못 짚습니다 */
+    font-size: 12px;
+    color: #e6eaf0;
+  }
+  .hm-panel-head { padding: 2px 12px 8px; font-size: 11px; color: #94a0b4; border-bottom: 1px solid #2a303b; }
+  .hm-panel-head b { color: #e6eaf0; font-size: 12.5px; }
+  .hm-panel-sub { display: block; margin-top: 2px; color: #6b7686; }
+  .hm-panel-row { display: flex; align-items: center; gap: 8px; padding: 3px 12px; }
+  .hm-panel-row.is-on { background: #262c38; }
+  .hm-panel-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .hm-panel-val { width: 62px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .hm-panel-more { padding: 5px 12px 2px; color: #6b7686; font-size: 11px; }
+
   @media (max-width: 640px) {
     .hm-viewport { height: 74vh; min-height: 420px; max-height: 620px; }
+    .hm-panel { display: none !important; } /* 좁은 화면에서는 설명줄만 씁니다 */
   }

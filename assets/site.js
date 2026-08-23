@@ -2007,7 +2007,7 @@ if (CURRENT_PAGE === 'sector') {
 
 // depth: 'sector' 는 섹터 19칸, 'member' 는 종목 100칸. null 이면 화면 폭에 맡깁니다.
 // zoom: 1 이면 창에 딱 맞고, 그보다 크면 판이 창보다 커져 창 안에서 스크롤됩니다.
-const HM = { data: null, market: null, period: '1m', size: 'turn', depth: null, zoom: 1, tiles: [], bound: false };
+const HM = { data: null, market: null, period: '1m', size: 'soft', depth: null, zoom: 1, tiles: [], bound: false };
 
 // 좁은 화면 기준. 이 아래에서는 종목 100칸을 넣어 봐야 이름이 한 글자도 안 들어갑니다.
 const HM_NARROW = 640;
@@ -2016,19 +2016,36 @@ function hmDepth() { return HM.depth || (hmIsNarrow() ? 'sector' : 'member'); }
 
 // 색을 어디서 최대로 진하게 만들지는 기간마다 달라야 합니다. 12개월 수익률에 ±5% 기준을
 // 쓰면 거의 모든 칸이 새빨갛거나 새파래져서 아무것도 구분되지 않습니다.
-const HM_CLAMP = { '1d': 3, '1w': 5, '1m': 10, '3m': 20, '6m': 30, '12m': 50 };
+// 칸 크기 척도의 화면 표기. 무엇으로 그렸는지는 늘 범례에 적혀 있어야 합니다.
+const HM_SIZE_LABEL = { turn: '거래대금 비중', soft: '거래대금 비중(완화)', equal: '균등' };
 
-// 하락 ← 보합 → 상승. 사이트 팔레트의 빨강·초록을 양 끝으로 씁니다.
+// 색이 최대로 진해지는 지점은 generate-sector-rs.js 가 시장별로 계산해 데이터에 넣습니다
+// (|등락률| 85분위). 아래 표는 옛 데이터 파일을 받았을 때만 쓰는 대비책입니다.
+const HM_CLAMP_FALLBACK = { '1d': 3, '1w': 5, '1m': 10, '3m': 20, '6m': 30, '12m': 50 };
+function hmClamp() {
+  const m = hmMarketData();
+  return (m.clamp && m.clamp[HM.period]) || HM_CLAMP_FALLBACK[HM.period] || 10;
+}
+
+// 하락 ← 보합 → 상승. Finviz 맵과 같은 7단 팔레트입니다.
+//
+// 왜 남의 팔레트를 그대로 쓰는가: 이 색은 주식 히트맵에서 사실상 표준이라
+// 이미 아는 사람은 설명 없이 읽습니다. 무엇보다 "보합"이 흰색·연회색이 아니라
+// 어두운 회색(#414554)이라는 점이 중요합니다. 밝은 배경에서 보합을 흰색으로 두면
+// 안 움직인 칸이 가장 밝아서 제일 먼저 눈에 들어옵니다 — 정확히 반대로 읽힙니다.
+// 어두운 판 위에서는 안 움직인 칸이 가라앉고 크게 움직인 칸만 튀어나옵니다.
 const HM_STOPS = [
-  [-1, [155, 44, 44]],   // 진한 빨강
-  [-0.5, [229, 62, 62]],
-  [0, [203, 213, 224]],  // 보합
-  [0.5, [56, 161, 105]],
-  [1, [34, 84, 61]],     // 진한 초록
+  [-1,     [246,  53,  56]],  // #F63538  최대 하락
+  [-2 / 3, [191,  64,  69]],  // #BF4045
+  [-1 / 3, [139,  68,  78]],  // #8B444E
+  [0,      [ 65,  69,  84]],  // #414554  보합
+  [1 / 3,  [ 53, 118,  78]],  // #35764E
+  [2 / 3,  [ 47, 158,  79]],  // #2F9E4F
+  [1,      [ 48, 204,  90]],  // #30CC5A  최대 상승
 ];
 
 function hmColor(v, clamp) {
-  if (v == null) return { bg: '#edf2f7', fg: '#a0aec0' };
+  if (v == null) return { bg: '#2b2f38', fg: 'rgba(255,255,255,0.45)' };
   const t = Math.max(-1, Math.min(1, v / clamp));
   let lo = HM_STOPS[0], hi = HM_STOPS[HM_STOPS.length - 1];
   for (let i = 0; i < HM_STOPS.length - 1; i++) {
@@ -2037,9 +2054,10 @@ function hmColor(v, clamp) {
   const span = hi[0] - lo[0];
   const k = span === 0 ? 0 : (t - lo[0]) / span;
   const rgb = [0, 1, 2].map(i => Math.round(lo[1][i] + (hi[1][i] - lo[1][i]) * k));
-  // 배경이 어두우면 흰 글자, 밝으면 검은 글자. 대비를 눈대중하지 않고 휘도로 정합니다.
-  const lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-  return { bg: `rgb(${rgb.join(',')})`, fg: lum > 0.6 ? '#1a202c' : '#ffffff' };
+  // 일곱 색 모두 어두워서 글자는 항상 흰색입니다. 밝기를 재서 검정으로 뒤집던 처리는
+  // 팔레트를 바꾼 지금은 필요 없을 뿐 아니라, 어중간한 칸에서만 검은 글자가 튀어
+  // 화면이 얼룩덜룩해집니다.
+  return { bg: `rgb(${rgb.join(',')})`, fg: '#ffffff' };
 }
 
 // 트리맵 배치. 값이 큰 순으로 정렬된 항목을 절반씩 갈라 긴 변 쪽으로 나눕니다.
@@ -2126,6 +2144,23 @@ async function initHeatmapPage() {
 // 화면이 그럴듯하게 틀립니다 — 표에서 숫자를 지우는 것보다 눈에 안 띄어서 더 나쁩니다.
 function hmSizeMode() { return hmMarketData().hasTurnover ? HM.size : 'equal'; }
 
+// 거래대금 비중을 칸 크기로 바꿉니다.
+//
+// 왜 '완화'가 기본인가: 한국 시장은 하루 거래대금이 두 종목에 극단적으로 쏠립니다.
+// 실측으로 삼성전자 36.9% + SK하이닉스 34.9% = 판의 72% 였습니다. 비중 그대로 그리면
+// 나머지 89종목이 남은 28% 를 나눠 갖느라 전부 손톱만 해져서, "돈이 어디 있나"는
+// 보이지만 "그게 오르는지 내리는지"는 하나도 안 보입니다. 화면의 목적 절반이 죽습니다.
+//
+// 제곱근을 씌우면 순서는 그대로 두고 격차만 좁힙니다(142배 → 12배).
+// 다만 이건 실제 비중이 아니므로 이름을 '완화'로 붙이고 범례에도 그대로 적습니다.
+// 진짜 비중이 보고 싶으면 '거래대금' 버튼이 한 번 거리에 있습니다.
+function hmSizeValue(share) {
+  const mode = hmSizeMode();
+  if (mode === 'equal') return 1;
+  const v = Math.max(share == null ? 0 : share, 0.0001);
+  return mode === 'soft' ? Math.sqrt(v) : v;
+}
+
 function renderHeatmapControls() {
   const flags = { KR: '🇰🇷', US: '🇺🇸' };
   document.getElementById('hmMarketToggle').innerHTML = Object.keys(HM.data.markets)
@@ -2186,10 +2221,104 @@ function hmFontFor(w, h, len) {
 
 function hmShowTip(text) { document.getElementById('hmTip').innerHTML = text; }
 
+// 겹 높이. 그룹 띠가 섹터 띠보다 두껍고 진합니다 — 어느 쪽이 큰 묶음인지
+// 글자를 읽기 전에 알아야 합니다.
+const HM_GROUP_HEAD = 19;
+const HM_SECTOR_HEAD = 14;
+
+// 칸 하나를 그립니다. 그룹 묶음이든 섹터 묶음이든 종목이든 전부 이 함수를 씁니다.
+function hmTileHtml(it, box, clamp) {
+  const { bg, fg } = hmColor(it.ret, clamp);
+  const sign = it.ret > 0 ? '+' : '';
+  const idx = HM.tiles.length;
+  HM.tiles.push(it);
+
+  const fs = hmFontFor(box.w, box.h, it.name.length);
+  const showName = fs >= 8;
+  const showPct = box.w > 26 && box.h > 13;
+  const pctSize = showName ? Math.max(9, Math.min(fs - 1, 13)) : 9;
+
+  return `<div data-tile="${idx}" title="${rsEsc(it.sector)} · ${rsEsc(it.name)}  ${sign}${it.ret.toFixed(1)}%" ` +
+    `style="position:absolute; left:${box.x}px; top:${box.y}px; width:${box.w}px; height:${box.h}px; ` +
+    `background:${bg}; color:${fg}; border:1px solid #14161c; box-sizing:border-box; ` +
+    `display:flex; flex-direction:column; align-items:center; justify-content:center; ` +
+    `overflow:hidden; cursor:default; line-height:1.2; padding:1px;">` +
+    (showName
+      ? `<span style="font-weight:700; font-size:${fs}px; max-width:100%; overflow:hidden; ` +
+        `text-overflow:ellipsis; white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,0.35);">${rsEsc(it.name)}</span>`
+      : '') +
+    (showPct
+      ? `<span style="font-size:${pctSize}px; opacity:0.92; text-shadow:0 1px 2px rgba(0,0,0,0.35);">` +
+        `${sign}${it.ret.toFixed(showName ? 1 : 0)}%</span>`
+      : '') +
+    `</div>`;
+}
+
+// 묶음 띠(그룹·섹터 이름).
+function hmHeadHtml(name, x, y, w, h, level) {
+  const group = level === 'group';
+  return `<div style="position:absolute; left:${x}px; top:${y}px; width:${w}px; height:${h}px; ` +
+    `line-height:${h}px; box-sizing:border-box; padding:0 6px; overflow:hidden; white-space:nowrap; ` +
+    `background:${group ? '#0e1014' : '#1c2028'}; ` +
+    `color:${group ? '#dfe4ec' : '#98a2b3'}; ` +
+    `font-size:${group ? 11 : 9.5}px; font-weight:700; ` +
+    `letter-spacing:${group ? '0.6px' : '0.2px'}; ` +
+    `border:1px solid #14161c; border-bottom:none;">${rsEsc(name)}</div>`;
+}
+
+// 히트맵에 그릴 나무를 만듭니다: 그룹 → 섹터 → (종목).
+// 값(칸 크기)은 항상 아래에서 위로 더해 올립니다. 그래야 그룹 크기가 그 안의 섹터
+// 합과 어긋나지 않습니다.
+function hmBuildTree(m, P) {
+  const sectors = m.sectors
+    .filter(s => s.periods[P] && s.periods[P].ret != null)
+    .map(s => {
+      const members = s.members
+        .filter(mem => mem.ret[P] != null)
+        .map(mem => ({
+          name: mem.name, code: mem.code, ret: mem.ret[P],
+          turn: mem.turn ? mem.turn[P] : null,
+          spark: mem.spark || null,
+          sector: s.name,
+          value: hmSizeValue(mem.turn ? mem.turn[P] : null),
+        }))
+        .sort((a, b) => b.value - a.value);
+      return {
+        key: s.key, name: s.name, group: s.group || 'etc',
+        ret: s.periods[P].ret, turn: s.periods[P].turnShare,
+        members,
+        // 섹터 칸 자체를 그릴 때(묶음=섹터) 쓰는 이름표.
+        sector: '섹터 지수', spark: null,
+        value: members.length
+          ? members.reduce((a, x) => a + x.value, 0)
+          : hmSizeValue(s.periods[P].turnShare),
+      };
+    })
+    .filter(s => s.members.length > 0);
+
+  const byGroup = new Map();
+  for (const sec of sectors) {
+    if (!byGroup.has(sec.group)) {
+      byGroup.set(sec.group, {
+        key: sec.group,
+        name: (m.groups && m.groups[sec.group]) || '기타',
+        sectors: [], value: 0,
+      });
+    }
+    const g = byGroup.get(sec.group);
+    g.sectors.push(sec);
+    g.value += sec.value;
+  }
+
+  const groups = [...byGroup.values()].sort((a, b) => b.value - a.value);
+  for (const g of groups) g.sectors.sort((a, b) => b.value - a.value);
+  return groups;
+}
+
 function renderHeatmap() {
   const m = hmMarketData();
   const P = HM.period;
-  const clamp = HM_CLAMP[P] || 10;
+  const clamp = hmClamp();
   const canvas = document.getElementById('hmCanvas');
   const viewport = document.getElementById('hmViewport');
   if (!canvas || !viewport) return;
@@ -2213,94 +2342,45 @@ function renderHeatmap() {
   canvas.style.width = W + 'px';
   canvas.style.height = H + 'px';
 
+  const groups = hmBuildTree(m, P);
+  if (groups.length === 0) { canvas.innerHTML = ''; return; }
+
   const html = [];
   HM.tiles = [];
-  const HEADER = 17; // 섹터 이름 띠
 
-  // 한 칸 그리기. 섹터 묶음과 종목 묶음이 같은 함수를 씁니다 — 두 벌로 두면
-  // 한쪽만 고치게 됩니다.
-  const drawTile = (it, box) => {
-    const { bg, fg } = hmColor(it.ret, clamp);
-    const sign = it.ret > 0 ? '+' : '';
-    const idx = HM.tiles.length;
-    HM.tiles.push(it);
+  const gboxes = [];
+  hmLayout(groups, 0, 0, W, H, gboxes);
 
-    const fs = hmFontFor(box.w, box.h, it.name.length);
-    const showName = fs >= 8;
-    const showPct = box.w > 26 && box.h > 13;
-    const pctSize = showName ? Math.max(9, Math.min(fs - 1, 12)) : 9;
+  for (const gb of gboxes) {
+    const g = gb.item;
+    // 띠를 넣을 자리가 없으면 넣지 않습니다. 띠만 남고 칸이 사라지면 그 그룹은
+    // 화면에서 통째로 없어진 것처럼 보입니다.
+    const gHead = gb.h > HM_GROUP_HEAD + 22 && gb.w > 54;
+    if (gHead) html.push(hmHeadHtml(g.name, gb.x, gb.y, gb.w, HM_GROUP_HEAD, 'group'));
 
-    return `<div data-tile="${idx}" title="${rsEsc(it.sector)} · ${rsEsc(it.name)}  ${sign}${it.ret.toFixed(1)}%" ` +
-      `style="position:absolute; left:${box.x}px; top:${box.y}px; width:${box.w}px; height:${box.h}px; ` +
-      `background:${bg}; color:${fg}; border:1px solid rgba(255,255,255,0.85); box-sizing:border-box; ` +
-      `display:flex; flex-direction:column; align-items:center; justify-content:center; ` +
-      `overflow:hidden; cursor:default; line-height:1.25; padding:1px;">` +
-      (showName
-        ? `<span style="font-weight:700; font-size:${fs}px; max-width:100%; overflow:hidden; ` +
-          `text-overflow:ellipsis; white-space:nowrap;">${rsEsc(it.name)}</span>`
-        : '') +
-      (showPct
-        ? `<span style="font-size:${pctSize}px; opacity:0.95;">${sign}${it.ret.toFixed(showName ? 1 : 0)}%</span>`
-        : '') +
-      `</div>`;
-  };
+    const gy = gb.y + (gHead ? HM_GROUP_HEAD : 0);
+    const gh = gb.h - (gHead ? HM_GROUP_HEAD : 0);
 
-  if (byMember) {
-    // 섹터 → 그 안의 종목. 값이 없는 종목은 그리지 않습니다(상장폐지·데이터 없음).
-    const sectors = m.sectors.map(s => {
-      const members = s.members
-        .filter(mem => mem.ret[P] != null)
-        .map(mem => ({
-          name: mem.name, code: mem.code, ret: mem.ret[P],
-          turn: mem.turn ? mem.turn[P] : null,
-          sector: s.name,
-          value: hmSizeMode() === 'equal' ? 1 : Math.max(mem.turn && mem.turn[P] ? mem.turn[P] : 0, 0.0001),
-        }))
-        .sort((a, b) => b.value - a.value);
-      return { name: s.name, members, value: members.reduce((a, x) => a + x.value, 0) };
-    }).filter(s => s.members.length > 0).sort((a, b) => b.value - a.value);
+    const sboxes = [];
+    hmLayout(g.sectors, gb.x, gy, gb.w, gh, sboxes);
 
-    if (sectors.length === 0) { canvas.innerHTML = ''; return; }
+    for (const sb of sboxes) {
+      const sec = sb.item;
 
-    const boxes = [];
-    hmLayout(sectors, 0, 0, W, H, boxes);
+      // 묶음=섹터: 섹터 자체가 칸입니다. 여기서 끝.
+      if (!byMember) { html.push(hmTileHtml(sec, sb, clamp)); continue; }
 
-    for (const box of boxes) {
-      const s = box.item;
-      html.push(
-        `<div style="position:absolute; left:${box.x}px; top:${box.y}px; width:${box.w}px; height:${box.h}px; ` +
-        `border:1px solid #fff; box-sizing:border-box; overflow:hidden;">` +
-        (box.h > HEADER + 8
-          ? `<div style="height:${HEADER}px; line-height:${HEADER}px; background:#2d3748; color:#fff; ` +
-            `font-size:10px; font-weight:700; padding:0 5px; white-space:nowrap; overflow:hidden;">${rsEsc(s.name)}</div>`
-          : '') +
-        `</div>`
-      );
+      // 그룹 이름과 섹터 이름이 같으면 띠를 두 번 그리지 않습니다.
+      // 미국은 섹터 정의가 대부분 GICS 대분류 그대로라 "금융" 밑에 또 "금융"이 붙었습니다.
+      // 같은 말을 두 줄로 적는 것은 자리 낭비이자, 겹이 하나 더 있는 것처럼 보이게 합니다.
+      const sHead = sb.h > HM_SECTOR_HEAD + 16 && sb.w > 40 && sec.name !== g.name;
+      if (sHead) html.push(hmHeadHtml(sec.name, sb.x, sb.y, sb.w, HM_SECTOR_HEAD, 'sector'));
 
-      const innerY = box.h > HEADER + 8 ? HEADER : 0;
       const cells = [];
-      hmLayout(s.members, box.x, box.y + innerY, box.w, box.h - innerY, cells);
-      for (const cell of cells) html.push(drawTile(cell.item, cell));
+      const cy = sb.y + (sHead ? HM_SECTOR_HEAD : 0);
+      hmLayout(sec.members, sb.x, cy, sb.w, sb.h - (sHead ? HM_SECTOR_HEAD : 0), cells);
+      for (const cell of cells) html.push(hmTileHtml(cell.item, cell, clamp));
     }
-  } else {
-    // 섹터 묶음. 칸이 19개뿐이라 좁은 화면에서도 이름이 그대로 들어갑니다.
-    // 수익률은 섹터 지수(구성 종목 동일가중)의 값이라 종목 칸의 평균과는 다릅니다.
-    const items = m.sectors
-      .filter(s => s.periods[P] && s.periods[P].ret != null)
-      .map(s => {
-        const share = s.periods[P].turnShare;
-        return {
-          name: s.name, code: s.key, ret: s.periods[P].ret, turn: share, sector: '섹터 지수',
-          value: hmSizeMode() === 'equal' ? 1 : Math.max(share || 0, 0.0001),
-        };
-      })
-      .sort((a, b) => b.value - a.value);
-
-    if (items.length === 0) { canvas.innerHTML = ''; return; }
-
-    const cells = [];
-    hmLayout(items, 0, 0, W, H, cells);
-    for (const cell of cells) html.push(drawTile(cell.item, cell));
   }
 
   canvas.innerHTML = html.join('');
@@ -2308,49 +2388,139 @@ function renderHeatmap() {
   // 기간·시장을 바꾸면 설명줄을 비웁니다. 그대로 두면 지도는 12개월인데 설명줄만
   // "1개월 -9.8%" 로 남아, 화면 안에서 두 기간이 섞여 보입니다.
   hmShowTip('칸에 마우스를 올리거나 터치하면 자세한 값이 여기에 나옵니다.');
+  hmHidePanel();
 
   // 배율 안내. 배율 1에서는 스크롤이 없으니 "밀어서 보세요"라고 하면 안 됩니다.
   document.getElementById('hmZoomHint').textContent = HM.zoom > 1
     ? '· 확대된 상태입니다. 지도 안을 밀어서 나머지를 보세요.'
-    : (hmDepth() === 'sector'
-      ? '· 섹터로 묶어 보는 중입니다. 종목까지 보려면 묶음을 종목으로 바꾸세요.'
-      : '· 이름이 잘리면 배율을 올리거나 묶음을 섹터로 바꾸세요.');
+    : (byMember
+      ? '· 이름이 잘리면 배율을 올리거나 묶음을 섹터로 바꾸세요.'
+      : '· 섹터로 묶어 보는 중입니다. 종목까지 보려면 묶음을 종목으로 바꾸세요.');
 
-  // 마우스와 터치 양쪽에서 같은 설명을 띄웁니다. 칸이 작아 글자를 못 넣은 경우가 많아
-  // 이 줄이 사실상 유일한 확인 수단입니다.
-  //
-  // 한 번만 붙입니다. 예전에는 렌더할 때마다 붙여서, 기간 버튼을 열 번 누르면
-  // 같은 핸들러가 열 개 쌓였습니다(칸 하나 만질 때마다 열 번 실행).
-  if (!HM.bound) {
-    const onPick = e => {
-      const el = e.target.closest('[data-tile]');
-      if (!el) return;
-      const it = HM.tiles[Number(el.dataset.tile)];
-      if (!it) return;
-      const sign = it.ret > 0 ? '+' : '';
-      const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
-      hmShowTip(
-        `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
-        `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
-        (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '')
-      );
-    };
-    canvas.addEventListener('mousemove', onPick);
-    canvas.addEventListener('click', onPick);
-    HM.bound = true;
-  }
+  hmBindPointer(canvas);
+  hmRenderLegend(clamp, byMember);
+}
 
-  // 범례
-  const steps = [-clamp, -clamp / 2, 0, clamp / 2, clamp];
+// 마우스와 터치 양쪽에서 같은 설명을 띄웁니다. 칸이 작아 글자를 못 넣은 경우가 많아
+// 이 줄과 설명창이 사실상 유일한 확인 수단입니다.
+//
+// 한 번만 붙입니다. 예전에는 렌더할 때마다 붙여서, 기간을 열 번 누르면
+// 같은 핸들러가 열 개 쌓였습니다(칸 하나 만질 때마다 열 번 실행).
+function hmBindPointer(canvas) {
+  if (HM.bound) return;
+  HM.bound = true;
+
+  const pick = e => {
+    const el = e.target.closest('[data-tile]');
+    if (!el) return null;
+    return HM.tiles[Number(el.dataset.tile)] || null;
+  };
+
+  const onMove = e => {
+    const it = pick(e);
+    if (!it) { hmHidePanel(); return; }
+    hmShowTipFor(it);
+    hmShowPanel(it, e);
+  };
+
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('click', e => {
+    const it = pick(e);
+    if (it) { hmShowTipFor(it); hmShowPanel(it, e); }
+  });
+  canvas.addEventListener('mouseleave', hmHidePanel);
+}
+
+function hmShowTipFor(it) {
+  const sign = it.ret > 0 ? '+' : '';
+  const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
+  hmShowTip(
+    `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
+    `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
+    (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '')
+  );
+}
+
+// 20거래일 종가를 작은 선으로. 값은 첫날 = 100 으로 이미 맞춰져 있습니다(생성기).
+// 축도 눈금도 없습니다 — 여기서 읽을 것은 방향과 굴곡뿐입니다.
+function hmSparkSvg(spark, up) {
+  if (!spark || spark.length < 2) return '<span style="width:54px;"></span>';
+  const lo = Math.min(...spark), hi = Math.max(...spark);
+  const span = hi - lo || 1;
+  const W = 54, H = 18;
+  const pts = spark.map((v, i) =>
+    `${(i / (spark.length - 1) * W).toFixed(1)},${(H - 1 - ((v - lo) / span) * (H - 2)).toFixed(1)}`
+  ).join(' ');
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true" style="display:block;">` +
+    `<polyline points="${pts}" fill="none" stroke="${up ? '#30CC5A' : '#F63538'}" stroke-width="1.2" ` +
+    `stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+
+// 칸을 짚으면 그 칸이 속한 섹터의 구성 종목을 한꺼번에 보여 주는 창.
+// 칸이 작아 이름이 안 들어가는 종목도 여기서는 전부 읽힙니다.
+function hmShowPanel(it, e) {
+  const panel = document.getElementById('hmPanel');
+  const viewport = document.getElementById('hmViewport');
+  if (!panel || !viewport) return;
+
+  const m = hmMarketData();
+  const P = HM.period;
+  // 짚은 칸이 종목이면 그 종목의 섹터를, 섹터 칸이면 그 섹터 자신을 펼칩니다.
+  const sec = m.sectors.find(s => s.name === it.sector) || m.sectors.find(s => s.name === it.name);
+  if (!sec) { hmHidePanel(); return; }
+
+  const rows = sec.members
+    .filter(mem => mem.ret[P] != null)
+    .sort((a, b) => b.ret[P] - a.ret[P])
+    .slice(0, 12);
+
+  const gname = (m.groups && m.groups[sec.group]) || '';
+  panel.innerHTML =
+    `<div class="hm-panel-head">${rsEsc(gname)}${gname ? ' · ' : ''}<b>${rsEsc(sec.name)}</b>` +
+    `<span class="hm-panel-sub">${hmPeriodLabel()} 등락률</span></div>` +
+    rows.map(mem => {
+      const v = mem.ret[P];
+      const up = v >= 0;
+      return `<div class="hm-panel-row${mem.name === it.name ? ' is-on' : ''}">` +
+        `<span class="hm-panel-name">${rsEsc(mem.name)}</span>` +
+        hmSparkSvg(mem.spark, up) +
+        `<span class="hm-panel-val" style="color:${up ? '#30CC5A' : '#F63538'};">` +
+        `${up ? '+' : ''}${v.toFixed(2)}%</span></div>`;
+    }).join('') +
+    (sec.members.length > rows.length
+      ? `<div class="hm-panel-more">외 ${sec.members.length - rows.length}종목</div>` : '');
+
+  panel.style.display = 'block';
+
+  // 창이 화면 밖으로 나가지 않게 뷰포트 안에 가둡니다.
+  const vr = viewport.getBoundingClientRect();
+  const pw = panel.offsetWidth, ph = panel.offsetHeight;
+  let x = e.clientX - vr.left + 14;
+  let y = e.clientY - vr.top + 14;
+  if (x + pw > vr.width) x = Math.max(4, e.clientX - vr.left - pw - 14);
+  if (y + ph > vr.height) y = Math.max(4, vr.height - ph - 4);
+  panel.style.left = Math.round(x) + 'px';
+  panel.style.top = Math.round(y) + 'px';
+}
+
+function hmHidePanel() {
+  const panel = document.getElementById('hmPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+// 범례. 색 stop 과 같은 7단으로 그려야 "이 색이 몇 %인가"를 실제로 셀 수 있습니다.
+function hmRenderLegend(clamp, byMember) {
+  const steps = HM_STOPS.map(st => st[0] * clamp);
   document.getElementById('hmLegend').innerHTML =
     '<span>하락</span>' +
     steps.map(v => {
       const { bg, fg } = hmColor(v, clamp);
-      return `<span style="background:${bg}; color:${fg}; padding:3px 8px; border-radius:4px; font-weight:600;">` +
-        `${v > 0 ? '+' : ''}${v}%</span>`;
+      const t = Math.round(v);
+      return `<span style="background:${bg}; color:${fg}; padding:3px 9px; border-radius:3px; font-weight:700;">` +
+        `${t > 0 ? '+' : ''}${t}%</span>`;
     }).join('') +
     '<span>상승</span>' +
-    `<span style="margin-left:8px;">· 칸 크기 = ${hmSizeMode() === 'equal' ? '균등' : '거래대금 비중'}` +
+    `<span style="margin-left:8px;">· 칸 크기 = ${HM_SIZE_LABEL[hmSizeMode()] || '거래대금 비중'}` +
     ` · 칸 = ${byMember ? '종목' : '섹터'}</span>`;
 }
 

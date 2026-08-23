@@ -12,49 +12,71 @@
 // (오타로 섹터가 조용히 비는 것을 막으려고 generate-sector-rs.js 가 시작할 때 검사합니다)
 
 const KR_SECTORS = [
-  { key: 'memory',    name: '반도체·메모리',    codes: ['005930', '000660', '000990'] },
-  { key: 'semi-eqp',  name: '반도체 소부장',    codes: ['042700', '039030', '240810', '058470', '095340', '403870'] },
-  { key: 'battery',   name: '2차전지',          codes: ['373220', '006400', '051910', '247540', '086520', '066970'] },
-  { key: 'bio',       name: '바이오·제약',      codes: ['207940', '068270', '196170', '028300', '128940', '000100'] },
-  { key: 'software',  name: '인터넷·소프트웨어', codes: ['035420', '035720', '012510', '053800', '030520'] },
-  { key: 'game',      name: '게임',             codes: ['259960', '036570', '251270', '263750', '293490', '112040'] },
-  { key: 'enter',     name: '엔터·미디어',      codes: ['352820', '041510', '122870', '035900'] },
-  { key: 'defense',   name: '방산·우주항공',    codes: ['012450', '047810', '064350', '079550'] },
-  { key: 'ship',      name: '조선',             codes: ['042660', '009540', '329180', '010140', '010620'] },
-  { key: 'auto',      name: '자동차',           codes: ['005380', '000270', '012330', '204320', '161390'] },
-  { key: 'bank',      name: '은행·금융지주',    codes: ['105560', '055550', '086790', '316140', '024110', '323410'] },
-  { key: 'broker',    name: '증권·보험',        codes: ['032830', '000810', '006800', '016360', '071050', '039490'] },
-  { key: 'telecom',   name: '통신',             codes: ['017670', '030200', '032640'] },
-  { key: 'power',     name: '전력·원전',        codes: ['015760', '034020', '267260', '298040', '010120'] },
-  { key: 'const',     name: '건설·기계',        codes: ['000720', '028260', '047040', '006360'] },
-  { key: 'material',  name: '소재·철강·화학',   codes: ['005490', '010130', '011170', '011780', '004020'] },
-  { key: 'consumer',  name: '화장품·소비재',    codes: ['090430', '161890', '192820', '097950', '033780', '139480'] },
-  { key: 'transport', name: '해운·항공',        codes: ['011200', '003490', '028670'] },
-  { key: 'robot',     name: '로봇',             codes: ['277810', '454910', '108490'] },
+  { key: 'memory',    name: '반도체·메모리',    codes: ['005930', '000660', '000990'], group: 'tech' },
+  { key: 'semi-eqp',  name: '반도체 소부장',    codes: ['042700', '039030', '240810', '058470', '095340', '403870'], group: 'tech' },
+  { key: 'battery',   name: '2차전지',          codes: ['373220', '006400', '051910', '247540', '086520', '066970'], group: 'material' },
+  { key: 'bio',       name: '바이오·제약',      codes: ['207940', '068270', '196170', '028300', '128940', '000100'], group: 'health' },
+  { key: 'software',  name: '인터넷·소프트웨어', codes: ['035420', '035720', '012510', '053800', '030520'], group: 'tech' },
+  { key: 'game',      name: '게임',             codes: ['259960', '036570', '251270', '263750', '293490', '112040'], group: 'comm' },
+  { key: 'enter',     name: '엔터·미디어',      codes: ['352820', '041510', '122870', '035900'], group: 'comm' },
+  { key: 'defense',   name: '방산·우주항공',    codes: ['012450', '047810', '064350', '079550'], group: 'indus' },
+  { key: 'ship',      name: '조선',             codes: ['042660', '009540', '329180', '010140', '010620'], group: 'indus' },
+  { key: 'auto',      name: '자동차',           codes: ['005380', '000270', '012330', '204320', '161390'], group: 'cyclical' },
+  { key: 'bank',      name: '은행·금융지주',    codes: ['105560', '055550', '086790', '316140', '024110', '323410'], group: 'finance' },
+  { key: 'broker',    name: '증권·보험',        codes: ['032830', '000810', '006800', '016360', '071050', '039490'], group: 'finance' },
+  { key: 'telecom',   name: '통신',             codes: ['017670', '030200', '032640'], group: 'comm' },
+  { key: 'power',     name: '전력·원전',        codes: ['015760', '034020', '267260', '298040', '010120'], group: 'utility' },
+  { key: 'const',     name: '건설·기계',        codes: ['000720', '028260', '047040', '006360'], group: 'indus' },
+  { key: 'material',  name: '소재·철강·화학',   codes: ['005490', '010130', '011170', '011780', '004020'], group: 'material' },
+  { key: 'consumer',  name: '화장품·소비재',    codes: ['090430', '161890', '192820', '097950', '033780', '139480'], group: 'cyclical' },
+  { key: 'transport', name: '해운·항공',        codes: ['011200', '003490', '028670'], group: 'indus' },
+  { key: 'robot',     name: '로봇',             codes: ['277810', '454910', '108490'], group: 'tech' },
 ];
 
 // 미국은 섹터 ETF 를 씁니다. 개별 종목을 묶는 것보다 구성이 투명하고, 편입/편출을
 // 우리가 따라다니지 않아도 됩니다. 메모리처럼 순수 ETF 가 없는 테마만 종목을 묶습니다.
 const US_SECTORS = [
-  { key: 'memory',   name: '메모리 반도체',  codes: ['MU', 'WDC', 'STX'] },
-  { key: 'semi',     name: '반도체 전체',    codes: ['SMH'] },
-  { key: 'software', name: '소프트웨어',     codes: ['IGV'] },
-  { key: 'health',   name: '헬스케어',       codes: ['XLV'] },
-  { key: 'bio',      name: '바이오텍',       codes: ['XBI'] },
-  { key: 'tech',     name: '기술',           codes: ['XLK'] },
-  { key: 'comm',     name: '커뮤니케이션',   codes: ['XLC'] },
-  { key: 'finance',  name: '금융',           codes: ['XLF'] },
-  { key: 'energy',   name: '에너지',         codes: ['XLE'] },
-  { key: 'indus',    name: '산업재',         codes: ['XLI'] },
-  { key: 'material', name: '소재',           codes: ['XLB'] },
-  { key: 'staples',  name: '필수소비재',     codes: ['XLP'] },
-  { key: 'discret',  name: '경기소비재',     codes: ['XLY'] },
-  { key: 'utility',  name: '유틸리티',       codes: ['XLU'] },
-  { key: 'reit',     name: '부동산',         codes: ['XLRE'] },
-  { key: 'defense',  name: '방산·우주',      codes: ['ITA'] },
-  { key: 'cyber',    name: '사이버보안',     codes: ['CIBR'] },
-  { key: 'nuclear',  name: '원자력·우라늄',  codes: ['URA'] },
-  { key: 'robot',    name: '로봇·AI',        codes: ['BOTZ'] },
+  { key: 'memory',   name: '메모리 반도체',  codes: ['MU', 'WDC', 'STX'], group: 'tech' },
+  { key: 'semi',     name: '반도체 전체',    codes: ['SMH'], group: 'tech' },
+  { key: 'software', name: '소프트웨어',     codes: ['IGV'], group: 'tech' },
+  { key: 'health',   name: '헬스케어',       codes: ['XLV'], group: 'health' },
+  { key: 'bio',      name: '바이오텍',       codes: ['XBI'], group: 'health' },
+  { key: 'tech',     name: '기술',           codes: ['XLK'], group: 'tech' },
+  { key: 'comm',     name: '커뮤니케이션',   codes: ['XLC'], group: 'comm' },
+  { key: 'finance',  name: '금융',           codes: ['XLF'], group: 'finance' },
+  { key: 'energy',   name: '에너지',         codes: ['XLE'], group: 'energy' },
+  { key: 'indus',    name: '산업재',         codes: ['XLI'], group: 'indus' },
+  { key: 'material', name: '소재',           codes: ['XLB'], group: 'material' },
+  { key: 'staples',  name: '필수소비재',     codes: ['XLP'], group: 'defensive' },
+  { key: 'discret',  name: '경기소비재',     codes: ['XLY'], group: 'cyclical' },
+  { key: 'utility',  name: '유틸리티',       codes: ['XLU'], group: 'utility' },
+  { key: 'reit',     name: '부동산',         codes: ['XLRE'], group: 'reit' },
+  { key: 'defense',  name: '방산·우주',      codes: ['ITA'], group: 'indus' },
+  { key: 'cyber',    name: '사이버보안',     codes: ['CIBR'], group: 'tech' },
+  { key: 'nuclear',  name: '원자력·우라늄',  codes: ['URA'], group: 'energy' },
+  { key: 'robot',    name: '로봇·AI',        codes: ['BOTZ'], group: 'tech' },
+];
+
+// 대분류(그룹). 히트맵에서 섹터 위에 한 겹 더 씌우는 묶음입니다.
+//
+// 왜 필요한가: 섹터 19개를 한 판에 늘어놓으면 "반도체 소부장"과 "은행"이 나란히 붙어
+// 서로 아무 관계도 없는 칸끼리 이웃합니다. Finviz 처럼 대분류 → 섹터 → 종목으로 겹치면
+// "기술이 통째로 빨갛다" 같은 큰 그림이 먼저 보이고, 그 안에서 어디가 버텼는지가 보입니다.
+//
+// 이 목록은 표시 순서가 아니라 이름표일 뿐입니다. 화면에서는 거래대금이 큰 그룹이
+// 먼저 자리를 잡습니다. 시장에 없는 그룹은 그냥 안 그려집니다.
+const GROUPS = [
+  { key: 'tech',      name: '기술' },
+  { key: 'comm',      name: '커뮤니케이션' },
+  { key: 'cyclical',  name: '경기소비재' },
+  { key: 'defensive', name: '필수소비재' },
+  { key: 'health',    name: '헬스케어' },
+  { key: 'finance',   name: '금융' },
+  { key: 'indus',     name: '산업재' },
+  { key: 'material',  name: '소재' },
+  { key: 'energy',    name: '에너지' },
+  { key: 'utility',   name: '유틸리티' },
+  { key: 'reit',      name: '부동산' },
 ];
 
 // 미국 종목 이름표. 표에서 구성 종목을 한글로 보여주기 위한 것뿐입니다.
@@ -107,4 +129,4 @@ const PERIODS = [
   { key: '12m', label: '12개월', days: 250 },
 ];
 
-module.exports = { KR_SECTORS, US_SECTORS, US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, usSymbols, PERIODS };
+module.exports = { KR_SECTORS, US_SECTORS, US_NAMES, GROUPS, BENCHMARKS, TURNOVER_COMPARABLE, usSymbols, PERIODS };

@@ -16,7 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { KR_TICKERS } = require('./kr-tickers');
-const { KR_SECTORS, US_SECTORS, US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, usSymbols, PERIODS } = require('./sectors');
+const { KR_SECTORS, US_SECTORS, US_NAMES, GROUPS, BENCHMARKS, TURNOVER_COMPARABLE, usSymbols, PERIODS } = require('./sectors');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_FILE = path.join(ROOT, 'data', 'sectors.json');
@@ -24,6 +24,7 @@ const OUT_FILE = path.join(ROOT, 'data', 'sectors.json');
 const AXIS_ROWS = 520;  // 거래일 축 길이. 12개월(250) 지표를 직전 12개월과 비교하는 데 필요.
 const RS_ROWS = 250;    // 화면 차트에 그릴 RS 선의 길이 (약 1년)
 const RANK_LAG = 20;    // "1개월 전 순위"의 기준. 이 차이가 곧 수급 유입/이탈 방향입니다.
+const SPARK_ROWS = 20;  // 히트맵 설명창의 미니 그래프 길이 (약 1개월)
 
 const round2 = v => (v == null || !Number.isFinite(v) ? null : Math.round(v * 100) / 100);
 
@@ -142,6 +143,37 @@ function foreignAt(series, axis, index) {
     if (f != null) return f;
   }
   return null;
+}
+
+// 히트맵 색이 최대로 진해지는 지점(±%)을 데이터에서 정합니다.
+//
+// 손으로 정하면 반드시 틀립니다. 실측으로 1일 등락률 중앙값이 한국 3.2%, 미국 0.8% 로
+// 네 배 차이였습니다. 두 시장에 같은 기준을 쓰면 한쪽은 절반이 새빨갛고(계조가 사라짐)
+// 다른 쪽은 전부 잿빛이 됩니다(아무것도 안 움직인 것처럼 보임).
+// 실제로 고정값을 쓰던 동안 종목의 33~51% 가 완전 포화 상태였습니다.
+//
+// 그래서 |등락률| 85 분위를 잡아 "대부분은 중간 색, 상위 15% 만 최대 색"이 되게 합니다.
+// 종목 수나 구성이 바뀌어도 저절로 따라옵니다.
+//
+// 눈금은 읽기 좋은 수로 올림합니다. 범례에 "±17.3%" 같은 수가 찍히면 아무도 안 읽습니다.
+const CLAMP_LADDER = [1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100];
+
+function niceClamp(v) {
+  if (!Number.isFinite(v) || v <= 0) return 10;
+  return CLAMP_LADDER.find(x => x >= v) || 100;
+}
+
+function colorClamps(sectorsOut) {
+  const out = {};
+  for (const P of PERIODS) {
+    const abs = [];
+    for (const s of sectorsOut) for (const m of s.members) {
+      if (m.ret[P.key] != null) abs.push(Math.abs(m.ret[P.key]));
+    }
+    abs.sort((a, b) => a - b);
+    out[P.key] = abs.length ? niceClamp(abs[Math.floor(abs.length * 0.85)]) : 10;
+  }
+  return out;
 }
 
 // ── 한 시장 계산 ──────────────────────────────────────────────────────
@@ -263,6 +295,7 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
     return {
       key: s.def.key,
       name: s.def.name,
+      group: s.def.group,
       rs,
       periods,
       members: s.members.map((m, mi) => {
@@ -278,13 +311,24 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
           ret[P.key] = (from == null || to == null || from <= 0) ? null : round2((to / from - 1) * 100);
           turn[P.key] = memberTurn[P.key][i][mi];
         }
-        return { code: m.code, name: nameOf(m), ret, turn };
+        // 히트맵에서 칸을 짚으면 뜨는 설명창의 미니 그래프용. 최근 20거래일 종가를
+        // 첫날 = 100 으로 맞춘 값입니다. 모양만 쓰므로 절대 가격은 넣지 않습니다.
+        // 값이 하나라도 비면(상장 전·시세 끊김) 그래프를 그리지 않도록 통째로 null.
+        const tail = a.slice(-SPARK_ROWS);
+        const base0 = tail.find(v => v != null && v > 0);
+        const spark = (base0 == null || tail.some(v => v == null || v <= 0))
+          ? null
+          : tail.map(v => Math.round((v / base0) * 1000) / 10);
+
+        return { code: m.code, name: nameOf(m), ret, turn, spark };
       }),
     };
   });
 
   const benchPeriods = {};
   for (const P of PERIODS) benchPeriods[P.key] = round2(periodReturn(benchIdx, P.days));
+
+  const clamp = colorClamps(out);
 
   if (dropped.length) console.warn(`⚠️  ${marketKey}: 데이터 파일이 없어 제외한 구성 종목 ${dropped.length}개 — ${dropped.join(', ')}`);
   if (stale.length) console.warn(`⚠️  ${marketKey}: 시세가 뒤처져 최근 구간에서 빠지는 종목 ${stale.length}개 — ${stale.join(', ')}\n`
@@ -298,6 +342,13 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
       benchmark: { code: bench.code, name: bench.name, ret: benchPeriods },
       updated: new Date(axis[last] * 86400000).toISOString().slice(0, 10),
       universeCount: universeList.length,
+      // 그룹 이름표. 이 시장에 실제로 들어 있는 그룹만 담습니다 —
+      // 화면이 빈 그룹 칸을 그리는 일이 없게.
+      groups: Object.fromEntries(
+        GROUPS.filter(g => sectors.some(s => s.def.group === g.key)).map(g => [g.key, g.name])
+      ),
+      // 히트맵 색이 최대로 진해지는 지점. 시장마다 다릅니다 (colorClamps 주석 참고).
+      clamp,
       dates: axis.slice(rsFrom),
       sectors: out,
     },
@@ -316,6 +367,17 @@ function assertCodesKnown() {
   const bad = [...krBad, ...usBad];
   if (bad.length) {
     console.error(`::error::sectors.js 가 모르는 코드를 참조합니다: ${bad.join(', ')}`);
+    process.exit(1);
+  }
+
+  // 그룹 키도 같은 이유로 검사합니다. 오타가 나면 그 섹터만 조용히 "기타" 로 빠져서,
+  // 화면에는 멀쩡한 칸이 그려지는데 엉뚱한 자리에 있게 됩니다.
+  const groupKnown = new Set(GROUPS.map(g => g.key));
+  const badGroup = [...KR_SECTORS, ...US_SECTORS]
+    .filter(s => !groupKnown.has(s.group))
+    .map(s => `${s.name}/${s.group}`);
+  if (badGroup.length) {
+    console.error(`::error::sectors.js 가 모르는 그룹을 참조합니다: ${badGroup.join(', ')}`);
     process.exit(1);
   }
 }

@@ -54,7 +54,8 @@
       <div id="hmPeriodBtns" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
       <label style="margin-left:8px;">칸 크기</label>
       <div class="mode-toggle" id="hmSizeToggle">
-        <button type="button" data-size="turn" class="active" onclick="setHeatmapSize('turn')">거래대금</button>
+        <button type="button" data-size="soft" class="active" onclick="setHeatmapSize('soft')">완화</button>
+        <button type="button" data-size="turn" onclick="setHeatmapSize('turn')">거래대금</button>
         <button type="button" data-size="equal" onclick="setHeatmapSize('equal')">균등</button>
       </div>
       <!-- 좁은 화면에서는 종목 100개를 한 화면에 넣으면 칸이 손톱만 해져 이름이 안 보입니다.
@@ -78,8 +79,12 @@
       </div>
       <!-- 확대하면 hmCanvas 가 뷰포트보다 커지고, 넘치는 만큼 이 상자 안에서 스크롤됩니다.
            칸을 작게 만들어 두고 손가락으로 키워 보는 대신, 배율을 눌러 키운 뒤 밀어서 봅니다. -->
-      <div id="hmViewport" class="hm-viewport">
-        <div id="hmCanvas" style="position:relative; width:100%; height:100%;"></div>
+      <div class="hm-board">
+        <div id="hmViewport" class="hm-viewport">
+          <div id="hmCanvas" style="position:relative; width:100%; height:100%;"></div>
+          <!-- 칸을 짚으면 그 섹터의 구성 종목이 여기 뜹니다. assets/site.js 의 hmShowPanel() -->
+          <div id="hmPanel" class="hm-panel"></div>
+        </div>
       </div>
       <div class="hm-zoom">
         <span>배율</span>
@@ -114,9 +119,9 @@
         <div style="font-size:11px; color:#718096; margin-top:4px;">섹터는 19칸, 종목은 100칸입니다. 좁은 화면에서는 섹터로 시작합니다 — 종목 100칸은 칸이 너무 작아 이름이 안 들어갑니다.</div>
       </div>
       <div class="stat-box">
-        <div class="label">균등 모드</div>
-        <div class="value">비교용</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">큰 종목이 화면을 다 차지해 나머지가 안 보일 때 칸을 같은 크기로 만듭니다.</div>
+        <div class="label">칸 크기 척도</div>
+        <div class="value">완화 / 거래대금 / 균등</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">기본은 <b>완화</b>입니다. 순서는 그대로 두고 격차만 좁혀, 대형주 두엇이 판을 다 먹지 않게 합니다. 진짜 비중은 <b>거래대금</b>, 전부 같은 크기는 <b>균등</b>.</div>
       </div>
       <div class="stat-box">
         <div class="label">배율</div>
@@ -132,11 +137,18 @@
   <section class="card" style="background:#f7fafc;">
     <h2 class="section">📚 조금 더</h2>
     <details open>
-      <summary>큰 칸 두어 개가 화면을 다 차지합니다</summary>
+      <summary>칸 크기 "완화"는 정확히 무엇을 하나요?</summary>
       <div class="body">
-        거래대금이 실제로 그렇게 쏠려 있다는 뜻입니다. 한국 시장은 반도체 대형주 두 종목이
-        수록 종목 거래대금의 상당 부분을 차지하는 날이 흔합니다. 그 쏠림 자체가 정보이므로
-        기본값은 실제 비중 그대로 두었고, 나머지를 들여다볼 때는 <b>균등</b> 모드로 바꾸면 됩니다.
+        <p>거래대금 비중에 <b>제곱근</b>을 씌워 칸 크기를 정합니다. 순서는 하나도 바뀌지 않고
+        큰 것과 작은 것의 <b>격차만</b> 좁아집니다.</p>
+        <p style="margin-top:8px;">왜 필요한지는 숫자로 보는 편이 빠릅니다. 한국 시장은 하루 거래대금이
+        극단적으로 쏠립니다. 실측으로 삼성전자 36.9% + SK하이닉스 34.9% = 판의 <b>72%</b> 였습니다.
+        비중 그대로 그리면 나머지 89종목이 남은 28%를 나눠 갖느라 전부 손톱만 해져서,
+        "돈이 어디 있나"는 보이지만 "그게 오르는지 내리는지"는 하나도 안 보입니다.
+        제곱근을 씌우면 그 격차가 142배에서 12배로 줄어 두 질문 다 보입니다.</p>
+        <p style="margin-top:8px;">다만 이건 <b>실제 비중이 아닙니다.</b> 그래서 기본값이면서도
+        범례에 늘 "거래대금 비중(완화)"라고 적어 둡니다. 진짜 비중이 보고 싶으면
+        <b>거래대금</b>을 누르세요 — 그 쏠림 자체가 정보인 날도 많습니다.</p>
       </div>
     </details>
     <details>
@@ -161,6 +173,9 @@
         정적 파일로 저장합니다. 브라우저는 그 파일을 읽습니다. 즉 새로고침해도 장중 시세로 바뀌지
         않고, 늘 <b>마지막으로 마감된 거래일의 종가</b>입니다. 화면 위에 적힌 기준일이 그 날짜입니다.
         미국 데이터는 한국 시각 기준으로 한 거래일 늦게 반영됩니다.</p>
+        <p style="margin-top:8px;"><b>갱신 시각</b>은 평일 기준 <b>한국시간 18:30</b>(한국 종가 반영)과
+        <b>다음날 07:30</b>(미국 종가 반영), 하루 두 번입니다. 주말·공휴일에는 돌지 않으므로
+        월요일 아침에 보는 것은 금요일 종가입니다. 장중 실시간 시세는 제공하지 않습니다.</p>
         <p style="margin-top:8px;"><b>1일</b> 기간은 달력의 하루가 아니라 <b>거래일 하루</b>입니다.
         월요일에 보면 금요일 종가 대비이고, 연휴 뒤에는 연휴 직전 종가 대비입니다.</p>
         <p style="margin-top:8px;">여기서 말하는 "전체"는 거래소 전체가 아니라 <b>이 화면에 수록된 종목들</b>입니다.
