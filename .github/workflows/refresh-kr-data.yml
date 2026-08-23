@@ -46,6 +46,12 @@ jobs:
       - name: Test the sector RS math
         run: node scripts/test-sector-rs.js
 
+      # PAGE_URLS 표가 assets/site.js 와 index.html 두 곳에 복제돼 있어 한쪽만 고치기
+      # 쉽습니다. 어긋나면 링크가 죽는 대신 홈으로 되돌아와서 "눌러도 아무 일이 없는" 것처럼
+      # 보입니다. 실제로 섹터 페이지 추가 때 그렇게 됐습니다.
+      - name: Test navigation links
+        run: node scripts/test-nav-links.js
+
       - name: Generate Korean stock data
         run: node scripts/generate-kr-data.js
 
