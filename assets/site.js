@@ -1626,6 +1626,106 @@ function rsRankChg(v) {
   return `<span style="color:${v > 0 ? rsUp : rsDown}; font-weight:600;">${arrow} ${Math.abs(v)}</span>`;
 }
 
+// ── 갱신 시각 안내 (섹터 RS · 히트맵 공용) ────────────────────────────
+//
+// 이 사이트의 시세는 사용자가 페이지를 열 때 받아오는 게 아닙니다. GitHub Actions 가
+// 정해진 시각에 받아 파일로 커밋해 두고, 브라우저는 그 파일을 읽습니다. 그래서 "지금
+// 화면의 숫자가 언제 것이냐"를 사용자가 알 방법이 화면에 적혀 있는 것 말고는 없습니다.
+//
+// 세 가지를 구분해서 보여줍니다. 셋이 다른 값이고, 섞이면 오해가 생깁니다.
+//   기준일      어느 날 종가인가        (market.updated)
+//   마지막 갱신 언제 받아왔는가          (data.generatedAt)
+//   다음 갱신   언제 다시 받는가        (data.schedule 로 계산)
+//
+// 안내 문구를 HTML 에 적어 두지 않는 이유: 워크플로우 cron 을 고치면 그 문구가 조용히
+// 거짓말이 됩니다. cron 을 그대로 실어 보내고(scripts/sectors.js 의 REFRESH_SCHEDULE)
+// 화면이 계산합니다. 둘이 어긋나면 scripts/test-sector-rs.js 가 잡습니다.
+
+const RS_KST = 'Asia/Seoul';
+
+function rsFmtKst(date, withYear) {
+  return date.toLocaleString('ko-KR', {
+    timeZone: RS_KST, month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+    ...(withYear ? { year: 'numeric' } : {}),
+  });
+}
+
+// 다음 실행 시각. cron 은 UTC 기준이므로 UTC 로 계산하고 표시할 때만 한국시간으로 바꿉니다.
+// (한국시간으로 계산하면 22:30 UTC 실행이 "다음 날"이라는 것 때문에 요일이 하루씩 밀립니다)
+function rsNextRefresh(schedule, from) {
+  if (!schedule || !Array.isArray(schedule.runs) || schedule.runs.length === 0) return null;
+  const now = from || new Date();
+  let best = null;
+  for (let ahead = 0; ahead <= 10; ahead++) {
+    const day = new Date(now.getTime() + ahead * 86400000);
+    for (const run of schedule.runs) {
+      const t = new Date(Date.UTC(
+        day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), run.hourUtc, run.minuteUtc, 0));
+      if (t <= now) continue;
+      if (!run.daysUtc.includes(t.getUTCDay())) continue;
+      if (!best || t < best) best = t;
+    }
+    if (best) break; // 하루 안에 찾았으면 그 다음 날은 볼 필요가 없습니다
+  }
+  return best;
+}
+
+// 실행 시각을 한국시간 "시:분" 목록으로. 안내 문구용입니다.
+function rsScheduleTimes(schedule) {
+  if (!schedule || !Array.isArray(schedule.runs)) return [];
+  // 요일에 관계없이 시:분만 뽑으면 되므로 아무 평일(월요일) 하나를 골라 변환합니다.
+  return schedule.runs.map(run => {
+    const t = new Date(Date.UTC(2026, 0, 5, run.hourUtc, run.minuteUtc)); // 2026-01-05 = 월요일
+    const hhmm = t.toLocaleTimeString('ko-KR', { timeZone: RS_KST, hour: '2-digit', minute: '2-digit', hour12: false });
+    // 22:30 UTC 는 한국시간으로 다음 날 아침입니다. 그걸 밝히지 않으면 "월요일 07:30"이
+    // 언제인지가 어긋납니다. 로케일 문자열("5일")을 비교하지 않고 날짜 숫자로 봅니다.
+    const kstDay = Number(new Intl.DateTimeFormat('en-US', { timeZone: RS_KST, day: 'numeric' }).format(t));
+    return { hhmm, sameDay: kstDay === t.getUTCDate(), scope: run.scope };
+  });
+}
+
+// 며칠째 갱신이 없으면 그걸 화면에 밝힙니다.
+// 워크플로우가 멈춰도(키 만료, GitHub 의 스케줄 자동 해제) 화면은 지난 숫자를 아무 일 없다는
+// 얼굴로 계속 보여줍니다. 그게 이 화면에서 가장 조용한 고장이라, 눈에 띄게 만듭니다.
+const RS_STALE_DAYS = 4;
+
+function rsRefreshLine(data) {
+  const times = rsScheduleTimes(data.schedule);
+  const plan = times.length
+    ? '매 거래일(월~금) 한국시간 ' + times.map(t => t.hhmm + (t.sameDay ? '' : '(다음 날)')).join(' · ') + ' 자동 갱신'
+    : '';
+
+  const gen = data.generatedAt ? new Date(data.generatedAt) : null;
+  const genOk = gen && !isNaN(gen);
+  const ageDays = genOk ? (Date.now() - gen.getTime()) / 86400000 : null;
+  const stale = ageDays != null && ageDays > RS_STALE_DAYS;
+
+  const next = rsNextRefresh(data.schedule);
+  const parts = [];
+  if (genOk) parts.push(`마지막 갱신 <b>${rsFmtKst(gen)}</b>`);
+  if (next) parts.push(`다음 갱신 <b>${rsFmtKst(next)}</b>`);
+  if (plan) parts.push(plan);
+
+  const line = '🔄 ' + parts.join(' · ');
+  if (!stale) return line;
+  return line + `<br><span style="color:#c53030; font-weight:600;">⚠️ ${Math.floor(ageDays)}일째 갱신되지 않았습니다 — 자동 수집이 멈췄을 수 있습니다.</span>`;
+}
+
+function rsRenderRefresh(elementId, data) {
+  const el = document.getElementById(elementId);
+  if (el) el.innerHTML = rsRefreshLine(data);
+}
+
+// 탭 앞의 기호는 데이터가 들고 옵니다(scripts/sectors.js 의 MARKETS).
+// 화면에 표를 하나 더 두면 시장을 추가할 때 두 곳을 고쳐야 합니다.
+function rsMarketButtons(markets, current, handler) {
+  return Object.keys(markets)
+    .map(k => `<button type="button" class="${k === current ? 'active' : ''}" onclick="${handler}('${k}')">`
+      + `${rsEsc(markets[k].flag || '')} ${rsEsc(markets[k].label)}</button>`)
+    .join('');
+}
+
 function rsMarketData() { return RS.data.markets[RS.market]; }
 function rsPeriodLabel() { return (RS_PERIODS.find(p => p.key === RS.period) || {}).label || RS.period; }
 
@@ -1663,10 +1763,8 @@ async function initSectorPage() {
 // 시장 탭은 데이터에 실제로 들어 있는 시장만 그립니다. 수집이 실패해 한쪽이 비어도
 // 없는 탭을 눌러 빈 화면을 보는 일이 없게 합니다.
 function renderSectorControls() {
-  const flags = { KR: '🇰🇷', US: '🇺🇸' };
-  document.getElementById('rsMarketToggle').innerHTML = Object.keys(RS.data.markets)
-    .map(k => `<button type="button" class="${k === RS.market ? 'active' : ''}" onclick="setSectorMarket('${k}')">${flags[k] || ''} ${rsEsc(RS.data.markets[k].label)}</button>`)
-    .join('');
+  document.getElementById('rsMarketToggle').innerHTML =
+    rsMarketButtons(RS.data.markets, RS.market, 'setSectorMarket');
 
   document.getElementById('rsPeriodBtns').innerHTML = RS_PERIODS
     .map(p => `<button type="button" class="preset-btn ${p.key === RS.period ? 'active' : ''}" onclick="setSectorPeriod('${p.key}')">${p.label}</button>`)
@@ -1695,6 +1793,7 @@ function renderSectorAll() {
     `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> ` +
     `${rsPeriodLabel()} ${benchRet == null ? '—' : (benchRet > 0 ? '+' : '') + benchRet.toFixed(1) + '%'} · ` +
     `수록 ${m.universeCount}종목 / ${m.sectors.length}섹터`;
+  rsRenderRefresh('rsUpdate', RS.data);
   document.getElementById('rsSummaryPeriod').textContent = rsPeriodLabel();
 
   renderSectorSummary();
@@ -2046,10 +2145,8 @@ function hmTileValue(turn, mode) {
 }
 
 function renderHeatmapControls() {
-  const flags = { KR: '🇰🇷', US: '🇺🇸' };
-  document.getElementById('hmMarketToggle').innerHTML = Object.keys(HM.data.markets)
-    .map(k => `<button type="button" class="${k === HM.market ? 'active' : ''}" onclick="setHeatmapMarket('${k}')">${flags[k] || ''} ${rsEsc(HM.data.markets[k].label)}</button>`)
-    .join('');
+  document.getElementById('hmMarketToggle').innerHTML =
+    rsMarketButtons(HM.data.markets, HM.market, 'setHeatmapMarket');
   document.getElementById('hmPeriodBtns').innerHTML = RS_PERIODS
     .map(p => `<button type="button" class="preset-btn ${p.key === HM.period ? 'active' : ''}" onclick="setHeatmapPeriod('${p.key}')">${p.label}</button>`)
     .join('');
@@ -2074,6 +2171,8 @@ function renderHeatmap() {
   const clamp = HM_CLAMP[P] || 10;
   const canvas = document.getElementById('hmCanvas');
   if (!canvas) return;
+
+  rsRenderRefresh('hmUpdate', HM.data);
 
   document.getElementById('hmMeta').innerHTML =
     `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · ` +
@@ -2104,6 +2203,14 @@ function renderHeatmap() {
   }).filter(s => s.members.length > 0).sort((a, b) => b.value - a.value);
 
   if (sectors.length === 0) { canvas.innerHTML = ''; return; }
+
+  // 지도 높이는 섹터 수를 따라갑니다.
+  //
+  // 560px 고정이던 시절엔 섹터가 20개 안팎이라 문제가 없었습니다. 테마 탭은 50개라
+  // 같은 높이에 밀어 넣으면 묶음 하나에 11px 밖에 안 돌아가고, 그러면 섹터 이름 띠
+  // (HEADER 17px)가 통째로 사라져 "무슨 테마인지 알 수 없는 색종이"가 됩니다.
+  // 묶음당 약 26px 을 확보하고, 화면을 다 잡아먹지 않게 위아래로 가둡니다.
+  canvas.style.height = Math.round(Math.max(560, Math.min(1080, 200 + sectors.length * 26))) + 'px';
 
   const W = canvas.clientWidth;
   const H = canvas.clientHeight;

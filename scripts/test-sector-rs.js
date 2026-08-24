@@ -93,6 +93,56 @@ check('RS Rating: 섹터가 하나뿐이면 50', () => {
   assert.deepStrictEqual(toRatings([7]), [50]);
 });
 
+// ── 갱신 시각 안내가 실제 cron 과 같은가 ──────────────────────────────
+// 화면의 "다음 자동 갱신 …" 문구는 sectors.js 의 REFRESH_SCHEDULE 에서 나옵니다.
+// 워크플로우 cron 만 고치고 이쪽을 잊으면, 화면이 오지 않을 시각을 계속 안내합니다.
+// 그건 눈으로 볼 수 없는 종류의 거짓말이라 여기서 잡습니다.
+check('안내하는 갱신 시각이 워크플로우 cron 과 일치한다', () => {
+  const { REFRESH_SCHEDULE } = require('./sectors');
+  const yml = fs.readFileSync(path.join(ROOT, '.github/workflows/refresh-kr-data.yml'), 'utf8');
+  const inYml = [...yml.matchAll(/^\s*-\s*cron:\s*'([^']+)'/gm)].map(m => m[1]);
+  const declared = REFRESH_SCHEDULE.runs.map(r => r.cron);
+  assert.deepStrictEqual(declared, inYml,
+    `sectors.js: ${declared.join(' | ')} / 워크플로우: ${inYml.join(' | ')}`);
+
+  // cron 문자열과 화면 계산용 숫자(hourUtc·minuteUtc·daysUtc)도 서로 맞아야 합니다.
+  for (const r of REFRESH_SCHEDULE.runs) {
+    const [min, hour, , , dow] = r.cron.split(/\s+/);
+    assert.strictEqual(Number(min), r.minuteUtc, r.cron);
+    assert.strictEqual(Number(hour), r.hourUtc, r.cron);
+    const [from, to] = dow.split('-').map(Number);
+    const days = [];
+    for (let d = from; d <= (Number.isFinite(to) ? to : from); d++) days.push(d);
+    assert.deepStrictEqual(r.daysUtc, days, r.cron);
+  }
+});
+
+// ── 시장·섹터 정의 ────────────────────────────────────────────────────
+check('모든 시장의 구성 종목이 수집 목록 안에 있다', () => {
+  const { MARKETS, SECTOR_DEFS, usSymbols, US_NAMES } = require('./sectors');
+  const { KR_TICKERS } = require('./kr-tickers');
+  const known = { kr: new Set(KR_TICKERS.map(t => t.code)), us: new Set(usSymbols()) };
+  const bad = [];
+  for (const m of MARKETS) {
+    assert.ok(SECTOR_DEFS[m.key], `${m.key} 섹터 정의 없음`);
+    for (const s of SECTOR_DEFS[m.key]) {
+      assert.ok(s.codes.length > 0, `${m.key}/${s.name} 이 비어 있습니다`);
+      for (const c of s.codes) if (!known[m.dir].has(c)) bad.push(`${m.key}/${s.name}/${c}`);
+    }
+  }
+  assert.deepStrictEqual(bad, []);
+  // 이름표가 없으면 화면에 티커가 그대로 나옵니다. 죽을 일은 아니지만 티가 나므로 막습니다.
+  assert.deepStrictEqual(usSymbols().filter(s => !US_NAMES[s]), []);
+});
+
+check('섹터 키가 시장 안에서 겹치지 않는다', () => {
+  const { MARKETS, SECTOR_DEFS } = require('./sectors');
+  for (const m of MARKETS) {
+    const keys = SECTOR_DEFS[m.key].map(s => s.key);
+    assert.strictEqual(new Set(keys).size, keys.length, `${m.key} 에 중복 키가 있습니다`);
+  }
+});
+
 // ── 합성 데이터로 전체 파이프라인 ──────────────────────────────────────
 // 답을 미리 정해 둔 세 섹터를 만들고 buildMarket 을 그대로 통과시킵니다.
 const N = 300;

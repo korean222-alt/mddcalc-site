@@ -56,6 +56,9 @@
       <div id="rsPeriodBtns" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
     </div>
     <div id="rsMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
+    <!-- 갱신 시각·주기. 문구는 assets/site.js 가 data/sectors.json 의 schedule 로 만듭니다
+         (워크플로우 cron 을 고치면 여기 안내도 같이 바뀝니다) -->
+    <div id="rsUpdate" style="font-size:12px; color:#4a5568; margin-top:6px; padding-top:8px; border-top:1px solid #edf2f7;"></div>
   </div>
 
   <div id="rsLoading" class="loading show">⏳ 섹터 데이터 불러오는 중...</div>
@@ -158,6 +161,35 @@
         시가총액 가중을 쓰지 않은 이유는 간단합니다. 그렇게 하면 "반도체·메모리"를 삼성전자 하나가
         거의 전부 설명해 버려서 섹터 지표로서 의미가 없어집니다.
         구성 종목 중 하나가 거래정지되거나 아직 상장 전이면, 그 종목은 해당 구간 계산에서만 빠집니다.
+      </div>
+    </details>
+
+    <details>
+      <summary>세 개의 탭은 무엇이 다른가요?</summary>
+      <div class="body">
+        <p><b>🇰🇷 한국</b>과 <b>🇺🇸 미국</b>은 그 시장 전체를 20개 안팎으로 나눈 넓은 지도입니다.
+        반도체, 은행, 자동차처럼 오래 쓰인 큰 묶음이라 "지금 시장의 무게가 어디에 있나"를 보기 좋습니다.</p>
+        <p style="margin-top:8px;"><b>🌐 AI·성장 테마</b>는 같은 미국 종목을 훨씬 잘게 쪼갠 50개 테마입니다.
+        "반도체" 하나를 GPU·ASIC / 파운드리·CoWoS / HBM·메모리 / 패키징·검사 / 반도체 장비로 가르고,
+        AI 데이터센터를 서버 · 광통신 · 전력 · 냉각 · 시공 · REIT 로 나눕니다.
+        같은 AI 랠리 안에서도 돈이 지금 어느 칸에 있는지는 넓은 섹터로는 보이지 않기 때문입니다.</p>
+        <p style="margin-top:8px;">테마 탭에서는 한 종목이 여러 테마에 들어갑니다. 브로드컴은 GPU·ASIC 이면서
+        네트워크 반도체이고, 버티브는 UPS 이면서 냉각입니다. 실제로 그 두 흐름을 다 타기 때문에 그대로 뒀습니다.
+        거래대금 비중을 낼 때는 종목을 한 번만 세므로 중복이 비중을 부풀리지는 않습니다.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>이 숫자는 언제 갱신되나요?</summary>
+      <div class="body">
+        <p>사람이 손으로 올리지 않습니다. 매 거래일(월~금) 정해진 시각에 자동으로 받아 갱신됩니다.</p>
+        <ul style="margin:8px 0 0 18px; line-height:1.9;">
+          <li><b>한국시간 18:30</b> — 한국장 마감 뒤. 한국 탭이 당일 종가로 바뀝니다.</li>
+          <li><b>다음 날 한국시간 07:30</b> — 미국장 마감 뒤. 미국·테마 탭이 갱신됩니다.</li>
+        </ul>
+        <p style="margin-top:8px;">화면 맨 위 <b>🔄 줄</b>에 마지막으로 받아온 시각과 다음 갱신 예정 시각이 늘 적혀 있습니다.
+        수집이 며칠째 멈추면 그 자리에 경고가 뜹니다 — 지난 숫자를 아무 일 없다는 얼굴로 보여주지 않기 위해서입니다.</p>
+        <p style="margin-top:8px;">미국장은 한국시간 새벽에 끝나므로, 미국·테마 탭의 기준일은 한국 탭보다 하루 앞선 날짜로 보이는 것이 정상입니다.</p>
       </div>
     </details>
 
