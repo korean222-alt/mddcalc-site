@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// 미국 섹터 ETF·종목 일봉을 미리 만들어 정적 파일로 저장합니다.
+// 미국 종목 일봉을 미리 만들어 정적 파일로 저장합니다. 대상 목록은 scripts/sectors.js
+// 의 US_SECTORS 입니다(+ 벤치마크 SPY).
 //
 //   node scripts/generate-us-data.js
 //
 // 왜 별도 파이프라인인가:
 //   미국 종목은 이미 /api/twelve-data/time-series 로 조회할 수 있지만, 그쪽은 하루 800회
-//   한도를 MySQL 로 세는 API 프록시입니다. 섹터 화면은 한 번 열 때 20개 넘는 심볼이
-//   필요하므로, 그 경로로 보내면 페이지뷰 40번이면 하루 한도가 끝납니다.
+//   한도를 MySQL 로 세는 API 프록시입니다. 섹터 화면은 한 번 열 때 80개 심볼이 필요하므로,
+//   그 경로로 보내면 페이지뷰 10번이면 하루 한도가 끝납니다.
 //   그래서 한국 데이터와 똑같이 "빌드 시점에 받아 정적 파일로 커밋" 방식을 씁니다.
 //
 // 왜 Twelve Data 가 1순위인가:
@@ -14,8 +15,10 @@
 //     야후  : 22심볼 전부 첫 요청부터 HTTP 429 (간격을 벌려도 동일 — IP 대역 차단)
 //     Stooq : CSV 대신 <noscript> 봇 차단 페이지
 //   반면 Twelve Data 는 이 저장소가 이미 키를 갖고 있고(refresh-stock-pages.yml 이 씁니다),
-//   무료 플랜 하루 800회 중 여기서 쓰는 건 22회뿐입니다. 그 800회 한도는 원래 "사용자가
+//   무료 플랜 하루 800회 중 여기서 쓰는 건 80회입니다. 그 800회 한도는 원래 "사용자가
 //   버튼을 누를 때마다 호출"하는 경로를 걱정한 것이지, 하루 한 번 도는 배치가 아닙니다.
+//   그래도 공짜는 아니라서, 워크플로우는 미국장 마감 뒤 실행에서만 이 스크립트를 돌립니다.
+//   한국장 마감 시각(09:30 UTC)에 받아봐야 어차피 같은 전일 종가입니다.
 //
 //   무료 소스 둘은 폴백으로 남깁니다. 키가 없거나 만료된 환경에서는 그쪽이 살아날 수 있고,
 //   로컬에서는 야후가 되는 경우가 있습니다.
@@ -37,7 +40,8 @@ const API_KEY = process.env.TWELVE_DATA_API_KEY || '';
 // 22심볼이 전부 HTTP 400 을 받았습니다. api/twelve-data/time-series.js 도 5000 을 씁니다.
 const TD_MAX_OUTPUTSIZE = 5000;
 
-// Twelve Data 무료 플랜은 분당 8회입니다. 22심볼이면 8.5초 간격으로 약 3분 걸립니다.
+// Twelve Data 무료 플랜은 분당 8회입니다. 80심볼이면 8.5초 간격으로 약 11분 걸립니다.
+// 종목을 늘리려면 이 시간이 그만큼 길어진다는 것을 먼저 계산하세요.
 // 키가 없어 무료 소스로 떨어질 때는 KR 쪽과 같은 700ms 를 씁니다.
 const DELAY_MS = API_KEY ? 8500 : 700;
 
@@ -196,6 +200,7 @@ async function main() {
       console.log(`✅ ${symbol} (${payload.name}) — ${payload.d.length}행, 최신 ${payload.updated} [${got.source}]`);
     } catch (err) {
       // 기존 파일을 건드리지 않으므로 그 심볼은 지난번 데이터로 계속 서빙됩니다.
+      // 아직 한 번도 못 받은 심볼이면 그 종목만 섹터에서 빠집니다(generate-sector-rs.js).
       failed.push({ symbol, reason: err.message });
       console.warn(`⚠️  ${symbol} 실패: ${err.message} — 기존 파일 유지`);
     }
