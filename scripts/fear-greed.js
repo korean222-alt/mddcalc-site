@@ -77,6 +77,27 @@ function realizedVol(series, at, n) {
   return Math.sqrt(varr) * Math.sqrt(252);
 }
 
+// 한글 조사 고르기. 화면에 "코스피이 국고채10년보다" 가 나갔습니다 — 벤치마크 이름을
+// 문구에 끼워 넣으면서 조사를 '이' 로 박아 뒀기 때문입니다. 받침 유무로 고릅니다.
+// 숫자로 끝나는 이름(S&P 500)도 읽는 소리 기준으로 판단합니다: 0 영, 1 일, 3 삼, 6 육,
+// 7 칠, 8 팔 은 받침이 있고 2 이, 4 사, 5 오, 9 구 는 없습니다.
+function josa(word, withBatchim, withoutBatchim) {
+  const s = String(word == null ? '' : word).trim();
+  const last = s[s.length - 1];
+  if (!last) return withoutBatchim;
+
+  const code = last.charCodeAt(0);
+  if (code >= 0xAC00 && code <= 0xD7A3) {
+    return (code - 0xAC00) % 28 !== 0 ? withBatchim : withoutBatchim;
+  }
+  if (/[0-9]/.test(last)) {
+    return [0, 1, 3, 6, 7, 8].includes(Number(last)) ? withBatchim : withoutBatchim;
+  }
+  // 영문은 모음으로 끝나면 받침이 없는 것으로 읽습니다 (SPY 는 "에스피와이").
+  if (/[a-zA-Z]/.test(last)) return /[aeiouAEIOU]/.test(last) ? withoutBatchim : withBatchim;
+  return withoutBatchim;
+}
+
 // raw[at] 이 최근 Z_WINDOW 구간에서 몇 표준편차인지. 표본이 모자라거나 값이 한 번도
 // 변하지 않았으면(σ=0) null — 변하지 않는 값에서 "몇 표준편차"는 뜻이 없습니다.
 function zScoreAt(raw, at, opt = {}) {
@@ -127,7 +148,11 @@ const COMPONENTS = [
       const c = bench[at];
       if (ma == null || c == null || ma <= 0) return null;
       const dev = (c / ma - 1) * 100;
-      return { v: dev, note: `${benchName || '지수'}가 125일 이동평균보다 ${dev >= 0 ? '+' : ''}${dev.toFixed(1)}%` };
+      const name = benchName || '지수';
+      return {
+        v: dev,
+        note: `${name}${josa(name, '이', '가')} 125일 이동평균보다 ${dev >= 0 ? '+' : ''}${dev.toFixed(1)}%`,
+      };
     },
   },
   {
@@ -226,7 +251,8 @@ const COMPONENTS = [
       const diff = ((b1 / b0 - 1) - (n1 / n0 - 1)) * 100;
       return {
         v: diff,
-        note: `최근 20거래일 ${benchName || '주식'}이 ${bondName || '국채'}보다 ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%p`,
+        note: `최근 20거래일 ${benchName || '주식'}${josa(benchName || '주식', '이', '가')} `
+          + `${bondName || '국채'}보다 ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%p`,
       };
     },
   },
@@ -284,7 +310,7 @@ function band(score) {
 }
 
 module.exports = {
-  scale, sma, realizedVol, zScoreAt, scoreAt,
+  scale, sma, realizedVol, zScoreAt, scoreAt, josa,
   COMPONENTS, EXTRAS, combine, band, BANDS,
   Z_WINDOW, Z_MIN, Z_SPAN,
 };

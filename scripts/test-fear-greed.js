@@ -76,6 +76,19 @@ check('scoreAt: 평소 수준이면 50점, ±2σ 가 0점과 100점', () => {
   assert.ok(Math.abs(z.z) <= 2);
 });
 
+check('조사: 받침 유무로 이/가 를 고른다', () => {
+  // 화면에 "코스피이 국고채10년보다" 가 나간 적이 있습니다.
+  assert.strictEqual(FG.josa('코스피', '이', '가'), '가');
+  assert.strictEqual(FG.josa('코스닥', '이', '가'), '이');
+  assert.strictEqual(FG.josa('국고채10년', '이', '가'), '이');   // 년 → 받침
+  assert.strictEqual(FG.josa('S&P 500', '이', '가'), '이');      // 오백 → 받침
+  assert.strictEqual(FG.josa('나스닥 100', '이', '가'), '이');   // 백 → 받침
+  assert.strictEqual(FG.josa('KODEX 200', '이', '가'), '이');
+  assert.strictEqual(FG.josa('SPY', '이', '가'), '이');
+  assert.strictEqual(FG.josa('', '이', '가'), '가');
+  assert.strictEqual(FG.josa(null, '이', '가'), '가');
+});
+
 // ── 구성 요소 ─────────────────────────────────────────────────────────
 // 각 구성 요소는 "클수록 탐욕"인 원시값을 냅니다. 그 방향이 뒤집히면 지수 전체가
 // 거꾸로 도는데, 화면만 봐서는 절대 알 수 없습니다. 여기서 방향만큼은 확실히 못박습니다.
