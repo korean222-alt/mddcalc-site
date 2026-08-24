@@ -52,11 +52,16 @@ jobs:
       - name: Rebuild the fear & greed data
         run: node scripts/generate-fear-greed.js
 
+      # 새 점수를 fear-greed.html 안에도 글자로 심습니다 (자바스크립트 없이 보이는 요약).
+      - name: Write today's numbers into the pages
+        continue-on-error: true
+        run: node scripts/write-page-summaries.js
+
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/cnn-fear-greed.json data/fear-greed.json
+          git add data/cnn-fear-greed.json data/fear-greed.json fear-greed.html sector-rs.html heatmap.html
           if git diff --cached --quiet; then
             echo "변경 사항 없음 — 커밋하지 않음"
           else

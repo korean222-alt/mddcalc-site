@@ -112,6 +112,12 @@ jobs:
         continue-on-error: true
         run: node scripts/generate-fear-greed.js
 
+      # 계산 결과를 HTML 안에 글자로 심습니다. 세 화면은 본문을 자바스크립트로 그리기 때문에,
+      # 이게 없으면 크롤러가 보는 HTML 에는 숫자가 한 글자도 없습니다.
+      - name: Write today's numbers into the pages
+        continue-on-error: true
+        run: node scripts/write-page-summaries.js
+
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"

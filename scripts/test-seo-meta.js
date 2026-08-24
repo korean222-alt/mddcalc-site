@@ -134,5 +134,52 @@ check('JSON-LD 가 전부 파싱된다', () => {
   assert.deepStrictEqual(broken, [], '\n     ' + broken.join('\n     '));
 });
 
+// 세 화면은 본문을 자바스크립트로 그립니다. 크롤러가 자바스크립트를 실행하지 않으면
+// HTML 에는 "불러오는 중..." 말고 숫자가 한 글자도 없습니다. 그래서 매 거래일 계산이 끝나면
+// scripts/write-page-summaries.js 가 오늘 값을 문장과 표로 심어 둡니다.
+// 그 블록이 사라지거나(마커 유실), 데이터만 갱신되고 요약은 굳어 있는 것을 여기서 잡습니다.
+const SUMMARIES = [
+  { file: 'fear-greed.html', marker: 'FG_SUMMARY', data: 'data/fear-greed.json' },
+  { file: 'sector-rs.html', marker: 'RS_SUMMARY', data: 'data/sectors.json' },
+  { file: 'heatmap.html', marker: 'HM_SUMMARY', data: 'data/sectors.json' },
+];
+
+// 데이터 파일이 말하는 기준일 = 시장들의 기준일 중 가장 최근 것.
+function dataDateOf(rel) {
+  const p = path.join(ROOT, rel);
+  if (!fs.existsSync(p)) return null;
+  const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+  const dates = Object.values(j.markets || {}).map(m => m.updated).filter(Boolean);
+  return dates.length ? dates.sort().pop() : null;
+}
+
+check('자바스크립트 없이도 오늘 값이 보이는 요약 블록이 있다', () => {
+  const bad = [];
+  for (const s of SUMMARIES) {
+    const src = fs.readFileSync(path.join(ROOT, s.file), 'utf8');
+    const m = src.match(new RegExp(`<!-- ${s.marker}_START[\\s\\S]*?<!-- ${s.marker}_END -->`));
+    if (!m) { bad.push(`${s.file}: ${s.marker} 마커가 없습니다`); continue; }
+    // 마커만 남고 내용이 비면 아무 의미가 없습니다.
+    if (m[0].length < 400) bad.push(`${s.file}: 요약 내용이 비어 있습니다 (${m[0].length}자)`);
+    if (!/\d{4}-\d{2}-\d{2}/.test(m[0])) bad.push(`${s.file}: 요약에 기준일이 없습니다`);
+  }
+  assert.deepStrictEqual(bad, [], '\n     ' + bad.join('\n     '));
+});
+
+check('요약의 기준일이 데이터 파일과 같다 (요약만 굳어 있지 않다)', () => {
+  const bad = [];
+  for (const s of SUMMARIES) {
+    const src = fs.readFileSync(path.join(ROOT, s.file), 'utf8');
+    const m = src.match(new RegExp(`<!-- ${s.marker}_START[\\s\\S]*?<!-- ${s.marker}_END -->`));
+    if (!m) continue;   // 앞 검사에서 이미 잡혔습니다
+    const inHtml = (m[0].match(/\d{4}-\d{2}-\d{2}/) || [])[0];
+    const inData = dataDateOf(s.data);
+    if (inData && inHtml !== inData) {
+      bad.push(`${s.file}: 요약 ${inHtml} vs ${s.data} ${inData} — write-page-summaries.js 를 다시 돌리세요`);
+    }
+  }
+  assert.deepStrictEqual(bad, [], '\n     ' + bad.join('\n     '));
+});
+
 console.log(failed ? `\n${failed}개 실패` : '\n모두 통과');
 process.exit(failed ? 1 : 0);
