@@ -1,6 +1,6 @@
 {
   "updated": "2026-08-24",
-  "count": 80,
+  "count": 208,
   "stocks": [
     {
       "code": "SPY",
@@ -400,6 +400,646 @@
     {
       "code": "EQIX",
       "name": "에퀴닉스",
+      "market": "US"
+    },
+    {
+      "code": "MRVL",
+      "name": "마벨테크놀로지",
+      "market": "US"
+    },
+    {
+      "code": "UMC",
+      "name": "UMC",
+      "market": "US"
+    },
+    {
+      "code": "GFS",
+      "name": "글로벌파운드리",
+      "market": "US"
+    },
+    {
+      "code": "ASX",
+      "name": "ASE테크놀로지",
+      "market": "US"
+    },
+    {
+      "code": "TER",
+      "name": "테라다인",
+      "market": "US"
+    },
+    {
+      "code": "AMKR",
+      "name": "앰코테크놀로지",
+      "market": "US"
+    },
+    {
+      "code": "ONTO",
+      "name": "온투이노베이션",
+      "market": "US"
+    },
+    {
+      "code": "CRDO",
+      "name": "크레도테크놀로지",
+      "market": "US"
+    },
+    {
+      "code": "ALAB",
+      "name": "아스테라랩스",
+      "market": "US"
+    },
+    {
+      "code": "SNPS",
+      "name": "시놉시스",
+      "market": "US"
+    },
+    {
+      "code": "CDNS",
+      "name": "케이던스",
+      "market": "US"
+    },
+    {
+      "code": "ARM",
+      "name": "ARM홀딩스",
+      "market": "US"
+    },
+    {
+      "code": "DELL",
+      "name": "델테크놀로지스",
+      "market": "US"
+    },
+    {
+      "code": "SMCI",
+      "name": "슈퍼마이크로컴퓨터",
+      "market": "US"
+    },
+    {
+      "code": "HPE",
+      "name": "HPE",
+      "market": "US"
+    },
+    {
+      "code": "COHR",
+      "name": "코히런트",
+      "market": "US"
+    },
+    {
+      "code": "LITE",
+      "name": "루멘텀",
+      "market": "US"
+    },
+    {
+      "code": "CIEN",
+      "name": "시에나",
+      "market": "US"
+    },
+    {
+      "code": "FN",
+      "name": "팹리넷",
+      "market": "US"
+    },
+    {
+      "code": "MSI",
+      "name": "모토로라솔루션스",
+      "market": "US"
+    },
+    {
+      "code": "UI",
+      "name": "유비쿼티",
+      "market": "US"
+    },
+    {
+      "code": "EXTR",
+      "name": "익스트림네트웍스",
+      "market": "US"
+    },
+    {
+      "code": "APH",
+      "name": "앰페놀",
+      "market": "US"
+    },
+    {
+      "code": "TEL",
+      "name": "TE커넥티비티",
+      "market": "US"
+    },
+    {
+      "code": "GLW",
+      "name": "코닝",
+      "market": "US"
+    },
+    {
+      "code": "VRT",
+      "name": "버티브",
+      "market": "US"
+    },
+    {
+      "code": "ETN",
+      "name": "이튼",
+      "market": "US"
+    },
+    {
+      "code": "EMR",
+      "name": "에머슨일렉트릭",
+      "market": "US"
+    },
+    {
+      "code": "GNRC",
+      "name": "제너랙",
+      "market": "US"
+    },
+    {
+      "code": "TT",
+      "name": "트레인테크놀로지스",
+      "market": "US"
+    },
+    {
+      "code": "JCI",
+      "name": "존슨콘트롤스",
+      "market": "US"
+    },
+    {
+      "code": "MOD",
+      "name": "모다인",
+      "market": "US"
+    },
+    {
+      "code": "PWR",
+      "name": "콴타서비스",
+      "market": "US"
+    },
+    {
+      "code": "EME",
+      "name": "EMCOR",
+      "market": "US"
+    },
+    {
+      "code": "MTZ",
+      "name": "매스텍",
+      "market": "US"
+    },
+    {
+      "code": "FIX",
+      "name": "컴포트시스템즈",
+      "market": "US"
+    },
+    {
+      "code": "DLR",
+      "name": "디지털리얼티",
+      "market": "US"
+    },
+    {
+      "code": "IRM",
+      "name": "아이언마운틴",
+      "market": "US"
+    },
+    {
+      "code": "AEP",
+      "name": "아메리칸일렉트릭파워",
+      "market": "US"
+    },
+    {
+      "code": "ED",
+      "name": "콘에디슨",
+      "market": "US"
+    },
+    {
+      "code": "EXC",
+      "name": "엑셀론",
+      "market": "US"
+    },
+    {
+      "code": "PPL",
+      "name": "PPL",
+      "market": "US"
+    },
+    {
+      "code": "HUBB",
+      "name": "허벨",
+      "market": "US"
+    },
+    {
+      "code": "POWL",
+      "name": "파월인더스트리스",
+      "market": "US"
+    },
+    {
+      "code": "NVT",
+      "name": "nVent일렉트릭",
+      "market": "US"
+    },
+    {
+      "code": "GEV",
+      "name": "GE버노바",
+      "market": "US"
+    },
+    {
+      "code": "CMI",
+      "name": "커민스",
+      "market": "US"
+    },
+    {
+      "code": "NRG",
+      "name": "NRG에너지",
+      "market": "US"
+    },
+    {
+      "code": "TLN",
+      "name": "탈렌에너지",
+      "market": "US"
+    },
+    {
+      "code": "PEG",
+      "name": "퍼블릭서비스엔터프라이즈",
+      "market": "US"
+    },
+    {
+      "code": "BWXT",
+      "name": "BWX테크놀로지스",
+      "market": "US"
+    },
+    {
+      "code": "LEU",
+      "name": "센트루스에너지",
+      "market": "US"
+    },
+    {
+      "code": "SMR",
+      "name": "뉴스케일파워",
+      "market": "US"
+    },
+    {
+      "code": "OKLO",
+      "name": "오클로",
+      "market": "US"
+    },
+    {
+      "code": "NNE",
+      "name": "나노뉴클리어에너지",
+      "market": "US"
+    },
+    {
+      "code": "CCJ",
+      "name": "카메코",
+      "market": "US"
+    },
+    {
+      "code": "UEC",
+      "name": "우라늄에너지",
+      "market": "US"
+    },
+    {
+      "code": "NXE",
+      "name": "넥스젠에너지",
+      "market": "US"
+    },
+    {
+      "code": "UUUU",
+      "name": "에너지퓨얼스",
+      "market": "US"
+    },
+    {
+      "code": "FLNC",
+      "name": "플루언스에너지",
+      "market": "US"
+    },
+    {
+      "code": "ENPH",
+      "name": "엔페이즈에너지",
+      "market": "US"
+    },
+    {
+      "code": "FSLR",
+      "name": "퍼스트솔라",
+      "market": "US"
+    },
+    {
+      "code": "NXT",
+      "name": "넥스트래커",
+      "market": "US"
+    },
+    {
+      "code": "RUN",
+      "name": "선런",
+      "market": "US"
+    },
+    {
+      "code": "LNG",
+      "name": "셰니어에너지",
+      "market": "US"
+    },
+    {
+      "code": "EQT",
+      "name": "EQT",
+      "market": "US"
+    },
+    {
+      "code": "WMB",
+      "name": "윌리엄스",
+      "market": "US"
+    },
+    {
+      "code": "KMI",
+      "name": "킨더모건",
+      "market": "US"
+    },
+    {
+      "code": "TRGP",
+      "name": "타가리소시스",
+      "market": "US"
+    },
+    {
+      "code": "ZS",
+      "name": "지스케일러",
+      "market": "US"
+    },
+    {
+      "code": "S",
+      "name": "센티넬원",
+      "market": "US"
+    },
+    {
+      "code": "NOW",
+      "name": "서비스나우",
+      "market": "US"
+    },
+    {
+      "code": "WDAY",
+      "name": "워크데이",
+      "market": "US"
+    },
+    {
+      "code": "HUBS",
+      "name": "허브스팟",
+      "market": "US"
+    },
+    {
+      "code": "AI",
+      "name": "C3.ai",
+      "market": "US"
+    },
+    {
+      "code": "SNOW",
+      "name": "스노우플레이크",
+      "market": "US"
+    },
+    {
+      "code": "PATH",
+      "name": "유아이패스",
+      "market": "US"
+    },
+    {
+      "code": "TEAM",
+      "name": "아틀라시안",
+      "market": "US"
+    },
+    {
+      "code": "TDC",
+      "name": "테라데이타",
+      "market": "US"
+    },
+    {
+      "code": "MDB",
+      "name": "몽고DB",
+      "market": "US"
+    },
+    {
+      "code": "DDOG",
+      "name": "데이터독",
+      "market": "US"
+    },
+    {
+      "code": "DT",
+      "name": "다이나트레이스",
+      "market": "US"
+    },
+    {
+      "code": "GTLB",
+      "name": "깃랩",
+      "market": "US"
+    },
+    {
+      "code": "ESTC",
+      "name": "일래스틱",
+      "market": "US"
+    },
+    {
+      "code": "FI",
+      "name": "파이서브",
+      "market": "US"
+    },
+    {
+      "code": "FIS",
+      "name": "FIS",
+      "market": "US"
+    },
+    {
+      "code": "GPN",
+      "name": "글로벌페이먼츠",
+      "market": "US"
+    },
+    {
+      "code": "AFRM",
+      "name": "어펌",
+      "market": "US"
+    },
+    {
+      "code": "AXP",
+      "name": "아메리칸익스프레스",
+      "market": "US"
+    },
+    {
+      "code": "TOST",
+      "name": "토스트",
+      "market": "US"
+    },
+    {
+      "code": "HOOD",
+      "name": "로빈후드",
+      "market": "US"
+    },
+    {
+      "code": "SCHW",
+      "name": "찰스슈왑",
+      "market": "US"
+    },
+    {
+      "code": "IBKR",
+      "name": "인터랙티브브로커스",
+      "market": "US"
+    },
+    {
+      "code": "SOFI",
+      "name": "소파이",
+      "market": "US"
+    },
+    {
+      "code": "MSTR",
+      "name": "스트래티지",
+      "market": "US"
+    },
+    {
+      "code": "MARA",
+      "name": "마라홀딩스",
+      "market": "US"
+    },
+    {
+      "code": "RIOT",
+      "name": "라이엇플랫폼스",
+      "market": "US"
+    },
+    {
+      "code": "ROK",
+      "name": "로크웰오토메이션",
+      "market": "US"
+    },
+    {
+      "code": "ZBRA",
+      "name": "지브라테크놀로지스",
+      "market": "US"
+    },
+    {
+      "code": "SERV",
+      "name": "서브로보틱스",
+      "market": "US"
+    },
+    {
+      "code": "MBLY",
+      "name": "모빌아이",
+      "market": "US"
+    },
+    {
+      "code": "AUR",
+      "name": "오로라이노베이션",
+      "market": "US"
+    },
+    {
+      "code": "UBER",
+      "name": "우버",
+      "market": "US"
+    },
+    {
+      "code": "KTOS",
+      "name": "크라토스디펜스",
+      "market": "US"
+    },
+    {
+      "code": "AVAV",
+      "name": "에어로바이런먼트",
+      "market": "US"
+    },
+    {
+      "code": "RCAT",
+      "name": "레드캣홀딩스",
+      "market": "US"
+    },
+    {
+      "code": "ONDS",
+      "name": "온다스홀딩스",
+      "market": "US"
+    },
+    {
+      "code": "GD",
+      "name": "제너럴다이내믹스",
+      "market": "US"
+    },
+    {
+      "code": "LHX",
+      "name": "L3해리스",
+      "market": "US"
+    },
+    {
+      "code": "RKLB",
+      "name": "로켓랩",
+      "market": "US"
+    },
+    {
+      "code": "ASTS",
+      "name": "AST스페이스모바일",
+      "market": "US"
+    },
+    {
+      "code": "IRDM",
+      "name": "이리듐",
+      "market": "US"
+    },
+    {
+      "code": "PL",
+      "name": "플래닛랩스",
+      "market": "US"
+    },
+    {
+      "code": "IONQ",
+      "name": "아이온큐",
+      "market": "US"
+    },
+    {
+      "code": "RGTI",
+      "name": "리게티컴퓨팅",
+      "market": "US"
+    },
+    {
+      "code": "QBTS",
+      "name": "D-Wave퀀텀",
+      "market": "US"
+    },
+    {
+      "code": "QUBT",
+      "name": "퀀텀컴퓨팅",
+      "market": "US"
+    },
+    {
+      "code": "BIIB",
+      "name": "바이오젠",
+      "market": "US"
+    },
+    {
+      "code": "CRSP",
+      "name": "크리스퍼테라퓨틱스",
+      "market": "US"
+    },
+    {
+      "code": "NTLA",
+      "name": "인텔리아테라퓨틱스",
+      "market": "US"
+    },
+    {
+      "code": "BEAM",
+      "name": "빔테라퓨틱스",
+      "market": "US"
+    },
+    {
+      "code": "ILMN",
+      "name": "일루미나",
+      "market": "US"
+    },
+    {
+      "code": "NVO",
+      "name": "노보노디스크",
+      "market": "US"
+    },
+    {
+      "code": "VKTX",
+      "name": "바이킹테라퓨틱스",
+      "market": "US"
+    },
+    {
+      "code": "ISRG",
+      "name": "인튜이티브서지컬",
+      "market": "US"
+    },
+    {
+      "code": "MDT",
+      "name": "메드트로닉",
+      "market": "US"
+    },
+    {
+      "code": "SYK",
+      "name": "스트라이커",
+      "market": "US"
+    },
+    {
+      "code": "BSX",
+      "name": "보스턴사이언티픽",
       "market": "US"
     }
   ]

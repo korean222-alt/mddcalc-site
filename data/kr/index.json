@@ -1,6 +1,6 @@
 {
   "updated": "2026-08-24",
-  "count": 101,
+  "count": 102,
   "stocks": [
     {
       "code": "005930",
@@ -395,6 +395,11 @@
     {
       "code": "122630",
       "name": "KODEX 레버리지",
+      "market": "KS"
+    },
+    {
+      "code": "148070",
+      "name": "KOSEF 국고채10년",
       "market": "KS"
     },
     {
