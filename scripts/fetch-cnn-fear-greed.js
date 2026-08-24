@@ -48,11 +48,25 @@ const COMPONENT_KEYS = [
 const isScore = v => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100;
 const epochDay = ms => Math.floor(ms / 86400000);
 
-// CNN 은 timestamp 를 밀리초로 줍니다. 초 단위로 바뀌어도 읽히도록 폭을 둡니다.
+// CNN 은 시각을 두 가지 모양으로 줍니다. 실제 응답(2026-08-24 러너 로그에서 확인):
+//   fear_and_greed.timestamp        "2026-08-22T16:00:04+00:00"   ← ISO 문자열
+//   fear_and_greed_historical.x     1755878400000                 ← 밀리초 숫자
+//
+// 처음엔 숫자만 읽도록 만들어서 첫 실행이 통째로 거절됐습니다 — 받아오기는 멀쩡히 됐는데
+// "timestamp 를 읽지 못했습니다"로 끝났습니다. 둘 다 읽고, 초 단위로 바뀌어도 견딥니다.
 function toMillis(ts) {
-  const n = typeof ts === 'string' ? Number(ts) : ts;
-  if (!Number.isFinite(n) || n <= 0) return null;
-  return n < 1e11 ? n * 1000 : n;   // 1e11 미만이면 초 단위로 봅니다
+  if (ts == null) return null;
+  const str = String(ts).trim();
+  if (str === '') return null;
+
+  if (/^\d+(\.\d+)?$/.test(str)) {
+    const n = Number(str);
+    if (!Number.isFinite(n) || n <= 0) return null;
+    return n < 1e11 ? n * 1000 : n;   // 1e11 미만이면 초 단위로 봅니다
+  }
+
+  const parsed = Date.parse(str);     // ISO 8601
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function pick(json, spec) {

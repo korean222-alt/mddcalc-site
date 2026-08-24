@@ -80,6 +80,30 @@ check('timestamp 가 초 단위로 와도 읽는다', () => {
   assert.strictEqual(parse(f).updated, new Date(now).toISOString().slice(0, 10));
 });
 
+// 실제 응답이 이 모양이었습니다. 처음엔 숫자만 읽도록 만들어서 첫 실행이 통째로 거절됐습니다 —
+// 받아오기는 멀쩡히 됐는데 "timestamp 를 읽지 못했습니다"로 끝났습니다.
+check('timestamp 가 ISO 문자열로 와도 읽는다 (CNN 이 실제로 주는 모양)', () => {
+  const f = fixture();
+  const iso = new Date(now).toISOString().replace('Z', '+00:00');
+  f.fear_and_greed.timestamp = iso;
+  assert.strictEqual(parse(f).updated, iso.slice(0, 10));
+});
+
+check('이력의 x 는 밀리초 숫자 그대로 읽는다 (같은 응답 안에서 모양이 다르다)', () => {
+  const f = fixture();
+  f.fear_and_greed.timestamp = new Date(now).toISOString();
+  const out = parse(f);
+  assert.strictEqual(out.history.dates.at(-1), Math.floor(now / day));
+});
+
+check('읽을 수 없는 timestamp 는 거절한다', () => {
+  for (const bad of ['', '어제', {}, [], true]) {
+    const f = fixture();
+    f.fear_and_greed.timestamp = bad;
+    assert.throws(() => parse(f), /timestamp/, `${JSON.stringify(bad)} 를 통과시켰습니다`);
+  }
+});
+
 // ── 여기부터는 "쓰지 않고 거절해야 하는" 경우들입니다 ──────────────────
 const rejects = (label, over, expect) => check(label, () => {
   assert.throws(() => parse(fixture(over)), new RegExp(expect));
