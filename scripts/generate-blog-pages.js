@@ -90,6 +90,20 @@ const PAGE_URLS = {
 // 정적 페이지로 옮기며 그 함수 자체가 통째로 빠져서 CTA_MAP 데이터는 남았지만 버튼이
 // 어디에도 그려지지 않고 있었다 — 홈의 실제 계산 결과로 가는 유일한 경로였던 만큼 실제
 // <a href> 링크로 복원한다 (JS 없이도, 크롤러도 그대로 따라갈 수 있도록).
+// 글에서 매일 갱신되는 화면으로 보내는 링크.
+//
+// 블로그 글에는 상단 네비게이션이 없습니다(읽는 데 방해라 일부러 뺐습니다). 그래서 글을 다
+// 읽은 사람이 섹터 RS·히트맵·공포탐욕으로 갈 길이 아예 없었습니다. 크롤러 입장에서도
+// 그 세 화면으로 들어오는 링크가 사이트 안에 몇 개 없습니다.
+//
+// 글 내용과 무관하게 같은 세 개를 답니다. 글마다 다르게 고르려면 그 매핑을 손으로
+// 관리해야 하는데, 지금은 그럴 근거가 없습니다.
+const MARKET_LINKS_HTML = `
+    <div class="related">
+      <div class="related-title">지금 시장은 어떤가</div>
+      <a href="/fear-greed.html" class="related-chip">😱 공포·탐욕 지수 — 지금 시장 심리</a><a href="/sector-rs.html" class="related-chip">📊 섹터 상대강도(RS) — 어디로 돈이 몰리나</a><a href="/heatmap.html" class="related-chip">🔥 주식 히트맵 — 오늘의 등락 지도</a>
+    </div>`;
+
 function buildCtaHtml(postId) {
   const cta = CTA_MAP[postId];
   if (!cta) return '';
@@ -141,6 +155,17 @@ function buildPostPage(post, related) {
 <meta property="og:site_name" content="MDD 분석기">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "MDD 분석기", "item": "https://mddcalc.com/" },
+    { "@type": "ListItem", "position": 2, "name": "투자 가이드", "item": "https://mddcalc.com/blog.html" },
+    { "@type": "ListItem", "position": 3, "name": "${escapeHtml(post.title)}", "item": "https://mddcalc.com/blog/${post.id}.html" }
+  ]
+}
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -226,6 +251,7 @@ function buildPostPage(post, related) {
       ${relatedHtml}
     </div>
     ${tickerReportHtml}
+    ${MARKET_LINKS_HTML}
     <p class="note">
       📅 최초 작성 ${escapeHtml(post.date)} · 최종 검토 ${REVIEWED_DATE}<br>
       본 글은 정보 제공 및 교육 목적으로 작성되었으며 투자 자문이 아닙니다. 과거 데이터는 미래 수익을 보장하지 않고,

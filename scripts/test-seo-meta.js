@@ -134,6 +134,48 @@ check('JSON-LD 가 전부 파싱된다', () => {
   assert.deepStrictEqual(broken, [], '\n     ' + broken.join('\n     '));
 });
 
+// 카카오톡·X 에 링크를 붙였을 때 뜨는 썸네일. 경로가 틀리면 카드가 통째로 비는데,
+// 링크를 붙여보기 전에는 알 수 없습니다.
+check('og:image 는 실제로 있는 파일을 가리키고, 카드 종류가 맞다', () => {
+  const bad = [];
+  for (const [file, m] of meta) {
+    const img = (m.src.match(/<meta\s+property="og:image"\s+content="([^"]*)"/i) || [])[1];
+    if (!img) continue;
+    if (!img.startsWith(ORIGIN + '/')) { bad.push(`${file}: ${img} — 절대 주소여야 합니다`); continue; }
+    const rel = img.slice(ORIGIN.length + 1);
+    if (!fs.existsSync(path.join(ROOT, rel))) bad.push(`${file}: ${rel} 파일이 없습니다`);
+
+    // 이미지가 있는데 summary 로 두면 X 에서 손톱만 하게 뜹니다.
+    const card = (m.src.match(/<meta\s+name="twitter:card"\s+content="([^"]*)"/i) || [])[1];
+    if (card && card !== 'summary_large_image') bad.push(`${file}: twitter:card 가 ${card}`);
+  }
+  assert.deepStrictEqual(bad, [], '\n     ' + bad.join('\n     '));
+});
+
+// 검색 결과에 "mddcalc.com › 도구 모음 › RSI 계산기" 처럼 경로가 나오게 하는 구조화
+// 데이터입니다. 홈은 자기 자신이 뿌리라 없어도 됩니다.
+check('홈을 뺀 모든 페이지에 BreadcrumbList 가 있고, 마지막 항목이 자기 자신이다', () => {
+  const bad = [];
+  for (const [file, m] of meta) {
+    if (file === 'index.html') continue;
+    const blocks = [...m.src.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+      .map(b => JSON.parse(b[1]));
+    const crumb = blocks.find(b => b['@type'] === 'BreadcrumbList');
+    if (!crumb) { bad.push(`${file}: BreadcrumbList 없음`); continue; }
+
+    const items = crumb.itemListElement || [];
+    if (items.length < 2) { bad.push(`${file}: 항목이 ${items.length}개뿐`); continue; }
+    // 위치 번호가 1부터 순서대로여야 합니다.
+    items.forEach((it, i) => {
+      if (it.position !== i + 1) bad.push(`${file}: position 이 ${it.position} (있어야 할 값 ${i + 1})`);
+    });
+    if (items[0].item !== ORIGIN + '/') bad.push(`${file}: 첫 항목이 홈이 아닙니다 (${items[0].item})`);
+    const last = items[items.length - 1].item;
+    if (last !== urlOf(file)) bad.push(`${file}: 마지막 항목이 ${last} 를 가리킵니다`);
+  }
+  assert.deepStrictEqual(bad, [], '\n     ' + bad.join('\n     '));
+});
+
 // 세 화면은 본문을 자바스크립트로 그립니다. 크롤러가 자바스크립트를 실행하지 않으면
 // HTML 에는 "불러오는 중..." 말고 숫자가 한 글자도 없습니다. 그래서 매 거래일 계산이 끝나면
 // scripts/write-page-summaries.js 가 오늘 값을 문장과 표로 심어 둡니다.

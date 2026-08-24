@@ -581,6 +581,17 @@ function buildPage(symbol, a, spyA, generatedDate) {
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "MDD 분석기", "item": "https://mddcalc.com/" },
+    { "@type": "ListItem", "position": 2, "name": "도구 모음", "item": "https://mddcalc.com/tools.html" },
+    { "@type": "ListItem", "position": 3, "name": "${symbol} 하락 리포트", "item": "https://mddcalc.com/stock/${symbol.toLowerCase()}.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "${escapeHtml(label)} MDD·고점 대비 하락률 리포트",
   "description": "${escapeHtml(description)}",
