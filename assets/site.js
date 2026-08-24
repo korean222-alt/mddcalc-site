@@ -1912,7 +1912,20 @@ if (CURRENT_PAGE === 'sector') {
 // 칸 크기 = 거래대금 비중, 색 = 등락률. 캔버스가 아니라 절대배치 div 로 그립니다.
 // 그래야 글자가 그대로 검색·선택되고, 화면 크기가 바뀌어도 다시 그리기만 하면 됩니다.
 
-const HM = { data: null, market: null, period: '1m', size: 'turn', tiles: [] };
+const HM = { data: null, market: null, period: '1m', size: 'soft', tiles: [] };
+
+// 칸 크기 모드
+//   turn  거래대금 비중 그대로. 실제 쏠림을 1:1 로 보여줍니다.
+//   soft  거래대금을 0.6 제곱으로 눌러 담습니다. 순서는 그대로고 격차만 좁아집니다.
+//   equal 전부 같은 크기.
+//
+// 기본값이 soft 인 이유: 한국은 SK하이닉스와 삼성전자 둘이 수록 종목 거래대금의 70% 를
+// 넘게 차지하는 날이 흔합니다. 그대로 그리면 두 칸이 화면의 70% 를 먹고 나머지 89종목이
+// 실오라기가 됩니다 — 지도로서 아무것도 읽을 수 없습니다. 0.6 제곱이면 그 둘이 약 30%
+// 로 줄어 여전히 가장 큰 칸이면서, 나머지가 눈에 들어옵니다.
+// 실제 비중이 궁금하면 '거래대금' 모드로 바꾸거나, 칸을 짚어 설명줄의 숫자를 보면 됩니다
+// (설명줄에는 언제나 눌리지 않은 진짜 비중이 나옵니다).
+const HM_SIZE_POWER = 0.6;
 
 // 색을 어디서 최대로 진하게 만들지는 기간마다 달라야 합니다. 12개월 수익률에 ±5% 기준을
 // 쓰면 거의 모든 칸이 새빨갛거나 새파래져서 아무것도 구분되지 않습니다.
@@ -2016,10 +2029,21 @@ async function initHeatmapPage() {
   });
 }
 
-// 거래대금을 비교할 수 없는 시장(미국: 섹터 ETF 와 개별 종목이 섞여 있음)에서는
-// 칸 크기를 균등으로 고정합니다. 비교가 성립하지 않는 값으로 칸 크기를 정하면
-// 화면이 그럴듯하게 틀립니다 — 표에서 숫자를 지우는 것보다 눈에 안 띄어서 더 나쁩니다.
+// 거래대금을 서로 비교할 수 없는 시장에서는 칸 크기를 균등으로 고정합니다.
+// (지금은 한국·미국 다 개별 종목이라 해당 없음. 바스켓에 ETF 를 섞으면 그때 살아납니다 —
+//  scripts/sectors.js 의 TURNOVER_COMPARABLE 참고)
+// 비교가 성립하지 않는 값으로 칸 크기를 정하면 화면이 그럴듯하게 틀립니다 —
+// 표에서 숫자를 지우는 것보다 눈에 안 띄어서 더 나쁩니다.
 function hmSizeMode() { return hmMarketData().hasTurnover ? HM.size : 'equal'; }
+
+const HM_SIZE_LABEL = { turn: '거래대금 비중', soft: '거래대금(완만)', equal: '균등' };
+
+// 칸 하나의 넓이. turn 은 % 값이라 0 이나 null 이 들어올 수 있어 바닥을 깔아 둡니다.
+// (넓이가 0 이면 트리맵이 칸을 아예 만들지 않아 종목이 소리 없이 사라집니다)
+function hmTileValue(turn, mode) {
+  const t = Math.max(turn || 0, 0.0001);
+  return mode === 'soft' ? Math.pow(t, HM_SIZE_POWER) : t;
+}
 
 function renderHeatmapControls() {
   const flags = { KR: '🇰🇷', US: '🇺🇸' };
@@ -2057,7 +2081,13 @@ function renderHeatmap() {
     ` · 색 최대 ±${clamp}%` +
     // 거래대금을 비교할 수 없는 시장에서는 칸 크기가 균등이라는 걸 화면에 밝힙니다.
     // 크기가 아무 의미 없는데 의미 있어 보이는 것이 이 화면에서 가장 위험한 오해입니다.
-    (m.hasTurnover ? '' : ' · 이 시장은 섹터 ETF 와 개별 종목이 섞여 있어 거래대금을 서로 비교할 수 없습니다 — <b>칸 크기는 균등</b>입니다');
+    (m.hasTurnover
+      ? (hmSizeMode() === 'soft'
+        // 크기를 눌러 그린다는 사실을 화면에 밝힙니다. 눌린 그림을 실제 비중으로 읽으면
+        // 그게 이 화면에서 가장 위험한 오해입니다.
+        ? ' · 칸 크기는 거래대금을 <b>완만하게</b> 눌러 그립니다(순서는 그대로)'
+        : '')
+      : ' · 이 시장은 거래대금을 서로 비교할 수 없습니다 — <b>칸 크기는 균등</b>입니다');
 
   // 섹터 → 그 안의 종목. 값이 없는 종목은 그리지 않습니다(상장폐지·데이터 없음).
   const sectors = m.sectors.map(s => {
@@ -2067,7 +2097,7 @@ function renderHeatmap() {
         name: mem.name, code: mem.code, ret: mem.ret[P],
         turn: mem.turn ? mem.turn[P] : null,
         sector: s.name,
-        value: hmSizeMode() === 'equal' ? 1 : Math.max(mem.turn && mem.turn[P] ? mem.turn[P] : 0, 0.0001),
+        value: hmSizeMode() === 'equal' ? 1 : hmTileValue(mem.turn ? mem.turn[P] : null, hmSizeMode()),
       }))
       .sort((a, b) => b.value - a.value);
     return { name: s.name, members, value: members.reduce((a, x) => a + x.value, 0) };
@@ -2162,7 +2192,7 @@ function renderHeatmap() {
         `${v > 0 ? '+' : ''}${v}%</span>`;
     }).join('') +
     '<span>상승</span>' +
-    `<span style="margin-left:8px;">· 칸 크기 = ${hmSizeMode() === 'equal' ? '균등' : '거래대금 비중'}</span>`;
+    `<span style="margin-left:8px;">· 칸 크기 = ${HM_SIZE_LABEL[hmSizeMode()]}</span>`;
 }
 
 if (CURRENT_PAGE === 'heatmap') {
