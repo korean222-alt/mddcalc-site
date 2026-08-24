@@ -104,6 +104,10 @@ const KR_TICKERS = [
   // ── ETF ──
   { code: '069500', name: 'KODEX 200', market: 'KS', aliases: ['코덱스200'] },
   { code: '122630', name: 'KODEX 레버리지', market: 'KS', aliases: ['코덱스레버리지'] },
+  // 국고채 10년 ETF. 공포·탐욕 지수의 "안전자산 선호"가 이 종목을 씁니다 —
+  // CNN 이 주식 대비 국채 수익률 차이를 보는 것과 같은 자리입니다(scripts/fear-greed.js).
+  // 3년물이 아니라 10년물인 이유는 듀레이션이 길어야 위험회피가 가격에 크게 찍히기 때문입니다.
+  { code: '148070', name: 'KOSEF 국고채10년', market: 'KS', aliases: ['코세프국고채10년', '국고채10년'] },
 
   // ── 코스닥 ──
   { code: '247540', name: '에코프로비엠', market: 'KQ' },

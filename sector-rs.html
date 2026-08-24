@@ -18,6 +18,43 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="섹터 상대강도(RS) | MDD 분석기">
 <meta name="twitter:description" content="기간을 고르면 어느 섹터로 돈이 몰리고 어디서 빠지는지 한 줄로 세워 보여줍니다.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "섹터 상대강도(RS)",
+  "description": "한국·미국 섹터를 상대강도(RS) 순으로 줄 세우고 거래대금 비중·외국인 소진율로 수급까지 함께 보는 무료 도구",
+  "url": "https://mddcalc.com/sector-rs.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" },
+  "isPartOf": { "@type": "WebSite", "name": "MDD 분석기", "url": "https://mddcalc.com/" },
+  "inLanguage": "ko"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "상대강도(RS)와 RSI는 무엇이 다릅니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "RSI는 한 종목이 스스로의 과거 대비 과열됐는지를 보고, RS(Relative Strength)는 다른 섹터·시장 대비 강한지를 봅니다. 이름만 비슷할 뿐 다른 지표입니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "RS 점수 1~99는 무슨 뜻입니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "같은 기간 같은 시장 섹터들 사이의 백분위 순위입니다. 99면 그 시장에서 가장 강했다는 뜻이고, 절대 수익률이 아니라 순위이므로 시장 전체가 빠지는 구간에서도 덜 빠진 섹터가 드러납니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "어느 섹터에 돈이 들어오는지는 어떻게 봅니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "거래대금 비중이 늘고 있으면 돈이 실제로 들어오는 중이고, 순위 변화(▲▼)는 한 달 전 대비 그 섹터가 올라오는 중인지 식는 중인지를 보여줍니다. 한국 시장은 외국인 소진율 변화도 함께 봅니다." }
+    }
+  ]
+}
+</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 <link rel="stylesheet" href="/assets/site.css">
@@ -31,6 +68,7 @@
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
       <a href="/heatmap.html" onclick="navigate('heatmap'); return false;" id="nav-heatmap">🔥 히트맵</a>
+      <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;" id="nav-feargreed">😱 공탐지수</a>
       <a href="/tools.html" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
       <a href="/blog.html" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
       <a href="/about.html" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
@@ -126,6 +164,19 @@
         <div class="value">수급</div>
         <div style="font-size:11px; color:#718096; margin-top:4px;">수록 종목 전체 거래대금에서 그 섹터가 차지하는 몫. 늘고 있으면 돈이 실제로 들어오는 중입니다.</div>
       </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section">🔗 이어서 보기</h2>
+    <div style="font-size:13px; color:#4a5568; line-height:1.9;">
+      같은 데이터를 지도로 보고 싶으면 히트맵, 시장 전체 심리가 어느 쪽인지가 궁금하면 공포·탐욕 지수를 보세요.
+      섹터를 펼쳤을 때 나오는 <b>구성 종목</b>을 누르면 그 종목의 MDD 계산기로 바로 갑니다.
+    </div>
+    <div class="link-chips">
+      <a class="link-chip" href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 주식 히트맵</a>
+      <a class="link-chip" href="/fear-greed.html" onclick="navigate('feargreed'); return false;">😱 공포·탐욕 지수</a>
+      <a class="link-chip" href="/" onclick="navigate('home'); return false;">📉 MDD 계산기</a>
     </div>
   </div>
 
@@ -228,6 +279,7 @@
         <a href="/leverage-etf-simulator.html" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
         <a href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
         <a href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 섹터 히트맵</a>
+        <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;">😱 공포·탐욕 지수</a>
         <a href="/dca-planner.html" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
         <a href="/tools.html" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
       </div>

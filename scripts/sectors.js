@@ -280,6 +280,18 @@ const REFRESH_SCHEDULE = {
   ],
 };
 
+// 공포·탐욕 지수가 쓰는 "안전자산" 자리의 종목입니다 (scripts/fear-greed.js).
+//
+// CNN 의 안전자산 선호(Safe Haven Demand)는 주식과 국채의 최근 20거래일 수익률 차이입니다.
+// 처음에는 채권 데이터가 없어서 방어주 바스켓으로 대신했는데, 그건 결국 주식 안에서의
+// 순환일 뿐이라 "주식에서 돈이 빠져나가는가"를 보지 못합니다. 국고채 ETF 를 한 종목
+// 더 받아오는 비용이 훨씬 쌉니다.
+//
+// 미국은 CNN 공식 값을 그대로 쓰므로(scripts/fetch-cnn-fear-greed.js) 여기 필요 없습니다.
+const FG_BOND = {
+  KR: '148070',   // KOSEF 국고채10년 (scripts/kr-tickers.js 에 있어야 합니다)
+};
+
 // 미국에서 실제로 받아와야 하는 심볼 = US·THEME 두 목록의 구성 심볼 + 벤치마크.
 // generate-us-data.js 가 이 함수를 수집 목록으로 씁니다.
 function usSymbols() {
@@ -304,5 +316,5 @@ const PERIODS = [
 
 module.exports = {
   KR_SECTORS, US_SECTORS, THEME_SECTORS, SECTOR_DEFS, MARKETS,
-  US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, REFRESH_SCHEDULE, usSymbols, PERIODS,
+  US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, REFRESH_SCHEDULE, usSymbols, PERIODS, FG_BOND,
 };
