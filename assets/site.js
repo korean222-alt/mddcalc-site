@@ -2477,9 +2477,15 @@ function renderFearGreed() {
 
   rsRenderRefresh('fgUpdate', FGP.data);
 
-  document.getElementById('fgMeta').innerHTML =
-    `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> · ` +
-    `수록 ${m.universeCount}종목 · 구성 요소 ${m.components.length}개`;
+  // 같은 화면의 두 탭이 서로 다른 곳에서 온 숫자입니다. 어느 쪽인지 반드시 밝힙니다 —
+  // 밝히지 않으면 미국 값은 "CNN 을 베낀 것"으로, 한국 값은 "CNN 이 만든 것"으로 오해됩니다.
+  const inScore = m.components.filter(c => c.inScore !== false);
+  document.getElementById('fgMeta').innerHTML = m.source === 'cnn'
+    ? `기준일 <b>${rsEsc(m.updated)}</b> · 출처 <b><a href="${rsEsc(m.sourceUrl || 'https://www.cnn.com/markets/fear-and-greed')}" target="_blank" rel="noopener nofollow">` +
+      `${rsEsc(m.sourceName || 'CNN Business Fear & Greed Index')}</a></b> — CNN 이 발표하는 값을 그대로 보여줍니다 · 구성 지표 ${inScore.length}개`
+    : `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> · ` +
+      (m.universeCount ? `수록 ${m.universeCount}종목 · ` : '') +
+      `구성 지표 ${inScore.length}개 — <b>CNN 과 같은 방식</b>으로 직접 계산했습니다`;
 
   document.getElementById('fgGauge').innerHTML = fgGaugeSvg(m.score);
   document.getElementById('fgScore').innerHTML =
@@ -2491,11 +2497,12 @@ function renderFearGreed() {
   document.getElementById('fgPrev').innerHTML =
     fgPrevBox('어제', m.prev.d1) + fgPrevBox('1주 전', m.prev.w1) +
     fgPrevBox('1개월 전', m.prev.m1) + fgPrevBox('3개월 전', m.prev.m3) +
-    fgPrevBox('6개월 전', m.prev.m6);
+    fgPrevBox('6개월 전', m.prev.m6) +
+    (m.prev.y1 == null ? '' : fgPrevBox('1년 전', m.prev.y1));
 
   // 구성 요소. 점수 막대 옆에 언제나 원래 값(근거 문구)을 같이 둡니다.
   // 점수만 있으면 "왜 이 숫자인가"를 화면에서 되짚을 수 없습니다.
-  document.getElementById('fgComponents').innerHTML = m.components.map(c => {
+  const componentRow = c => {
     const cb = fgBandOf(c.score);
     const width = c.score == null ? 0 : c.score;
     return `<div style="padding:12px 0; border-bottom:1px solid #edf2f7;">` +
@@ -2508,9 +2515,28 @@ function renderFearGreed() {
         `</div>` +
       `</div>` +
       `<div class="bar-container" style="margin:8px 0 6px;"><div class="bar-fill${c.score != null && c.score < 50 ? ' zero' : ''}" style="width:${width}%;"></div></div>` +
-      `<div style="font-size:12px; color:#4a5568;">${c.note ? rsEsc(c.note) : '계산에 필요한 데이터가 모자랍니다'}</div>` +
+      // 근거 줄. 값이 없는 경우가 두 가지인데 뜻이 완전히 다릅니다.
+      //   점수도 없다  → 우리가 계산하지 못한 것 (데이터 부족)
+      //   점수는 있는데 근거 값이 없다 → CNN 이 지표별 원본 값은 공개하지 않는 것
+      // 후자에까지 "데이터가 모자랍니다"를 적으면, 멀쩡히 나온 CNN 점수가 고장 난 것처럼 보입니다.
+      (c.note
+        ? `<div style="font-size:12px; color:#4a5568;">${rsEsc(c.note)}</div>`
+        : (c.score == null
+          ? `<div style="font-size:12px; color:#a0aec0;">계산에 필요한 데이터가 모자랍니다</div>`
+          : '')) +
       `</div>`;
-  }).join('');
+  };
+
+  // 참고 지표(외국인 수급)는 점수에 들어가지 않습니다. 같은 목록에 섞어 두면 "이것도 점수에
+  // 반영된 것"으로 읽히므로, 줄을 긋고 그렇지 않다고 적습니다.
+  const extras = m.components.filter(c => c.inScore === false);
+  document.getElementById('fgComponents').innerHTML =
+    inScore.map(componentRow).join('') +
+    (extras.length
+      ? `<div style="margin-top:18px; padding-top:14px; border-top:2px dashed #e2e8f0;">` +
+        `<div style="font-size:12px; color:#a0aec0; margin-bottom:2px;">참고 지표 — CNN 에 없는 항목이라 <b>위 점수에는 들어가지 않습니다</b></div>` +
+        extras.map(componentRow).join('') + `</div>`
+      : '');
 
   drawFearGreedChart(m);
 }

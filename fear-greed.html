@@ -4,26 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>공포·탐욕 지수 (한국·미국) — 지금 시장 심리는 | MDD 분석기</title>
-<meta name="description" content="한국(코스피)과 미국(S&P 500) 시장의 공포·탐욕 지수를 매 거래일 계산합니다. 모멘텀·주가 강도·시장 폭·변동성·거래 강도·안전자산 선호·외국인 수급 7가지를 0~100으로 환산해 지금 시장이 겁먹었는지 들떴는지 한 눈에 보여줍니다.">
+<meta name="description" content="미국은 CNN Business 공포탐욕지수 공식 값을 그대로, 한국(코스피)은 CNN과 같은 방식으로 계산해 보여줍니다. 시장 모멘텀·주가 강도·주가 폭·시장 변동성·안전자산 선호를 0~100으로 환산해 지금 시장이 겁먹었는지 들떴는지 한 눈에.">
 <meta name="robots" content="index, follow">
 <meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
 <link rel="canonical" href="https://mddcalc.com/fear-greed.html">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%98%B1%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="공포·탐욕 지수 (한국·미국) | MDD 분석기">
-<meta property="og:description" content="지금 시장이 겁먹었는지 들떴는지를 0~100 한 숫자로. 한국·미국 각각 매 거래일 갱신됩니다.">
+<meta property="og:description" content="미국은 CNN 공식 값 그대로, 한국은 같은 방식으로 계산. 매 거래일 갱신됩니다.">
 <meta property="og:url" content="https://mddcalc.com/fear-greed.html">
 <meta property="og:site_name" content="MDD 분석기">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="공포·탐욕 지수 (한국·미국) | MDD 분석기">
-<meta name="twitter:description" content="지금 시장이 겁먹었는지 들떴는지를 0~100 한 숫자로. 한국·미국 각각 매 거래일 갱신됩니다.">
+<meta name="twitter:description" content="미국은 CNN 공식 값 그대로, 한국은 같은 방식으로 계산. 매 거래일 갱신됩니다.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "공포·탐욕 지수 (한국·미국)",
-  "description": "한국·미국 시장의 투자 심리를 7가지 구성 요소로 계산해 0~100으로 보여주는 무료 지표",
+  "description": "미국은 CNN 공포탐욕지수 공식 값을, 한국은 같은 방식으로 계산한 값을 0~100으로 보여주는 무료 지표",
   "url": "https://mddcalc.com/fear-greed.html",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Web",
@@ -44,13 +44,13 @@
     },
     {
       "@type": "Question",
-      "name": "이 지수는 무엇으로 계산합니까?",
-      "acceptedAnswer": { "@type": "Answer", "text": "시장 모멘텀(지수와 125일 이동평균의 거리), 주가 강도(52주 신고가·신저가 종목 수), 시장 폭(50일선 위 종목 비율), 변동성(최근 20일 실현변동성), 거래 강도(오른 날에 실린 거래대금 비중), 안전자산 선호(경기민감주와 방어주의 20일 수익률 차이), 그리고 한국은 외국인 수급(외국인 소진율 변화)까지 7가지입니다. 각 값을 그 시장의 지난 1년과 견줘 몇 표준편차인지로 환산한 뒤 평균냅니다." }
+      "name": "한국 공포탐욕지수는 무엇으로 계산합니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "CNN이 쓰는 7개 지표 중 한국 데이터로 계산되는 5개를 씁니다. 시장 모멘텀(코스피와 125일 이동평균의 거리), 주가 강도(52주 신고가·신저가 종목 수), 주가 폭(오른 날과 내린 날 중 어디에 거래대금이 실렸는가), 시장 변동성(20일 실현변동성이 자기 50일 평균보다 높은가), 안전자산 선호(코스피와 국고채10년 ETF의 20거래일 수익률 차이)입니다. 풋/콜 옵션과 정크본드 수요는 국내 데이터가 없어 빠집니다. 각 값을 지난 250거래일 평균에서 몇 표준편차 떨어져 있는지로 환산한 뒤 동일 가중 평균합니다." }
     },
     {
       "@type": "Question",
       "name": "CNN 공포탐욕지수와 같은 값입니까?",
-      "acceptedAnswer": { "@type": "Answer", "text": "아닙니다. 발상은 같지만 별개의 지표입니다. CNN 은 공개 API 가 없고 한국 시장 지수는 만들지도 않기 때문에, 이 화면은 저희가 매 거래일 수집하는 한국·미국 개별 종목 일봉·거래량·외국인 소진율로 직접 계산합니다. 채권·풋콜비율처럼 데이터가 없는 구성 요소는 빠져 있어 값이 CNN 과 다를 수 있습니다." }
+      "acceptedAnswer": { "@type": "Answer", "text": "미국 탭은 CNN Business가 발표하는 공식 값을 그대로 보여줍니다. 한국 탭은 CNN이 한국 지수를 만들지 않기 때문에 같은 방식(7개 지표 중 한국 데이터로 계산되는 5개, 동일 가중, 표준편차 환산)을 코스피에 적용해 계산한 값입니다. 즉 미국은 CNN 값과 같고, 한국은 CNN 방식으로 만든 한국판입니다." }
     },
     {
       "@type": "Question",
@@ -87,7 +87,7 @@
   <div class="page-hero">
     <div class="inner">
       <h1>😱 공포·탐욕 지수</h1>
-      <p>지금 시장이 겁먹었는지 들떴는지 — 0(극단적 공포)에서 100(극단적 탐욕)까지 한 숫자로</p>
+      <p>미국은 <b>CNN 공식 값 그대로</b>, 한국은 <b>같은 방식으로 계산</b> — 0(극단적 공포)에서 100(극단적 탐욕)까지</p>
     </div>
   </div>
 
@@ -113,8 +113,9 @@
     <div class="card">
       <h2 class="section">🧩 무엇이 이 점수를 만들었나</h2>
       <div style="font-size:12px; color:#718096; margin-bottom:4px;">
-        구성 요소 각각을 <b>그 시장의 지난 1년</b>과 견줘 0~100으로 환산한 뒤 동일 가중 평균한 값이 위 점수입니다.
-        점수 아래 줄은 환산 전의 실제 값입니다.
+        지표 각각을 <b>평균에서 몇 표준편차 떨어져 있는지</b>로 0~100 환산한 뒤 <b>동일 가중</b> 평균한 값이 위 점수입니다
+        (CNN 과 같은 방식). 한국 지표에는 환산 전의 실제 값을 함께 적었습니다 —
+        CNN 은 지표별 원본 값을 공개하지 않아 미국 탭에는 점수만 있습니다.
       </div>
       <div id="fgComponents"></div>
     </div>
@@ -173,44 +174,58 @@
   <section class="card" style="background:#f7fafc;">
     <h2 class="section">📚 조금 더</h2>
     <details open>
-      <summary>이 숫자는 무엇으로 만듭니까</summary>
+      <summary>미국과 한국, 두 탭은 어디서 온 숫자입니까</summary>
       <div class="body">
-        <p>성격이 다른 구성 요소 여러 개를 각각 0~100으로 환산해 <b>동일 가중</b>으로 평균냅니다.
-        값 하나를 믿지 않는 것이 이 지표의 핵심입니다 — 어느 날 변동성만 튀어도 전체가 흔들리면
-        심리 지표가 아니라 변동성 지표가 됩니다.</p>
-        <p style="margin-top:8px;">쓰는 재료는 <b>시장 모멘텀</b>(지수와 125일 이동평균의 거리),
-        <b>주가 강도</b>(52주 신고가·신저가 종목 수), <b>시장 폭</b>(50일선 위 종목 비율),
-        <b>변동성</b>(최근 20거래일 실현변동성), <b>거래 강도</b>(오른 날에 실린 거래대금 비중),
-        <b>안전자산 선호</b>(경기민감주와 방어주의 20거래일 수익률 차이),
-        그리고 한국은 <b>외국인 수급</b>(외국인 소진율 변화)까지입니다.</p>
-        <p style="margin-top:8px;">가중치를 두지 않은 이유는 간단합니다. 어느 구성 요소가 더 중요한지를
-        뒷받침할 근거가 저희에게 없고, 근거 없는 가중치는 결국 "보고 싶은 숫자"를 만들어내는 손잡이가 됩니다.</p>
+        <p><b>🇺🇸 미국</b>은 <a href="https://www.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener nofollow">CNN Business Fear &amp; Greed Index</a>가
+        발표하는 <b>공식 값을 그대로</b> 보여줍니다. 매 거래일 받아와 저장합니다. 미국 시장 심리에 관해서는
+        CNN 값이 사실상 표준이라, 비슷한 걸 따로 계산해 두면 "CNN 은 72 라던데 여기는 55" 같은 일이
+        매일 생기고 그때 틀린 쪽은 우리로 보입니다.</p>
+        <p style="margin-top:8px;"><b>🇰🇷 한국</b>은 CNN 이 만들지 않습니다. 그래서 <b>CNN 이 쓰는 방식을
+        그대로 코스피에 적용해</b> 우리가 계산합니다. 지표 구성·동일 가중·표준편차 환산까지 같은 규칙입니다.</p>
+        <p style="margin-top:8px; color:#718096;">CNN 값을 받지 못한 날에는 미국도 같은 방식으로 계산해 채우고,
+        화면 위 안내줄에 "직접 계산했습니다"라고 적힙니다. 남의 서버가 막혔다고 탭이 사라지면
+        우리가 고장 난 것처럼 보이기 때문입니다.</p>
       </div>
     </details>
     <details>
-      <summary>왜 "지난 1년과 견줘"입니까</summary>
+      <summary>CNN 의 7개 지표 중 한국은 몇 개를 씁니까</summary>
       <div class="body">
-        <p>처음에는 "125일선 대비 ±10%" 같은 고정 구간에 대고 점수를 냈습니다. 그렇게 만든 첫 판을
-        검산해 보니 한국 모멘텀이 1년 중 90%를 100점에 붙어 있었습니다. 코스피가 1년에 100% 넘게
-        오른 구간이라 125일선 +10% 초과가 그냥 일상이었던 것입니다. 늘 100점인 값은 지표가 아니라
-        상수이고, 상수는 평균에 섞여 나머지를 조용히 희석시킵니다.</p>
-        <p style="margin-top:8px;">그래서 각 구성 요소를 <b>그 시장 자신의 최근 250거래일</b>과 견줍니다.
+        <p>7개 중 <b>5개</b>입니다. 국내에 데이터가 없는 둘은 <b>비워 둡니다</b> — 그럴듯한 다른 값으로
+        채우면 이름만 같고 내용이 다른 지표가 되고, 그러면 "CNN 방식"이라는 말 자체가 거짓이 됩니다.</p>
+        <div style="overflow-x:auto; margin-top:10px;">
+          <table style="font-size:12.5px;">
+            <thead><tr>
+              <th style="text-align:left;">CNN 지표</th><th style="text-align:left;">한국 지수에서</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="text-align:left;">시장 모멘텀</td><td style="text-align:left;">코스피 vs 125일 이동평균 — <b>그대로</b></td></tr>
+              <tr><td style="text-align:left;">주가 강도</td><td style="text-align:left;">52주 신고가·신저가 종목 수 — <b>그대로</b></td></tr>
+              <tr><td style="text-align:left;">주가 폭</td><td style="text-align:left;">오른 날·내린 날에 실린 거래대금 — <b>그대로</b></td></tr>
+              <tr><td style="text-align:left;">시장 변동성</td><td style="text-align:left;">VIX 대신 <b>코스피 20일 실현변동성</b> (비교 방식은 같은 50일 평균 대비)</td></tr>
+              <tr><td style="text-align:left;">안전자산 선호</td><td style="text-align:left;">코스피 vs <b>국고채10년 ETF</b> 20거래일 수익률 차이</td></tr>
+              <tr><td style="text-align:left; color:#a0aec0;">풋/콜 옵션</td><td style="text-align:left; color:#a0aec0;">없음 — 국내 옵션 데이터 미보유</td></tr>
+              <tr><td style="text-align:left; color:#a0aec0;">정크본드 수요</td><td style="text-align:left; color:#a0aec0;">없음 — 국내 하이일드 스프레드 미보유</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:10px;">여기에 더해 <b>외국인 수급</b>(외국인 소진율 20거래일 변화)을 화면에 보여주지만,
+        CNN 에 없는 항목이라 <b>점수에는 넣지 않습니다.</b> 한국 시장에서는 쓸모 있는 정보라 버리기 아까워
+        참고 자리에 따로 둡니다.</p>
+      </div>
+    </details>
+    <details>
+      <summary>왜 "평균에서 몇 표준편차"로 환산합니까</summary>
+      <div class="body">
+        <p>CNN 이 쓰는 방식이기도 하고, 실제로 그래야 눈금이 살아 있습니다. 처음에는
+        "125일선 대비 ±10%" 같은 고정 구간에 대고 점수를 냈는데, 검산해 보니 한국 모멘텀이
+        1년 중 90%를 100점에 붙어 있었습니다. 코스피가 1년에 100% 넘게 오른 구간이라
+        125일선 +10% 초과가 그냥 일상이었던 것입니다. 늘 100점인 값은 지표가 아니라 상수이고,
+        상수는 평균에 섞여 나머지를 조용히 희석시킵니다.</p>
+        <p style="margin-top:8px;">그래서 각 지표를 <b>그 시장 자신의 최근 250거래일</b>과 견줍니다.
         오늘 값이 그 구간에서 몇 표준편차인지 보고, ±2σ를 0과 100으로 놓습니다.</p>
-        <p style="margin-top:8px;">대신 분명히 해둘 것이 있습니다. 이 지수는 "역사상 절대적으로 극단인가"가
-        아니라 <b>"지난 1년의 이 시장 자신에 견줘 극단인가"</b>입니다. 1년 내내 조용히 오르기만 한 시장은
-        100점이 잘 나오지 않습니다. 절대 수준이 궁금하면 구성 요소마다 적어 둔 원래 값
-        (52주 신고가 몇 종목, 50일선 위 몇 종목)을 보세요.</p>
-      </div>
-    </details>
-    <details>
-      <summary>CNN 공포탐욕지수와 같은 값입니까</summary>
-      <div class="body">
-        <p>아닙니다. 발상은 같지만 <b>별개의 지표</b>입니다. CNN 은 공개 API 가 없고 한국 시장 지수는
-        만들지도 않습니다. 그래서 저희가 매 거래일 수집해 두는 한국·미국 개별 종목 일봉·거래량·
-        외국인 소진율로 직접 계산합니다.</p>
-        <p style="margin-top:8px;">채권 수익률, 풋콜비율, 정크본드 스프레드처럼 저희에게 데이터가 없는
-        구성 요소는 빠져 있습니다. 대신 한국에는 CNN 에 없는 외국인 수급이 들어갑니다.
-        그래서 미국 점수도 CNN 값과 다를 수 있습니다.</p>
+        <p style="margin-top:8px;">대신 분명히 해둘 것: 한국 지수는 "역사상 절대적으로 극단인가"가
+        아니라 <b>"지난 1년의 코스피 자신에 견줘 극단인가"</b>입니다. 절대 수준이 궁금하면 지표마다
+        적어 둔 원래 값(52주 신고가 몇 종목 등)을 보세요.</p>
       </div>
     </details>
     <details>
@@ -225,10 +240,12 @@
     <details>
       <summary>데이터 출처와 한계</summary>
       <div class="body">
-        <p>한국은 네이버 금융, 미국은 Twelve Data 의 일봉을 매 거래일 장 마감 뒤 받아 정적 파일로
-        저장합니다. <b>전일 종가 기준</b>이며 실시간이 아닙니다.</p>
-        <p style="margin-top:8px;">여기서 말하는 "시장"은 거래소 전체가 아니라 <b>이 사이트에 수록된 종목들</b>입니다
-        (한국 약 96종목, 미국 약 79종목 — 시가총액·거래대금 상위 위주). 전 종목을 쓰는 지표와는 값이 다릅니다.
+        <p><b>미국</b>은 CNN Business 가 발표하는 값을 매 거래일 받아 저장합니다. 저작·표시에 관한 권리는
+        CNN 에 있으며, 이 화면은 출처를 밝히고 원문으로 가는 링크를 함께 답니다.</p>
+        <p style="margin-top:8px;"><b>한국</b>은 네이버 금융 일봉(코스피 지수·개별 종목·국고채10년 ETF)을
+        매 거래일 장 마감 뒤 받아 정적 파일로 저장한 뒤 계산합니다. <b>전일 종가 기준</b>이며 실시간이 아닙니다.</p>
+        <p style="margin-top:8px;">한국 지수에서 말하는 "시장"은 거래소 전체가 아니라 <b>이 사이트에 수록된
+        종목들</b>입니다(약 96종목, 시가총액·거래대금 상위 위주). 전 종목을 쓰는 지표와는 값이 다릅니다.
         이 화면은 정보 제공용이며 투자 권유가 아닙니다.</p>
       </div>
     </details>

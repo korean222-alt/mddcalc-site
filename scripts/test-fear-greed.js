@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-// 공포·탐욕 지수 계산 회귀 테스트.   실행: node scripts/test-fear-greed.js
+// 공포·탐욕 지수 계산 회귀 테스트 (한국 지수).   실행: node scripts/test-fear-greed.js
+//
+// 미국은 CNN 공식 값을 그대로 쓰므로 여기가 아니라 scripts/test-cnn-parse.js 가 지킵니다.
 //
 // 이 파일이 있는 이유:
 //   0~100 짜리 심리 지표는 틀려도 화면에서 티가 나지 않습니다. 바늘이 어디를 가리키든
@@ -77,7 +79,7 @@ check('scoreAt: 평소 수준이면 50점, ±2σ 가 0점과 100점', () => {
 // ── 구성 요소 ─────────────────────────────────────────────────────────
 // 각 구성 요소는 "클수록 탐욕"인 원시값을 냅니다. 그 방향이 뒤집히면 지수 전체가
 // 거꾸로 도는데, 화면만 봐서는 절대 알 수 없습니다. 여기서 방향만큼은 확실히 못박습니다.
-const spec = key => FG.COMPONENTS.find(c => c.key === key);
+const spec = key => FG.COMPONENTS.find(c => c.key === key) || FG.EXTRAS.find(c => c.key === key);
 
 const risingMarket = (n, rate) => {
   const bench = [];
@@ -103,49 +105,72 @@ check('주가 강도: 신고가 종목이 많으면 양수, 신저가가 많으�
   assert.ok(spec('strength').raw({ stocks: [down, down, down] }, 299).v < 0);
 });
 
-check('시장 폭: 50일선 위 비율이 그대로 원시값', () => {
-  const up = { close: risingMarket(120, 0.004) };
-  const down = { close: risingMarket(120, -0.004) };
-  const v = spec('breadth').raw({ stocks: [up, up, down, down] }, 119).v;
-  assert.strictEqual(Math.round(v), 50);
+check('주가 강도: 수록 종목 수로 나눈 비율이라 종목을 늘려도 눈금이 그대로다', () => {
+  const up = { close: risingMarket(300, 0.003) };
+  const a = spec('strength').raw({ stocks: [up, up] }, 299).v;
+  const b = spec('strength').raw({ stocks: [up, up, up, up, up, up] }, 299).v;
+  assert.strictEqual(Math.round(a), Math.round(b));
 });
 
-check('변동성: 부호가 뒤집혀 있다 (변동성이 크면 원시값이 작다)', () => {
-  const calm = new Array(60).fill(0).map((_, i) => 100 + i * 0.01);
-  const wild = new Array(60).fill(0).map((_, i) => 100 * (1 + (i % 2 ? 0.05 : -0.05)));
-  const a = spec('volatility').raw({ bench: calm }, 59).v;
-  const b = spec('volatility').raw({ bench: wild }, 59).v;
-  assert.ok(a > b, `조용한 시장(${a}) 이 요동치는 시장(${b}) 보다 커야 합니다`);
-});
-
-check('거래 강도: 거래대금이 오른 날에만 실리면 100 에 가깝다', () => {
+check('주가 폭: 거래대금이 오른 날에만 실리면 100 에 가깝다 (McClellan 과 같은 방향)', () => {
   // 하루 걸러 오르고 내리되, 오르는 날에만 거래량이 실린 시장.
   const close = [], volume = [];
   for (let i = 0; i < 40; i++) {
     close.push(i % 2 ? 110 : 100);
     volume.push(i % 2 ? 1000 : 1);
   }
-  const v = spec('volume').raw({ stocks: [{ close, volume }] }, 39).v;
+  const v = spec('breadth').raw({ stocks: [{ close, volume }] }, 39).v;
   assert.ok(v > 90, `오른 날 거래대금 비중이 ${v}`);
+
+  // 반대로 내린 날에만 실리면 0 쪽으로 가야 합니다.
+  const volume2 = volume.map((x, i) => (i % 2 ? 1 : 1000));
+  const v2 = spec('breadth').raw({ stocks: [{ close, volume: volume2 }] }, 39).v;
+  assert.ok(v2 < 10, `내린 날에 실렸는데 ${v2}`);
 });
 
-check('안전자산 선호: 경기민감주가 앞서면 양수, 방어주가 앞서면 음수', () => {
+check('시장 변동성: 평소보다 조용하면 양수, 요동치면 음수 (부호가 뒤집혀 있다)', () => {
+  // vol20 은 생성기가 미리 만들어 넘기는 실현변동성 선입니다.
+  const calm = new Array(60).fill(0.20);
+  calm[59] = 0.10;                       // 마지막 날만 절반으로 잠잠
+  assert.ok(spec('volatility').raw({ vol20: calm }, 59).v > 0);
+
+  const wild = new Array(60).fill(0.20);
+  wild[59] = 0.45;                       // 마지막 날만 폭증
+  assert.ok(spec('volatility').raw({ vol20: wild }, 59).v < 0);
+});
+
+check('시장 변동성: 50일 평균을 채울 만큼 데이터가 없으면 null', () => {
+  assert.strictEqual(spec('volatility').raw({ vol20: new Array(30).fill(0.2) }, 29), null);
+});
+
+check('안전자산 선호: 주식이 국채보다 앞서면 양수, 뒤지면 음수', () => {
   const up = risingMarket(40, 0.01);
   const flat = new Array(40).fill(100);
-  assert.ok(spec('safehaven').raw({ riskIdx: up, safeIdx: flat }, 39).v > 0);
-  assert.ok(spec('safehaven').raw({ riskIdx: flat, safeIdx: up }, 39).v < 0);
+  assert.ok(spec('safehaven').raw({ bench: up, bond: flat }, 39).v > 0);
+  assert.ok(spec('safehaven').raw({ bench: flat, bond: up }, 39).v < 0);
 });
 
-check('안전자산 선호: 바스켓이 하나라도 없으면 null', () => {
-  assert.strictEqual(spec('safehaven').raw({ riskIdx: null, safeIdx: [1, 2] }, 39), null);
+check('안전자산 선호: 국채 데이터가 없으면 null (다른 값으로 대신하지 않는다)', () => {
+  assert.strictEqual(spec('safehaven').raw({ bench: risingMarket(40, 0.01), bond: null }, 39), null);
 });
 
-check('외국인 수급: 소진율이 오르면 양수, 내리면 음수', () => {
+check('CNN 에 있는 지표만 점수에 들어간다', () => {
+  const keys = FG.COMPONENTS.map(c => c.key).sort();
+  assert.deepStrictEqual(keys, ['breadth', 'momentum', 'safehaven', 'strength', 'volatility']);
+  // 다섯 개 모두 CNN 의 어느 지표에 대응하는지 이름을 달고 있어야 합니다.
+  assert.ok(FG.COMPONENTS.every(c => typeof c.cnn === 'string' && c.cnn.length > 0));
+});
+
+check('외국인 수급은 참고 지표이고 점수에 들어가지 않는다', () => {
+  assert.deepStrictEqual(FG.EXTRAS.map(c => c.key), ['foreign']);
+  assert.ok(!FG.COMPONENTS.some(c => c.key === 'foreign'));
+
+  const extra = FG.EXTRAS[0];
   const up = { close: [], foreign: Array.from({ length: 40 }, (_, i) => 30 + i * 0.1) };
   const down = { close: [], foreign: Array.from({ length: 40 }, (_, i) => 30 - i * 0.1) };
-  assert.ok(spec('foreign').raw({ stocks: [up] }, 39).v > 0);
-  assert.ok(spec('foreign').raw({ stocks: [down] }, 39).v < 0);
-  assert.strictEqual(spec('foreign').raw({ stocks: [{ close: [], foreign: null }] }, 39), null);
+  assert.ok(extra.raw({ stocks: [up] }, 39).v > 0);
+  assert.ok(extra.raw({ stocks: [down] }, 39).v < 0);
+  assert.strictEqual(extra.raw({ stocks: [{ close: [], foreign: null }] }, 39), null);
 });
 
 // ── 합산과 구간 이름 ──────────────────────────────────────────────────
@@ -193,11 +218,17 @@ function syntheticMarket({ n, trend, vol, foreignTrend }) {
   const bench = [];
   for (let i = 0; i < n; i++) bench.push(stocks.reduce((a, s) => a + s.close[i], 0) / stocks.length);
 
+  // 국채는 주식과 상관없이 아주 완만하게 오르는 선으로 둡니다.
+  const bond = [];
+  for (let i = 0; i < n; i++) bond.push(100 * (1 + 0.0001 * i));
+
   return {
     bench,
+    benchName: '합성지수',
+    bondName: '합성국채',
     stocks,
-    riskIdx: stocks[1].close.slice(),
-    safeIdx: stocks[0].close.slice(),
+    bond,
+    vol20: bench.map((_, at) => FG.realizedVol(bench, at, 20)),
   };
 }
 
@@ -230,12 +261,14 @@ check('합성 시장: 조용히 오르던 시장이 급락하면 점수가 크�
       s.foreign[i] = s.foreign[i - 1] - 0.05;
     }
     crash.bench[i] = crash.stocks.reduce((a, s) => a + s.close[i], 0) / crash.stocks.length;
-    crash.riskIdx[i] = crash.stocks[1].close[i];
-    crash.safeIdx[i] = crash.stocks[0].close[i] * 0.995; // 방어주는 덜 빠집니다
+    crash.bond[i] = crash.bond[i - 1] * 1.002;   // 겁이 나면 돈은 채권으로 갑니다
   }
+  // 벤치마크를 갈아끼웠으니 변동성 선도 다시 만듭니다.
+  crash.vol20 = crash.bench.map((_, at) => FG.realizedVol(crash.bench, at, 20));
   const after = scoreLast(crash, n);
 
-  assert.ok(before.used >= 6, `구성 요소가 ${before.used}개만 계산됐습니다`);
+  assert.strictEqual(before.used, FG.COMPONENTS.length,
+    `구성 요소 ${FG.COMPONENTS.length}개 중 ${before.used}개만 계산됐습니다`);
   assert.ok(after.score < before.score - 20,
     `급락 뒤 점수가 충분히 떨어지지 않았습니다 (${before.score} → ${after.score})`);
   assert.ok(after.score < 40, `급락한 시장의 점수가 ${after.score} 입니다`);

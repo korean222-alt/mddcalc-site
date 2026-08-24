@@ -280,24 +280,16 @@ const REFRESH_SCHEDULE = {
   ],
 };
 
-// 공포·탐욕 지수의 "안전자산 선호" 구성 요소가 쓰는 두 바구니입니다 (scripts/fear-greed.js).
+// 공포·탐욕 지수가 쓰는 "안전자산" 자리의 종목입니다 (scripts/fear-greed.js).
 //
-// 채권 데이터가 없으니 주식 안에서 위험선호를 봅니다. 겁이 나면 돈은 통신·은행·필수소비재
-// 같은 저베타 쪽으로 숨고, 배가 부르면 반도체·성장주로 갑니다. 두 바구니의 20거래일
-// 수익률 차이가 곧 그 시장의 위험선호입니다.
+// CNN 의 안전자산 선호(Safe Haven Demand)는 주식과 국채의 최근 20거래일 수익률 차이입니다.
+// 처음에는 채권 데이터가 없어서 방어주 바스켓으로 대신했는데, 그건 결국 주식 안에서의
+// 순환일 뿐이라 "주식에서 돈이 빠져나가는가"를 보지 못합니다. 국고채 ETF 를 한 종목
+// 더 받아오는 비용이 훨씬 쌉니다.
 //
-// 고를 때의 기준은 "공식 방어주"가 아니라 그 시장에서 실제로 저베타로 움직이는 묶음입니다.
-// 그래서 한국의 전력·원전은 방어 바구니에 넣지 않았습니다 — 이름은 유틸리티지만 지금
-// 두산에너빌리티·HD현대일렉트릭이 들어 있어 성장 테마처럼 움직입니다.
-const FG_BASKETS = {
-  KR: {
-    risk: ['memory', 'semi-eqp', 'battery', 'software', 'game', 'robot', 'bio'],
-    safe: ['telecom', 'bank', 'holding'],
-  },
-  US: {
-    risk: ['semi', 'software', 'internet', 'auto', 'discret'],
-    safe: ['staples', 'health', 'reit'],
-  },
+// 미국은 CNN 공식 값을 그대로 쓰므로(scripts/fetch-cnn-fear-greed.js) 여기 필요 없습니다.
+const FG_BOND = {
+  KR: '148070',   // KOSEF 국고채10년 (scripts/kr-tickers.js 에 있어야 합니다)
 };
 
 // 미국에서 실제로 받아와야 하는 심볼 = US·THEME 두 목록의 구성 심볼 + 벤치마크.
@@ -324,5 +316,5 @@ const PERIODS = [
 
 module.exports = {
   KR_SECTORS, US_SECTORS, THEME_SECTORS, SECTOR_DEFS, MARKETS,
-  US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, REFRESH_SCHEDULE, usSymbols, PERIODS, FG_BASKETS,
+  US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, REFRESH_SCHEDULE, usSymbols, PERIODS, FG_BOND,
 };

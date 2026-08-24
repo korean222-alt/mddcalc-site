@@ -61,7 +61,9 @@ jobs:
       # 공포·탐욕 지수도 같은 이유로 먼저 검사합니다. 0~100 짜리 심리 지표는 부호가 뒤집혀
       # 폭락장에 "극단적 탐욕"이 떠도 화면만 봐서는 알 수 없습니다.
       - name: Test the fear & greed math
-        run: node scripts/test-fear-greed.js
+        run: |
+          node scripts/test-fear-greed.js
+          node scripts/test-cnn-parse.js
 
       # PAGE_URLS 표가 assets/site.js 와 index.html 두 곳에 복제돼 있어 한쪽만 고치기
       # 쉽습니다. 어긋나면 링크가 죽는 대신 홈으로 되돌아와서 "눌러도 아무 일이 없는" 것처럼
@@ -96,6 +98,14 @@ jobs:
         continue-on-error: true
         run: node scripts/generate-sector-rs.js
 
+      # 미국 공포·탐욕은 CNN 공식 값을 그대로 씁니다. 못 받으면 기존 파일을 그대로 두고
+      # 넘어갑니다(스크립트가 스스로 그렇게 합니다). 그 경우 아래 계산이 같은 방식으로
+      # 미국 값을 채우고, 화면에는 "직접 계산했습니다"라고 표시됩니다.
+      - name: Fetch the official CNN fear & greed index
+        continue-on-error: true
+        run: node scripts/fetch-cnn-fear-greed.js
+
+      # 한국 지수를 계산하고, 위에서 받아둔 CNN 값과 합쳐 data/fear-greed.json 을 만듭니다.
       # 섹터 RS 와 같은 원본 파일만 읽습니다. 네트워크를 쓰지 않습니다.
       # 실패해도 잡을 죽이지 않습니다 — 그 경우 공포·탐욕 화면만 지난 값으로 남습니다.
       - name: Compute the fear & greed index
