@@ -54,7 +54,8 @@
       <div id="hmPeriodBtns" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
       <label style="margin-left:8px;">칸 크기</label>
       <div class="mode-toggle" id="hmSizeToggle">
-        <button type="button" data-size="turn" class="active" onclick="setHeatmapSize('turn')">거래대금</button>
+        <button type="button" data-size="soft" class="active" onclick="setHeatmapSize('soft')">완만</button>
+        <button type="button" data-size="turn" onclick="setHeatmapSize('turn')">거래대금</button>
         <button type="button" data-size="equal" onclick="setHeatmapSize('equal')">균등</button>
       </div>
     </div>
@@ -80,7 +81,7 @@
       <div class="stat-box">
         <div class="label">칸 크기</div>
         <div class="value">거래대금</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">고른 기간 동안 오간 돈의 양. 큰 칸일수록 그 종목에 돈이 많이 몰려 있습니다.</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">고른 기간 동안 오간 돈의 양. 큰 칸일수록 그 종목에 돈이 많이 몰려 있습니다. 기본값은 <b>완만</b> — 순서는 그대로 두고 격차만 좁혀 그립니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">색</div>
@@ -93,9 +94,9 @@
         <div style="font-size:11px; color:#718096; margin-top:4px;">같은 테마끼리 붙어 있어, 섹터 전체가 초록인지 빨강인지가 바로 보입니다.</div>
       </div>
       <div class="stat-box">
-        <div class="label">균등 모드</div>
-        <div class="value">비교용</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">큰 종목이 화면을 다 차지해 나머지가 안 보일 때 칸을 같은 크기로 만듭니다.</div>
+        <div class="label">칸 크기 모드</div>
+        <div class="value">3가지</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;"><b>완만</b>은 격차를 좁혀 그리고, <b>거래대금</b>은 실제 비중 그대로, <b>균등</b>은 전부 같은 크기입니다.</div>
       </div>
     </div>
     <div class="info-banner" style="margin-top:12px;">
@@ -106,18 +107,24 @@
   <section class="card" style="background:#f7fafc;">
     <h2 class="section">📚 조금 더</h2>
     <details open>
-      <summary>큰 칸 두어 개가 화면을 다 차지합니다</summary>
+      <summary>칸 크기 세 가지는 무엇이 다릅니까</summary>
       <div class="body">
-        거래대금이 실제로 그렇게 쏠려 있다는 뜻입니다. 한국 시장은 반도체 대형주 두 종목이
-        수록 종목 거래대금의 상당 부분을 차지하는 날이 흔합니다. 그 쏠림 자체가 정보이므로
-        기본값은 실제 비중 그대로 두었고, 나머지를 들여다볼 때는 <b>균등</b> 모드로 바꾸면 됩니다.
+        <p>한국 시장은 SK하이닉스와 삼성전자 둘이 수록 종목 거래대금의 70%를 넘게 차지하는
+        날이 흔합니다. 실제 비중 그대로 그리면 두 칸이 화면의 70%를 먹고 나머지 90여 종목이
+        실오라기가 됩니다. 쏠림 자체는 정보지만, 그 화면으로는 나머지를 읽을 수 없습니다.</p>
+        <p style="margin-top:8px;"><b>완만</b>(기본값)은 거래대금을 0.6제곱으로 눌러 그립니다.
+        큰 순서는 하나도 바뀌지 않고 격차만 좁아져, 두 대형주가 여전히 가장 큰 칸이면서
+        나머지도 눈에 들어옵니다. 실제 비중이 궁금하면 <b>거래대금</b> 모드로 바꾸거나
+        칸을 짚어 보세요 — 설명줄에는 언제나 눌리지 않은 진짜 비중이 나옵니다.
+        <b>균등</b>은 크기를 아예 빼고 색(등락률)만 비교할 때 씁니다.</p>
       </div>
     </details>
     <details>
       <summary>데이터 출처와 한계</summary>
       <div class="body">
         <p>한국은 네이버 금융, 미국은 Twelve Data 의 일봉을 매 거래일 장 마감 뒤 받아
-        정적 파일로 저장합니다. <b>전일 종가 기준</b>이며 실시간이 아닙니다.</p>
+        정적 파일로 저장합니다. <b>전일 종가 기준</b>이며 실시간이 아닙니다.
+        양쪽 모두 개별 종목이며, 섹터마다 시가총액·거래대금 상위 3~6종목을 담았습니다.</p>
         <p style="margin-top:8px;">여기서 말하는 "전체"는 거래소 전체가 아니라 <b>이 화면에 수록된 종목들</b>입니다.
         섹터 구분도 공식 산업분류가 아니라 투자자들이 실제로 묶어 부르는 테마 기준으로 정한 것입니다.
         이 화면은 정보 제공용이며 투자 권유가 아닙니다.</p>
