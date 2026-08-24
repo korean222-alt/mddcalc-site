@@ -364,6 +364,35 @@ function buildRelatedTickersHtml(symbol) {
   return others.map(t => `<a href="/stock/${t.toLowerCase()}.html" class="chip">${t}</a>`).join('');
 }
 
+// 종목 리포트에서 시장 흐름 화면(섹터 RS·히트맵·공포탐욕)으로 보내는 링크.
+//
+// 이 페이지들은 "이 종목이 과거에 얼마나 빠졌나"까지만 답합니다. 그걸 본 사람이 다음에
+// 궁금해하는 건 대개 "그래서 지금 이 섹터에 돈이 들어오고 있나"인데, 그 답을 가진 화면이
+// 사이트 안에 있는데도 여기서는 갈 길이 없었습니다.
+//
+// data/ticker-sectors.json 이 있으면 그 종목의 섹터로 바로 꽂아 줍니다. 없거나(아직 안 만들어짐)
+// 목록에 없는 종목(SPY 같은 지수 ETF)이면 일반 링크로 보냅니다 — 엉뚱한 칸을 강조하며
+// "못 찾았습니다"를 띄우는 것보다 낫습니다.
+function buildMarketLinksHtml(symbol) {
+  let t = null;
+  try {
+    const idx = JSON.parse(fs.readFileSync(path.join(SITE_ROOT, 'data', 'ticker-sectors.json'), 'utf8'));
+    t = (idx.tickers && idx.tickers[symbol]) || null;
+  } catch (e) { /* 색인이 없으면 일반 링크만 */ }
+
+  const rs = t ? `/sector-rs.html?m=${t.m}&p=1m&s=${encodeURIComponent(t.s)}` : '/sector-rs.html';
+  const hm = t ? `/heatmap.html?m=${t.m}&p=1m&hl=${encodeURIComponent(symbol)}` : '/heatmap.html';
+  const fg = t ? `/fear-greed.html?m=${t.m}` : '/fear-greed.html';
+  const title = t
+    ? `시장 흐름 함께 보기 — ${escapeHtml(symbol)}는 ${escapeHtml(t.sn)} 섹터입니다`
+    : '시장 흐름 함께 보기';
+
+  return `<div class="related" style="margin-top:16px;">
+      <div class="related-title">${title}</div>
+      <a href="${rs}" class="chip">📊 섹터 상대강도(RS)</a><a href="${hm}" class="chip">🔥 주식 히트맵</a><a href="${fg}" class="chip">😱 공포·탐욕 지수</a>
+    </div>`;
+}
+
 function buildRelatedBlogHtml(symbol) {
   const { BLOG_POSTS, RETIRED_POSTS } = require('./posts-data.js');
   // 내려간 글로는 링크하지 않는다. 그 글의 파일은 더 이상 생성되지 않으므로
@@ -662,6 +691,7 @@ ${buildTickerNoteHtml(symbol)}
 
   <div class="card">
     <a class="tool-cta" href="/?ticker=${symbol}">MDD 계산기에서 ${symbol} 실시간으로 다시 조회하기 →</a>
+    ${buildMarketLinksHtml(symbol)}
   </div>
 
   <div class="card">

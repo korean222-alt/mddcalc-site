@@ -1036,7 +1036,7 @@ const PAGE_URLS = {
   blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
   disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
   compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
-  sector: '/sector-rs.html', heatmap: '/heatmap.html'
+  sector: '/sector-rs.html', heatmap: '/heatmap.html', feargreed: '/fear-greed.html'
 };
 
 function navigate(page) {
@@ -1753,12 +1753,29 @@ async function initSectorPage() {
     errBox.textContent = '표시할 시장이 없습니다.';
     return;
   }
-  RS.market = keys.includes('KR') ? 'KR' : keys[0];
+  // 딥링크: 홈의 "이 종목 수급" 카드나 히트맵에서 넘어올 때 시장·기간·섹터를 지정합니다.
+  //   /sector-rs.html?m=KR&p=1m&s=memory
+  // 값이 이상하면 무시하고 기본값으로 엽니다 — 링크 하나 잘못됐다고 빈 화면을 보일 이유가 없습니다.
+  const q = new URLSearchParams(window.location.search);
+  const wantMarket = (q.get('m') || '').toUpperCase();
+  const wantPeriod = q.get('p');
+  const wantSector = q.get('s');
+
+  RS.market = keys.includes(wantMarket) ? wantMarket : (keys.includes('KR') ? 'KR' : keys[0]);
+  if (wantPeriod && RS_PERIODS.some(p => p.key === wantPeriod)) RS.period = wantPeriod;
+  if (wantSector && RS.data.markets[RS.market].sectors.some(x => x.key === wantSector)) RS.openKey = wantSector;
 
   loading.classList.remove('show');
   document.getElementById('rsBody').classList.remove('hidden');
   renderSectorControls();
   renderSectorAll();
+
+  // 섹터를 지정해 들어왔으면 그 자리로 데려다 줍니다. 표 어딘가가 열려 있어도
+  // 화면 맨 위에 그대로 서 있으면 "눌렀는데 아무 일이 없다"로 보입니다.
+  if (RS.openKey) {
+    const detail = document.getElementById('rsDetail');
+    if (detail) setTimeout(() => detail.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
 }
 
 // 시장 탭은 데이터에 실제로 들어 있는 시장만 그립니다. 수집이 실패해 한쪽이 비어도
@@ -1931,13 +1948,17 @@ function renderSectorDetail() {
     return bv - av;
   });
   document.getElementById('rsMembers').innerHTML =
-    `<h3 style="font-size:14px; color:#4a5568; margin-bottom:8px;">구성 종목 ${rsPeriodLabel()} 수익률</h3>` +
+    `<h3 style="font-size:14px; color:#4a5568; margin-bottom:8px;">구성 종목 ${rsPeriodLabel()} 수익률 ` +
+    `<span style="font-weight:400; color:#a0aec0; font-size:12px;">— 종목을 누르면 MDD 계산기로 갑니다</span></h3>` +
     `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
     members.map(mem => {
       const v = mem.ret[RS.period];
       const color = v == null ? rsFlat : (v > 0 ? rsUp : rsDown);
-      return `<span class="fav-chip" style="cursor:default;">${rsEsc(mem.name)} ` +
-        `<b style="color:${color};">${v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + '%'}</b></span>`;
+      // 종목 이름을 누르면 그 종목의 MDD 계산기로 갑니다. 여기서 "이 섹터가 강하다"까지
+      // 봤으면 다음 질문은 대개 "그럼 이 종목은 고점 대비 얼마나 빠져 있나"입니다.
+      return `<a class="fav-chip" href="/?ticker=${encodeURIComponent(mem.code)}" ` +
+        `title="${rsEsc(mem.name)} MDD 계산기에서 보기">${rsEsc(mem.name)} ` +
+        `<b style="color:${color};">${v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + '%'}</b></a>`;
     }).join('') + '</div>';
 
   drawSectorChart(s, m);
@@ -2012,7 +2033,7 @@ if (CURRENT_PAGE === 'sector') {
 // 칸 크기 = 거래대금 비중, 색 = 등락률. 캔버스가 아니라 절대배치 div 로 그립니다.
 // 그래야 글자가 그대로 검색·선택되고, 화면 크기가 바뀌어도 다시 그리기만 하면 됩니다.
 
-const HM = { data: null, market: null, period: '1m', size: 'soft', tiles: [] };
+const HM = { data: null, market: null, period: '1m', size: 'soft', tiles: [], highlight: null };
 
 // 칸 크기 모드
 //   turn  거래대금 비중 그대로. 실제 쏠림을 1:1 로 보여줍니다.
@@ -2114,7 +2135,16 @@ async function initHeatmapPage() {
     errBox.textContent = '표시할 시장이 없습니다.';
     return;
   }
-  HM.market = keys.includes('KR') ? 'KR' : keys[0];
+  // 딥링크: 홈의 "이 종목 수급" 카드에서 넘어올 때 시장·기간을 맞추고 그 종목 칸을 짚어 줍니다.
+  //   /heatmap.html?m=KR&p=1m&hl=005930
+  // 칸이 작아 이름이 안 들어가는 경우가 많아서, 강조 없이 보내면 "그래서 어느 칸인데?" 가 됩니다.
+  const q = new URLSearchParams(window.location.search);
+  const wantMarket = (q.get('m') || '').toUpperCase();
+  const wantPeriod = q.get('p');
+
+  HM.market = keys.includes(wantMarket) ? wantMarket : (keys.includes('KR') ? 'KR' : keys[0]);
+  if (wantPeriod && RS_PERIODS.some(p => p.key === wantPeriod)) HM.period = wantPeriod;
+  HM.highlight = q.get('hl') || null;
 
   loading.classList.remove('show');
   document.getElementById('hmBody').classList.remove('hidden');
@@ -2160,7 +2190,9 @@ function renderHeatmapControls() {
   });
 }
 
-function setHeatmapMarket(k) { if (HM.market === k) return; HM.market = k; renderHeatmapControls(); renderHeatmap(); }
+// 시장을 바꾸면 강조 종목은 그 지도에 없습니다. 남겨 두면 아무 칸도 강조되지 않은 채
+// 설명줄만 다른 시장 종목을 가리키게 됩니다.
+function setHeatmapMarket(k) { if (HM.market === k) return; HM.market = k; HM.highlight = null; renderHeatmapControls(); renderHeatmap(); }
 function setHeatmapPeriod(k) { HM.period = k; renderHeatmapControls(); renderHeatmap(); }
 function setHeatmapSize(k) { HM.size = k; renderHeatmapControls(); renderHeatmap(); }
 
@@ -2222,6 +2254,7 @@ function renderHeatmap() {
 
   const html = [];
   HM.tiles = [];
+  let highlighted = null;   // ?hl= 로 지정된 종목의 칸 번호
 
   for (const box of boxes) {
     const s = box.item;
@@ -2248,11 +2281,14 @@ function renderHeatmap() {
       const small = cell.w > 30 && cell.h > 14 && !label;
       const idx = HM.tiles.length;
       HM.tiles.push(it);
+      const lit = HM.highlight && it.code === HM.highlight;
+      if (lit) highlighted = idx;
 
       html.push(
         `<div data-tile="${idx}" title="${rsEsc(it.sector)} · ${rsEsc(it.name)}  ${sign}${it.ret.toFixed(1)}%" ` +
         `style="position:absolute; left:${cell.x}px; top:${cell.y}px; width:${cell.w}px; height:${cell.h}px; ` +
         `background:${bg}; color:${fg}; border:1px solid rgba(255,255,255,0.85); box-sizing:border-box; ` +
+        (lit ? 'outline:3px solid #2b6cb0; outline-offset:-3px; z-index:2; ' : '') +
         `display:flex; flex-direction:column; align-items:center; justify-content:center; ` +
         `overflow:hidden; cursor:default; font-size:11px; line-height:1.25; padding:1px;">` +
         (label
@@ -2274,21 +2310,35 @@ function renderHeatmap() {
 
   // 마우스와 터치 양쪽에서 같은 설명을 띄웁니다. 칸이 작아 글자를 못 넣은 경우가 많아
   // 이 줄이 사실상 유일한 확인 수단입니다.
+  const tipFor = it => {
+    const sign = it.ret > 0 ? '+' : '';
+    const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
+    return `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
+      `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
+      (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '') +
+      // 칸에서 바로 그 종목의 MDD 로 갈 수 있게 합니다. 여기서 "많이 빠졌네"를 본 다음
+      // 궁금해지는 건 "고점 대비로는 얼마나 빠진 건데?" 이고, 그 답은 홈에 있습니다.
+      ` · <a href="/?ticker=${encodeURIComponent(it.code)}" style="color:#2b6cb0; font-weight:600;">📉 MDD 보기</a>`;
+  };
+
   const onPick = e => {
     const el = e.target.closest('[data-tile]');
     if (!el) return;
     const it = HM.tiles[Number(el.dataset.tile)];
     if (!it) return;
-    const sign = it.ret > 0 ? '+' : '';
-    const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
-    hmShowTip(
-      `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
-      `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
-      (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '')
-    );
+    hmShowTip(tipFor(it));
   };
   canvas.addEventListener('mousemove', onPick);
   canvas.addEventListener('click', onPick);
+
+  // ?hl= 로 들어왔으면 그 칸의 설명을 미리 띄워 둡니다. 테두리만 그려 놓으면 지도가 큰
+  // 화면에서는 어디를 봐야 하는지 여전히 알기 어렵습니다.
+  if (highlighted != null) {
+    hmShowTip('👉 ' + tipFor(HM.tiles[highlighted]));
+  } else if (HM.highlight) {
+    // 지정된 종목이 이 지도에 없는 경우(기간을 바꿔 값이 빠졌거나, 다른 시장 종목).
+    hmShowTip('이 지도에서는 요청한 종목을 찾지 못했습니다. 시장·기간 탭을 확인해 보세요.');
+  }
 
   // 범례
   const steps = [-clamp, -clamp / 2, 0, clamp / 2, clamp];
@@ -2305,4 +2355,227 @@ function renderHeatmap() {
 
 if (CURRENT_PAGE === 'heatmap') {
   document.addEventListener('DOMContentLoaded', initHeatmapPage);
+}
+
+// ========== 공포·탐욕 지수 ==========
+// 데이터: data/fear-greed.json (scripts/generate-fear-greed.js 가 매 거래일 만듭니다)
+// 산식은 scripts/fear-greed.js 한 곳에만 있습니다. 여기서는 계산하지 않고 그리기만 합니다 —
+// 화면에서 한 번 더 계산하면 두 산식이 조용히 갈라집니다.
+
+const FGP = { data: null, market: null, chart: null };
+
+function fgMarketData() { return FGP.data.markets[FGP.market]; }
+
+// 구간 표는 데이터가 들고 옵니다. 게이지 색과 글자가 같은 표에서 나와야 어긋나지 않습니다.
+function fgBands() { return (FGP.data && FGP.data.bands) || []; }
+
+function fgBandOf(score) {
+  if (score == null) return null;
+  return fgBands().find(b => score <= b.max) || fgBands()[fgBands().length - 1];
+}
+
+async function initFearGreedPage() {
+  const loading = document.getElementById('fgLoading');
+  const errBox = document.getElementById('fgError');
+  try {
+    const res = await fetch('/data/fear-greed.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    FGP.data = await res.json();
+  } catch (e) {
+    loading.classList.remove('show');
+    errBox.style.display = 'block';
+    errBox.className = 'status error show';
+    errBox.textContent = '공포·탐욕 지수 데이터를 불러오지 못했습니다. 잠시 뒤 새로고침해 주세요.';
+    return;
+  }
+
+  const keys = Object.keys(FGP.data.markets || {});
+  if (keys.length === 0) {
+    loading.classList.remove('show');
+    errBox.style.display = 'block';
+    errBox.className = 'status error show';
+    errBox.textContent = '표시할 시장이 없습니다.';
+    return;
+  }
+  // ?m=US 로 들어오면 그 시장부터 보여줍니다 (다른 화면에서 넘어오는 링크용).
+  const q = new URLSearchParams(window.location.search);
+  const wanted = (q.get('m') || '').toUpperCase();
+  FGP.market = keys.includes(wanted) ? wanted : (keys.includes('KR') ? 'KR' : keys[0]);
+
+  loading.classList.remove('show');
+  document.getElementById('fgBody').classList.remove('hidden');
+  renderFearGreedControls();
+  renderFearGreed();
+}
+
+function renderFearGreedControls() {
+  document.getElementById('fgMarketToggle').innerHTML =
+    rsMarketButtons(FGP.data.markets, FGP.market, 'setFearGreedMarket');
+}
+
+function setFearGreedMarket(k) {
+  if (FGP.market === k) return;
+  FGP.market = k;
+  renderFearGreedControls();
+  renderFearGreed();
+}
+
+// 반원 게이지. 0점이 왼쪽(공포), 100점이 오른쪽(탐욕)입니다.
+// 구간별로 색 띠를 깔고 그 위에 바늘을 올립니다. 숫자만 크게 쓰는 것보다 "어느 쪽으로
+// 치우쳤나"가 먼저 읽힙니다 — 이 지표는 정확한 값보다 위치가 중요한 지표입니다.
+function fgGaugeSvg(score) {
+  const W = 320, H = 186, CX = 160, CY = 160, R = 128, TH = 26;
+  const pt = (pct, r) => {
+    const a = Math.PI * (1 - pct / 100);
+    return [CX + r * Math.cos(a), CY - r * Math.sin(a)];
+  };
+  const arc = (from, to, color) => {
+    const [x1, y1] = pt(from, R);
+    const [x2, y2] = pt(to, R);
+    const large = (to - from) > 50 ? 1 : 0;
+    return `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${R} ${R} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" ` +
+      `fill="none" stroke="${color}" stroke-width="${TH}" stroke-linecap="butt" />`;
+  };
+
+  const bands = fgBands();
+  let from = 0;
+  const arcs = bands.map(b => {
+    const to = Math.min(b.max + 1, 100);
+    const path = arc(from, to, b.color);
+    from = to;
+    return path;
+  }).join('');
+
+  const has = score != null;
+  const [nx, ny] = pt(has ? score : 50, R - TH / 2 - 6);
+  const needle = has
+    ? `<line x1="${CX}" y1="${CY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#2d3748" stroke-width="4" stroke-linecap="round" />` +
+      `<circle cx="${CX}" cy="${CY}" r="7" fill="#2d3748" />`
+    : '';
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:340px; display:block; margin:0 auto;" role="img" ` +
+    `aria-label="공포탐욕 지수 ${has ? score : '데이터 없음'}">` +
+    arcs + needle +
+    `<text x="${CX - R}" y="${CY + 22}" font-size="11" fill="#a0aec0" text-anchor="middle">0</text>` +
+    `<text x="${CX + R}" y="${CY + 22}" font-size="11" fill="#a0aec0" text-anchor="middle">100</text>` +
+    `</svg>`;
+}
+
+// 과거 점수와의 비교 한 줄. 값이 없는 칸(이력이 그만큼 길지 않은 경우)은 — 로 둡니다.
+function fgPrevBox(label, score) {
+  const b = fgBandOf(score);
+  return `<div class="stat-box">` +
+    `<div class="label">${rsEsc(label)}</div>` +
+    `<div class="value" style="color:${b ? b.color : '#cbd5e0'};">${score == null ? '—' : score}</div>` +
+    `<div style="font-size:11px; color:#718096; margin-top:4px;">${b ? rsEsc(b.label) : '이력 부족'}</div>` +
+    `</div>`;
+}
+
+function renderFearGreed() {
+  const m = fgMarketData();
+  const b = fgBandOf(m.score);
+
+  rsRenderRefresh('fgUpdate', FGP.data);
+
+  document.getElementById('fgMeta').innerHTML =
+    `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> · ` +
+    `수록 ${m.universeCount}종목 · 구성 요소 ${m.components.length}개`;
+
+  document.getElementById('fgGauge').innerHTML = fgGaugeSvg(m.score);
+  document.getElementById('fgScore').innerHTML =
+    `<div style="font-size:52px; font-weight:800; line-height:1; color:${b.color};">${m.score}</div>` +
+    `<div style="font-size:20px; font-weight:700; margin-top:6px; color:${b.color};">${rsEsc(m.emoji)} ${rsEsc(m.bandLabel)}</div>` +
+    `<div style="font-size:12px; color:#718096; margin-top:6px;">` +
+    `최근 ${m.history.scores.length}거래일 범위 ${m.range.min}~${m.range.max} · 평균 ${m.range.avg}</div>`;
+
+  document.getElementById('fgPrev').innerHTML =
+    fgPrevBox('어제', m.prev.d1) + fgPrevBox('1주 전', m.prev.w1) +
+    fgPrevBox('1개월 전', m.prev.m1) + fgPrevBox('3개월 전', m.prev.m3) +
+    fgPrevBox('6개월 전', m.prev.m6);
+
+  // 구성 요소. 점수 막대 옆에 언제나 원래 값(근거 문구)을 같이 둡니다.
+  // 점수만 있으면 "왜 이 숫자인가"를 화면에서 되짚을 수 없습니다.
+  document.getElementById('fgComponents').innerHTML = m.components.map(c => {
+    const cb = fgBandOf(c.score);
+    const width = c.score == null ? 0 : c.score;
+    return `<div style="padding:12px 0; border-bottom:1px solid #edf2f7;">` +
+      `<div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px;">` +
+        `<div><b style="font-size:14px;">${rsEsc(c.label)}</b>` +
+        `<div style="font-size:11px; color:#a0aec0; margin-top:2px;">${rsEsc(c.hint)}</div></div>` +
+        `<div style="text-align:right; white-space:nowrap;">` +
+          `<b style="font-size:18px; color:${cb ? cb.color : '#cbd5e0'};">${c.score == null ? '—' : c.score}</b>` +
+          `<div style="font-size:11px; color:#718096;">${cb ? rsEsc(cb.label) : '데이터 부족'}</div>` +
+        `</div>` +
+      `</div>` +
+      `<div class="bar-container" style="margin:8px 0 6px;"><div class="bar-fill${c.score != null && c.score < 50 ? ' zero' : ''}" style="width:${width}%;"></div></div>` +
+      `<div style="font-size:12px; color:#4a5568;">${c.note ? rsEsc(c.note) : '계산에 필요한 데이터가 모자랍니다'}</div>` +
+      `</div>`;
+  }).join('');
+
+  drawFearGreedChart(m);
+}
+
+function drawFearGreedChart(m) {
+  const wrap = document.getElementById('fgChartWrap');
+  if (!wrap) return;
+  if (typeof Chart === 'undefined') {
+    // 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 숫자는 멀쩡해야 하므로
+    // 캔버스만 안내 문구로 바꾸고 나머지는 그대로 둡니다. (섹터 RS 화면과 같은 처리)
+    wrap.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; ` +
+      `background:#f7fafc; border-radius:10px; color:#718096; font-size:13px; text-align:center; padding:16px;">` +
+      `차트를 불러오지 못했습니다. (광고 차단 확장 프로그램이 원인일 수 있습니다)<br>` +
+      `<span style="font-size:12px; color:#a0aec0;">위 점수와 구성 요소는 정상입니다.</span></div>`;
+    return;
+  }
+  if (FGP.chart) { FGP.chart.destroy(); FGP.chart = null; }
+  wrap.innerHTML = '<canvas id="fgChart"></canvas>';
+
+  const labels = m.history.dates.map(d => new Date(d * 86400000).toISOString().slice(0, 10));
+  FGP.chart = new Chart(document.getElementById('fgChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: '공포·탐욕 지수',
+        data: m.history.scores,
+        borderColor: '#4c51bf',
+        backgroundColor: 'rgba(76,81,191,0.08)',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.15,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, font: { size: 10 } },
+          grid: { color: '#edf2f7' },
+        },
+        x: {
+          ticks: { maxTicksLimit: 6, font: { size: 10 } },
+          grid: { display: false },
+        },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const bd = fgBandOf(ctx.parsed.y);
+              return `${ctx.parsed.y}점 — ${bd ? bd.label : ''}`;
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+if (CURRENT_PAGE === 'feargreed') {
+  document.addEventListener('DOMContentLoaded', initFearGreedPage);
 }

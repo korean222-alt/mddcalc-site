@@ -38,9 +38,22 @@
               border-radius: 20px; padding: 6px 6px 6px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
               transition: background 0.2s; }
   .fav-chip:hover { background: #bee3f8; }
+  /* 섹터 상세의 구성 종목은 <a> 라서 기본 밑줄이 그어집니다. 관심종목 칩과 같은 모양을
+     유지하되, 마우스를 올렸을 때만 밑줄로 "눌리는 것"임을 알립니다. */
+  a.fav-chip { text-decoration: none; }
+  a.fav-chip:hover { text-decoration: underline; }
   .fav-chip .fav-remove { background: none; border: none; color: #63b3ed; font-size: 15px; cursor: pointer;
                            padding: 2px 6px; line-height: 1; border-radius: 50%; }
   .fav-chip .fav-remove:hover { color: #e53e3e; background: rgba(255,255,255,0.6); }
+
+  /* 다른 화면으로 보내는 링크 칩 ("이어서 보기", 홈의 수급 카드).
+     quick-chip 은 어두운 패널 위에서 흰 글씨로 쓰라고 만든 것이라, 밝은 카드 위에 두면
+     글자가 사라집니다. 실제로 그렇게 한 번 만들었다가 링크가 안 보였습니다. */
+  .link-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .link-chip { display: inline-block; background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8;
+               border-radius: 20px; padding: 7px 14px; font-size: 13px; font-weight: 700;
+               text-decoration: none; transition: background 0.2s, color 0.2s; }
+  .link-chip:hover { background: #bee3f8; color: #1a365d; }
   .fav-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #cbd5e0; padding: 0 4px;
              line-height: 1; transition: color 0.2s, transform 0.15s; vertical-align: middle; }
   .fav-btn:hover { transform: scale(1.15); }
@@ -131,6 +144,12 @@
   .site-nav { display: flex; gap: 4px; align-items: center; }
   .site-nav a { color: #cbd5e0; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; transition: all 0.2s; }
   .site-nav a:hover, .site-nav a.active { background: rgba(255,255,255,0.15); color: #fff; }
+  /* 항목이 8개가 되면서 769~860px 구간에서 메뉴 글자가 두 줄로 접혔습니다
+     (햄버거 메뉴는 768px 이하에서만 나옵니다). 줄바꿈을 막고 그 구간에서만 여백을 줄입니다. */
+  .site-nav a { white-space: nowrap; }
+  @media (max-width: 900px) and (min-width: 769px) {
+    .site-nav a { padding: 6px 7px; font-size: 12px; }
+  }
   .nav-hamburger { display: none; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 8px; }
   @media (max-width: 768px) {
     .nav-hamburger { display: block; }

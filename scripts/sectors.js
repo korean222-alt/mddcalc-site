@@ -280,6 +280,26 @@ const REFRESH_SCHEDULE = {
   ],
 };
 
+// 공포·탐욕 지수의 "안전자산 선호" 구성 요소가 쓰는 두 바구니입니다 (scripts/fear-greed.js).
+//
+// 채권 데이터가 없으니 주식 안에서 위험선호를 봅니다. 겁이 나면 돈은 통신·은행·필수소비재
+// 같은 저베타 쪽으로 숨고, 배가 부르면 반도체·성장주로 갑니다. 두 바구니의 20거래일
+// 수익률 차이가 곧 그 시장의 위험선호입니다.
+//
+// 고를 때의 기준은 "공식 방어주"가 아니라 그 시장에서 실제로 저베타로 움직이는 묶음입니다.
+// 그래서 한국의 전력·원전은 방어 바구니에 넣지 않았습니다 — 이름은 유틸리티지만 지금
+// 두산에너빌리티·HD현대일렉트릭이 들어 있어 성장 테마처럼 움직입니다.
+const FG_BASKETS = {
+  KR: {
+    risk: ['memory', 'semi-eqp', 'battery', 'software', 'game', 'robot', 'bio'],
+    safe: ['telecom', 'bank', 'holding'],
+  },
+  US: {
+    risk: ['semi', 'software', 'internet', 'auto', 'discret'],
+    safe: ['staples', 'health', 'reit'],
+  },
+};
+
 // 미국에서 실제로 받아와야 하는 심볼 = US·THEME 두 목록의 구성 심볼 + 벤치마크.
 // generate-us-data.js 가 이 함수를 수집 목록으로 씁니다.
 function usSymbols() {
@@ -304,5 +324,5 @@ const PERIODS = [
 
 module.exports = {
   KR_SECTORS, US_SECTORS, THEME_SECTORS, SECTOR_DEFS, MARKETS,
-  US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, REFRESH_SCHEDULE, usSymbols, PERIODS,
+  US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, REFRESH_SCHEDULE, usSymbols, PERIODS, FG_BASKETS,
 };

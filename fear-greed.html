@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공포·탐욕 지수 (한국·미국) — 지금 시장 심리는 | MDD 분석기</title>
+<meta name="description" content="한국(코스피)과 미국(S&P 500) 시장의 공포·탐욕 지수를 매 거래일 계산합니다. 모멘텀·주가 강도·시장 폭·변동성·거래 강도·안전자산 선호·외국인 수급 7가지를 0~100으로 환산해 지금 시장이 겁먹었는지 들떴는지 한 눈에 보여줍니다.">
+<meta name="robots" content="index, follow">
+<meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
+<link rel="canonical" href="https://mddcalc.com/fear-greed.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%98%B1%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="공포·탐욕 지수 (한국·미국) | MDD 분석기">
+<meta property="og:description" content="지금 시장이 겁먹었는지 들떴는지를 0~100 한 숫자로. 한국·미국 각각 매 거래일 갱신됩니다.">
+<meta property="og:url" content="https://mddcalc.com/fear-greed.html">
+<meta property="og:site_name" content="MDD 분석기">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="공포·탐욕 지수 (한국·미국) | MDD 분석기">
+<meta name="twitter:description" content="지금 시장이 겁먹었는지 들떴는지를 0~100 한 숫자로. 한국·미국 각각 매 거래일 갱신됩니다.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "공포·탐욕 지수 (한국·미국)",
+  "description": "한국·미국 시장의 투자 심리를 7가지 구성 요소로 계산해 0~100으로 보여주는 무료 지표",
+  "url": "https://mddcalc.com/fear-greed.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" },
+  "isPartOf": { "@type": "WebSite", "name": "MDD 분석기", "url": "https://mddcalc.com/" },
+  "inLanguage": "ko"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "공포·탐욕 지수란 무엇입니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "지금 시장 참여자들이 겁을 먹었는지 들떠 있는지를 0~100 한 숫자로 나타낸 심리 지표입니다. 0에 가까우면 극단적 공포, 100에 가까우면 극단적 탐욕입니다. 성격이 다른 여러 지표를 각각 0~100으로 환산해 평균낸 값이라 하나가 튀어도 전체가 흔들리지 않습니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "이 지수는 무엇으로 계산합니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "시장 모멘텀(지수와 125일 이동평균의 거리), 주가 강도(52주 신고가·신저가 종목 수), 시장 폭(50일선 위 종목 비율), 변동성(최근 20일 실현변동성), 거래 강도(오른 날에 실린 거래대금 비중), 안전자산 선호(경기민감주와 방어주의 20일 수익률 차이), 그리고 한국은 외국인 수급(외국인 소진율 변화)까지 7가지입니다. 각 값을 그 시장의 지난 1년과 견줘 몇 표준편차인지로 환산한 뒤 평균냅니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "CNN 공포탐욕지수와 같은 값입니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "아닙니다. 발상은 같지만 별개의 지표입니다. CNN 은 공개 API 가 없고 한국 시장 지수는 만들지도 않기 때문에, 이 화면은 저희가 매 거래일 수집하는 한국·미국 개별 종목 일봉·거래량·외국인 소진율로 직접 계산합니다. 채권·풋콜비율처럼 데이터가 없는 구성 요소는 빠져 있어 값이 CNN 과 다를 수 있습니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "지수가 낮으면 사야 합니까?",
+      "acceptedAnswer": { "@type": "Answer", "text": "아닙니다. 이 지수는 지금 시장 심리가 어느 쪽으로 치우쳤는지를 보여줄 뿐, 매수·매도 시점을 알려주지 않습니다. 공포 구간이 몇 달씩 이어지며 더 빠지는 경우도, 탐욕 구간에서 계속 오르는 경우도 흔합니다. 이 화면은 정보 제공용이며 투자 권유가 아닙니다." }
+    }
+  ]
+}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
+      <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
+      <a href="/heatmap.html" onclick="navigate('heatmap'); return false;" id="nav-heatmap">🔥 히트맵</a>
+      <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;" id="nav-feargreed">😱 공탐지수</a>
+      <a href="/tools.html" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
+      <a href="/blog.html" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
+      <a href="/about.html" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
+      <a href="/contact.html" onclick="navigate('contact'); return false;" id="nav-contact">✉️ 문의</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+<div id="page-feargreed" class="page active">
+  <div class="page-hero">
+    <div class="inner">
+      <h1>😱 공포·탐욕 지수</h1>
+      <p>지금 시장이 겁먹었는지 들떴는지 — 0(극단적 공포)에서 100(극단적 탐욕)까지 한 숫자로</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="controls" style="margin-bottom:0;">
+      <div class="mode-toggle" id="fgMarketToggle"></div>
+    </div>
+    <div id="fgMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
+    <!-- 갱신 시각·주기. 섹터 RS·히트맵과 같은 문구를 같은 함수가 만듭니다. -->
+    <div id="fgUpdate" style="font-size:12px; color:#4a5568; margin-top:6px; padding-top:8px; border-top:1px solid #edf2f7;"></div>
+  </div>
+
+  <div id="fgLoading" class="loading show">⏳ 공포·탐욕 지수 불러오는 중...</div>
+  <div id="fgError" class="status" style="display:none;"></div>
+
+  <div id="fgBody" class="hidden">
+    <div class="card">
+      <div id="fgGauge"></div>
+      <div id="fgScore" style="text-align:center; margin-top:4px;"></div>
+      <div class="stats-grid" id="fgPrev" style="margin-top:18px;"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section">🧩 무엇이 이 점수를 만들었나</h2>
+      <div style="font-size:12px; color:#718096; margin-bottom:4px;">
+        구성 요소 각각을 <b>그 시장의 지난 1년</b>과 견줘 0~100으로 환산한 뒤 동일 가중 평균한 값이 위 점수입니다.
+        점수 아래 줄은 환산 전의 실제 값입니다.
+      </div>
+      <div id="fgComponents"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section">📉 지수 흐름</h2>
+      <div style="font-size:12px; color:#718096; margin-bottom:10px;">
+        오늘 점수 하나만으로는 높은지 낮은지 알 수 없습니다. 같은 시장의 최근 흐름 위에서 보세요.
+      </div>
+      <div class="chart-wrap" id="fgChartWrap"><canvas id="fgChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="background:#f7fafc;">
+    <h2 class="section">📖 읽는 법</h2>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="label">0 ~ 24</div>
+        <div class="value" style="color:#c53030;">😱 극단적 공포</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">거의 모든 구성 요소가 평소보다 나쁜 쪽으로 치우친 상태입니다.</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">25 ~ 44</div>
+        <div class="value" style="color:#dd6b20;">😨 공포</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">시장이 움츠러들어 있습니다. 방어주로 돈이 숨는 구간에서 자주 나옵니다.</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">45 ~ 55</div>
+        <div class="value" style="color:#718096;">😐 중립</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">평소와 비슷합니다. 이 지수로 말할 수 있는 게 별로 없는 구간입니다.</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">56 ~ 100</div>
+        <div class="value" style="color:#38a169;">🙂 🤑 탐욕</div>
+        <div style="font-size:11px; color:#718096; margin-top:4px;">위험을 기꺼이 지는 구간입니다. 75를 넘으면 극단적 탐욕입니다.</div>
+      </div>
+    </div>
+    <div class="info-banner" style="margin-top:12px;">
+      ⚠️ 이 지수는 <b>매수·매도 시점을 알려주지 않습니다.</b> 공포 구간이 몇 달 이어지며 더 빠지는 경우도,
+      탐욕 구간에서 계속 오르는 경우도 흔합니다. "지금 심리가 어느 쪽으로 치우쳤나"까지만 말해 주는 지표입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section">🔗 이어서 보기</h2>
+    <div style="font-size:13px; color:#4a5568; line-height:1.9;">
+      심리가 어느 쪽인지 봤다면, 그 돈이 <b>어느 섹터로</b> 갔는지는 다음 두 화면에서 확인할 수 있습니다. 같은 데이터로 만듭니다.
+    </div>
+    <div class="link-chips">
+      <a class="link-chip" href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
+      <a class="link-chip" href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 주식 히트맵</a>
+      <a class="link-chip" href="/" onclick="navigate('home'); return false;">📉 MDD 계산기</a>
+    </div>
+  </div>
+
+  <section class="card" style="background:#f7fafc;">
+    <h2 class="section">📚 조금 더</h2>
+    <details open>
+      <summary>이 숫자는 무엇으로 만듭니까</summary>
+      <div class="body">
+        <p>성격이 다른 구성 요소 여러 개를 각각 0~100으로 환산해 <b>동일 가중</b>으로 평균냅니다.
+        값 하나를 믿지 않는 것이 이 지표의 핵심입니다 — 어느 날 변동성만 튀어도 전체가 흔들리면
+        심리 지표가 아니라 변동성 지표가 됩니다.</p>
+        <p style="margin-top:8px;">쓰는 재료는 <b>시장 모멘텀</b>(지수와 125일 이동평균의 거리),
+        <b>주가 강도</b>(52주 신고가·신저가 종목 수), <b>시장 폭</b>(50일선 위 종목 비율),
+        <b>변동성</b>(최근 20거래일 실현변동성), <b>거래 강도</b>(오른 날에 실린 거래대금 비중),
+        <b>안전자산 선호</b>(경기민감주와 방어주의 20거래일 수익률 차이),
+        그리고 한국은 <b>외국인 수급</b>(외국인 소진율 변화)까지입니다.</p>
+        <p style="margin-top:8px;">가중치를 두지 않은 이유는 간단합니다. 어느 구성 요소가 더 중요한지를
+        뒷받침할 근거가 저희에게 없고, 근거 없는 가중치는 결국 "보고 싶은 숫자"를 만들어내는 손잡이가 됩니다.</p>
+      </div>
+    </details>
+    <details>
+      <summary>왜 "지난 1년과 견줘"입니까</summary>
+      <div class="body">
+        <p>처음에는 "125일선 대비 ±10%" 같은 고정 구간에 대고 점수를 냈습니다. 그렇게 만든 첫 판을
+        검산해 보니 한국 모멘텀이 1년 중 90%를 100점에 붙어 있었습니다. 코스피가 1년에 100% 넘게
+        오른 구간이라 125일선 +10% 초과가 그냥 일상이었던 것입니다. 늘 100점인 값은 지표가 아니라
+        상수이고, 상수는 평균에 섞여 나머지를 조용히 희석시킵니다.</p>
+        <p style="margin-top:8px;">그래서 각 구성 요소를 <b>그 시장 자신의 최근 250거래일</b>과 견줍니다.
+        오늘 값이 그 구간에서 몇 표준편차인지 보고, ±2σ를 0과 100으로 놓습니다.</p>
+        <p style="margin-top:8px;">대신 분명히 해둘 것이 있습니다. 이 지수는 "역사상 절대적으로 극단인가"가
+        아니라 <b>"지난 1년의 이 시장 자신에 견줘 극단인가"</b>입니다. 1년 내내 조용히 오르기만 한 시장은
+        100점이 잘 나오지 않습니다. 절대 수준이 궁금하면 구성 요소마다 적어 둔 원래 값
+        (52주 신고가 몇 종목, 50일선 위 몇 종목)을 보세요.</p>
+      </div>
+    </details>
+    <details>
+      <summary>CNN 공포탐욕지수와 같은 값입니까</summary>
+      <div class="body">
+        <p>아닙니다. 발상은 같지만 <b>별개의 지표</b>입니다. CNN 은 공개 API 가 없고 한국 시장 지수는
+        만들지도 않습니다. 그래서 저희가 매 거래일 수집해 두는 한국·미국 개별 종목 일봉·거래량·
+        외국인 소진율로 직접 계산합니다.</p>
+        <p style="margin-top:8px;">채권 수익률, 풋콜비율, 정크본드 스프레드처럼 저희에게 데이터가 없는
+        구성 요소는 빠져 있습니다. 대신 한국에는 CNN 에 없는 외국인 수급이 들어갑니다.
+        그래서 미국 점수도 CNN 값과 다를 수 있습니다.</p>
+      </div>
+    </details>
+    <details>
+      <summary>언제 갱신됩니까</summary>
+      <div class="body">
+        <p>매 거래일(월~금) 자동으로 갱신됩니다. <b>한국시간 18:30</b>(한국장 마감 뒤)에 한국이,
+        <b>다음 날 07:30</b>(미국장 마감 뒤)에 미국이 새 종가로 바뀝니다. 화면 위 <b>🔄 줄</b>에
+        마지막 갱신 시각과 다음 갱신 예정 시각이 적혀 있고, 수집이 며칠째 멈추면 같은 자리에 경고가 뜹니다.</p>
+        <p style="margin-top:8px;">섹터 RS·히트맵과 완전히 같은 원본 데이터를 씁니다 — 한쪽이 갱신되면 같이 갱신됩니다.</p>
+      </div>
+    </details>
+    <details>
+      <summary>데이터 출처와 한계</summary>
+      <div class="body">
+        <p>한국은 네이버 금융, 미국은 Twelve Data 의 일봉을 매 거래일 장 마감 뒤 받아 정적 파일로
+        저장합니다. <b>전일 종가 기준</b>이며 실시간이 아닙니다.</p>
+        <p style="margin-top:8px;">여기서 말하는 "시장"은 거래소 전체가 아니라 <b>이 사이트에 수록된 종목들</b>입니다
+        (한국 약 96종목, 미국 약 79종목 — 시가총액·거래대금 상위 위주). 전 종목을 쓰는 지표와는 값이 다릅니다.
+        이 화면은 정보 제공용이며 투자 권유가 아닙니다.</p>
+      </div>
+    </details>
+  </section>
+</div>
+
+</div><!-- end container -->
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>📊 MDD 분석기</h4>
+        <p>고점 대비 하락률(MDD)으로 하락 및 회복 패턴을 찾아주는 무료 주식 분석 도구입니다.</p>
+      </div>
+      <div class="footer-col">
+        <h4>무료 계산기</h4>
+        <a href="/" onclick="navigate('home'); return false;">📊 MDD 계산기</a>
+        <a href="/rsi-calculator.html" onclick="navigate('rsi'); return false;">📈 RSI 계산기</a>
+        <a href="/dividend-calculator.html" onclick="navigate('dividend'); return false;">💰 배당 수익률 계산기</a>
+        <a href="/fx-calculator.html" onclick="navigate('fx'); return false;">💱 환율 계산기</a>
+        <a href="/roi-calculator.html" onclick="navigate('roi'); return false;">💹 수익률 계산기</a>
+        <a href="/compound-calculator.html" onclick="navigate('compound'); return false;">🧮 복리 계산기</a>
+        <a href="/leverage-etf-simulator.html" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
+        <a href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
+        <a href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 섹터 히트맵</a>
+        <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;">😱 공포·탐욕 지수</a>
+        <a href="/dca-planner.html" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
+        <a href="/tools.html" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
+      </div>
+      <div class="footer-col">
+        <h4>투자 가이드</h4>
+        <a href="/blog.html" onclick="navigate('blog'); return false;">📚 모든 가이드 보기</a>
+        <a href="/blog/1.html">MDD란 무엇인가?</a>
+        <a href="/blog/3.html">-30% 하락 시 하락 대응 패턴</a>
+        <a href="/blog/5.html">RSI 완전 가이드</a>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <a href="/about.html" onclick="navigate('about'); return false;">ℹ️ 소개</a>
+        <a href="/contact.html" onclick="navigate('contact'); return false;">✉️ 문의하기</a>
+        <a href="/privacy.html" onclick="navigate('privacy'); return false;">🔒 개인정보 처리방침</a>
+        <a href="/terms.html" onclick="navigate('terms'); return false;">📋 이용약관</a>
+        <a href="/disclaimer.html" onclick="navigate('disclaimer'); return false;">⚠️ 면책조항</a>
+        <a href="mailto:gktgkt2309@gmail.com">📧 gktgkt2309@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MDD 분석기. All rights reserved.</p>
+      <p class="footer-disclaimer">⚠️ 이 사이트에서 제공하는 모든 정보는 교육적 목적으로만 제공되며, 투자 권유나 재정 조언이 아닙니다. 주식 투자는 원금 손실의 위험이 있으며, 모든 투자 결정은 본인의 신중한 판단에 따라 진행하시기 바랍니다.</p>
+    </div>
+  </div>
+</footer>
+
+<script>window.CURRENT_PAGE = 'feargreed';</script>
+<script src="/assets/site.js"></script>
+</body>
+</html>

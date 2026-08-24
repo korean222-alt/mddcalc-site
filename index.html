@@ -74,6 +74,15 @@
                 border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
                 font-family: inherit; transition: background 0.2s; }
   .quick-chip:hover { background: rgba(255,255,255,0.38); }
+
+  /* 다른 화면으로 보내는 링크 칩 ("이어서 보기", 홈의 수급 카드).
+     quick-chip 은 어두운 패널 위에서 흰 글씨로 쓰라고 만든 것이라, 밝은 카드 위에 두면
+     글자가 사라집니다. 실제로 그렇게 한 번 만들었다가 링크가 안 보였습니다. */
+  .link-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .link-chip { display: inline-block; background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8;
+               border-radius: 20px; padding: 7px 14px; font-size: 13px; font-weight: 700;
+               text-decoration: none; transition: background 0.2s, color 0.2s; }
+  .link-chip:hover { background: #bee3f8; color: #1a365d; }
   /* 조회 가능한 한국 종목 목록 (초록 패널 안) */
   .kr-supported { margin-top: 10px; background: rgba(255,255,255,0.14); border-radius: 8px; padding: 8px 12px; }
   .kr-supported > summary { font-size: 12px; font-weight: 700; cursor: pointer; }
@@ -209,6 +218,12 @@
   .site-nav { display: flex; gap: 4px; align-items: center; }
   .site-nav a { color: #cbd5e0; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; transition: all 0.2s; }
   .site-nav a:hover, .site-nav a.active { background: rgba(255,255,255,0.15); color: #fff; }
+  /* 항목이 8개가 되면서 769~860px 구간에서 메뉴 글자가 두 줄로 접혔습니다
+     (햄버거 메뉴는 768px 이하에서만 나옵니다). 줄바꿈을 막고 그 구간에서만 여백을 줄입니다. */
+  .site-nav a { white-space: nowrap; }
+  @media (max-width: 900px) and (min-width: 769px) {
+    .site-nav a { padding: 6px 7px; font-size: 12px; }
+  }
   .nav-hamburger { display: none; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 8px; }
   @media (max-width: 768px) {
     .nav-hamburger { display: block; }
@@ -307,6 +322,7 @@
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
       <a href="/heatmap.html" onclick="navigate('heatmap'); return false;" id="nav-heatmap">🔥 히트맵</a>
+      <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;" id="nav-feargreed">😱 공탐지수</a>
       <a href="/tools.html" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
       <a href="/blog.html" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
       <a href="/about.html" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
@@ -500,6 +516,14 @@
       </div>
     </div>
 
+    <!-- 이 종목 최근 수급. data/ticker-sectors.json 에 있는 종목일 때만 나타납니다.
+         MDD 는 "얼마나 빠졌나"까지만 답합니다. 그 다음에 사람들이 궁금해하는 건 대개
+         "그래서 지금 이 종목·섹터에 돈이 들어오고 있나"라서, 그 답을 가진 화면으로 보냅니다. -->
+    <div class="card hidden no-capture" id="supplyCard" style="background:#fffaf0; border:1px solid #fbd38d;">
+      <h2 class="section">🔥 이 종목, 최근 수급이 궁금하세요?</h2>
+      <div id="supplyBody"></div>
+    </div>
+
     <!-- 심층 분석 (전체 히스토리 기준, 추가 API 호출 없이 기존 데이터로 계산) -->
     <div class="card">
       <h2 class="section">🔍 심층 분석 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(조회된 전체 기간 데이터 기준)</span></h2>
@@ -673,6 +697,7 @@
         <a href="/leverage-etf-simulator.html" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
         <a href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
         <a href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 섹터 히트맵</a>
+        <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;">😱 공포·탐욕 지수</a>
         <a href="/dca-planner.html" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
         <a href="/tools.html" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
       </div>
@@ -1253,6 +1278,8 @@ async function loadData() {
     }
     showStatus(usageMsg, 'success');
     document.getElementById('result').classList.remove('hidden');
+    // 수급 카드는 MDD 결과와 독립입니다. 기다리지 않고 뒤따라 붙습니다.
+    renderSupplyCard(ticker);
   } catch (e) {
     // 진단에 필요한 원문은 콘솔에만 남기고, 화면에는 사람이 읽을 수 있는 문장만 보여준다.
     // (예전에는 "Unexpected token '<'..." 같은 파싱 에러나 "백엔드 오류 / 무료 한도(분당 8회)"
@@ -2345,7 +2372,7 @@ const PAGE_URLS = {
   blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
   disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
   compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
-  sector: '/sector-rs.html', heatmap: '/heatmap.html'
+  sector: '/sector-rs.html', heatmap: '/heatmap.html', feargreed: '/fear-greed.html'
 };
 
 function navigate(page) {
@@ -2865,6 +2892,97 @@ function calcDCA() {
       </table>
     </div>
     <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ 예상 주가는 V자형 시나리오 기반으로 시뮬레이션된 값입니다. 실제 주가는 다를 수 있습니다.</p>`;
+}
+
+// ========== 이 종목 최근 수급 카드 ==========
+// data/ticker-sectors.json 은 섹터 RS 를 만들 때 같이 나오는 색인입니다
+// (scripts/generate-sector-rs.js). 홈에서 필요한 건 "이 종목이 어느 섹터이고 그 섹터에
+// 요즘 돈이 들어오나" 몇 줄뿐이라, 210KB 짜리 sectors.json 대신 이걸 받습니다.
+//
+// 조회 결과가 나온 뒤에 받습니다. 첫 화면 로딩을 이 파일이 붙잡으면 안 됩니다.
+// 실패하면 카드만 조용히 없습니다 — MDD 결과는 이 파일과 아무 상관이 없어야 합니다.
+const SUPPLY = { data: null, pending: null };
+
+function loadTickerSectors() {
+  if (SUPPLY.data) return Promise.resolve(SUPPLY.data);
+  if (!SUPPLY.pending) {
+    SUPPLY.pending = fetch('/data/ticker-sectors.json')
+      .then(r => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then(j => { SUPPLY.data = j; return j; });
+  }
+  return SUPPLY.pending;
+}
+
+// null 과 0 은 다릅니다. 값이 없으면 0 이라고 우기지 말고 — 로 둡니다.
+function supplyNum(v, digits, unit) {
+  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  const color = v > 0 ? '#38a169' : (v < 0 ? '#e53e3e' : '#a0aec0');
+  return `<span style="color:${color}; font-weight:700;">${v > 0 ? '+' : ''}${v.toFixed(digits)}${unit}</span>`;
+}
+
+function supplyRankChg(v) {
+  if (v == null) return '';
+  if (v === 0) return ' <span style="color:#a0aec0; font-size:12px;">(변화 없음)</span>';
+  const up = v > 0;
+  return ` <span style="color:${up ? '#38a169' : '#e53e3e'}; font-size:12px;">(${up ? '▲' : '▼'} ${Math.abs(v)})</span>`;
+}
+
+async function renderSupplyCard(ticker) {
+  const card = document.getElementById('supplyCard');
+  if (!card) return;
+  card.classList.add('hidden');
+
+  const data = await loadTickerSectors();
+  if (!data || !data.tickers) return;
+
+  const resolved = resolveSymbol(ticker);
+  const code = resolved.isKR ? resolved.code : resolved.symbol;
+  const t = data.tickers[code];
+  // 수록 종목이 아니면(지수·미수록 종목) 카드를 아예 띄우지 않습니다.
+  // 빈 카드로 "여긴 데이터가 없습니다"를 알리는 것보다 없는 편이 낫습니다.
+  if (!t) return;
+
+  const market = (data.markets && data.markets[t.m]) || { label: t.m, flag: '' };
+  const period = data.periodLabel || data.period;
+  const qs = `m=${encodeURIComponent(t.m)}&p=${encodeURIComponent(data.period)}`;
+
+  const themeChips = (t.t || []).map(([key, name]) =>
+    `<a class="link-chip" href="/heatmap.html?m=THEME&p=${encodeURIComponent(data.period)}&hl=${encodeURIComponent(code)}">🌐 ${escapeHtml(name)}</a>`
+  ).join('');
+
+  document.getElementById('supplyBody').innerHTML =
+    `<p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:12px;">` +
+      `<b>${escapeHtml(t.n)}</b>는 ${escapeHtml(market.flag)} ${escapeHtml(market.label)} <b>${escapeHtml(t.sn)}</b> 섹터입니다. ` +
+      `아래는 <b>${escapeHtml(period)}</b> 기준 그 섹터의 수급이며, 기준일은 ${escapeHtml(market.updated || data.updated)} 입니다.` +
+    `</p>` +
+    `<div class="stats-grid">` +
+      `<div class="stat-box"><div class="label">이 종목 ${escapeHtml(period)}</div>` +
+        `<div class="value">${supplyNum(t.ret, 1, '%')}</div></div>` +
+      `<div class="stat-box"><div class="label">섹터 ${escapeHtml(period)}</div>` +
+        `<div class="value">${supplyNum(t.sectorRet, 1, '%')}</div></div>` +
+      `<div class="stat-box"><div class="label">섹터 RS 점수</div>` +
+        `<div class="value">${t.rating == null ? '—' : t.rating}${supplyRankChg(t.rankChg)}</div>` +
+        `<div style="font-size:11px; color:#718096; margin-top:4px;">1~99, 괄호는 한 달 전 순위 대비</div></div>` +
+      `<div class="stat-box"><div class="label">거래대금 비중 변화</div>` +
+        `<div class="value">${supplyNum(t.turnShareChg, 2, '%p')}</div>` +
+        `<div style="font-size:11px; color:#718096; margin-top:4px;">늘고 있으면 돈이 들어오는 중</div></div>` +
+      (t.foreignChg == null ? '' :
+      `<div class="stat-box"><div class="label">외국인 소진율 변화</div>` +
+        `<div class="value">${supplyNum(t.foreignChg, 2, '%p')}</div>` +
+        `<div style="font-size:11px; color:#718096; margin-top:4px;">섹터 구성 종목 평균</div></div>`) +
+    `</div>` +
+    `<div class="link-chips">` +
+      `<a class="link-chip" href="/sector-rs.html?${qs}&s=${encodeURIComponent(t.s)}">📊 ${escapeHtml(t.sn)} 섹터 자세히 보기</a>` +
+      `<a class="link-chip" href="/heatmap.html?${qs}&hl=${encodeURIComponent(code)}">🔥 히트맵에서 이 종목 찾기</a>` +
+      `<a class="link-chip" href="/fear-greed.html?m=${encodeURIComponent(t.m)}">😱 지금 시장 심리는</a>` +
+      themeChips +
+    `</div>` +
+    `<div style="font-size:11px; color:#a0aec0; margin-top:10px;">` +
+      `전일 종가 기준입니다. 섹터 구분은 공식 산업분류가 아니라 투자자들이 실제로 묶어 부르는 테마 기준입니다.` +
+    `</div>`;
+
+  card.classList.remove('hidden');
 }
 
 // 페이지 로드 시 복리 계산기 초기화

@@ -23,6 +23,7 @@ const {
 
 const ROOT = path.join(__dirname, '..');
 const OUT_FILE = path.join(ROOT, 'data', 'sectors.json');
+const TICKER_FILE = path.join(ROOT, 'data', 'ticker-sectors.json');
 
 const AXIS_ROWS = 520;  // 거래일 축 길이. 12개월(250) 지표를 직전 12개월과 비교하는 데 필요.
 const RS_ROWS = 250;    // 화면 차트에 그릴 RS 선의 길이 (약 1년)
@@ -318,6 +319,57 @@ function assertCodesKnown() {
   }
 }
 
+// ── 종목 → 섹터 색인 ──────────────────────────────────────────────────
+// MDD 계산기(홈)에서 "이 종목 최근 수급" 카드를 그리는 데 씁니다.
+//
+// 왜 sectors.json 을 그냥 쓰지 않는가:
+//   sectors.json 은 210KB 입니다. 섹터 화면은 그 값을 다 쓰지만, 홈은 종목 하나의 섹터와
+//   그 섹터의 최근 수급 몇 줄만 필요합니다. 티커를 하나 조회할 때마다 210KB 를 받게 하는 건
+//   그 카드 하나가 치를 값이 아닙니다. 그래서 필요한 것만 담은 20KB 짜리를 따로 만듭니다.
+//
+// 기간은 1개월 하나로 고정합니다. 카드에서 기간을 고르게 하면 결국 섹터 화면을 홈에 다시
+// 만드는 일이 되고, 그 화면은 이미 있습니다 — 카드는 그리로 보내는 것이 일입니다.
+const TICKER_PERIOD = '1m';
+
+function buildTickerIndex(markets) {
+  // 테마(AI·성장)는 부가 정보로만 답니다. 같은 미국 종목을 다르게 묶은 것이라
+  // "이 종목의 섹터"로 삼으면 시장 탭과 어긋납니다.
+  const themes = {};
+  if (markets.THEME) {
+    for (const s of markets.THEME.sectors) {
+      for (const mem of s.members) (themes[mem.code] = themes[mem.code] || []).push([s.key, s.name]);
+    }
+  }
+
+  const tickers = {};
+  for (const key of ['KR', 'US']) {
+    const m = markets[key];
+    if (!m) continue;
+    for (const s of m.sectors) {
+      const p = s.periods[TICKER_PERIOD] || {};
+      for (const mem of s.members) {
+        // 한 종목이 두 섹터에 들어 있으면 먼저 나온 쪽을 씁니다(sectors.js 의 순서).
+        if (tickers[mem.code]) continue;
+        tickers[mem.code] = {
+          m: key,
+          n: mem.name,
+          s: s.key,
+          sn: s.name,
+          ret: mem.ret[TICKER_PERIOD],
+          sectorRet: p.ret == null ? null : p.ret,
+          rating: p.rating == null ? null : p.rating,
+          rankChg: p.rankChg == null ? null : p.rankChg,
+          turnShare: p.turnShare == null ? null : p.turnShare,
+          turnShareChg: p.turnShareChg == null ? null : p.turnShareChg,
+          foreignChg: p.foreignChg == null ? null : p.foreignChg,
+          t: themes[mem.code],
+        };
+      }
+    }
+  }
+  return tickers;
+}
+
 function main() {
   assertCodesKnown();
 
@@ -362,8 +414,22 @@ function main() {
     markets,
   }));
   console.log('✅ data/sectors.json — ' + Math.round(fs.statSync(OUT_FILE).size / 1024) + 'KB');
+
+  const tickers = buildTickerIndex(markets);
+  fs.writeFileSync(TICKER_FILE, JSON.stringify({
+    updated: new Date().toISOString().slice(0, 10),
+    generatedAt: new Date().toISOString(),
+    period: TICKER_PERIOD,
+    periodLabel: (PERIODS.find(p => p.key === TICKER_PERIOD) || {}).label || TICKER_PERIOD,
+    markets: Object.fromEntries(Object.entries(markets)
+      .filter(([k]) => k === 'KR' || k === 'US')
+      .map(([k, m]) => [k, { label: m.label, flag: m.flag, benchmark: m.benchmark.name, updated: m.updated }])),
+    tickers,
+  }));
+  console.log('✅ data/ticker-sectors.json — ' + Object.keys(tickers).length + '종목, '
+    + Math.round(fs.statSync(TICKER_FILE).size / 1024) + 'KB');
 }
 
 if (require.main === module) main();
 
-module.exports = { equalWeightIndex, alignForward, periodReturn, toRatings, readSeries, buildMarket };
+module.exports = { equalWeightIndex, alignForward, periodReturn, toRatings, readSeries, buildMarket, buildTickerIndex };
