@@ -31,7 +31,12 @@ const { usSymbols, US_NAMES } = require('./sectors');
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'us');
 
-const MAX_ROWS = 6000;
+// 여기서 만드는 파일은 오직 generate-sector-rs.js 만 읽습니다. 그쪽이 쓰는 거래일 축은
+// AXIS_ROWS = 520 행이므로, 그보다 긴 히스토리는 저장소만 불립니다.
+// (한국 파일이 6000 행인 것은 MDD 계산기가 전 구간을 쓰기 때문입니다 — 여긴 아닙니다)
+// 800 행이면 약 3년 2개월치로, 축 520 행에 넉넉한 여유를 둔 값입니다.
+// 미국 종목이 210개를 넘어가면서 6000 행을 그대로 두면 매일 20MB 넘는 커밋이 쌓입니다.
+const MAX_ROWS = 800;
 const TAIL_ROWS = 520;  // 거래량은 최근분만. (generate-kr-data.js 와 같은 규칙)
 
 const API_KEY = process.env.TWELVE_DATA_API_KEY || '';
@@ -40,7 +45,8 @@ const API_KEY = process.env.TWELVE_DATA_API_KEY || '';
 // 22심볼이 전부 HTTP 400 을 받았습니다. api/twelve-data/time-series.js 도 5000 을 씁니다.
 const TD_MAX_OUTPUTSIZE = 5000;
 
-// Twelve Data 무료 플랜은 분당 8회입니다. 80심볼이면 8.5초 간격으로 약 11분 걸립니다.
+// Twelve Data 무료 플랜은 분당 8회입니다. 8.5초 간격이면 심볼 하나에 8.5초,
+// 지금처럼 210심볼이면 약 30분 걸립니다(하루 800회 한도 중 210회).
 // 종목을 늘리려면 이 시간이 그만큼 길어진다는 것을 먼저 계산하세요.
 // 키가 없어 무료 소스로 떨어질 때는 KR 쪽과 같은 700ms 를 씁니다.
 const DELAY_MS = API_KEY ? 8500 : 700;

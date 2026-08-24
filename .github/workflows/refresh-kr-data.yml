@@ -32,6 +32,9 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # 미국 수집이 심볼당 8.5초(Twelve Data 무료 플랜의 분당 8회 제한)라 209심볼이면
+    # 30분 안팎입니다. 여유를 두되, 어딘가 멈춰 러너를 6시간 붙잡는 일은 막습니다.
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,7 +76,7 @@ jobs:
       # 키가 없어도 스텝은 통과합니다 — 그 경우 미국 탭이 지난 데이터로 남습니다.
       #
       # 아침(09:30 UTC) 실행에서는 건너뜁니다. 그때는 미국장이 열리지도 않아서 받아봐야
-      # 저녁 실행과 똑같은 종가인데, 심볼 80개 × 8.5초 = 11분과 API 호출 80회를 그냥 씁니다.
+      # 저녁 실행과 똑같은 종가인데, 심볼 209개 × 8.5초 = 약 30분과 API 호출 209회를 그냥 씁니다.
       # (Twelve Data 무료 플랜 하루 800회는 사용자 요청 경로와 나눠 쓰는 한도입니다)
       - name: Generate US sector data
         if: github.event.schedule != '30 9 * * 1-5'

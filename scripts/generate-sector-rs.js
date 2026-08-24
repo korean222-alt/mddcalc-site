@@ -16,7 +16,10 @@
 const fs = require('fs');
 const path = require('path');
 const { KR_TICKERS } = require('./kr-tickers');
-const { KR_SECTORS, US_SECTORS, US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE, usSymbols, PERIODS } = require('./sectors');
+const {
+  MARKETS, SECTOR_DEFS, US_NAMES, BENCHMARKS, TURNOVER_COMPARABLE,
+  REFRESH_SCHEDULE, usSymbols, PERIODS,
+} = require('./sectors');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_FILE = path.join(ROOT, 'data', 'sectors.json');
@@ -145,7 +148,10 @@ function foreignAt(series, axis, index) {
 }
 
 // ── 한 시장 계산 ──────────────────────────────────────────────────────
-function buildMarket(marketKey, dir, sectorDefs, nameOf) {
+// meta 는 MARKETS 의 한 줄(라벨·깃발 등)입니다. 넘기지 않으면 키로 찾고, 그것도 없으면
+// 키를 그대로 라벨로 씁니다 — 테스트가 가짜 시장으로 부를 수 있게 두려는 것입니다.
+function buildMarket(marketKey, dir, sectorDefs, nameOf, meta) {
+  const info = meta || MARKETS.find(m => m.key === marketKey) || { label: marketKey, flag: '' };
   const hasTurnover = TURNOVER_COMPARABLE[marketKey] !== false;
   const bench = BENCHMARKS[marketKey];
   const benchSeries = readSeries(dir, bench.code);
@@ -281,8 +287,9 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
 
   return {
     market: {
-      label: marketKey === 'KR' ? '한국' : '미국',
-      hasForeign: marketKey === 'KR',
+      label: info.label,
+      flag: info.flag || '',
+      hasForeign: !!info.hasForeign,
       hasTurnover,
       benchmark: { code: bench.code, name: bench.name, ret: benchPeriods },
       updated: new Date(axis[last] * 86400000).toISOString().slice(0, 10),
@@ -298,11 +305,13 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf) {
 // 오타 하나로 섹터가 조용히 비는 것을 막습니다. 데이터 파일이 아직 없는 것(수집 실패)과
 // 애초에 목록에 없는 코드(오타)는 다른 문제이므로, 후자만 여기서 죽입니다.
 function assertCodesKnown() {
-  const krKnown = new Set(KR_TICKERS.map(t => t.code));
-  const krBad = KR_SECTORS.flatMap(s => s.codes.filter(c => !krKnown.has(c)).map(c => `${s.name}/${c}`));
-  const usKnown = new Set(usSymbols());
-  const usBad = US_SECTORS.flatMap(s => s.codes.filter(c => !usKnown.has(c)).map(c => `${s.name}/${c}`));
-  const bad = [...krBad, ...usBad];
+  const known = { kr: new Set(KR_TICKERS.map(t => t.code)), us: new Set(usSymbols()) };
+  const bad = [];
+  for (const m of MARKETS) {
+    for (const s of SECTOR_DEFS[m.key]) {
+      for (const c of s.codes) if (!known[m.dir].has(c)) bad.push(`${m.key}/${s.name}/${c}`);
+    }
+  }
   if (bad.length) {
     console.error(`::error::sectors.js 가 모르는 코드를 참조합니다: ${bad.join(', ')}`);
     process.exit(1);
@@ -318,18 +327,18 @@ function main() {
   // 한 시장의 데이터가 통째로 없어도(수집 실패, 야후 차단) 나머지 시장은 살립니다.
   // 화면도 실제로 들어 있는 시장만 탭으로 보여줍니다. 여기서 죽이면 사고 하나에
   // 페이지 전체가 데이터 없는 화면이 됩니다 — KR 수집이 이미 택한 정책과 같습니다.
-  const plan = [
-    ['KR', 'kr', KR_SECTORS, m => krName.get(m.code) || m.name],
-    ['US', 'us', US_SECTORS, m => US_NAMES[m.code] || m.name],
-  ];
-  for (const [key, dir, defs, nameOf] of plan) {
+  const nameOfFor = dir => (dir === 'kr'
+    ? m => krName.get(m.code) || m.name
+    : m => US_NAMES[m.code] || m.name);
+
+  for (const info of MARKETS) {
     try {
-      const built = buildMarket(key, dir, defs, nameOf);
-      markets[key] = built.market;
+      const built = buildMarket(info.key, info.dir, SECTOR_DEFS[info.key], nameOfFor(info.dir), info);
+      markets[info.key] = built.market;
       console.log('   ' + built.market.label + ' ' + built.stats.sectors + '섹터'
         + ' (기준일 ' + built.market.updated + ', 수록 ' + built.market.universeCount + '종목)');
     } catch (err) {
-      console.warn('⚠️  ' + key + ' 시장을 건너뜁니다: ' + err.message);
+      console.warn('⚠️  ' + info.key + ' 시장을 건너뜁니다: ' + err.message);
     }
   }
 
@@ -338,8 +347,18 @@ function main() {
     process.exit(1);
   }
 
+  // generatedAt 은 날짜만이 아니라 시각까지 담습니다.
+  //
+  // 기준일(market.updated)은 "어느 날 종가인가"이고, generatedAt 은 "언제 받아왔는가"라서
+  // 서로 다른 값입니다. 화면에서 "왜 어제 날짜지?" 를 가르는 것이 바로 이 둘의 차이입니다.
+  // 갱신이 며칠째 멈춰 있어도 기준일만 보면 알 수 없으므로, 화면이 이 값으로 판단합니다.
+  //
+  // schedule 은 "다음 갱신은 언제인가"를 화면이 스스로 계산하는 데 씁니다. 안내 문구를
+  // HTML 에 박아 두면 cron 을 고쳤을 때 조용히 거짓말이 됩니다.
   fs.writeFileSync(OUT_FILE, JSON.stringify({
     updated: new Date().toISOString().slice(0, 10),
+    generatedAt: new Date().toISOString(),
+    schedule: REFRESH_SCHEDULE,
     markets,
   }));
   console.log('✅ data/sectors.json — ' + Math.round(fs.statSync(OUT_FILE).size / 1024) + 'KB');

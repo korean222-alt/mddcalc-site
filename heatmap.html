@@ -60,6 +60,8 @@
       </div>
     </div>
     <div id="hmMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
+    <!-- 갱신 시각·주기. sector-rs.html 과 같은 문구를 같은 함수가 만듭니다. -->
+    <div id="hmUpdate" style="font-size:12px; color:#4a5568; margin-top:6px; padding-top:8px; border-top:1px solid #edf2f7;"></div>
   </div>
 
   <div id="hmLoading" class="loading show">⏳ 히트맵 데이터 불러오는 중...</div>
@@ -117,6 +119,27 @@
         나머지도 눈에 들어옵니다. 실제 비중이 궁금하면 <b>거래대금</b> 모드로 바꾸거나
         칸을 짚어 보세요 — 설명줄에는 언제나 눌리지 않은 진짜 비중이 나옵니다.
         <b>균등</b>은 크기를 아예 빼고 색(등락률)만 비교할 때 씁니다.</p>
+      </div>
+    </details>
+    <details>
+      <summary>탭 세 개는 무엇이 다릅니까</summary>
+      <div class="body">
+        <p><b>🇰🇷 한국</b>·<b>🇺🇸 미국</b>은 시장 전체를 20개 안팎으로 나눈 넓은 지도입니다.
+        <b>🌐 AI·성장 테마</b>는 같은 미국 종목을 50개 테마로 잘게 쪼갠 지도입니다 —
+        GPU·ASIC, 파운드리·CoWoS, HBM·메모리, 광통신, UPS·전력관리, 데이터센터 냉각·시공,
+        SMR, 우라늄, 양자컴퓨팅, 휴머노이드 로봇처럼 실제로 함께 움직이는 단위입니다.</p>
+        <p style="margin-top:8px;">테마 탭은 묶음이 많아 지도가 세로로 길어집니다.
+        칸이 작아 글자가 들어가지 않을 때는 칸을 짚으면 위 설명줄에 이름과 값이 나옵니다.</p>
+      </div>
+    </details>
+    <details>
+      <summary>언제 갱신됩니까</summary>
+      <div class="body">
+        <p>매 거래일(월~금) 자동으로 갱신됩니다. <b>한국시간 18:30</b>(한국장 마감 뒤)에 한국 탭이,
+        <b>다음 날 07:30</b>(미국장 마감 뒤)에 미국·테마 탭이 새 종가로 바뀝니다.
+        화면 위 <b>🔄 줄</b>에 마지막 갱신 시각과 다음 갱신 예정 시각이 적혀 있고,
+        수집이 며칠째 멈추면 같은 자리에 경고가 뜹니다.</p>
+        <p style="margin-top:8px;">섹터 RS 화면과 완전히 같은 데이터입니다 — 한쪽이 갱신되면 다른 쪽도 같이 갱신됩니다.</p>
       </div>
     </details>
     <details>
