@@ -1,10 +1,60 @@
 {
-  "updated": "2026-08-23",
-  "count": 22,
+  "updated": "2026-08-24",
+  "count": 80,
   "stocks": [
     {
       "code": "SPY",
       "name": "S&P 500",
+      "market": "US"
+    },
+    {
+      "code": "NVDA",
+      "name": "엔비디아",
+      "market": "US"
+    },
+    {
+      "code": "AVGO",
+      "name": "브로드컴",
+      "market": "US"
+    },
+    {
+      "code": "AMD",
+      "name": "AMD",
+      "market": "US"
+    },
+    {
+      "code": "TSM",
+      "name": "TSMC",
+      "market": "US"
+    },
+    {
+      "code": "QCOM",
+      "name": "퀄컴",
+      "market": "US"
+    },
+    {
+      "code": "INTC",
+      "name": "인텔",
+      "market": "US"
+    },
+    {
+      "code": "ASML",
+      "name": "ASML",
+      "market": "US"
+    },
+    {
+      "code": "AMAT",
+      "name": "어플라이드머티어리얼즈",
+      "market": "US"
+    },
+    {
+      "code": "LRCX",
+      "name": "램리서치",
+      "market": "US"
+    },
+    {
+      "code": "KLAC",
+      "name": "KLA",
       "market": "US"
     },
     {
@@ -23,93 +73,333 @@
       "market": "US"
     },
     {
-      "code": "SMH",
-      "name": "VanEck 반도체",
+      "code": "MSFT",
+      "name": "마이크로소프트",
       "market": "US"
     },
     {
-      "code": "IGV",
-      "name": "iShares 소프트웨어",
+      "code": "ORCL",
+      "name": "오라클",
       "market": "US"
     },
     {
-      "code": "XLV",
-      "name": "SPDR 헬스케어",
+      "code": "CRM",
+      "name": "세일즈포스",
       "market": "US"
     },
     {
-      "code": "XBI",
-      "name": "SPDR 바이오텍",
+      "code": "ADBE",
+      "name": "어도비",
       "market": "US"
     },
     {
-      "code": "XLK",
-      "name": "SPDR 기술",
+      "code": "PLTR",
+      "name": "팔란티어",
       "market": "US"
     },
     {
-      "code": "XLC",
-      "name": "SPDR 커뮤니케이션",
+      "code": "GOOGL",
+      "name": "알파벳(구글)",
       "market": "US"
     },
     {
-      "code": "XLF",
-      "name": "SPDR 금융",
+      "code": "META",
+      "name": "메타",
       "market": "US"
     },
     {
-      "code": "XLE",
-      "name": "SPDR 에너지",
+      "code": "AMZN",
+      "name": "아마존",
       "market": "US"
     },
     {
-      "code": "XLI",
-      "name": "SPDR 산업재",
+      "code": "NFLX",
+      "name": "넷플릭스",
       "market": "US"
     },
     {
-      "code": "XLB",
-      "name": "SPDR 소재",
+      "code": "AAPL",
+      "name": "애플",
       "market": "US"
     },
     {
-      "code": "XLP",
-      "name": "SPDR 필수소비재",
+      "code": "CSCO",
+      "name": "시스코",
       "market": "US"
     },
     {
-      "code": "XLY",
-      "name": "SPDR 경기소비재",
+      "code": "ANET",
+      "name": "아리스타네트웍스",
       "market": "US"
     },
     {
-      "code": "XLU",
-      "name": "SPDR 유틸리티",
+      "code": "CRWD",
+      "name": "크라우드스트라이크",
       "market": "US"
     },
     {
-      "code": "XLRE",
-      "name": "SPDR 부동산",
+      "code": "PANW",
+      "name": "팔로알토네트웍스",
       "market": "US"
     },
     {
-      "code": "ITA",
-      "name": "iShares 방산·우주",
+      "code": "FTNT",
+      "name": "포티넷",
       "market": "US"
     },
     {
-      "code": "CIBR",
-      "name": "First Trust 사이버보안",
+      "code": "TSLA",
+      "name": "테슬라",
       "market": "US"
     },
     {
-      "code": "URA",
-      "name": "Global X 우라늄",
+      "code": "GM",
+      "name": "제너럴모터스",
       "market": "US"
     },
     {
-      "code": "BOTZ",
-      "name": "Global X 로봇·AI",
+      "code": "F",
+      "name": "포드",
+      "market": "US"
+    },
+    {
+      "code": "JPM",
+      "name": "JP모건",
+      "market": "US"
+    },
+    {
+      "code": "BAC",
+      "name": "뱅크오브아메리카",
+      "market": "US"
+    },
+    {
+      "code": "WFC",
+      "name": "웰스파고",
+      "market": "US"
+    },
+    {
+      "code": "GS",
+      "name": "골드만삭스",
+      "market": "US"
+    },
+    {
+      "code": "V",
+      "name": "비자",
+      "market": "US"
+    },
+    {
+      "code": "MA",
+      "name": "마스터카드",
+      "market": "US"
+    },
+    {
+      "code": "PYPL",
+      "name": "페이팔",
+      "market": "US"
+    },
+    {
+      "code": "COIN",
+      "name": "코인베이스",
+      "market": "US"
+    },
+    {
+      "code": "LLY",
+      "name": "일라이릴리",
+      "market": "US"
+    },
+    {
+      "code": "JNJ",
+      "name": "존슨앤드존슨",
+      "market": "US"
+    },
+    {
+      "code": "UNH",
+      "name": "유나이티드헬스",
+      "market": "US"
+    },
+    {
+      "code": "ABBV",
+      "name": "애브비",
+      "market": "US"
+    },
+    {
+      "code": "AMGN",
+      "name": "암젠",
+      "market": "US"
+    },
+    {
+      "code": "GILD",
+      "name": "길리어드",
+      "market": "US"
+    },
+    {
+      "code": "VRTX",
+      "name": "버텍스",
+      "market": "US"
+    },
+    {
+      "code": "REGN",
+      "name": "리제네론",
+      "market": "US"
+    },
+    {
+      "code": "XOM",
+      "name": "엑슨모빌",
+      "market": "US"
+    },
+    {
+      "code": "CVX",
+      "name": "셰브론",
+      "market": "US"
+    },
+    {
+      "code": "COP",
+      "name": "코노코필립스",
+      "market": "US"
+    },
+    {
+      "code": "SLB",
+      "name": "슐럼버거",
+      "market": "US"
+    },
+    {
+      "code": "NEE",
+      "name": "넥스트에라에너지",
+      "market": "US"
+    },
+    {
+      "code": "SO",
+      "name": "서던컴퍼니",
+      "market": "US"
+    },
+    {
+      "code": "CEG",
+      "name": "컨스텔레이션에너지",
+      "market": "US"
+    },
+    {
+      "code": "VST",
+      "name": "비스트라",
+      "market": "US"
+    },
+    {
+      "code": "CAT",
+      "name": "캐터필러",
+      "market": "US"
+    },
+    {
+      "code": "DE",
+      "name": "디어",
+      "market": "US"
+    },
+    {
+      "code": "HON",
+      "name": "허니웰",
+      "market": "US"
+    },
+    {
+      "code": "GE",
+      "name": "GE에어로스페이스",
+      "market": "US"
+    },
+    {
+      "code": "LMT",
+      "name": "록히드마틴",
+      "market": "US"
+    },
+    {
+      "code": "RTX",
+      "name": "RTX",
+      "market": "US"
+    },
+    {
+      "code": "NOC",
+      "name": "노스럽그러먼",
+      "market": "US"
+    },
+    {
+      "code": "BA",
+      "name": "보잉",
+      "market": "US"
+    },
+    {
+      "code": "LIN",
+      "name": "린데",
+      "market": "US"
+    },
+    {
+      "code": "FCX",
+      "name": "프리포트맥모란",
+      "market": "US"
+    },
+    {
+      "code": "NEM",
+      "name": "뉴몬트",
+      "market": "US"
+    },
+    {
+      "code": "PG",
+      "name": "프록터앤드갬블",
+      "market": "US"
+    },
+    {
+      "code": "KO",
+      "name": "코카콜라",
+      "market": "US"
+    },
+    {
+      "code": "PEP",
+      "name": "펩시코",
+      "market": "US"
+    },
+    {
+      "code": "COST",
+      "name": "코스트코",
+      "market": "US"
+    },
+    {
+      "code": "WMT",
+      "name": "월마트",
+      "market": "US"
+    },
+    {
+      "code": "MCD",
+      "name": "맥도날드",
+      "market": "US"
+    },
+    {
+      "code": "NKE",
+      "name": "나이키",
+      "market": "US"
+    },
+    {
+      "code": "HD",
+      "name": "홈디포",
+      "market": "US"
+    },
+    {
+      "code": "SBUX",
+      "name": "스타벅스",
+      "market": "US"
+    },
+    {
+      "code": "DIS",
+      "name": "디즈니",
+      "market": "US"
+    },
+    {
+      "code": "PLD",
+      "name": "프로로지스",
+      "market": "US"
+    },
+    {
+      "code": "AMT",
+      "name": "아메리칸타워",
+      "market": "US"
+    },
+    {
+      "code": "EQIX",
+      "name": "에퀴닉스",
       "market": "US"
     }
   ]
