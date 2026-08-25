@@ -23,6 +23,12 @@ const OUT_DIR = path.join(SITE_ROOT, 'stock');
 const SITEMAP_PATH = path.join(SITE_ROOT, 'sitemap.xml');
 const ADSENSE_CLIENT = 'ca-pub-5583100002281558';
 
+const { createUsageRecorder } = require('../lib/api-usage');
+
+// 트웰브데이터 호출 장부. 방문자 조회(api/twelve-data/time-series.js)와 같은 테이블을 쓴다.
+// 한도가 키 단위(일 800회)라, 여기서 쓴 몫이 장부에 안 남으면 화면의 잔량이 실제와 어긋난다.
+const usage = createUsageRecorder('cron');
+
 const API_KEY = process.env.TWELVE_DATA_API_KEY;
 if (!API_KEY) {
   console.error('❌ TWELVE_DATA_API_KEY 환경변수가 없습니다. TWELVE_DATA_API_KEY=xxxx node scripts/generate-stock-pages.js 로 실행하세요.');
@@ -167,8 +173,16 @@ async function fetchSeries(symbol) {
   const res = await fetch(url.toString());
   const json = await res.json();
 
-  if (json.status === 'error') throw new Error(`${symbol}: ${json.message}`);
-  if (!json.values || !json.values.length) throw new Error(`${symbol}: 데이터 없음`);
+  // 실패해도 트웰브데이터는 호출 한 건으로 셉니다. 장부에도 그대로 남깁니다.
+  if (json.status === 'error') {
+    await usage.record(symbol, 'error', res.status);
+    throw new Error(`${symbol}: ${json.message}`);
+  }
+  if (!json.values || !json.values.length) {
+    await usage.record(symbol, 'error', res.status);
+    throw new Error(`${symbol}: 데이터 없음`);
+  }
+  await usage.record(symbol, 'success', res.status);
 
   // Twelve Data는 최신순으로 내려주므로 오래된 순으로 뒤집는다
   return json.values.map(v => ({ date: v.datetime, close: parseFloat(v.close) })).reverse();
@@ -832,7 +846,11 @@ async function main() {
   console.log('✅ tools.html 허브 섹션 갱신 완료');
 }
 
-main().catch(err => {
-  console.error('❌ 생성 실패:', err.message);
-  process.exit(1);
-});
+main()
+  // 성공하든 실패하든 이미 써버린 호출은 장부에 남깁니다.
+  .then(() => usage.flush())
+  .catch(async err => {
+    await usage.flush();
+    console.error('❌ 생성 실패:', err.message);
+    process.exit(1);
+  });

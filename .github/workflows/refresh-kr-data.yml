@@ -46,6 +46,12 @@ jobs:
         with:
           node-version: 22
 
+      # 사용량 장부(lib/api-usage.js)가 쓰는 Postgres 드라이버를 설치합니다. 이게 없으면
+      # 크론이 쓴 트웰브데이터 호출이 장부에 안 남아 화면의 잔량이 실제와 어긋납니다.
+      # (설치가 실패해도 장부만 건너뛰고 데이터 갱신은 그대로 돌아갑니다)
+      - name: Install dependencies
+        run: npm install --omit=dev --no-audit --no-fund
+
       # 파서를 두 번 잘못 고쳐서 두 번 다 실행 로그를 보고서야 알았습니다.
       # 실제 응답을 픽스처로 박아둔 테스트를 먼저 돌려, 망가진 파서로 60번 요청하는 일을 막습니다.
       - name: Test the response parsers
@@ -90,6 +96,7 @@ jobs:
         continue-on-error: true
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: node scripts/generate-us-data.js
 
       # 위 두 단계가 만든 파일만 읽어 계산합니다. 네트워크를 쓰지 않습니다.
