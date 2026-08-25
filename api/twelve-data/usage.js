@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
       todayUsage: null,
       planDailyLimit: DAILY_LIMIT,
       error: redactHost(err.message),
-      hint: 'DATABASE_URL 이 비어 있거나, DB 가 잠들었거나(TiDB 서버리스는 오래 놀면 정지·삭제됨), 접속 정보가 만료된 경우입니다. Vercel > Project Settings > Environment Variables 를 확인하세요.',
+      hint: 'DATABASE_URL 이 비어 있거나, 접속 정보가 틀렸거나, DB 가 연결을 받지 못하는 상태입니다. Vercel > Project Settings > Environment Variables 를 확인하세요. 형식: mysql://사용자:비밀번호@호스트:4000/DB이름',
     });
   }
 };
