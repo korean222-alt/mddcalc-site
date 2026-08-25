@@ -2,13 +2,11 @@
 // 기존 server/_core/index.ts 의 Express 라우트를 그대로 이식한 Vercel 서버리스 함수입니다.
 // 프론트엔드(15개 정적 페이지)는 그대로 이 경로를 호출하므로, 이 파일만 있으면 동작이 100% 동일합니다.
 
-const { getPool, ensureUsageTable, utcDayStart } = require('./_usage-db');
-
-const DAILY_LIMIT = 800;
+const { DAILY_LIMIT, getPool, countTodayUsage, recordUsage } = require('./_usage-db');
 
 // 하루 사용량은 api_usage 테이블이 원본입니다. 다만 DB 가 잠깐 끊겨도 조회 자체는
 // 막지 않기로 했으므로, 그동안 이 인스턴스가 내보낸 요청 수만이라도 세어 둡니다.
-// (인스턴스가 여럿이면 실제보다 적게 잡힙니다. 그래서 화면에도 "대략"이라고 알립니다.)
+// (인스턴스가 여럿이면 실제보다 적게 잡힙니다. 그래서 화면에도 "확인 불가"라고 알립니다.)
 const memoryCounter = { day: null, count: 0 };
 
 function bumpMemoryCounter(day) {
@@ -24,36 +22,18 @@ function readMemoryCounter(day) {
   return memoryCounter.day === day ? memoryCounter.count : 0;
 }
 
-// 오늘(UTC 기준) 트웰브데이터로 실제 나간 요청 수.
-//
-// status 가 'success' 인 것만 세던 예전 코드는 실패 응답을 빠뜨렸는데, 트웰브데이터는
-// 에러로 끝난 요청도 크레딧을 깎습니다. 실제로 나간 요청('success' + 'error')을 모두 세야
-// 한도 계산이 맞습니다. 'rate_limit' 은 우리가 막아서 나가지 않은 요청이라 제외합니다.
-async function getTodayApiUsageCount() {
+async function readUsage() {
   try {
-    const pool = getPool();
-    await ensureUsageTable(pool);
-    const [rows] = await pool.execute(
-      "SELECT COUNT(*) AS cnt FROM api_usage WHERE status IN ('success','error') AND createdAt >= ?",
-      [utcDayStart()]
-    );
-    return { ok: true, count: Number(rows[0] && rows[0].cnt) || 0 };
+    return { ok: true, usage: await countTodayUsage(getPool()) };
   } catch (err) {
-    console.warn('[DB] usage count 조회 실패:', err.message);
-    return { ok: false, count: null, error: err.message };
+    console.warn('[DB] usage 조회 실패:', err.message);
+    return { ok: false, usage: null, error: err.message };
   }
 }
 
 async function logApiUsage(symbol, status, statusCode) {
   try {
-    const pool = getPool();
-    await ensureUsageTable(pool);
-    // NOW() 는 DB 세션 타임존을 따라가서 UTC 자정 경계와 어긋날 수 있습니다.
-    // 한도가 UTC 자정에 초기화되므로 기록도 UTC 로 못박습니다.
-    await pool.execute(
-      'INSERT INTO api_usage (symbol, status, statusCode, createdAt) VALUES (?, ?, ?, UTC_TIMESTAMP())',
-      [String(symbol).slice(0, 32), status, statusCode == null ? null : statusCode]
-    );
+    await recordUsage(getPool(), [{ symbol, status, statusCode }]);
     return true;
   } catch (err) {
     console.warn('[DB] usage 기록 실패:', err.message);
@@ -84,24 +64,26 @@ module.exports = async function handler(req, res) {
     }
 
     const today = new Date().toISOString().slice(0, 10);
-    const usage = await getTodayApiUsageCount();
+    const read = await readUsage();
     // DB 가 안 될 때는 이 인스턴스가 센 값으로 대신합니다. 실제보다 적게 잡히므로
     // 한도를 넘겨 버릴 위험이 있지만, DB 하나 때문에 조회를 통째로 막는 것보다 낫습니다.
-    const countedUsage = usage.ok ? usage.count : readMemoryCounter(today);
+    const usedNow = read.ok ? read.usage.total : readMemoryCounter(today);
+    const limitNow = read.ok ? read.usage.effectiveLimit : DAILY_LIMIT;
 
-    if (countedUsage >= DAILY_LIMIT) {
+    if (usedNow >= limitNow) {
       const minutesUntilReset = getMinutesUntilReset();
       const hoursLeft = Math.floor(minutesUntilReset / 60);
       const minutesLeft = minutesUntilReset % 60;
 
+      // 나가지 않은 요청이므로 크레딧은 안 씁니다. 세지 않는 status 로만 남깁니다.
       await logApiUsage(symbol, 'rate_limit', 429);
 
       res.status(429).json({
         error: 'API usage limit exceeded',
-        message: `일일 한도(800회)를 모두 사용했습니다. ${hoursLeft}시간 ${minutesLeft}분 뒤에 다시 시도해주세요.`,
+        message: `오늘 쓸 수 있는 조회 횟수를 모두 사용했습니다. ${hoursLeft}시간 ${minutesLeft}분 뒤에 다시 시도해주세요.`,
         remainingTime: { hours: hoursLeft, minutes: minutesLeft, totalMinutes: minutesUntilReset },
-        todayUsage: countedUsage,
-        dailyLimit: DAILY_LIMIT,
+        todayUsage: usedNow,
+        dailyLimit: limitNow,
       });
       return;
     }
@@ -136,30 +118,37 @@ module.exports = async function handler(req, res) {
     // 방금 넣은 한 건까지 포함한 수를 DB 에서 다시 읽습니다. 예전에는 요청 전에 읽은 값에
     // +1 을 했는데, 그러면 DB 가 안 될 때 항상 "1회"로 보였습니다. 지금은 기록이 실제로
     // 들어갔을 때만 DB 값을 쓰고, 아니면 확인 불가라고 정직하게 알립니다.
-    let todayUsage = null;
-    let usageSource = 'unavailable';
+    let metadata = null;
     if (logged) {
-      const after = await getTodayApiUsageCount();
+      const after = await readUsage();
       if (after.ok) {
-        todayUsage = after.count;
-        usageSource = 'db';
+        metadata = {
+          todayUsage: after.usage.total,
+          remainingUsage: Math.max(0, after.usage.effectiveLimit - after.usage.total),
+          dailyLimit: after.usage.effectiveLimit,
+          // 사용자 조회 몫과 배치(섹터·히트맵 데이터 수집) 몫을 나눠 보여 줍니다.
+          webUsage: after.usage.web,
+          batchUsage: after.usage.batch,
+          reservedForBatch: after.usage.reserved,
+          planDailyLimit: DAILY_LIMIT,
+          usageSource: 'db',
+        };
       }
     }
-    if (todayUsage == null) {
-      todayUsage = readMemoryCounter(today);
-      usageSource = 'memory';
+    if (!metadata) {
+      const counted = readMemoryCounter(today);
+      metadata = {
+        todayUsage: counted,
+        remainingUsage: Math.max(0, DAILY_LIMIT - counted),
+        dailyLimit: DAILY_LIMIT,
+        planDailyLimit: DAILY_LIMIT,
+        // 'memory' = 이 서버 인스턴스가 센 값(실제보다 적을 수 있음). 화면은 숫자 대신
+        // "확인 불가"라고 씁니다.
+        usageSource: 'memory',
+      };
     }
 
-    res.status(200).json({
-      ...data,
-      _metadata: {
-        todayUsage,
-        remainingUsage: Math.max(0, DAILY_LIMIT - todayUsage),
-        dailyLimit: DAILY_LIMIT,
-        // 'db' = 정확한 값 / 'memory' = 이 서버 인스턴스가 센 값(실제보다 적을 수 있음)
-        usageSource,
-      },
-    });
+    res.status(200).json({ ...data, _metadata: metadata });
   } catch (error) {
     console.error('Twelve Data API error:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });

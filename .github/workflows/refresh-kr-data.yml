@@ -85,11 +85,20 @@ jobs:
       # 아침(09:30 UTC) 실행에서는 건너뜁니다. 그때는 미국장이 열리지도 않아서 받아봐야
       # 저녁 실행과 똑같은 종가인데, 심볼 209개 × 8.5초 = 약 30분과 API 호출 209회를 그냥 씁니다.
       # (Twelve Data 무료 플랜 하루 800회는 사용자 요청 경로와 나눠 쓰는 한도입니다)
+      # 이 배치가 쓰는 209 회를 사이트와 같은 장부(api_usage 테이블)에 적기 위한 것뿐입니다.
+      # 실패해도 시세 갱신은 그대로 갑니다 — 그때는 사이트가 보여 주는 오늘 사용량이
+      # 실제보다 적게 나올 뿐입니다.
+      - name: Install DB client (for API usage accounting)
+        continue-on-error: true
+        run: npm install mysql2@^3 --no-save --no-audit --no-fund
+
       - name: Generate US sector data
         if: github.event.schedule != '30 9 * * 1-5'
         continue-on-error: true
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          # 없으면 기록만 건너뜁니다. 수집 자체는 영향받지 않습니다.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: node scripts/generate-us-data.js
 
       # 위 두 단계가 만든 파일만 읽어 계산합니다. 네트워크를 쓰지 않습니다.

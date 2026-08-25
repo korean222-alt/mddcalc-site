@@ -1,13 +1,15 @@
-// GET /api/twelve-data/usage — 오늘 사용량과 DB 상태를 그대로 보여 주는 점검용 엔드포인트.
+// GET /api/twelve-data/usage — 오늘 쓴 크레딧과 DB 상태를 그대로 보여 주는 점검용 엔드포인트.
 //
 // 사용량이 이상하게 보일 때(예: 계속 1회) 원인이 "정말 1회"인지 "DB 가 죽어서 0으로
 // 읽히는 것"인지 화면만 봐서는 구분할 수 없어서 만들었습니다. 브라우저로 열면 바로 보입니다.
-//   { "ok": true,  "todayUsage": 37, ... }            → DB 정상, 숫자도 진짜
-//   { "ok": false, "error": "...", ... }              → DB 연결 실패. error 에 이유가 있음
+//   { "ok": true,  "todayUsage": 216, "webUsage": 7, "batchUsage": 209, ... }  → 정상
+//   { "ok": false, "error": "...", ... }                                       → DB 연결 실패
+//
+// webUsage  : 사용자가 MDD 계산기에서 미국 종목을 조회한 횟수
+// batchUsage: GitHub Actions 배치가 섹터·히트맵·종목 페이지 데이터를 받아오며 쓴 횟수
+//             (히트맵·섹터 RS 화면 자체는 정적 파일만 읽어서 크레딧을 쓰지 않습니다)
 
-const { getPool, ensureUsageTable, utcDayStart } = require('./_usage-db');
-
-const DAILY_LIMIT = 800;
+const { DAILY_LIMIT, BATCH_BUDGET, getPool, utcDayStart, countTodayUsage } = require('./_usage-db');
 
 // 이 응답은 누구나 열어 볼 수 있습니다. 드라이버 에러 메시지에는 DB 호스트와 포트가
 // 그대로 실려 오는 경우가 많으므로(예: "connect ETIMEDOUT 1.2.3.4:4000") 가려서 내보냅니다.
@@ -39,31 +41,26 @@ module.exports = async function handler(req, res) {
 
   const since = utcDayStart();
   try {
-    const pool = getPool();
-    await ensureUsageTable(pool);
-    const [rows] = await pool.execute(
-      'SELECT status, COUNT(*) AS cnt FROM api_usage WHERE createdAt >= ? GROUP BY status',
-      [since]
-    );
-
-    const byStatus = {};
-    for (const r of rows) byStatus[r.status] = Number(r.cnt) || 0;
-    const sent = (byStatus.success || 0) + (byStatus.error || 0);
-
+    const u = await countTodayUsage(getPool());
     res.status(200).json({
       ok: true,
       utcDayStart: since,
-      todayUsage: sent,
-      remainingUsage: Math.max(0, DAILY_LIMIT - sent),
-      dailyLimit: DAILY_LIMIT,
-      byStatus,
+      todayUsage: u.total,
+      webUsage: u.web,
+      batchUsage: u.batch,
+      reservedForBatch: u.reserved,
+      remainingUsage: Math.max(0, u.effectiveLimit - u.total),
+      dailyLimit: u.effectiveLimit,
+      planDailyLimit: DAILY_LIMIT,
+      batchBudget: BATCH_BUDGET,
+      byStatus: u.byStatus,
     });
   } catch (err) {
     res.status(200).json({
       ok: false,
       utcDayStart: since,
       todayUsage: null,
-      dailyLimit: DAILY_LIMIT,
+      planDailyLimit: DAILY_LIMIT,
       error: redactHost(err.message),
       hint: 'DATABASE_URL 이 비어 있거나, DB 가 잠들었거나(TiDB 서버리스는 오래 놀면 정지·삭제됨), 접속 정보가 만료된 경우입니다. Vercel > Project Settings > Environment Variables 를 확인하세요.',
     });

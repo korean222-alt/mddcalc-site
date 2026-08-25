@@ -27,6 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const { fromYahoo, httpGet, epochDayFromYmd } = require('./generate-kr-data');
 const { usSymbols, US_NAMES } = require('./sectors');
+const usageLog = require('./api-usage-log');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'us');
@@ -79,6 +80,10 @@ async function fromTwelveData(symbol) {
     headers: { 'User-Agent': UA, Accept: 'application/json' },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
+
+  // 응답을 받았다는 것은 크레딧이 깎였다는 뜻입니다(4xx 도 마찬가지). 사이트가 쓰는
+  // 것과 같은 장부에 적어야 "오늘 몇 회 남았는지"가 실제와 맞습니다.
+  usageLog.count(symbol, res.status);
 
   let json;
   try {
@@ -238,10 +243,15 @@ async function main() {
   if (usable.length === 0) {
     console.warn('::warning::미국 심볼을 하나도 받지 못했습니다. 미국 탭은 표시되지 않습니다.');
   }
+
+  await usageLog.finish();
 }
 
 if (require.main === module) {
-  main().catch(err => {
+  main().catch(async err => {
+    // 중간에 죽더라도 이미 쓴 크레딧은 장부에 남겨야 합니다. 안 그러면 사이트가
+    // "아직 안 썼다"고 믿고 사용자 조회를 열어 줘서 실제 한도를 넘게 됩니다.
+    await usageLog.finish().catch(() => {});
     // 예기치 못한 예외도 마찬가지입니다. 로그만 남기고 후속 스텝을 살립니다.
     console.warn('::warning::미국 데이터 생성 실패:', err.message);
   });

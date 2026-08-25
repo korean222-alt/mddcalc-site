@@ -18,6 +18,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const usageLog = require('./api-usage-log');
+
 const SITE_ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(SITE_ROOT, 'stock');
 const SITEMAP_PATH = path.join(SITE_ROOT, 'sitemap.xml');
@@ -165,6 +167,9 @@ async function fetchSeries(symbol) {
   url.searchParams.set('apikey', API_KEY);
 
   const res = await fetch(url.toString());
+  // 응답을 받았다는 것은 크레딧이 깎였다는 뜻입니다(4xx 도 마찬가지). 사이트가 쓰는
+  // 것과 같은 장부에 적어야 "오늘 몇 회 남았는지"가 실제와 맞습니다.
+  usageLog.count(symbol, res.status);
   const json = await res.json();
 
   if (json.status === 'error') throw new Error(`${symbol}: ${json.message}`);
@@ -830,9 +835,14 @@ async function main() {
 
   updateToolsHub(publishedTickers);
   console.log('✅ tools.html 허브 섹션 갱신 완료');
+
+  await usageLog.finish();
 }
 
-main().catch(err => {
+main().catch(async err => {
+  // 중간에 죽더라도 이미 쓴 크레딧은 장부에 남겨야 한다. 안 그러면 사이트가
+  // "아직 안 썼다"고 믿고 사용자 조회를 열어 줘서 실제 한도를 넘게 된다.
+  await usageLog.finish().catch(() => {});
   console.error('❌ 생성 실패:', err.message);
   process.exit(1);
 });

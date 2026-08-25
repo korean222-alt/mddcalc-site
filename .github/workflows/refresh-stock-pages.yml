@@ -30,9 +30,17 @@ jobs:
         with:
           node-version: 22
 
+      # 이 배치가 쓰는 21 회를 사이트와 같은 장부(api_usage 테이블)에 적기 위한 것뿐입니다.
+      # 실패해도 페이지 갱신은 그대로 갑니다.
+      - name: Install DB client (for API usage accounting)
+        continue-on-error: true
+        run: npm install mysql2@^3 --no-save --no-audit --no-fund
+
       - name: Regenerate stock report pages
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          # 없으면 기록만 건너뜁니다. 페이지 생성 자체는 영향받지 않습니다.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           if [ -z "$TWELVE_DATA_API_KEY" ]; then
             echo "::error::TWELVE_DATA_API_KEY 시크릿이 설정되어 있지 않습니다. Settings > Secrets and variables > Actions 에서 추가해주세요."
