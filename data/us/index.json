@@ -1,6 +1,9 @@
 {
-  "updated": "2026-08-24",
+  "updated": "2026-08-25",
   "count": 208,
+  "sources": {
+    "twelvedata": 207
+  },
   "stocks": [
     {
       "code": "SPY",
