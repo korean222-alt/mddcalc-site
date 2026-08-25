@@ -27,6 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const { fromYahoo, httpGet, epochDayFromYmd } = require('./generate-kr-data');
 const { usSymbols, US_NAMES } = require('./sectors');
+const usageLog = require('./api-usage-log');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'us');
@@ -79,6 +80,10 @@ async function fromTwelveData(symbol) {
     headers: { 'User-Agent': UA, Accept: 'application/json' },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
+
+  // 응답을 받았다는 것은 크레딧이 깎였다는 뜻입니다(4xx 도 마찬가지). 사이트가 쓰는
+  // 것과 같은 장부에 적어야 "오늘 몇 회 남았는지"가 실제와 맞습니다.
+  usageLog.count(symbol, res.status);
 
   let json;
   try {
@@ -168,6 +173,71 @@ async function fetchOne(symbol) {
   throw new Error(errors.join(' / '));
 }
 
+// 받아 온 시세를 저장 형식(배열로 눌러 놓은 일봉)으로 바꿔 파일에 씁니다.
+function writeSymbolFile(symbol, got) {
+  const from = Math.max(0, got.d.length - MAX_ROWS);
+  const tail = Math.max(0, got.d.length - TAIL_ROWS);
+
+  const payload = {
+    code: symbol,
+    symbol,
+    name: US_NAMES[symbol] || symbol,
+    market: 'US',
+    currency: got.currency || 'USD',
+    updated: new Date(got.d[got.d.length - 1] * 86400000).toISOString().slice(0, 10),
+    d: got.d.slice(from),
+    h: got.h.slice(from),
+    c: got.c.slice(from),
+    // v[k] 는 d[d.length - v.length + k] 에 대응합니다. 외국인소진율(f)은 미국에 없습니다.
+    v: got.v ? got.v.slice(tail) : [],
+  };
+  fs.writeFileSync(path.join(OUT_DIR, `${symbol}.json`), JSON.stringify(payload));
+  return payload;
+}
+
+// 이미 저장된 파일의 마지막 날짜를 읽습니다. 파일이 없거나 깨졌으면 null 입니다.
+function lastStoredDate(symbol) {
+  try {
+    const raw = fs.readFileSync(path.join(OUT_DIR, `${symbol}.json`), 'utf8');
+    const j = JSON.parse(raw);
+    if (!Array.isArray(j.d) || j.d.length === 0) return null;
+    return new Date(j.d[j.d.length - 1] * 86400000).toISOString().slice(0, 10);
+  } catch (e) {
+    return null;
+  }
+}
+
+function isUpToDate(symbol, latestTradingDay) {
+  if (!latestTradingDay) return false; // 기준일을 못 구했으면 평소대로 전부 받습니다
+  const stored = lastStoredDate(symbol);
+  return stored !== null && stored >= latestTradingDay;
+}
+
+// 기준 심볼을 하나 받아 "가장 최근 거래일"을 알아냅니다. 이 한 번은 어차피 받아야 하는
+// 심볼이므로 낭비가 아닙니다. 결과는 그대로 저장하고, 호출부는 그 심볼을 다시 받지 않습니다
+// (isUpToDate 가 방금 쓴 파일을 보고 건너뜁니다).
+//
+// 실패하면 null 을 돌려주고, 그러면 예전처럼 전부 받습니다. 아끼려다 갱신을 통째로
+// 건너뛰는 일은 없어야 합니다.
+async function probeLatestTradingDay(symbols, ok, failed, bySource) {
+  const probe = symbols.includes('SPY') ? 'SPY' : symbols[0];
+  if (!probe) return null;
+  try {
+    const got = await fetchOne(probe);
+    bySource[got.source] = (bySource[got.source] || 0) + 1;
+    writeSymbolFile(probe, got);
+    ok.push(probe);
+    const latest = new Date(got.d[got.d.length - 1] * 86400000).toISOString().slice(0, 10);
+    console.log(`\u{1F4C5} 기준 ${probe} — 가장 최근 거래일 ${latest} [${got.source}]`);
+    await sleep(DELAY_MS);
+    return latest;
+  } catch (err) {
+    console.warn(`\u26A0\uFE0F  기준 심볼(${probe}) 조회 실패: ${err.message} — 건너뛰기 없이 전부 받습니다`);
+    failed.push({ symbol: probe, reason: err.message });
+    return null;
+  }
+}
+
 async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -181,27 +251,27 @@ async function main() {
   const failed = [];
   const bySource = {};
 
+  // 이미 최신인 심볼은 건너뜁니다.
+  //
+  // 이 워크플로우는 평일마다 도는데, 미국 증시 휴장일(연 9~10일)에도 그대로 돕니다.
+  // 그날은 209심볼을 전부 다시 받아도 어제와 똑같은 종가라, 하루치 크레딧의 26% 를
+  // 그냥 버리는 셈입니다. 수동 재실행(workflow_dispatch)도 마찬가지입니다.
+  //
+  // 그래서 기준 심볼(SPY) 하나만 먼저 받아 "가장 최근 거래일"을 알아냅니다. 그 날짜가
+  // 이미 들어 있는 파일은 받을 것이 없으므로 호출하지 않습니다. 휴장일·재실행이면
+  // 209회가 1회로 줄고, 평소에는 전부 하루치가 밀려 있으므로 아무것도 건너뛰지 않습니다.
+  const latestTradingDay = await probeLatestTradingDay(symbols, ok, failed, bySource);
+  let skipped = 0;
+
   for (const symbol of symbols) {
+    if (isUpToDate(symbol, latestTradingDay)) {
+      skipped++;
+      continue;
+    }
     try {
       const got = await fetchOne(symbol);
       bySource[got.source] = (bySource[got.source] || 0) + 1;
-      const from = Math.max(0, got.d.length - MAX_ROWS);
-      const tail = Math.max(0, got.d.length - TAIL_ROWS);
-
-      const payload = {
-        code: symbol,
-        symbol,
-        name: US_NAMES[symbol] || symbol,
-        market: 'US',
-        currency: got.currency || 'USD',
-        updated: new Date(got.d[got.d.length - 1] * 86400000).toISOString().slice(0, 10),
-        d: got.d.slice(from),
-        h: got.h.slice(from),
-        c: got.c.slice(from),
-        // v[k] 는 d[d.length - v.length + k] 에 대응합니다. 외국인소진율(f)은 미국에 없습니다.
-        v: got.v ? got.v.slice(tail) : [],
-      };
-      fs.writeFileSync(path.join(OUT_DIR, `${symbol}.json`), JSON.stringify(payload));
+      const payload = writeSymbolFile(symbol, got);
       ok.push(symbol);
       console.log(`✅ ${symbol} (${payload.name}) — ${payload.d.length}행, 최신 ${payload.updated} [${got.source}]`);
     } catch (err) {
@@ -226,7 +296,10 @@ async function main() {
     );
   }
 
-  console.log(`\n조회 성공 ${ok.length} / 실패 ${failed.length} / 서빙 가능 ${usable.length}심볼`);
+  console.log(`\n조회 성공 ${ok.length} / 실패 ${failed.length} / 건너뜀 ${skipped} / 서빙 가능 ${usable.length}심볼`);
+  if (skipped > 0) {
+    console.log(`   (건너뛴 ${skipped}심볼은 이미 ${latestTradingDay} 종가까지 들어 있어 API 를 쓰지 않았습니다)`);
+  }
   console.log('소스별 성공:', Object.entries(bySource).map(([k, n]) => `${k} ${n}`).join(', ') || '없음');
 
   // 여기서 절대 exit 1 하지 않습니다.
@@ -238,10 +311,15 @@ async function main() {
   if (usable.length === 0) {
     console.warn('::warning::미국 심볼을 하나도 받지 못했습니다. 미국 탭은 표시되지 않습니다.');
   }
+
+  await usageLog.finish();
 }
 
 if (require.main === module) {
-  main().catch(err => {
+  main().catch(async err => {
+    // 중간에 죽더라도 이미 쓴 크레딧은 장부에 남겨야 합니다. 안 그러면 사이트가
+    // "아직 안 썼다"고 믿고 사용자 조회를 열어 줘서 실제 한도를 넘게 됩니다.
+    await usageLog.finish().catch(() => {});
     // 예기치 못한 예외도 마찬가지입니다. 로그만 남기고 후속 스텝을 살립니다.
     console.warn('::warning::미국 데이터 생성 실패:', err.message);
   });

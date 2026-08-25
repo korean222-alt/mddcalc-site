@@ -565,7 +565,7 @@
 
     <!-- S&P500(SPY) 대비 비교 -->
     <div class="card">
-      <h2 class="section">📊 S&P500 대비 비교 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(SPY 데이터는 하루 1회만 조회)</span></h2>
+      <h2 class="section">📊 S&P500 대비 비교 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(조회 기간 기준 · SPY 데이터는 하루 1회만 조회)</span></h2>
       <div id="benchmarkLoading" style="text-align:center; padding:12px; color:#718096;">⏳ SPY 데이터와 비교 중...</div>
       <div id="benchmarkResult"></div>
     </div>
@@ -573,6 +573,7 @@
     <!-- 차트 -->
     <div class="card">
       <h2 class="section">📉 고점 대비 하락률 차트</h2>
+      <div id="windowPeakBanner" class="info-banner hidden"></div>
       <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
     </div>
 
@@ -1277,8 +1278,14 @@ async function loadData() {
     let usageMsg = `✅ ${shownName} 데이터 ${raw.length}일치 로드 완료 (최신: ${latestDate})`;
     if (fromCache) {
       usageMsg += `\n♻️ 방금 조회한 데이터를 재사용했어요 (API 미사용)`;
+    } else if (metadata && metadata.usageSource === 'db') {
+      // 방문자에게 필요한 것은 "앞으로 몇 번 더 조회할 수 있는가"입니다. 하루 크레딧을
+      // 사용자 조회와 데이터 수집 배치가 나눠 쓰는 사정은 /api/twelve-data/usage 에 있습니다.
+      usageMsg += `\n📊 오늘 남은 조회 횟수: ${metadata.remainingUsage}회`;
     } else if (metadata) {
-      usageMsg += `\n📊 오늘 사용량: ${metadata.todayUsage}/${metadata.dailyLimit}회 (남은 횟수: ${metadata.remainingUsage}회)`;
+      // 사용량 장부(DB)에 못 붙은 상황입니다. 예전에는 이때도 0으로 읽혀서 화면에 늘 "1회"가
+      // 찍혔습니다. 틀린 숫자를 맞는 숫자처럼 보여 주느니 모른다고 말하는 편이 낫습니다.
+      usageMsg += `\n📊 오늘 사용량: 집계 서버에 연결하지 못해 확인할 수 없어요 (조회는 정상)`;
     }
     showStatus(usageMsg, 'success');
     document.getElementById('result').classList.remove('hidden');
@@ -1500,6 +1507,7 @@ function render() {
   // 화면 조각은 하나씩 독립적으로 그립니다. 예전에는 여기서 난 예외가 loadData 의 catch까지
   // 올라가는 바람에, 시세는 멀쩡히 받아왔는데도 "데이터를 불러오지 못했어요"라는 엉뚱한
   // 메시지가 뜨고 결과 전체가 사라졌습니다. (차트 CDN이 광고 차단기·사내 방화벽에 막히면 발생)
+  renderStep('기간 밖 고점 안내', () => renderWindowPeakNotice(A));
   renderStep('하락률 차트', () => drawDDChart(A));
   renderStep('주가 차트', () => drawPriceChart(A));
   renderStep('회복률 표', () => renderRecovery(A));
@@ -2171,14 +2179,19 @@ async function renderBenchmarkComparison() {
       close: parseFloat(v.close),
     })).reverse();
 
-    // 1) SPY 자체의 현재 하락 상태 (전체 히스토리 기준 — 심층분석과 동일한 analyze() 재사용)
-    const spyFull = analyze(spyRaw, STATE.mode);
-    const F = analyze(STATE.raw, STATE.mode);
-    const tickerDD = F.currentDD, spyDD = spyFull.currentDD;
-
-    // 2) 조회 기간(현재 필터된 기간)과 같은 날짜 구간으로 SPY를 맞춰 누적수익률 비교
+    // 조회 기간(현재 필터된 기간)과 같은 날짜 구간으로 SPY를 맞춥니다.
     const sd = STATE.filtered[0].date, ed = STATE.filtered[STATE.filtered.length - 1].date;
     const spyFiltered = spyRaw.filter(r => r.date >= sd && r.date <= ed);
+
+    // 1) 종목과 SPY의 현재 하락 상태.
+    //
+    // 예전에는 여기서만 종목을 STATE.raw(전체 히스토리)로, SPY를 SPY 전체 히스토리로 재서
+    // 화면 맨 위의 "현재 고점 대비 하락률"(조회 기간 기준)과 다른 숫자가 나왔습니다.
+    // 한 화면에 같은 이름의 값이 두 개 있으면 어느 쪽이 맞는지 알 수 없으므로, 이 카드도
+    // 나머지와 똑같이 조회 기간을 기준으로 잽니다. 두 값을 같은 창에서 재야 뺄셈도 뜻이 있습니다.
+    const F = analyze(STATE.filtered, STATE.mode);
+    const spyWindow = spyFiltered.length >= 2 ? analyze(spyFiltered, STATE.mode) : analyze(spyRaw, STATE.mode);
+    const tickerDD = F.currentDD, spyDD = spyWindow.currentDD;
 
     let compareHtml = '';
     if (spyFiltered.length >= 2) {
@@ -2240,6 +2253,50 @@ function chartUnavailable(canvasId) {
     '<div style="display:flex; align-items:center; justify-content:center; height:100%; ' +
     'color:#718096; font-size:13px; text-align:center; padding:16px;">' +
     '차트를 불러오지 못했습니다 (광고 차단기·네트워크 차단). 아래 숫자 분석은 정상입니다.</div>';
+}
+
+// 조회 기간의 "고점"이 사실은 그 기간의 첫날 근처일 때 알려 줍니다.
+//
+// 왜 필요한가 — 페이팔(PYPL)로 보면 바로 보입니다. 이 화면의 기본 조회 기간은 최근 5년인데
+// 페이팔의 진짜 전고점은 2021년 7월, 즉 5년 창의 아주 살짝 바깥입니다. 그래서 창 안에서
+// 가장 높은 값은 "첫날"이 되고, 하락률 차트는 0%에서 시작해 끝까지 내려가기만 하며,
+// 구간별 회복률은 전부 0%로 찍힙니다. 계산이 틀린 것은 아니지만 화면은 고장 난 것처럼 보입니다.
+//
+// 이럴 때 실제 전고점이 언제·얼마였는지 알려 주고, 전체 기간으로 넘어갈 수 있게 합니다.
+function renderWindowPeakNotice(A) {
+  const banner = document.getElementById('windowPeakBanner');
+  if (!banner) return;
+  banner.classList.add('hidden');
+  banner.innerHTML = '';
+  if (!STATE.raw || !STATE.filtered) return;
+
+  // 이미 전체 기간을 보고 있으면 알려 줄 "바깥"이 없습니다.
+  const windowStart = STATE.filtered[0].date;
+  if (windowStart <= STATE.raw[0].date) return;
+
+  // 창 안의 고점이 창 앞머리(앞쪽 5% 또는 20거래일 이내)에 있을 때만.
+  const peakIdx = A.dates.indexOf(A.athDate);
+  const headRoom = Math.max(20, Math.floor(A.n * 0.05));
+  if (peakIdx < 0 || peakIdx > headRoom) return;
+
+  // 창 바깥(더 과거)에 더 높은 고점이 실제로 있는지 확인합니다.
+  const series = STATE.mode === 'high' ? 'high' : 'close';
+  let outerPeak = -Infinity, outerDate = null;
+  for (const r of STATE.raw) {
+    if (r.date >= windowStart) break;
+    if (r[series] > outerPeak) { outerPeak = r[series]; outerDate = r.date; }
+  }
+  if (!outerDate || outerPeak <= A.athPrice) return;
+
+  const realDD = (A.currentPrice / outerPeak - 1) * 100;
+  banner.classList.remove('hidden');
+  banner.innerHTML =
+    'ℹ️ 지금 보고 계신 기간의 고점 <b>' + money(A.athPrice) + '</b>(' + A.athDate + ')은 ' +
+    '<b>조회 시작일 부근</b>입니다. 더 높은 고점 <b>' + money(outerPeak) + '</b>(' + outerDate + ')이 ' +
+    '이 기간 <b>바깥</b>에 있어서, 차트가 처음부터 끝까지 내려가기만 하고 회복률이 모두 0%로 보입니다.<br>' +
+    '전체 기간 기준으로는 <b>' + fmtPct(realDD) + '</b>입니다. ' +
+    '<button class="btn btn-sm" style="background:#3182ce; color:#fff; margin-top:8px;" ' +
+    'onclick="setPreset(\'all\')">전체 기간으로 보기</button>';
 }
 
 function drawDDChart(A) {
