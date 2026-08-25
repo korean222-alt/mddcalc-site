@@ -30,9 +30,14 @@ jobs:
         with:
           node-version: 22
 
+      # 사용량 장부(lib/api-usage.js)가 쓰는 Postgres 드라이버를 설치합니다.
+      - name: Install dependencies
+        run: npm install --omit=dev --no-audit --no-fund
+
       - name: Regenerate stock report pages
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           if [ -z "$TWELVE_DATA_API_KEY" ]; then
             echo "::error::TWELVE_DATA_API_KEY 시크릿이 설정되어 있지 않습니다. Settings > Secrets and variables > Actions 에서 추가해주세요."

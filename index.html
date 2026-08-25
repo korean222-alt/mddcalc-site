@@ -1278,7 +1278,7 @@ async function loadData() {
     if (fromCache) {
       usageMsg += `\n♻️ 방금 조회한 데이터를 재사용했어요 (API 미사용)`;
     } else if (metadata) {
-      usageMsg += `\n📊 오늘 사용량: ${metadata.todayUsage}/${metadata.dailyLimit}회 (남은 횟수: ${metadata.remainingUsage}회)`;
+      usageMsg += `\n📊 오늘 사용량: ${metadata.todayUsage}/${metadata.dailyLimit}회 (남은 횟수: ${metadata.remainingUsage}회 · 사이트 자동 갱신 포함)`;
     }
     showStatus(usageMsg, 'success');
     document.getElementById('result').classList.remove('hidden');

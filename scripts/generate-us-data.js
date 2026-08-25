@@ -27,6 +27,11 @@ const fs = require('fs');
 const path = require('path');
 const { fromYahoo, httpGet, epochDayFromYmd } = require('./generate-kr-data');
 const { usSymbols, US_NAMES } = require('./sectors');
+const { createUsageRecorder } = require('../lib/api-usage');
+
+// 트웰브데이터 호출 장부. 방문자 조회(api/twelve-data/time-series.js)와 같은 테이블을 쓴다.
+// 한도가 키 단위(일 800회)라, 여기서 쓴 몫이 장부에 안 남으면 화면의 잔량이 실제와 어긋난다.
+const usage = createUsageRecorder('cron');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'us');
@@ -90,9 +95,15 @@ async function fromTwelveData(symbol) {
   // 잘못된 요청은 HTTP 400 으로도, HTTP 200 + status:"error" 로도 옵니다. 둘 다 봐야
   // 합니다. 후자를 놓치면 빈 결과를 정상으로 착각해 멀쩡한 기존 파일을 덮어씁니다.
   if (!res.ok || json.status === 'error') {
+    // 200 + status:"error" 도 트웰브데이터는 호출 한 건으로 셉니다. 장부에도 남깁니다.
+    await usage.record(symbol, 'error', res.status);
     throw new Error(`HTTP ${res.status} ${json.code || ''} ${json.message || ''}`.trim());
   }
-  if (!Array.isArray(json.values) || json.values.length === 0) throw new Error('values 비어 있음');
+  if (!Array.isArray(json.values) || json.values.length === 0) {
+    await usage.record(symbol, 'error', res.status);
+    throw new Error('values 비어 있음');
+  }
+  await usage.record(symbol, 'success', res.status);
 
   const d = [], h = [], c = [], v = [];
   for (let i = json.values.length - 1; i >= 0; i--) { // 과거 → 최신으로 뒤집습니다
@@ -238,12 +249,17 @@ async function main() {
   if (usable.length === 0) {
     console.warn('::warning::미국 심볼을 하나도 받지 못했습니다. 미국 탭은 표시되지 않습니다.');
   }
+
+  // 버퍼에 남은 기록을 마저 보냅니다. 실패해도 예외를 던지지 않습니다(장부는 부가 기능).
+  await usage.flush();
 }
 
 if (require.main === module) {
-  main().catch(err => {
+  main().catch(async err => {
     // 예기치 못한 예외도 마찬가지입니다. 로그만 남기고 후속 스텝을 살립니다.
     console.warn('::warning::미국 데이터 생성 실패:', err.message);
+    // 도중에 죽더라도 이미 써버린 호출은 장부에 남겨야 합니다.
+    await usage.flush();
   });
 }
 
