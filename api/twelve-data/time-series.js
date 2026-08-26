@@ -5,9 +5,11 @@
 const mysql = require('mysql2/promise');
 
 const DAILY_LIMIT = 800;
-const CONNECT_TIMEOUT_MS = 8000;
+const DB_TIMEOUT_MS = 1500;
+const DB_COOLDOWN_MS = 5 * 60 * 1000;
 
 let _pool = null;
+let _dbDownUntil = 0;
 
 function utcDayStartSql() {
   return new Date().toISOString().slice(0, 10) + ' 00:00:00';
@@ -18,21 +20,21 @@ function toCount(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
-function resetPool() {
+function dbIsCoolingDown() {
+  return Date.now() < _dbDownUntil;
+}
+
+function markDbDown() {
+  _dbDownUntil = Date.now() + DB_COOLDOWN_MS;
   const old = _pool;
   _pool = null;
-  if (old) {
-    old.end().catch(() => {});
-  }
+  if (old) old.end().catch(() => {});
 }
 
 function getPool() {
   if (_pool) return _pool;
-
   const raw = process.env.DATABASE_URL;
-  if (!raw) {
-    throw new Error('DATABASE_URL is not set');
-  }
+  if (!raw) throw new Error('DATABASE_URL is not set');
 
   const url = new URL(raw);
   _pool = mysql.createPool({
@@ -44,84 +46,67 @@ function getPool() {
     ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true },
     waitForConnections: true,
     connectionLimit: 1,
-    connectTimeout: CONNECT_TIMEOUT_MS,
+    connectTimeout: DB_TIMEOUT_MS,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
   });
   return _pool;
 }
 
-function isConnError(err) {
-  const code = err && err.code;
-  return code === 'ETIMEDOUT'
-    || code === 'ECONNRESET'
-    || code === 'ECONNREFUSED'
-    || code === 'PROTOCOL_CONNECTION_LOST'
-    || code === 'POOL_CLOSED';
+function withTimeout(promise, ms, label) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(label + ' timeout')), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-async function withDb(fn) {
+async function getTodayApiUsageCount() {
+  if (dbIsCoolingDown()) return null;
   try {
-    return await fn(getPool());
+    const [rows] = await withTimeout(
+      getPool().execute(
+        'SELECT COUNT(*) AS cnt FROM api_usage WHERE status = ? AND createdAt >= ?',
+        ['success', utcDayStartSql()]
+      ),
+      DB_TIMEOUT_MS,
+      'DB count'
+    );
+    return toCount(rows[0] && rows[0].cnt);
   } catch (err) {
-    if (isConnError(err)) resetPool();
-    throw err;
-  }
-}
-
-async function getTodayApiUsageCountFromDb() {
-  const [rows] = await withDb((pool) => pool.execute(
-    'SELECT COUNT(*) AS cnt FROM api_usage WHERE status = ? AND createdAt >= ?',
-    ['success', utcDayStartSql()]
-  ));
-  return toCount(rows[0] && rows[0].cnt);
-}
-
-async function logApiUsage(symbol, status, statusCode) {
-  try {
-    await withDb((pool) => pool.execute(
-      'INSERT INTO api_usage (symbol, status, statusCode, createdAt) VALUES (?, ?, ?, UTC_TIMESTAMP())',
-      [symbol, status, statusCode ?? null]
-    ));
-  } catch (err) {
-    if (isConnError(err)) resetPool();
-    console.warn('[DB] usage 기록 실패:', err.message);
-  }
-}
-
-// 문서상 이 엔드포인트는 크레딧을 쓰지 않습니다.
-async function fetchTwelveDataUsage(apiKey) {
-  if (!apiKey) return null;
-  try {
-    const url = new URL('https://api.twelvedata.com/api_usage');
-    url.searchParams.set('apikey', apiKey);
-    const res = await fetch(url.toString(), { signal: AbortSignal.timeout(8000) });
-    const json = await res.json();
-    if (!res.ok || json.status === 'error') return null;
-    const used = Number(json.daily_usage ?? json.current_usage);
-    const limit = Number(json.plan_daily_limit ?? json.plan_limit);
-    if (!Number.isFinite(used)) return null;
-    return { used, limit: Number.isFinite(limit) ? limit : DAILY_LIMIT };
-  } catch (err) {
-    console.warn('[TD] api_usage 조회 실패:', err.message);
+    markDbDown();
+    console.warn('[DB] usage count 조회 실패:', err.message);
     return null;
   }
 }
 
-async function readUsage(apiKey) {
+async function logApiUsage(symbol, status, statusCode) {
+  if (dbIsCoolingDown()) return;
   try {
-    const used = await getTodayApiUsageCountFromDb();
-    return { used, limit: DAILY_LIMIT, source: 'db', measured: true };
+    await withTimeout(
+      getPool().execute(
+        'INSERT INTO api_usage (symbol, status, statusCode, createdAt) VALUES (?, ?, ?, UTC_TIMESTAMP())',
+        [symbol, status, statusCode ?? null]
+      ),
+      DB_TIMEOUT_MS,
+      'DB insert'
+    );
   } catch (err) {
-    console.warn('[DB] usage count 조회 실패:', err.message);
+    markDbDown();
+    console.warn('[DB] usage 기록 실패:', err.message);
   }
+}
 
-  const td = await fetchTwelveDataUsage(apiKey);
-  if (td) {
-    return { used: td.used, limit: td.limit || DAILY_LIMIT, source: 'twelvedata', measured: true };
+function usageFromHeaders(response) {
+  const used = Number(response.headers.get('api-credits-used'));
+  const left = Number(response.headers.get('api-credits-left'));
+  if (!Number.isFinite(used) || !Number.isFinite(left)) return null;
+  const limit = used + left;
+  // Basic 계획의 분당 창(8) 을 일일 한도로 오인하지 않습니다.
+  if (limit > 60) {
+    return { todayUsage: used, remainingUsage: left, dailyLimit: limit };
   }
-
-  return { used: 0, limit: DAILY_LIMIT, source: 'none', measured: false };
+  return null;
 }
 
 function getMinutesUntilReset() {
@@ -146,29 +131,26 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const apiKey = process.env.TWELVE_DATA_API_KEY;
-    if (!apiKey) {
-      res.status(500).json({ error: 'API key not configured' });
-      return;
-    }
+    const todayUsage = await getTodayApiUsageCount();
 
-    const usage = await readUsage(apiKey);
-    const dailyLimit = usage.limit || DAILY_LIMIT;
-
-    if (usage.measured && usage.used >= dailyLimit) {
+    if (todayUsage !== null && todayUsage >= DAILY_LIMIT) {
       const minutesUntilReset = getMinutesUntilReset();
       const hoursLeft = Math.floor(minutesUntilReset / 60);
       const minutesLeft = minutesUntilReset % 60;
-
       await logApiUsage(symbol, 'rate_limit', 429);
-
       res.status(429).json({
         error: 'API usage limit exceeded',
-        message: `일일 한도(${dailyLimit}회)를 모두 사용했습니다. ${hoursLeft}시간 ${minutesLeft}분 뒤에 다시 시도해주세요.`,
+        message: `일일 한도(800회)를 모두 사용했습니다. ${hoursLeft}시간 ${minutesLeft}분 뒤에 다시 시도해주세요.`,
         remainingTime: { hours: hoursLeft, minutes: minutesLeft, totalMinutes: minutesUntilReset },
-        todayUsage: usage.used,
-        dailyLimit,
+        todayUsage,
+        dailyLimit: DAILY_LIMIT,
       });
+      return;
+    }
+
+    const apiKey = process.env.TWELVE_DATA_API_KEY;
+    if (!apiKey) {
+      res.status(500).json({ error: 'API key not configured' });
       return;
     }
 
@@ -189,11 +171,14 @@ module.exports = async function handler(req, res) {
 
     await logApiUsage(symbol, 'success', 200);
 
-    const todayUsage = usage.measured ? usage.used + 1 : 1;
-    const remainingUsage = Math.max(0, dailyLimit - todayUsage);
+    const headerUsage = usageFromHeaders(response);
+    const metadata = todayUsage !== null
+      ? { todayUsage: todayUsage + 1, remainingUsage: DAILY_LIMIT - (todayUsage + 1), dailyLimit: DAILY_LIMIT }
+      : headerUsage;
+
     res.status(200).json({
       ...data,
-      _metadata: { todayUsage, remainingUsage, dailyLimit },
+      ...(metadata ? { _metadata: metadata } : {}),
     });
   } catch (error) {
     console.error('Twelve Data API error:', error);
