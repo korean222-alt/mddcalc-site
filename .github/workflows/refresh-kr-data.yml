@@ -2,8 +2,10 @@ name: Refresh Korean stock data
 
 # scripts/generate-kr-data.js 로 data/kr/*.json (한국 주식 일봉)을,
 # scripts/generate-us-data.js 로 data/us/*.json (미국 종목 일봉)을 갱신하고,
-# scripts/generate-sector-rs.js 로 둘을 합쳐 data/sectors.json (섹터 RS)을 만든다.
-# API 키가 필요 없다.
+# scripts/generate-sector-rs.js 로 둘을 합쳐 data/sectors.json (섹터 RS·히트맵)을 만든다.
+#
+# 한국 데이터는 API 키가 필요 없다(네이버). 미국 데이터만 TWELVE_DATA_API_KEY 를 쓰며,
+# 그 사용량은 data/api-usage.json 에 남고 마지막 스텝이 그 기록을 검사한다.
 #
 # 사용자 브라우저는 이 결과 파일만 읽는다. 즉 시세 소스가 불안정해도 그 영향은
 # 이 워크플로우 안에서 끝나고, 사이트는 항상 마지막으로 성공한 데이터를 서빙한다.
@@ -71,6 +73,11 @@ jobs:
       - name: Test navigation links
         run: node scripts/test-nav-links.js
 
+      # 사용량 기록·검사기 자신의 회귀 테스트입니다. 이 검사기는 "조용한 실패"를 잡으려고
+      # 두는 것이라, 검사기가 조용히 망가지면 아무 소용이 없습니다.
+      - name: Test the API usage bookkeeping
+        run: node scripts/test-api-usage.js
+
       - name: Generate Korean stock data
         run: node scripts/generate-kr-data.js
 
@@ -85,6 +92,10 @@ jobs:
       # 아침(09:30 UTC) 실행에서는 건너뜁니다. 그때는 미국장이 열리지도 않아서 받아봐야
       # 저녁 실행과 똑같은 종가인데, 심볼 209개 × 8.5초 = 약 30분과 API 호출 209회를 그냥 씁니다.
       # (Twelve Data 무료 플랜 하루 800회는 사용자 요청 경로와 나눠 쓰는 한도입니다)
+      #
+      # 이 스텝이 data/api-usage.json 에 "몇 회 썼는지"를 남깁니다. Twelve Data 대시보드의
+      # 카운터는 UTC 자정에 리셋되는데 이 실행은 22:30 UTC 라, 한국 시간 낮에 대시보드를
+      # 열면 늘 0 으로 보입니다. 그 착시 때문에 사용량 파일을 따로 남깁니다.
       - name: Generate US sector data
         if: github.event.schedule != '30 9 * * 1-5'
         continue-on-error: true
@@ -143,3 +154,15 @@ jobs:
             echo "::error::3번 시도했지만 푸시하지 못했습니다."
             exit 1
           fi
+
+      # Twelve Data 를 정말로 썼는지 검사합니다. 검사만 하고 아무것도 고치지 않습니다.
+      #
+      # 왜 커밋 뒤인가: 여기서 실패하면 잡이 빨갛게 됩니다(그게 목적입니다 — 조용히 지나가면
+      # 며칠이 지나도 모릅니다). 커밋 앞에 두면 그 실패가 방금 받은 시세까지 버리게 됩니다.
+      # 이 저장소는 이미 한 번 그렇게 하루치를 날렸습니다. 그래서 커밋을 먼저 끝냅니다.
+      #
+      # 아침 실행은 미국 수집 자체를 건너뛰므로 검사도 건너뜁니다. 안 그러면 어제 기록을
+      # 놓고 "오늘 안 썼다"고 매일 아침 빨갛게 됩니다.
+      - name: Verify the API was actually used
+        if: github.event.schedule != '30 9 * * 1-5'
+        run: node scripts/check-api-usage.js --fresh

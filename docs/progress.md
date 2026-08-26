@@ -311,7 +311,36 @@ node scripts/generate-blog-pages.js      # 블로그 정적 페이지 (API 키 �
 node scripts/generate-kr-data.js         # 한국 주식 데이터 + 15개 HTML의 KR_STOCKS 표
 TWELVE_DATA_API_KEY=xxxx node scripts/generate-stock-pages.js   # 종목 리포트 (키 필요)
 node scripts/test-kr-parse.js            # 한국 시세 파서 테스트 (5개 케이스)
+node scripts/check-api-usage.js          # Twelve Data 를 실제로 썼는지 검사
 ```
+
+### Twelve Data 사용량 확인 (2026-08-25 추가)
+
+**대시보드가 0으로 보이는 것은 정상이다.** Twelve Data 의 일일 카운터는 UTC 자정에
+리셋되는데, 미국 수집은 22:30 UTC(한국 07:30)에 돈다. 한국 시간 낮에 대시보드를 열면
+그 사이 UTC 날짜가 넘어가 있어서 "오늘 0회"로 보인다. 실제로는 매 평일 밤 209회를 쓴다.
+
+그래서 사용량을 저장소 안에 남긴다.
+
+| 어디 | 무엇 |
+|---|---|
+| `data/api-usage.json` | 호출 수, 소스별 성공, Twelve Data 가 알려준 사용량 증가분, 실패 심볼 |
+| `data/us/*.json` 의 `source` | 이 종목 값을 어느 소스에서 받았는지 (`twelvedata`/`stooq`/`yahoo`) |
+| `data/sectors.json` 의 `provenance` | RS·히트맵이 읽는 그 파일이 어느 소스의 값으로 계산됐는지 |
+| Actions 실행 화면의 요약 패널 | 위 내용을 30분치 로그를 넘기지 않고 바로 볼 수 있게 |
+
+`scripts/check-api-usage.js` 가 그 기록을 검사하고, 워크플로우의 마지막 스텝으로 돈다.
+호출이 0회거나, 폴백(Stooq·야후)으로만 받았거나, RS·히트맵이 그 데이터로 만들어지지
+않았으면 잡이 빨갛게 된다.
+
+> ⚠️ **검사는 반드시 커밋 스텝 뒤에 둘 것.** 앞에 두면 검사 실패가 방금 받은 하루치
+> 시세까지 버린다. 이 저장소는 이미 한 번 그렇게 날렸다(미국 수집 실패가 한국 101종목의
+> 커밋을 막은 건). 검사는 아무것도 고치지 않고 보기만 한다.
+
+호출 수는 **209회/평일 밤 1회**다 (섹터·테마 구성 종목 208개 + 벤치마크 SPY).
+무료 플랜 하루 800회 중 나머지는 사용자 조회 프록시(`api/twelve-data/time-series.js`)와
+주간 종목 리포트(`refresh-stock-pages.yml`, 월요일)가 나눠 쓴다.
+아침 09:30 UTC 실행은 미국장이 열리기도 전이라 수집도 검사도 건너뛴다.
 
 ### 알아둘 구조
 

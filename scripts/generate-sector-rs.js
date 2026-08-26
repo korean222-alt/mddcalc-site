@@ -370,6 +370,43 @@ function buildTickerIndex(markets) {
   return tickers;
 }
 
+// 이 계산이 "어느 소스에서 받은 값으로" 만들어졌는지를 결과 파일에 함께 담습니다.
+//
+// 왜 필요한가: 섹터 RS 와 히트맵은 같은 data/sectors.json 을 읽습니다. 화면에 막대가
+// 그려진다고 해서 그 값이 Twelve Data 로 받은 최신 종가라는 보장은 없습니다 — 수집이
+// 통째로 실패해도 지난 파일이 남아 있어 화면은 똑같이 그려집니다. 그래서 "이번 계산에
+// 들어간 미국 파일 중 몇 개가 Twelve Data 에서 왔는가"를 여기서 세어 남깁니다.
+// scripts/check-api-usage.js 가 이 값을 검사합니다.
+function usProvenance() {
+  const sources = {};
+  let counted = 0;
+  for (const code of usSymbols()) {
+    const p = path.join(ROOT, 'data', 'us', `${code}.json`);
+    if (!fs.existsSync(p)) continue;
+    let src = 'unknown';   // source 필드가 생기기 전에 만들어진 파일
+    try { src = JSON.parse(fs.readFileSync(p, 'utf8')).source || 'unknown'; } catch { /* 손상 파일 */ }
+    sources[src] = (sources[src] || 0) + 1;
+    counted++;
+  }
+
+  const out = { symbols: counted, sources };
+
+  // 수집 기록이 있으면 호출 수까지 같이 답니다. 없으면 그 항목만 빠집니다.
+  const usagePath = path.join(ROOT, 'data', 'api-usage.json');
+  if (fs.existsSync(usagePath)) {
+    try {
+      const u = JSON.parse(fs.readFileSync(usagePath, 'utf8'));
+      out.apiUsage = {
+        provider: u.provider, calls: u.calls,
+        generatedAt: u.generatedAt, generatedAtKST: u.generatedAtKST,
+        delta: u.usage && u.usage.measured ? u.usage.delta : null,
+      };
+    } catch { /* 기록이 깨졌다고 RS 계산을 멈출 이유는 없습니다 */ }
+  }
+
+  return out;
+}
+
 function main() {
   assertCodesKnown();
 
@@ -407,13 +444,20 @@ function main() {
   //
   // schedule 은 "다음 갱신은 언제인가"를 화면이 스스로 계산하는 데 씁니다. 안내 문구를
   // HTML 에 박아 두면 cron 을 고쳤을 때 조용히 거짓말이 됩니다.
+  const provenance = { US: usProvenance() };
+
   fs.writeFileSync(OUT_FILE, JSON.stringify({
     updated: new Date().toISOString().slice(0, 10),
     generatedAt: new Date().toISOString(),
     schedule: REFRESH_SCHEDULE,
+    provenance,
     markets,
   }));
   console.log('✅ data/sectors.json — ' + Math.round(fs.statSync(OUT_FILE).size / 1024) + 'KB');
+  console.log('   미국 데이터 출처: '
+    + (Object.entries(provenance.US.sources).map(([k, n]) => `${k} ${n}`).join(', ') || '없음')
+    + (provenance.US.apiUsage ? ` · 마지막 수집 ${provenance.US.apiUsage.generatedAtKST}`
+      + ` (Twelve Data ${provenance.US.apiUsage.calls}회)` : ''));
 
   const tickers = buildTickerIndex(markets);
   fs.writeFileSync(TICKER_FILE, JSON.stringify({
@@ -432,4 +476,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { equalWeightIndex, alignForward, periodReturn, toRatings, readSeries, buildMarket, buildTickerIndex };
+module.exports = { equalWeightIndex, alignForward, periodReturn, toRatings, readSeries, buildMarket, buildTickerIndex, usProvenance };
