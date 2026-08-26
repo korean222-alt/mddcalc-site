@@ -7,12 +7,18 @@ const mysql = require('mysql2/promise');
 const DAILY_LIMIT = 800;
 const DB_TIMEOUT_MS = 1500;
 const DB_COOLDOWN_MS = 5 * 60 * 1000;
+const TD_USAGE_CACHE_MS = 2 * 60 * 1000;
 
 let _pool = null;
 let _dbDownUntil = 0;
+let _tdDaily = null;
+
+function utcDay() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function utcDayStartSql() {
-  return new Date().toISOString().slice(0, 10) + ' 00:00:00';
+  return utcDay() + ' 00:00:00';
 }
 
 function toCount(value) {
@@ -61,25 +67,6 @@ function withTimeout(promise, ms, label) {
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-async function getTodayApiUsageCount() {
-  if (dbIsCoolingDown()) return null;
-  try {
-    const [rows] = await withTimeout(
-      getPool().execute(
-        'SELECT COUNT(*) AS cnt FROM api_usage WHERE status = ? AND createdAt >= ?',
-        ['success', utcDayStartSql()]
-      ),
-      DB_TIMEOUT_MS,
-      'DB count'
-    );
-    return toCount(rows[0] && rows[0].cnt);
-  } catch (err) {
-    markDbDown();
-    console.warn('[DB] usage count 조회 실패:', err.message);
-    return null;
-  }
-}
-
 async function logApiUsage(symbol, status, statusCode) {
   if (dbIsCoolingDown()) return;
   try {
@@ -97,24 +84,44 @@ async function logApiUsage(symbol, status, statusCode) {
   }
 }
 
-function usageFromHeaders(response) {
-  const used = Number(response.headers.get('api-credits-used'));
-  const left = Number(response.headers.get('api-credits-left'));
-  if (!Number.isFinite(used) || !Number.isFinite(left)) return null;
-  const limit = used + left;
-  // Basic 계획의 분당 창(8) 을 일일 한도로 오인하지 않습니다.
-  if (limit > 60) {
-    return { todayUsage: used, remainingUsage: left, dailyLimit: limit };
+// 하루 사용량만 읽습니다. current_usage/plan_limit 는 분당 한도(무료 8회)라 쓰면 안 됩니다.
+// 이 엔드포인트도 크레딧 1회를 쓰므로 2분 캐시합니다.
+async function getTwelveDailyUsage(apiKey) {
+  const day = utcDay();
+  if (_tdDaily && _tdDaily.day === day && (Date.now() - _tdDaily.fetchedAt) < TD_USAGE_CACHE_MS) {
+    return _tdDaily;
   }
-  return null;
+  if (!apiKey) return _tdDaily;
+
+  try {
+    const url = new URL('https://api.twelvedata.com/api_usage');
+    url.searchParams.set('apikey', apiKey);
+    const res = await fetch(url.toString(), { signal: AbortSignal.timeout(4000) });
+    const json = await res.json();
+    if (!res.ok || json.status === 'error') return _tdDaily;
+
+    const used = Number(json.daily_usage);
+    const limit = Number(json.plan_daily_limit);
+    if (!Number.isFinite(used)) return _tdDaily;
+
+    _tdDaily = {
+      used,
+      limit: Number.isFinite(limit) && limit > 60 ? limit : DAILY_LIMIT,
+      fetchedAt: Date.now(),
+      day,
+    };
+    return _tdDaily;
+  } catch (err) {
+    console.warn('[TD] daily usage 조회 실패:', err.message);
+    return _tdDaily;
+  }
 }
 
-function getMinutesUntilReset() {
-  const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  tomorrow.setUTCHours(0, 0, 0, 0);
-  return Math.ceil((tomorrow.getTime() - now.getTime()) / (1000 * 60));
+function bumpLocalDailyUsage() {
+  if (_tdDaily && _tdDaily.day === utcDay()) {
+    _tdDaily.used += 1;
+    _tdDaily.fetchedAt = Date.now();
+  }
 }
 
 module.exports = async function handler(req, res) {
@@ -131,28 +138,14 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const todayUsage = await getTodayApiUsageCount();
-
-    if (todayUsage !== null && todayUsage >= DAILY_LIMIT) {
-      const minutesUntilReset = getMinutesUntilReset();
-      const hoursLeft = Math.floor(minutesUntilReset / 60);
-      const minutesLeft = minutesUntilReset % 60;
-      await logApiUsage(symbol, 'rate_limit', 429);
-      res.status(429).json({
-        error: 'API usage limit exceeded',
-        message: `일일 한도(800회)를 모두 사용했습니다. ${hoursLeft}시간 ${minutesLeft}분 뒤에 다시 시도해주세요.`,
-        remainingTime: { hours: hoursLeft, minutes: minutesLeft, totalMinutes: minutesUntilReset },
-        todayUsage,
-        dailyLimit: DAILY_LIMIT,
-      });
-      return;
-    }
-
     const apiKey = process.env.TWELVE_DATA_API_KEY;
     if (!apiKey) {
       res.status(500).json({ error: 'API key not configured' });
       return;
     }
+
+    // 시세 조회와 한도 조회를 같이 시작합니다. DB는 조회 경로를 막지 않습니다.
+    const tdUsagePromise = getTwelveDailyUsage(apiKey);
 
     const url = new URL('https://api.twelvedata.com/time_series');
     url.searchParams.set('symbol', symbol);
@@ -164,17 +157,22 @@ module.exports = async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      await logApiUsage(symbol, 'error', response.status);
+      logApiUsage(symbol, 'error', response.status);
       res.status(response.status).json(data);
       return;
     }
 
-    await logApiUsage(symbol, 'success', 200);
+    logApiUsage(symbol, 'success', 200);
+    bumpLocalDailyUsage();
 
-    const headerUsage = usageFromHeaders(response);
-    const metadata = todayUsage !== null
-      ? { todayUsage: todayUsage + 1, remainingUsage: DAILY_LIMIT - (todayUsage + 1), dailyLimit: DAILY_LIMIT }
-      : headerUsage;
+    const td = await tdUsagePromise;
+    const metadata = td
+      ? {
+          todayUsage: td.used,
+          remainingUsage: Math.max(0, td.limit - td.used),
+          dailyLimit: td.limit,
+        }
+      : null;
 
     res.status(200).json({
       ...data,
