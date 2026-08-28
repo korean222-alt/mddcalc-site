@@ -35,6 +35,7 @@ function escapeHtml(str) {
 // 글 데이터의 단일 원본. 예전에는 blog.html 인라인 JS에서 배열을 긁어왔지만,
 // 그 60KB짜리 블록을 모든 페이지에서 걷어내고 scripts/posts-data.js 로 분리했다.
 const { BLOG_POSTS, RELATED_POSTS, CTA_MAP, TICKER_RELATED_POSTS, RETIRED_POSTS } = require('./posts-data.js');
+const { chromeCss, headerHtml, footerHtml, chromeScript } = require('./site-chrome');
 
 // TICKER_RELATED_POSTS(티커 → 글 id[])를 반대로 뒤집어서 글 id → 티커[] 로.
 // generate-stock-pages.js가 만드는 /stock/{ticker}.html 쪽에서 이 글로 링크하니,
@@ -92,12 +93,10 @@ const PAGE_URLS = {
 // <a href> 링크로 복원한다 (JS 없이도, 크롤러도 그대로 따라갈 수 있도록).
 // 글에서 매일 갱신되는 화면으로 보내는 링크.
 //
-// 블로그 글에는 상단 네비게이션이 없습니다(읽는 데 방해라 일부러 뺐습니다). 그래서 글을 다
-// 읽은 사람이 섹터 RS·히트맵·공포탐욕으로 갈 길이 아예 없었습니다. 크롤러 입장에서도
-// 그 세 화면으로 들어오는 링크가 사이트 안에 몇 개 없습니다.
-//
-// 글 내용과 무관하게 같은 세 개를 답니다. 글마다 다르게 고르려면 그 매핑을 손으로
-// 관리해야 하는데, 지금은 그럴 근거가 없습니다.
+// 예전에는 글에 상단 네비게이션이 없었습니다. 읽는 데 방해라는 이유로 뺐는데,
+// 그 결과 글 17편이 사이트 메뉴·푸터 없이 고립됐고, 크롤러와 심사자가 글을 열면
+// 이 사이트의 다른 화면으로 가는 길이 본문 아래 칩 세 개뿐이었습니다.
+// 지금은 scripts/site-chrome.js 의 헤더·푸터를 붙입니다. 아래 세 링크는 본문 맥락용입니다.
 const MARKET_LINKS_HTML = `
     <div class="related">
       <div class="related-title">지금 시장은 어떤가</div>
@@ -197,8 +196,8 @@ function buildPostPage(post, related) {
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
-         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.75; padding: 16px; }
-  .container { max-width: 720px; margin: 0 auto; }
+         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.75; padding: 0; }
+  .container { max-width: 720px; margin: 0 auto; padding: 0 16px; }
   a { color: #4299e1; }
   .card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
@@ -225,9 +224,11 @@ function buildPostPage(post, related) {
   .cta-btn { display: inline-block; background: #2b6cb0; color: #fff !important; padding: 9px 18px; border-radius: 8px;
              font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
   .cta-btn:hover { background: #2c5282; }
+${chromeCss()}
 </style>
 </head>
 <body>
+${headerHtml('blog')}
 <div class="container">
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/blog.html">블로그</a></nav>
   <div class="card">
@@ -240,7 +241,8 @@ function buildPostPage(post, related) {
         <p class="author-bio">
           개인 투자자이자 개발자입니다. 고점 대비 하락률을 매번 손으로 계산하기 번거로워 만든 도구를 무료로 공개하고 있습니다.
           투자자문업·금융투자업 등록 사업자가 아니며, 특정 종목이나 상품을 추천하지 않습니다.
-          글에 쓰인 계산식은 모두 공개된 표준 공식이고, 시세는 Twelve Data의 종가 데이터를 사용합니다.
+          글에 쓰인 계산식은 모두 공개된 표준 공식이고, 시세 출처와 계산 순서는 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 모아 두었습니다.
+          미국 종목은 Twelve Data, 한국 종목은 네이버 금융의 종가를 사용합니다.
           내용에 오류가 있으면 <a href="mailto:gktgkt2309@gmail.com">gktgkt2309@gmail.com</a> 으로 알려주세요. 확인 후 수정합니다.
           <a href="/about.html">운영 원칙 자세히 보기 →</a>
         </p>
@@ -259,6 +261,8 @@ function buildPostPage(post, related) {
     </p>
   </div>
 </div>
+${footerHtml()}
+${chromeScript()}
 </body>
 </html>
 `;

@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>소개 | MDD 분석기</title>
-<meta name="description" content="MDD 분석기가 어떤 도구인지, 어떤 목적으로 만들어졌는지 소개합니다.">
+<meta name="description" content="MDD 분석기를 누가, 어떤 원칙으로 만드는지 소개합니다. 데이터 출처와 계산 방식, 연락처를 공개합니다.">
 <meta name="robots" content="index, follow">
 <meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
 <link rel="canonical" href="https://mddcalc.com/about.html">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="소개 | MDD 분석기">
-<meta property="og:description" content="MDD 분석기가 어떤 도구인지, 어떤 목적으로 만들어졌는지 소개합니다.">
+<meta property="og:description" content="MDD 분석기를 누가, 어떤 원칙으로 만드는지 소개합니다. 데이터 출처와 계산 방식, 연락처를 공개합니다.">
 <meta property="og:url" content="https://mddcalc.com/about.html">
 <meta property="og:site_name" content="MDD 분석기">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="소개 | MDD 분석기">
-<meta name="twitter:description" content="MDD 분석기가 어떤 도구인지, 어떤 목적으로 만들어졌는지 소개합니다.">
+<meta name="twitter:description" content="MDD 분석기를 누가, 어떤 원칙으로 만드는지 소개합니다. 데이터 출처와 계산 방식, 연락처를 공개합니다.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -36,6 +36,22 @@
       "item": "https://mddcalc.com/about.html"
     }
   ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "MDD 분석기",
+  "url": "https://mddcalc.com/",
+  "email": "gktgkt2309@gmail.com",
+  "description": "고점 대비 하락률(MDD)을 계산하는 무료 주식 분석 도구. 개인 투자자가 운영하며 투자자문업 등록 사업자가 아닙니다.",
+  "founder": {
+    "@type": "Person",
+    "name": "MDD 분석기 운영자",
+    "url": "https://mddcalc.com/about.html",
+    "email": "gktgkt2309@gmail.com"
+  }
 }
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
@@ -86,14 +102,21 @@
       </ul>
 
       <h2>👤 운영자 소개</h2>
-      <p>MDD 분석기는 개인 투자자가 직접 만들고 운영하는 사이트입니다. "고점 대비 얼마나 빠졌는지"를 매번 직접 계산하기 번거로워서 만든 도구를, 같은 고민을 하는 다른 투자자분들과 무료로 나누고자 공개했습니다. 특정 금융회사나 증권사와 제휴 관계는 없으며, 특정 종목·상품을 홍보하지 않습니다.</p>
+      <p>MDD 분석기는 2026년 7월부터 개인 투자자가 직접 만들고 운영하는 사이트입니다. "고점 대비 얼마나 빠졌는지"를 매번 직접 계산하기 번거로워서 만든 도구를, 같은 고민을 하는 다른 투자자분들과 무료로 나누고자 공개했습니다. 특정 금융회사나 증권사와 제휴 관계는 없으며, 특정 종목·상품을 홍보하지 않습니다.</p>
+      <p>운영자는 투자자문업·금융투자업에 등록되어 있지 않습니다. 자격증이나 증권사 리서치 소속을 내세우지 않습니다. 이 사이트에서 믿을 수 있는 것은 소속이 아니라 <strong>계산식이 공개되어 있고, 시세 출처가 적혀 있으며, 틀린 숫자를 알려주시면 고친다</strong>는 점입니다.</p>
+      <ul>
+        <li><strong>손으로 쓰는 것</strong> — 종목 리포트의 해설(왜 그 종목의 낙폭이 그런 모양인지), 투자 가이드 글, 이 소개와 계산 방식 문서.</li>
+        <li><strong>기계가 매일 하는 것</strong> — 한국 시세 파일 갱신, 섹터 상대강도·히트맵·공포탐욕 지수.</li>
+        <li><strong>기계가 매주 하는 것</strong> — 미국 종목 리포트의 표(낙폭·회복 기간)를 최신 종가로 다시 계산.</li>
+      </ul>
+      <p>숫자가 표에 들어가기 전에 운영자가 매일 전 종목을 눈으로 검수하지는 않습니다. 대신 파서·공식 회귀 테스트가 시세를 받기 전에 돌아가고, 사용자가 제보한 오류는 재현한 뒤 수정합니다. 계산 과정은 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 따로 모아 두었습니다.</p>
       <p><strong>연락처:</strong> <a href="mailto:gktgkt2309@gmail.com" style="color:#2b6cb0; font-weight:700;">gktgkt2309@gmail.com</a> — 콘텐츠의 오류 지적, 기능 제안, 개인정보 관련 요청 모두 이 주소로 받습니다. <a href="/contact.html" onclick="navigate('contact'); return false;" style="color:#4299e1;">문의 페이지</a>의 양식을 이용하셔도 됩니다.</p>
-      <p style="font-size:13px; color:#a0aec0;">최종 업데이트: 2026년 8월</p>
+      <p style="font-size:13px; color:#a0aec0;">최종 업데이트: 2026년 8월 28일</p>
 
       <h2>✍️ 콘텐츠 제작 원칙</h2>
       <p>투자 관련 정보는 잘못 전달되면 실제 손해로 이어질 수 있다고 생각합니다. 그래서 이 사이트의 글과 도구는 다음 원칙에 따라 만들고 있습니다.</p>
       <ul>
-        <li><strong>계산은 공개된 공식만 사용합니다.</strong> MDD, RSI, CAGR, 배당수익률 등은 널리 통용되는 표준 계산식을 그대로 사용하며, 각 도구 페이지에 계산식을 함께 표기합니다. 자체적으로 만든 비공개 지표나 예측 알고리즘은 사용하지 않습니다.</li>
+        <li><strong>계산은 공개된 공식만 사용합니다.</strong> MDD, RSI, CAGR, 배당수익률 등은 널리 통용되는 표준 계산식을 그대로 사용하며, 각 도구 페이지에 계산식을 함께 표기합니다. 자체적으로 만든 비공개 지표나 예측 알고리즘은 사용하지 않습니다. 공식과 데이터 처리 순서는 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 모아 두었습니다.</li>
         <li><strong>가격 데이터는 미국 종목과 한국 종목의 출처가 다릅니다.</strong> 미국 종목은 Twelve Data API에서 조회 시점에 받아오고, 한국 종목은 네이버 금융에서 받아 매 거래일 장 마감 뒤 갱신해 둔 파일을 읽습니다. 둘 다 전일 종가 기준이며 실시간 시세가 아닙니다. 데이터 출처와 기준 시점을 숨기지 않고 표시합니다.</li>
         <li><strong>과거 수치는 근사치임을 밝힙니다.</strong> 하락률·회복 기간 등 과거 데이터는 집계 방식(장중가/종가)과 출처에 따라 달라질 수 있어, 단정적으로 쓰지 않고 대략적인 값임을 함께 적습니다.</li>
         <li><strong>매수·매도 시점을 제시하지 않습니다.</strong> 특정 종목이나 상품을 추천하지 않으며, "지금이 매수 기회"와 같은 판단을 대신 내리지 않습니다. 과거에 시장이 어떻게 움직였는지를 보여주는 데까지가 이 사이트의 역할입니다.</li>
@@ -151,8 +174,7 @@
         <h4>투자 가이드</h4>
         <a href="/blog.html" onclick="navigate('blog'); return false;">📚 모든 가이드 보기</a>
         <a href="/blog/1.html">MDD란 무엇인가?</a>
-        <a href="/blog/3.html">-30% 하락 시 하락 대응 패턴</a>
-        <a href="/blog/5.html">RSI 완전 가이드</a>
+        <a href="/methodology.html">숫자는 어떻게 계산하나</a>
       </div>
       <div class="footer-col">
         <h4>사이트 정보</h4>

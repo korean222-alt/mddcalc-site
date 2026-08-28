@@ -89,5 +89,97 @@ check('표의 주소에 해당하는 파일이 실제로 있다', () => {
   assert.deepStrictEqual(missing, [], '파일이 없는 주소');
 });
 
+check('종목 리포트와 블로그 글에 사이트 헤더·푸터가 있다', () => {
+  const missing = [];
+  for (const dir of ['stock', 'blog']) {
+    const folder = path.join(ROOT, dir);
+    for (const f of fs.readdirSync(folder).filter(x => x.endsWith('.html'))) {
+      const src = fs.readFileSync(path.join(folder, f), 'utf8');
+      const rel = `${dir}/${f}`;
+      if (!src.includes('class="site-header"')) missing.push(`${rel}: header 없음`);
+      if (!src.includes('class="site-footer"')) missing.push(`${rel}: footer 없음`);
+      if (!src.includes('id="siteNav"')) missing.push(`${rel}: siteNav 없음`);
+      if (!/href="\/privacy.html"/.test(src)) missing.push(`${rel}: 개인정보 처리방침 링크 없음`);
+      if (!/href="\/terms.html"/.test(src)) missing.push(`${rel}: 이용약관 링크 없음`);
+      if (!/href="\/disclaimer.html"/.test(src)) missing.push(`${rel}: 면책조항 링크 없음`);
+      if (!/href="\/contact.html"/.test(src)) missing.push(`${rel}: 문의 링크 없음`);
+      if (!/href="\/"$/.test(src) && !/href="\/"/.test(src)) missing.push(`${rel}: 홈 링크 없음`);
+      // 이 페이지들은 site.js 를 안 쓰므로 SPA navigate 로 클릭을 가로채면 안 된다.
+      if (/onclick="navigate\('[^']+'\);\s*return false;"/.test(src)) {
+        missing.push(`${rel}: navigate()+return false 가 있어 스크립트 없이 클릭이 막힘`);
+      }
+    }
+  }
+  assert.deepStrictEqual(missing, [], missing.join('\n     '));
+});
+
+check('계산 방식 페이지가 소개·사이트맵에 연결되어 있다', () => {
+  const about = fs.readFileSync(path.join(ROOT, 'about.html'), 'utf8');
+  const sitemap = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+  assert.ok(about.includes('href="/methodology.html"'), 'about.html 에 methodology 링크가 없습니다');
+  assert.ok(fs.existsSync(path.join(ROOT, 'methodology.html')), 'methodology.html 파일이 없습니다');
+  assert.ok(sitemap.includes('https://mddcalc.com/methodology.html'), 'sitemap 에 methodology 가 없습니다');
+  assert.strictEqual(shared.methodology, '/methodology.html', 'assets/site.js PAGE_URLS 에 methodology 가 없습니다');
+  assert.strictEqual(home.methodology, '/methodology.html', 'index.html PAGE_URLS 에 methodology 가 없습니다');
+});
+
+check('공개 HTML 푸터에 계산 방식 페이지 링크가 있다', () => {
+  const missing = [];
+  const skipDir = new Set(['data', 'docs', 'scripts', 'api', 'vendor', 'og', 'node_modules']);
+  const walk = (dir) => {
+    for (const f of fs.readdirSync(dir)) {
+      const p = path.join(dir, f);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) {
+        if (!skipDir.has(f) && !f.startsWith('.')) walk(p);
+      } else if (f.endsWith('.html')) {
+        const src = fs.readFileSync(p, 'utf8');
+        if (!src.includes('href="/methodology.html"')) {
+          missing.push(path.relative(ROOT, p));
+        }
+      }
+    }
+  };
+  walk(ROOT);
+  assert.deepStrictEqual(missing, [], missing.join('\n     '));
+});
+
+check('종목 리포트와 블로그 본문에 좌우 여백이 있다', () => {
+  const missing = [];
+  for (const dir of ['stock', 'blog']) {
+    const folder = path.join(ROOT, dir);
+    for (const f of fs.readdirSync(folder).filter(x => x.endsWith('.html'))) {
+      const src = fs.readFileSync(path.join(folder, f), 'utf8');
+      if (!/\.container \{ max-width: \d+px; margin: 0 auto; padding: 0 16px; \}/.test(src)) {
+        missing.push(`${dir}/${f}`);
+      }
+    }
+  }
+  assert.deepStrictEqual(missing, [], missing.join('\n     '));
+});
+
+check('도구 카드가 크롤러가 따라갈 수 있는 링크다', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'tools.html'), 'utf8');
+  assert.ok(!/<div class="tool-card"/.test(src), '도구 카드가 아직 div 입니다');
+  const cards = [...src.matchAll(/<a class="tool-card" href="([^"]+)"/g)];
+  assert.strictEqual(cards.length, 12, `도구 카드 ${cards.length}개 (12개여야 함)`);
+  const missing = [];
+  for (const m of cards) {
+    const file = m[1] === '/' ? 'index.html' : m[1].replace(/^\//, '');
+    if (!fs.existsSync(path.join(ROOT, file))) missing.push(m[1]);
+  }
+  assert.deepStrictEqual(missing, [], '없는 주소를 가리키는 카드');
+  assert.ok(!src.includes('25개 글'), '도구 페이지가 글 수를 25개로 적고 있습니다');
+});
+
+check('소개 페이지 description 태그가 닫혀 있다', () => {
+  const about = fs.readFileSync(path.join(ROOT, 'about.html'), 'utf8');
+  assert.ok(
+    !/name="description"\s+content="[^"]*"\s*>>/.test(about),
+    'about.html description 뒤에 닫는 꺾쇠가 하나 더 있습니다'
+  );
+});
+
+
 console.log(failed ? `\n${failed}개 실패` : '\n모두 통과');
 process.exit(failed ? 1 : 0);

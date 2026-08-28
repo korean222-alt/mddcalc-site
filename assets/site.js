@@ -1036,7 +1036,8 @@ const PAGE_URLS = {
   blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
   disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
   compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
-  sector: '/sector-rs.html', heatmap: '/heatmap.html', feargreed: '/fear-greed.html'
+  sector: '/sector-rs.html', heatmap: '/heatmap.html', feargreed: '/fear-greed.html',
+  methodology: '/methodology.html'
 };
 
 function navigate(page) {

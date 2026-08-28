@@ -650,12 +650,13 @@
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 이 도구는 무료인가요?</strong><br>네, 모든 기능이 무료입니다. 회원가입 없이 사용할 수 있습니다.</p>
-    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 어떤 종목을 조회할 수 있나요?</strong><br>TSLA, NVDA, AAPL 같은 미국 상장 주식과 SPY, QQQ 같은 ETF를 조회할 수 있습니다. 데이터는 Twelve Data API를 통해 전일 종가 기준으로 제공됩니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 어떤 종목을 조회할 수 있나요?</strong><br>TSLA, NVDA, AAPL 같은 미국 상장 주식과 SPY, QQQ 같은 ETF, 그리고 삼성전자·SK하이닉스 같은 한국 주요 종목을 조회할 수 있습니다. 미국은 Twelve Data, 한국은 네이버 금융의 전일 종가입니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. MDD가 크면 매수 기회인가요?</strong><br>아닙니다. 많이 내렸다는 사실 자체는 반등의 근거가 되지 않습니다. 실적이 악화된 기업은 더 내려갈 수 있습니다. 이 도구는 가격의 위치를 보여줄 뿐, 매수·매도 판단은 여러 정보를 종합해 스스로 내리셔야 합니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 한국 주식도 조회할 수 있나요?</strong><br>네. 코스피·코스닥 주요 종목과 지수를 지원합니다. 종목코드(005930)나 종목명(삼성전자, SK하이닉스)을 그대로 입력하면 되고, 코스피·코스닥 지수도 이름으로 조회됩니다. 지원 종목 전체 목록은 검색창 아래 &quot;조회 가능한 한국 종목 보기&quot;에서 확인하실 수 있습니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 하락률과 회복률이 왜 다른가요?</strong><br>기준이 되는 금액이 다르기 때문입니다. 10만원에서 −50%면 5만원이 되는데, 5만원에서 10만원으로 돌아오려면 5만원이 더 필요하니 +100%가 됩니다. 손실이 깊어질수록 이 격차가 급격히 벌어져서, −90%는 회복에 +900%가 필요합니다. 큰 손실을 피하는 것이 중요한 이유입니다.</p>
-    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. "장중 최고가 기준"과 "종가 기준"은 뭐가 다른가요?</strong><br>장중 최고가 기준은 하루 중 가장 높았던 가격을 고점으로 봅니다. 실제로 계좌에서 겪은 낙폭에 가깝지만 수치가 더 크게 나옵니다. 종가 기준은 마감 가격만 쓰기 때문에 장중의 순간적인 급등락에 덜 흔들립니다. 장기 추세를 볼 때는 종가 기준이 더 안정적입니다.</p>
-    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 한국 종목과 미국 종목은 데이터 출처가 다른가요?</strong><br>다릅니다. 미국 종목은 Twelve Data API에서 조회 시점에 받아오고, 한국 종목은 매 거래일 장 마감 뒤 미리 만들어 둔 파일을 읽습니다. 그래서 한국 종목은 API 사용량 제한이나 조회 실패가 없는 대신, 항상 전일 종가까지만 반영됩니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. "장중 최고가 기준"과 "종가 기준"은 뭐가 다른가요?</strong><br>장중 최고가 기준은 하루 중 가장 높았던 가격을 고점으로 봅니다. 실제로 계좌에서 겪은 낙폭에 가깝지만 수치가 더 크게 나옵니다. 종가 기준은 마감 가격만 쓰기 때문에 장중의 순간적인 급등락에 덜 흔들립니다. 장기 추세를 볼 때는 종가 기준이 더 안정적입니다. 공식과 코스피로 직접 계산한 예는 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 있습니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 한국 종목과 미국 종목은 데이터 출처가 다른가요?</strong><br>다릅니다. 미국 종목은 Twelve Data API에서 조회 시점에 받아오고, 한국 종목은 네이버 금융에서 받아 매 거래일 장 마감 뒤 미리 만들어 둔 파일을 읽습니다. 그래서 한국 종목은 API 사용량 제한이나 조회 실패가 없는 대신, 항상 전일 종가까지만 반영됩니다.</p>
+    <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 숫자는 어떻게 계산하나요?</strong><br>최대 낙폭은 (저점 − 고점) / 고점 입니다. 홈 계산기는 장중 최고가와 종가를 고를 수 있고, 종목 리포트는 종가만 씁니다. 데이터 출처와 코스피 6,000거래일로 직접 계산한 예는 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 공개돼 있습니다.</p>
     <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
   </section>
 
@@ -705,6 +706,7 @@
         <h4>투자 가이드</h4>
         <a href="/blog.html" onclick="navigate('blog'); return false;">📚 모든 가이드 보기</a>
         <a href="/blog/1.html">MDD란 무엇인가?</a>
+        <a href="/methodology.html">숫자는 어떻게 계산하나</a>
         <a href="/blog/3.html">-30% 하락 시 하락 대응 패턴</a>
         <a href="/blog/5.html">RSI 완전 가이드</a>
       </div>
@@ -2376,7 +2378,8 @@ const PAGE_URLS = {
   blog: '/blog.html', about: '/about.html', contact: '/contact.html', privacy: '/privacy.html',
   disclaimer: '/disclaimer.html', terms: '/terms.html', fx: '/fx-calculator.html', roi: '/roi-calculator.html',
   compound: '/compound-calculator.html', leverage: '/leverage-etf-simulator.html', dca: '/dca-planner.html',
-  sector: '/sector-rs.html', heatmap: '/heatmap.html', feargreed: '/fear-greed.html'
+  sector: '/sector-rs.html', heatmap: '/heatmap.html', feargreed: '/fear-greed.html',
+  methodology: '/methodology.html'
 };
 
 function navigate(page) {

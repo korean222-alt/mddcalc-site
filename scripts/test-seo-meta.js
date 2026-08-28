@@ -85,6 +85,14 @@ check('description 이 페이지마다 다르다', () => {
   assert.deepStrictEqual(dups, [], '\n     ' + dups.join('\n     '));
 });
 
+check('description 태그가 닫는 꺾쇠를 하나 더 갖지 않는다', () => {
+  const bad = [];
+  for (const [file, m] of meta) {
+    if (/name="description"\s+content="[^"]*"\s*>>/.test(m.src)) bad.push(file);
+  }
+  assert.deepStrictEqual(bad, [], bad.join(', '));
+});
+
 check('og:title 이 페이지마다 다르다', () => {
   const seen = new Map();
   const dups = [];

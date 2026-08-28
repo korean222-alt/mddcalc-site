@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숫자는 어떻게 계산하나 | MDD 분석기</title>
+<meta name="description" content="MDD 분석기가 고점 대비 하락률과 회복 기간을 어떤 공식·어떤 시세로 계산하는지 공개합니다. 장중 최고가와 종가의 차이, 한국·미국 데이터 출처를 적었습니다.">
+<meta name="robots" content="index, follow">
+<meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
+<link rel="canonical" href="https://mddcalc.com/methodology.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="숫자는 어떻게 계산하나 | MDD 분석기">
+<meta property="og:description" content="MDD 분석기가 고점 대비 하락률과 회복 기간을 어떤 공식·어떤 시세로 계산하는지 공개합니다.">
+<meta property="og:url" content="https://mddcalc.com/methodology.html">
+<meta property="og:site_name" content="MDD 분석기">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="숫자는 어떻게 계산하나 | MDD 분석기">
+<meta name="twitter:description" content="MDD 분석기가 고점 대비 하락률과 회복 기간을 어떤 공식·어떤 시세로 계산하는지 공개합니다.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "MDD 분석기",
+      "item": "https://mddcalc.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "숫자는 어떻게 계산하나",
+      "item": "https://mddcalc.com/methodology.html"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "숫자는 어떻게 계산하나",
+  "description": "MDD 분석기가 고점 대비 하락률과 회복 기간을 어떤 공식·어떤 시세로 계산하는지 공개합니다.",
+  "url": "https://mddcalc.com/methodology.html",
+  "dateModified": "2026-08-28",
+  "inLanguage": "ko",
+  "author": {
+    "@type": "Person",
+    "name": "MDD 분석기 운영자",
+    "url": "https://mddcalc.com/about.html"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "MDD 분석기",
+    "url": "https://mddcalc.com/"
+  }
+}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5583100002281558" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
+      <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
+      <a href="/heatmap.html" onclick="navigate('heatmap'); return false;" id="nav-heatmap">🔥 히트맵</a>
+      <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;" id="nav-feargreed">😱 공탐지수</a>
+      <a href="/tools.html" onclick="navigate('tools'); return false;" id="nav-tools">🔧 도구</a>
+      <a href="/blog.html" onclick="navigate('blog'); return false;" id="nav-blog">📚 투자 가이드</a>
+      <a href="/about.html" onclick="navigate('about'); return false;" id="nav-about">ℹ️ 소개</a>
+      <a href="/contact.html" onclick="navigate('contact'); return false;" id="nav-contact">✉️ 문의</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+
+<div id="page-methodology" class="page active">
+  <div class="page-hero">
+    <div class="inner">
+      <h1>숫자는 어떻게 계산하나</h1>
+      <p>화면에 나오는 낙폭과 회복 기간의 공식·데이터 출처를 공개합니다</p>
+    </div>
+  </div>
+  <div class="prose">
+    <div class="card">
+      <p>이 문서는 투자 판단을 대신하지 않습니다. 이 사이트 숫자가 어디서 오는지, 무엇을 세고 무엇을 세지 않는지만 적습니다. 운영 원칙은 <a href="/about.html">소개 페이지</a>에, 법적 한계는 <a href="/disclaimer.html">면책조항</a>에 있습니다.</p>
+
+      <h2>MDD 공식</h2>
+      <p>최대 낙폭(MDD, Maximum Drawdown)은 어떤 기간 동안 <strong>그때까지의 고점</strong>에서 <strong>그 이후 저점</strong>까지 가격이 얼마나 줄었는지를 비율로 나타낸 값입니다.</p>
+      <p style="background:#f7fafc;border-radius:8px;padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;">MDD = (저점 − 고점) / 고점 × 100</p>
+      <p>예: 가격이 100 → 150 → 80 이면, 그 구간의 고점은 150, 저점은 80입니다. (80 − 150) / 150 = <strong>−46.67%</strong>. 이후 120으로 올라도, 고점 150을 아직 넘지 않았으면 그 하락 구간은 진행 중입니다.</p>
+      <p>원금이 얼마인지, 언제 샀는지는 이 공식에 들어가지 않습니다. 같은 종목이라도 조회 기간을 바꾸면 고점·저점이 바뀌므로 MDD도 바뀝니다.</p>
+
+      <h2>고점을 어디에 두느냐</h2>
+      <p>홈의 MDD 계산기는 고점을 두 가지 기준으로 고를 수 있습니다.</p>
+      <ul>
+        <li><strong>장중 최고가</strong> — 그날 하루 중 가장 높았던 가격. 네이버·야후 차트와 가깝게 보려면 이쪽입니다. 낙폭이 더 크게 나옵니다.</li>
+        <li><strong>종가</strong> — 그날 마감 가격만 씁니다. 장중에만 찍히고 마감 전에 되돌아온 고점은 세지 않습니다.</li>
+      </ul>
+      <p>종목 리포트(<a href="/tools.html">도구 모음</a>의 실데이터 페이지)는 매주 자동으로 만들 때 <strong>종가</strong>만 사용합니다. 장중 고가를 쓰면 주간 갱신 숫자와 홈 조회 숫자가 기준이 달라져 서로 어긋나기 때문입니다. 리포트 아래에도 “종가 기준의 근사치”라고 적어 둡니다.</p>
+      <p>한국 종목과 S&P500을 나란히 놓을 때는 환율을 맞추지 않습니다. 한국은 원화(또는 지수 포인트), 미국은 달러라서 비율 비교만 의미가 있습니다.</p>
+
+      <h2>실제 데이터로 한 번 계산해 본 예 — 코스피</h2>
+      <p>이 사이트가 보관 중인 코스피 일별 종가(네이버 금융, 2002-05-06 ~ 2026-08-27, 6,000거래일)로 위 공식을 그대로 적용하면 아래와 같습니다. 장중 최고가가 아니라 <strong>종가</strong>입니다.</p>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>항목</th><th>값</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>이 기간 고점(종가)</td><td>2,064.85 (2007-10-31)</td></tr>
+            <tr><td>그 이후 저점(종가)</td><td>938.75 (2008-10-24)</td></tr>
+            <tr><td>최대 낙폭</td><td>(938.75 − 2,064.85) / 2,064.85 = <strong>−54.54%</strong></td></tr>
+            <tr><td>종가가 그 고점을 다시 넘은 날</td><td>2011-01-03</td></tr>
+            <tr><td>데이터 구간 사상 최고 종가</td><td>9,114.55 (2026-06-22)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>2008년 저점은 금융위기와 날짜가 맞습니다. 집계 방식(장중가/종가)과 데이터 시작일이 다르면 다른 사이트와 1%p 안팎 차이가 날 수 있습니다. 그게 보이면 오류가 아니라 기준 차이일 때가 많습니다. 차이가 설명되지 않으면 <a href="/contact.html">문의</a>로 알려 주세요.</p>
+
+      <h2>회복을 어떻게 세나</h2>
+      <p>종목 리포트에서 “회복”은 <strong>종가가 그 구간의 직전 고점을 다시 넘어선 날</strong>입니다. 장중에만 고점을 찍고 종가가 못 미친 날은 회복으로 세지 않습니다.</p>
+      <p>일상적인 등락과 구분하기 위해, 리포트의 회복 통계는 <strong>−10% 이상</strong> 하락한 구간만 집계합니다. 고점 대비 0.5%짜리 미세 등락까지 구간으로 세면 횟수가 부풀고 회복 기간 중앙값이 며칠로 줄어, 숫자가 사실상 무의미해집니다.</p>
+      <p>과거에 회복했다는 사실이 이번에도 회복한다는 근거는 아닙니다. 개별 기업은 사업이 바뀌면 전고점을 영영 회복하지 못할 수도 있습니다. 리포트에도 그렇게 적습니다.</p>
+
+      <h2>데이터는 어디서 오나</h2>
+      <ul>
+        <li><strong>미국 주식·ETF</strong> — <a href="https://twelvedata.com/" target="_blank" rel="noopener nofollow">Twelve Data</a>의 일별 시세. 홈에서 조회할 때마다 받아오며, 전일 종가 기준입니다. 종목 리포트는 같은 출처를 주 1회 받아 페이지에 구워 둡니다.</li>
+        <li><strong>한국 주식·지수</strong> — <a href="https://finance.naver.com/" target="_blank" rel="noopener nofollow">네이버 금융</a>의 일별 시세. 조회 순간에 외부 API를 부르지 않습니다. 평일 장 마감 뒤 GitHub Actions가 받아 둔 파일을 읽습니다. 그래서 한국 종목은 항상 전일 종가까지입니다.</li>
+      </ul>
+      <p>둘 다 실시간 시세가 아닙니다. MDD는 원래 종가 계열 지표라, 초 단위 시세가 없어도 계산할 수 있습니다. 화면에는 기준일과 출처를 같이 둡니다.</p>
+      <p>연환산 변동성은 일간 로그수익률의 표본 표준편차에 √252를 곱합니다. 252는 미국 주식 시장의 관례적인 연간 거래일 수입니다.</p>
+
+      <h2>이 사이트가 하지 않는 것</h2>
+      <ul>
+        <li>매수·매도 시점을 제시하지 않습니다.</li>
+        <li>특정 종목이나 상품을 추천하지 않습니다.</li>
+        <li>자체 예측 모델이나 비공개 지표를 쓰지 않습니다. 계산식은 이 페이지와 각 도구에 적힌 공개 공식뿐입니다.</li>
+        <li>원 시세를 재가공해 별도의 데이터 상품으로 팔지 않습니다.</li>
+      </ul>
+      <p>숫자가 이상해 보이면 종목(티커 또는 종목코드), 화면에 나온 값, ATH 기준(장중 최고가/종가)과 조회 기간을 함께 <a href="/contact.html">알려 주세요</a>. 재현해서 공식 문제인지 원본 시세 문제인지 가린 뒤, 수정하면 해당 페이지의 날짜를 바꿉니다.</p>
+      <p style="font-size:13px;color:#a0aec0;">이 페이지의 코스피 예시는 저장소의 <code>data/kr/KS11.json</code> (갱신일 2026-08-27)으로 계산했습니다. 이후 장이 열리면 사상 최고 종가와 “지금 낙폭”은 달라집니다. 2008년 구간의 고점·저점·날짜는 과거 기록이므로 바뀌지 않습니다.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>📊 MDD 분석기</h4>
+        <p>고점 대비 하락률(MDD)으로 하락 및 회복 패턴을 찾아주는 무료 주식 분석 도구입니다.</p>
+      </div>
+      <div class="footer-col">
+        <h4>무료 계산기</h4>
+        <a href="/" onclick="navigate('home'); return false;">📊 MDD 계산기</a>
+        <a href="/rsi-calculator.html" onclick="navigate('rsi'); return false;">📈 RSI 계산기</a>
+        <a href="/dividend-calculator.html" onclick="navigate('dividend'); return false;">💰 배당 수익률 계산기</a>
+        <a href="/fx-calculator.html" onclick="navigate('fx'); return false;">💱 환율 계산기</a>
+        <a href="/roi-calculator.html" onclick="navigate('roi'); return false;">💹 수익률 계산기</a>
+        <a href="/compound-calculator.html" onclick="navigate('compound'); return false;">🧮 복리 계산기</a>
+        <a href="/leverage-etf-simulator.html" onclick="navigate('leverage'); return false;">🚀 레버리지 ETF 시뮬레이터</a>
+        <a href="/sector-rs.html" onclick="navigate('sector'); return false;">📊 섹터 상대강도(RS)</a>
+        <a href="/heatmap.html" onclick="navigate('heatmap'); return false;">🔥 섹터 히트맵</a>
+        <a href="/fear-greed.html" onclick="navigate('feargreed'); return false;">😱 공포·탐욕 지수</a>
+        <a href="/dca-planner.html" onclick="navigate('dca'); return false;">💰 분할매수 계획</a>
+        <a href="/tools.html" onclick="navigate('tools'); return false;">🔧 도구 모음</a>
+      </div>
+      <div class="footer-col">
+        <h4>투자 가이드</h4>
+        <a href="/blog.html" onclick="navigate('blog'); return false;">📚 모든 가이드 보기</a>
+        <a href="/blog/1.html">MDD란 무엇인가?</a>
+        <a href="/methodology.html">숫자는 어떻게 계산하나</a>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <a href="/about.html" onclick="navigate('about'); return false;">ℹ️ 소개</a>
+        <a href="/contact.html" onclick="navigate('contact'); return false;">✉️ 문의하기</a>
+        <a href="/privacy.html" onclick="navigate('privacy'); return false;">🔒 개인정보 처리방침</a>
+        <a href="/terms.html" onclick="navigate('terms'); return false;">📋 이용약관</a>
+        <a href="/disclaimer.html" onclick="navigate('disclaimer'); return false;">⚠️ 면책조항</a>
+        <a href="mailto:gktgkt2309@gmail.com">📧 gktgkt2309@gmail.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MDD 분석기. All rights reserved.</p>
+      <p class="footer-disclaimer">⚠️ 이 사이트에서 제공하는 모든 정보는 교육적 목적으로만 제공되며, 투자 권유나 재정 조언이 아닙니다. 주식 투자는 원금 손실의 위험이 있으며, 모든 투자 결정은 본인의 신중한 판단에 따라 진행하시기 바랍니다.</p>
+    </div>
+  </div>
+</footer>
+
+<script>window.CURRENT_PAGE = 'methodology';</script>
+<script src="/assets/site.js"></script>
+</body>
+</html>

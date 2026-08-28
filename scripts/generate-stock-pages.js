@@ -145,6 +145,7 @@ const { TICKER_NOTES } = require('./ticker-notes.js');
 // 이 리포트가 다루는 종목과 겹치는 블로그 글이 있으면 서로 링크한다.
 // generate-blog-pages.js도 같은 매핑을 반대 방향으로 써서 상호 링크를 만든다.
 const { TICKER_RELATED_POSTS } = require('./posts-data.js');
+const { chromeCss, headerHtml, footerHtml, chromeScript } = require('./site-chrome');
 
 function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -604,8 +605,8 @@ function buildPage(symbol, a, spyA, generatedDate) {
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
-         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.65; padding: 16px; }
-  .container { max-width: 760px; margin: 0 auto; }
+         background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.65; padding: 0; }
+  .container { max-width: 760px; margin: 0 auto; padding: 0 16px; }
   a { color: #4299e1; }
   .card { background: #fff; border-radius: 14px; padding: 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
@@ -637,9 +638,11 @@ function buildPage(symbol, a, spyA, generatedDate) {
   .note { font-size: 12px; color: #a0aec0; margin-top: 16px; line-height: 1.7; }
   .note-card { background: #fffdf7; border-left: 4px solid #d69e2e; }
   .note-card p { font-size: 14.5px; line-height: 1.85; color: #3d4852; margin-bottom: 0; }
+${chromeCss()}
 </style>
 </head>
 <body>
+${headerHtml('tools')}
 <div class="container">
   <nav class="crumbs"><a href="/">MDD 분석기</a> &gt; <a href="/tools.html">도구 모음</a> &gt; ${symbol}</nav>
 
@@ -715,6 +718,8 @@ ${buildTickerNoteHtml(symbol)}
     <p class="note">본 페이지는 정보 제공 목적이며 투자 자문이 아닙니다. 데이터 출처: Twelve Data. 오류 제보: <a href="mailto:gktgkt2309@gmail.com">gktgkt2309@gmail.com</a></p>
   </div>
 </div>
+${footerHtml()}
+${chromeScript()}
 </body>
 </html>
 `;
