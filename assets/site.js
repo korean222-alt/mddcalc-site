@@ -1616,6 +1616,16 @@ function rsNum(v, digits, unit) {
   return `<span style="color:${color}; font-weight:600;">${sign}${v.toFixed(digits)}${unit}</span>`;
 }
 
+// 거래대금 비중 변화는 "가격이 올랐다"가 아닙니다. 급락하는 섹터에도 돈은 몰립니다.
+// 수익률과 같은 초록·빨강으로 칠하면 수익률 카드 옆에 나란히 놓였을 때 그대로 상승률로
+// 읽힙니다. 방향은 부호로만 말하고 색은 중립 파랑 하나만 씁니다.
+const rsFlowColor = '#2b6cb0';
+function rsFlow(v, digits, unit) {
+  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  const sign = v > 0 ? '+' : '';
+  return `<span style="color:${v === 0 ? rsFlat : rsFlowColor}; font-weight:600;">${sign}${v.toFixed(digits)}${unit}</span>`;
+}
+
 function rsPlain(v, digits, unit) {
   if (v == null) return '<span style="color:#cbd5e0;">—</span>';
   return `${v.toFixed(digits)}${unit}`;
@@ -1728,6 +1738,28 @@ function rsMarketButtons(markets, current, handler) {
     .join('');
 }
 
+// 섹터 RS 화면과 히트맵은 같은 data/sectors.json 을 표와 지도로 각각 그린 두 페이지입니다.
+// 한쪽에서 기간을 1주로 바꿔 놓고 넘어갔는데 다른 쪽이 제 기본값(1개월)으로 열리면,
+// 같은 기간을 보고 있다고 믿은 채 서로 다른 창을 비교하게 됩니다. "1주 요약에선 반도체가
+// 초록인데 히트맵에선 빨갛다" 가 정확히 그 경우였습니다.
+//
+// 그래서 사용자가 실제로 고른 값만 세션에 남겨 두고 다음 화면이 이어받습니다. 기본값은
+// 건드리지 않습니다 — 각 페이지의 정적 요약문이 그 기본 기간으로 쓰여 있어서, 기본값을
+// 옮기면 본문과 화면이 어긋납니다. 저장이 막힌 브라우저(시크릿 모드 등)에서는 조용히
+// 지금까지처럼 동작합니다.
+const RS_VIEW_KEY = 'mdd.sectorView';
+
+function rsSaveView(market, period) {
+  try { sessionStorage.setItem(RS_VIEW_KEY, JSON.stringify({ market, period })); } catch (e) { /* 저장 불가 */ }
+}
+
+function rsLoadView() {
+  try {
+    const v = JSON.parse(sessionStorage.getItem(RS_VIEW_KEY) || 'null');
+    return (v && typeof v === 'object') ? v : null;
+  } catch (e) { return null; }
+}
+
 function rsMarketData() { return RS.data.markets[RS.market]; }
 function rsPeriodLabel() { return (RS_PERIODS.find(p => p.key === RS.period) || {}).label || RS.period; }
 
@@ -1762,8 +1794,12 @@ async function initSectorPage() {
   const wantPeriod = q.get('p');
   const wantSector = q.get('s');
 
-  RS.market = keys.includes(wantMarket) ? wantMarket : (keys.includes('KR') ? 'KR' : keys[0]);
+  // 우선순위: 링크로 들어온 값 > 직전 화면에서 고른 값 > 기본값
+  const saved = rsLoadView();
+  RS.market = keys.includes(wantMarket) ? wantMarket
+    : (saved && keys.includes(saved.market) ? saved.market : (keys.includes('KR') ? 'KR' : keys[0]));
   if (wantPeriod && RS_PERIODS.some(p => p.key === wantPeriod)) RS.period = wantPeriod;
+  else if (saved && RS_PERIODS.some(p => p.key === saved.period)) RS.period = saved.period;
   if (wantSector && RS.data.markets[RS.market].sectors.some(x => x.key === wantSector)) RS.openKey = wantSector;
 
   loading.classList.remove('show');
@@ -1794,12 +1830,14 @@ function setSectorMarket(key) {
   if (RS.market === key) return;
   RS.market = key;
   RS.openKey = null;
+  rsSaveView(RS.market, RS.period);
   renderSectorControls();
   renderSectorAll();
 }
 
 function setSectorPeriod(key) {
   RS.period = key;
+  rsSaveView(RS.market, RS.period);
   renderSectorControls();
   renderSectorAll();
 }
@@ -1818,6 +1856,16 @@ function renderSectorAll() {
   renderSectorSummary();
   renderSectorTable();
   renderSectorDetail();
+  rsSyncCrossLinks();
+}
+
+// 히트맵으로 가는 링크에 지금 보고 있는 시장·기간을 실어 보냅니다. 링크 문구에도 기간을
+// 적어 두면, 넘어가기 전에 무엇을 볼지가 먼저 보입니다.
+function rsSyncCrossLinks() {
+  const a = document.getElementById('rsToHeatmap');
+  if (!a) return;
+  a.href = `/heatmap.html?m=${encodeURIComponent(RS.market)}&p=${encodeURIComponent(RS.period)}`;
+  a.textContent = `🔥 히트맵에서 ${rsPeriodLabel()} 보기`;
 }
 
 function renderSectorSummary() {
@@ -1847,8 +1895,14 @@ function renderSectorSummary() {
       rsNum(weakest.periods[RS.period].alpha, 1, '%p'), '벤치마크 대비'),
   ];
   if (m.hasTurnover && inflow) {
+    // 변화폭 하나만 큼직하게 띄우면 "+6.55%p" 가 수익률로 읽힙니다. 어디서 어디로
+    // 옮겨갔는지를 같이 적으면 숫자 모양만 봐도 이게 비중이라는 게 드러납니다.
+    const f = inflow.periods[RS.period];
+    const before = (f.turnShare != null && f.turnShareChg != null) ? f.turnShare - f.turnShareChg : null;
     html.push(tile('수급이 몰린 섹터', rsEsc(inflow.name),
-      rsNum(inflow.periods[RS.period].turnShareChg, 2, '%p'), '거래대금 비중 변화'));
+      (before == null ? '' : `<span style="color:#4a5568;">${before.toFixed(1)}% → ${f.turnShare.toFixed(1)}%</span> `) +
+      rsFlow(f.turnShareChg, 2, '%p'),
+      '거래대금 비중 — 가격 등락이 아닙니다'));
   } else if (m.hasTurnover) {
     html.push(tile('수급이 몰린 섹터', '—', '<span style="color:#cbd5e0;">거래대금 데이터 준비 중</span>', ''));
   } else {
@@ -1906,7 +1960,7 @@ function renderSectorTable() {
       if (c.key === 'rankChg') return `<td>${rsRankChg(p.rankChg)}</td>`;
       if (c.key === 'turnShare') {
         return `<td style="white-space:nowrap;">${rsPlain(p.turnShare, 1, '%')}<br>` +
-          `<span style="font-size:11px;">${rsNum(p.turnShareChg, 2, '%p')}</span></td>`;
+          `<span style="font-size:11px;">${rsFlow(p.turnShareChg, 2, '%p')}</span></td>`;
       }
       if (c.key === 'foreignChg') {
         return `<td style="white-space:nowrap;">${rsPlain(p.foreign, 1, '%')}<br>` +
@@ -2143,8 +2197,12 @@ async function initHeatmapPage() {
   const wantMarket = (q.get('m') || '').toUpperCase();
   const wantPeriod = q.get('p');
 
-  HM.market = keys.includes(wantMarket) ? wantMarket : (keys.includes('KR') ? 'KR' : keys[0]);
+  // 우선순위는 섹터 RS 화면과 같습니다: 링크 > 직전 화면에서 고른 값 > 기본값
+  const saved = rsLoadView();
+  HM.market = keys.includes(wantMarket) ? wantMarket
+    : (saved && keys.includes(saved.market) ? saved.market : (keys.includes('KR') ? 'KR' : keys[0]));
   if (wantPeriod && RS_PERIODS.some(p => p.key === wantPeriod)) HM.period = wantPeriod;
+  else if (saved && RS_PERIODS.some(p => p.key === saved.period)) HM.period = saved.period;
   HM.highlight = q.get('hl') || null;
 
   loading.classList.remove('show');
@@ -2193,11 +2251,21 @@ function renderHeatmapControls() {
 
 // 시장을 바꾸면 강조 종목은 그 지도에 없습니다. 남겨 두면 아무 칸도 강조되지 않은 채
 // 설명줄만 다른 시장 종목을 가리키게 됩니다.
-function setHeatmapMarket(k) { if (HM.market === k) return; HM.market = k; HM.highlight = null; renderHeatmapControls(); renderHeatmap(); }
-function setHeatmapPeriod(k) { HM.period = k; renderHeatmapControls(); renderHeatmap(); }
+function setHeatmapMarket(k) { if (HM.market === k) return; HM.market = k; HM.highlight = null; rsSaveView(HM.market, HM.period); renderHeatmapControls(); renderHeatmap(); }
+function setHeatmapPeriod(k) { HM.period = k; rsSaveView(HM.market, HM.period); renderHeatmapControls(); renderHeatmap(); }
 function setHeatmapSize(k) { HM.size = k; renderHeatmapControls(); renderHeatmap(); }
 
 function hmShowTip(text) { document.getElementById('hmTip').innerHTML = text; }
+
+// 섹터 RS 로 가는 링크에 지금 보고 있는 시장·기간을 실어 보냅니다. 히트맵에서 1주를
+// 보다가 넘어갔는데 표가 3개월로 열리면, 같은 데이터인데 순위가 달라 보입니다.
+function hmSyncCrossLinks() {
+  const href = `/sector-rs.html?m=${encodeURIComponent(HM.market)}&p=${encodeURIComponent(HM.period)}`;
+  const chip = document.getElementById('hmToSector');
+  if (chip) { chip.href = href; chip.textContent = `📊 섹터 RS에서 ${hmPeriodLabel()} 보기`; }
+  const inline = document.getElementById('hmToSectorInline');
+  if (inline) inline.href = href;
+}
 
 function renderHeatmap() {
   const m = hmMarketData();
@@ -2207,6 +2275,7 @@ function renderHeatmap() {
   if (!canvas) return;
 
   rsRenderRefresh('hmUpdate', HM.data);
+  hmSyncCrossLinks();
 
   document.getElementById('hmMeta').innerHTML =
     `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · ` +
