@@ -5,13 +5,37 @@
     <link>https://mddcalc.com/blog.html</link>
     <description>고점 대비 하락률(MDD)과 주식 하락·회복 패턴에 대한 글을 씁니다.</description>
     <language>ko</language>
-    <lastBuildDate>Wed, 20 May 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 29 Aug 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://mddcalc.com/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>분할매수(DCA) 완전 가이드: 언제, 얼마나, 어떻게 나누어 살 것인가</title>
+      <link>https://mddcalc.com/blog/17.html</link>
+      <guid isPermaLink="true">https://mddcalc.com/blog/17.html</guid>
+      <pubDate>Sat, 29 Aug 2026 00:00:00 GMT</pubDate>
+      <category>분할매수</category>
+      <description>분할매수의 3가지 전략(균등/계단식/후반집중)을 MDD와 함께 활용하는 방법을 알아보세요.</description>
+    </item>
+    <item>
+      <title>TQQQ vs QQQ: 3배 ETF는 정말 3배로 빠졌나 — 같은 구간을 실제로 세어봤습니다</title>
+      <link>https://mddcalc.com/blog/16.html</link>
+      <guid isPermaLink="true">https://mddcalc.com/blog/16.html</guid>
+      <pubDate>Sat, 29 Aug 2026 00:00:00 GMT</pubDate>
+      <category>레버리지 ETF</category>
+      <description>같은 고점·저점을 공유한 하락 구간 네 개에서 TQQQ와 QQQ의 낙폭과 회복 기간을 직접 비교했습니다.</description>
+    </item>
+    <item>
+      <title>MDD 분석기 사용법: 무엇을 보여주고, 무엇을 보여주지 않는가</title>
+      <link>https://mddcalc.com/blog/15.html</link>
+      <guid isPermaLink="true">https://mddcalc.com/blog/15.html</guid>
+      <pubDate>Sat, 29 Aug 2026 00:00:00 GMT</pubDate>
+      <category>실전 가이드</category>
+      <description>화면에 있는 기능을 순서대로 짚고, 이 도구로는 답할 수 없는 것까지 함께 정리합니다.</description>
+    </item>
     <item>
       <title>주식 투자 완전 초보 가이드: MDD로 시작하는 첫 투자</title>
       <link>https://mddcalc.com/blog/25.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/25.html</guid>
-      <pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>투자 시작</category>
       <description>계좌 개설 전 준비물부터 첫 매수까지. 수익률이 아니라 하락 감내력에서 출발하는 초보자용 5단계 가이드입니다.</description>
     </item>
@@ -19,7 +43,7 @@
       <title>10년 장기 투자자가 MDD를 대하는 방법</title>
       <link>https://mddcalc.com/blog/24.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/24.html</guid>
-      <pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>장기 투자</category>
       <description>장기 투자자에게 MDD는 단기 투자자와 전혀 다른 의미를 갖습니다. 하락을 계획에 반영하는 세 가지 관점을 정리했습니다.</description>
     </item>
@@ -27,7 +51,7 @@
       <title>SPY, QQQ, VTI 중 어떤 ETF가 나에게 맞는가?</title>
       <link>https://mddcalc.com/blog/23.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/23.html</guid>
-      <pubDate>Sun, 10 May 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>ETF 전략</category>
       <description>대표 미국 ETF 3종의 구성, 운용보수, 역사적 MDD를 비교하고 각 ETF가 어떤 성향의 투자자와 맞는지 정리했습니다.</description>
     </item>
@@ -35,7 +59,7 @@
       <title>주식 투자자의 가장 큰 적: 심리적 편향 7가지</title>
       <link>https://mddcalc.com/blog/22.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/22.html</guid>
-      <pubDate>Tue, 05 May 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>투자 심리</category>
       <description>손실 회피, 확증 편향, FOMO, 앵커링... 투자 판단을 흐리는 대표적인 심리적 편향 7가지와 대응 방법을 정리했습니다.</description>
     </item>
@@ -43,7 +67,7 @@
       <title>주식 매수 전 반드시 확인해야 할 5가지 지표</title>
       <link>https://mddcalc.com/blog/21.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/21.html</guid>
-      <pubDate>Fri, 01 May 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>실전 투자</category>
       <description>MDD, RSI, 거래량, PER, 이동평균선. 각 지표가 무엇을 말해주고 어떤 한계가 있는지, 함께 봐야 하는 이유를 정리했습니다.</description>
     </item>
@@ -51,39 +75,15 @@
       <title>AAPL 주가 MDD 분석: 애플의 역사적 하락과 회복 패턴</title>
       <link>https://mddcalc.com/blog/20.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/20.html</guid>
-      <pubDate>Sat, 25 Apr 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>시장 분석</category>
       <description>애플(AAPL)이 지난 25년간 겪은 주요 하락 구간과 회복 기간을 정리하고, 대형 우량주의 MDD를 읽는 방법을 알아봅니다.</description>
-    </item>
-    <item>
-      <title>분할매수(DCA) 완전 가이드: 언제, 얼마나, 어떻게 나누어 살 것인가</title>
-      <link>https://mddcalc.com/blog/17.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/17.html</guid>
-      <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
-      <category>분할매수</category>
-      <description>분할매수의 3가지 전략(균등/계단식/후반집중)을 MDD와 함께 활용하는 방법을 알아보세요.</description>
-    </item>
-    <item>
-      <title>TQQQ vs QQQ: 레버리지 ETF의 진실 - MDD로 비교해보니</title>
-      <link>https://mddcalc.com/blog/16.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/16.html</guid>
-      <pubDate>Sun, 05 Apr 2026 00:00:00 GMT</pubDate>
-      <category>레버리지 ETF</category>
-      <description>3배 레버리지 ETF TQQQ는 정말 3배의 수익을 줌가요? 변동성 감쇠 효과와 MDD로 진실을 확인해보세요.</description>
-    </item>
-    <item>
-      <title>MDD 분석기 100% 활용하는 방법</title>
-      <link>https://mddcalc.com/blog/15.html</link>
-      <guid isPermaLink="true">https://mddcalc.com/blog/15.html</guid>
-      <pubDate>Wed, 01 Apr 2026 00:00:00 GMT</pubDate>
-      <category>실전 가이드</category>
-      <description>MDD 분석기의 모든 기능을 실제 투자에 어떻게 적용할지 단계별로 안내합니다.</description>
     </item>
     <item>
       <title>NVDA 역대 최대 하락률: AI 시대의 엔비디아</title>
       <link>https://mddcalc.com/blog/12.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/12.html</guid>
-      <pubDate>Sun, 15 Mar 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>NVDA 분석</category>
       <description>엔비디아의 맹스러운 상승과 하락 역사를 MDD로 분석합니다.</description>
     </item>
@@ -91,7 +91,7 @@
       <title>마이크로소프트(MSFT) 하락·회복 패턴 분석</title>
       <link>https://mddcalc.com/blog/9.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/9.html</guid>
-      <pubDate>Sun, 01 Mar 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>상승장 전략</category>
       <description>MSFT의 역사적 MDD와 회복 패턴을 분석하여 과거 데이터를 살펴보세요.</description>
     </item>
@@ -99,7 +99,7 @@
       <title>배당 재투자(DRIP)의 마술: 10년 후 얼마나 달라지나</title>
       <link>https://mddcalc.com/blog/6.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/6.html</guid>
-      <pubDate>Tue, 10 Feb 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>배당 투자</category>
       <description>배당금을 재투자하면 복리의 효과로 자산이 급성장합니다. 실제 시뮬레이션으로 확인해보세요.</description>
     </item>
@@ -107,7 +107,7 @@
       <title>RSI 지표 완전 가이드: 과매수/과매도 판단법</title>
       <link>https://mddcalc.com/blog/5.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/5.html</guid>
-      <pubDate>Thu, 05 Feb 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>RSI 가이드</category>
       <description>RSI 14일 기준으로 매수/매도 시점을 판단하는 방법을 실제 사례로 설명합니다.</description>
     </item>
@@ -115,7 +115,7 @@
       <title>S&amp;P 500 역대 MDD 분석: 각 위기마다 얼마나 하락했나</title>
       <link>https://mddcalc.com/blog/4.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/4.html</guid>
-      <pubDate>Sun, 01 Feb 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>S&amp;P 500</category>
       <description>1929년 대공황부터 2020년 코로나까지, S&amp;P 500의 역사적 낙폭을 정리했습니다.</description>
     </item>
@@ -123,7 +123,7 @@
       <title>고점 대비 -30% 하락 시 시장은 어떻게 움직였나: 과거 데이터 분석</title>
       <link>https://mddcalc.com/blog/3.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/3.html</guid>
-      <pubDate>Sun, 25 Jan 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>하락 대응 패턴</category>
       <description>-30% 하락 시점 이후 시장은 실제로 어떻게 움직였을까요? S&amp;P500 역사 데이터로 살펴봤습니다.</description>
     </item>
@@ -131,7 +131,7 @@
       <title>TSLA 역대 최대 하락률 분석: -75%에서 살아돌아온 테슬라</title>
       <link>https://mddcalc.com/blog/2.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/2.html</guid>
-      <pubDate>Tue, 20 Jan 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>종목 분석</category>
       <description>테슬라의 역사적 MDD를 분석하고, 각 하락 구간에서의 회복 패턴을 알아보세요.</description>
     </item>
@@ -139,7 +139,7 @@
       <title>MDD란 무엇인가? 고점 대비 하락률 완전 가이드</title>
       <link>https://mddcalc.com/blog/1.html</link>
       <guid isPermaLink="true">https://mddcalc.com/blog/1.html</guid>
-      <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 10 Aug 2026 00:00:00 GMT</pubDate>
       <category>MDD 기초</category>
       <description>Maximum Drawdown의 정의와 투자에서 왜 중요한지, 실제 사례로 쉽게 설명합니다.</description>
     </item>

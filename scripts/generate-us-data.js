@@ -28,6 +28,18 @@ const path = require('path');
 const { fromYahoo, httpGet, epochDayFromYmd } = require('./generate-kr-data');
 const { usSymbols, US_NAMES } = require('./sectors');
 
+// 섹터 계산에는 안 들어가지만 정적 파일은 있어야 하는 심볼들.
+//
+// 프론트엔드는 미국 종목 조회가 실패하면 data/us/{심볼}.json 으로 떨어집니다
+// (index.html·assets/site.js 의 fetchUsStaticSeries). 그 폴백이 의미가 있으려면
+// "사이트가 조회된다고 약속한 종목"에 파일이 있어야 합니다.
+//
+// 아래는 홈 바로가기 칩과 /stock/ 리포트가 가리키는데 usSymbols() 에는 없는 것들입니다.
+// 레버리지·지수 ETF 라 섹터 바구니(sectors.js)에 넣으면 섹터 RS·히트맵 숫자가 오염되므로
+// 여기서 따로 받습니다. generate-sector-rs.js 는 디렉터리가 아니라 usSymbols() 를 순회하므로
+// 이 파일들이 늘어도 섹터 계산에는 영향이 없습니다.
+const FALLBACK_ONLY_SYMBOLS = ['QQQ', 'VOO', 'VTI', 'SCHD', 'JEPQ', 'TQQQ', 'SOXL', 'SOXX'];
+
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'data', 'us');
 
@@ -283,7 +295,7 @@ async function main() {
       + 'GitHub Actions 러너에서는 무료 소스가 대부분 막히므로 미국 데이터가 비게 됩니다.');
   }
 
-  const symbols = usSymbols();
+  const symbols = [...usSymbols(), ...FALLBACK_ONLY_SYMBOLS];
   const ok = [];
   const failed = [];
   const bySource = {};

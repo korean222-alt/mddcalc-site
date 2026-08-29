@@ -234,6 +234,29 @@ async function fetchKrSeries(code) {
   return { values, meta: { symbol: j.symbol, name: j.name, currency: j.currency, updated: j.updated } };
 }
 
+// 미국 종목의 정적 예비 데이터입니다. 저장 형식은 data/kr 과 같고
+// scripts/generate-us-data.js 가 만듭니다. 라이브 API 가 실패했을 때만 씁니다.
+//
+// 전 종목이 있지는 않습니다(섹터 종목 + 사이트가 안내하는 ETF). 없는 종목의 404 는
+// 오류가 아니라 정상적인 결과이며, 그 경우 호출한 쪽이 원래 API 오류를 그대로 올립니다.
+async function fetchUsStaticSeries(symbol) {
+  const res = await fetch('/data/us/' + encodeURIComponent(symbol) + '.json');
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const j = await res.json();
+  if (!j || !Array.isArray(j.d) || j.d.length === 0) throw new Error('데이터가 없습니다.');
+
+  const values = [];
+  for (let i = j.d.length - 1; i >= 0; i--) {
+    const close = j.c[i];
+    values.push({
+      datetime: new Date(j.d[i] * 86400000).toISOString().slice(0, 10),
+      open: close, high: j.h[i], low: close, close,
+    });
+  }
+  return { values, meta: { symbol: j.symbol, name: j.name, currency: j.currency, updated: j.updated } };
+}
+
 async function fetchPriceSeries(ticker, outputsize) {
   const resolved = resolveSymbol(ticker);
   const key = resolved.symbol;
@@ -253,27 +276,51 @@ async function fetchPriceSeries(ticker, outputsize) {
     return { fromCache: false, values: kr.values.slice(0, outputsize), metadata: null, meta: kr.meta, resolved };
   }
 
-  const res = await fetch('/api/twelve-data/time-series', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ symbol: key, interval: '1day', outputsize })
-  });
-  const json = await res.json();
+  // 미국 종목은 라이브 API 를 먼저 씁니다. 그런데 이 호출이 실패하면 loadData() 가
+  // #result 를 hidden 으로 둔 채 끝나기 때문에, 계산기 페이지에 검색창과 에러 문구만
+  // 남습니다. 계산기가 본체인 사이트에서 그 화면에는 볼 것이 하나도 없습니다.
+  //
+  // 실패는 드문 일이 아닙니다. 무료 플랜은 분당 8회인데, 주간 배치(generate-us-data.js)가
+  // 217종목을 8.5초 간격으로 받는 약 30분 동안 그 한도를 씁니다. 키 만료·Twelve Data 장애·
+  // Vercel 환경변수 누락도 전부 같은 화면으로 끝납니다.
+  //
+  // 그래서 실패하면 저장소에 커밋된 정적 파일로 떨어집니다. 다만 이 파일은 최근 800거래일뿐이라
+  // API 응답(최대 5,000일)과 같은 데이터가 아닙니다. 조용히 바꿔치기하면 어제는 20년치로
+  // 계산되던 MDD 가 오늘은 3년치가 되므로, fallback 플래그를 올려 화면에 반드시 밝힙니다.
+  let json;
+  try {
+    const res = await fetch('/api/twelve-data/time-series', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symbol: key, interval: '1day', outputsize })
+    });
+    json = await res.json();
 
-  if (res.status === 429) {
-    const err = new Error(json.message || '오늘 사용량을 모두 사용했어요.');
-    err.rateLimited429 = true;
-    throw err;
+    if (res.status === 429) {
+      const err = new Error(json.message || '오늘 사용량을 모두 사용했어요.');
+      err.rateLimited429 = true;
+      throw err;
+    }
+    if (json.status === 'error' && json.message && json.message.includes('rate limit')) {
+      const err = new Error('분당 요청 한도(8회)를 초과했습니다. 60초 뒤에 다시 시도해주세요.');
+      err.rateLimitedMinute = true;
+      throw err;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (json.error) throw new Error(json.error);
+    if (json.status === 'error') throw new Error(json.message || 'API 오류');
+    if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
+  } catch (apiErr) {
+    let fb = null;
+    try {
+      fb = await fetchUsStaticSeries(key);
+    } catch (e) {
+      // 예비 데이터도 없는 종목입니다. 원래 API 오류를 그대로 올려 기존 안내 문구를 씁니다.
+    }
+    if (!fb) throw apiErr;
+    PRICE_CACHE[key] = { values: fb.values, meta: fb.meta, time: Date.now() };
+    return { fromCache: false, fallback: true, values: fb.values.slice(0, outputsize), metadata: null, meta: fb.meta, resolved };
   }
-  if (json.status === 'error' && json.message && json.message.includes('rate limit')) {
-    const err = new Error('분당 요청 한도(8회)를 초과했습니다. 60초 뒤에 다시 시도해주세요.');
-    err.rateLimitedMinute = true;
-    throw err;
-  }
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  if (json.error) throw new Error(json.error);
-  if (json.status === 'error') throw new Error(json.message || 'API 오류');
-  if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
 
   PRICE_CACHE[key] = { values: json.values, meta: json.meta || null, time: Date.now() };
   return { fromCache: false, values: json.values, metadata: json._metadata || null, meta: json.meta || null, resolved };
@@ -450,7 +497,7 @@ async function loadData() {
   try {
     showStatus('⏳ 데이터 불러오는 중...', 'info');
 
-    const { values, fromCache, metadata } = await fetchPriceSeries(ticker, 5000);
+    const { values, fromCache, fallback, metadata } = await fetchPriceSeries(ticker, 5000);
 
     const raw = values.map(v => ({
       date: v.datetime,
@@ -467,7 +514,11 @@ async function loadData() {
     
     // 사용량 정보 표시
     let usageMsg = `✅ ${ticker} 데이터 ${raw.length}일치 로드 완료 (최신: ${latestDate})`;
-    if (fromCache) {
+    if (fallback) {
+      // 예비 데이터로 그린 화면임을 반드시 밝힙니다. 기간이 짧아 같은 종목이라도
+      // 평소보다 얕은 MDD 가 나오므로, 안 적으면 숫자가 조용히 달라진 것처럼 보입니다.
+      usageMsg += `\n📁 실시간 조회가 안 돼 저장된 예비 데이터로 계산했어요 (최근 ${raw.length}거래일). 전체 기간 수치는 잠시 후 다시 조회해 주세요.`;
+    } else if (fromCache) {
       usageMsg += `\n♻️ 방금 조회한 데이터를 재사용했어요 (API 미사용)`;
     } else if (metadata) {
       usageMsg += `\n📊 오늘 사용량: ${metadata.todayUsage}/${metadata.dailyLimit}회 (남은 횟수: ${metadata.remainingUsage}회)`;

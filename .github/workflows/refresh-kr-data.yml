@@ -73,6 +73,12 @@ jobs:
       - name: Test navigation links
         run: node scripts/test-nav-links.js
 
+      # 시세 조회가 실패했을 때 정적 파일로 떨어지는 경로입니다. 평소에는 안 타므로
+      # 조용히 망가지기 쉽고, 망가지면 하필 API 가 불안한 순간에 계산기 화면이 통째로
+      # 비어 버립니다 (loadData 가 실패하면 #result 를 hidden 으로 둔 채 끝납니다).
+      - name: Test the US static fallback
+        run: node scripts/test-us-fallback.js
+
       # 사용량 기록·검사기 자신의 회귀 테스트입니다. 이 검사기는 "조용한 실패"를 잡으려고
       # 두는 것이라, 검사기가 조용히 망가지면 아무 소용이 없습니다.
       - name: Test the API usage bookkeeping

@@ -55,14 +55,16 @@ function main() {
   const retired = RETIRED_POSTS || new Set();
   const posts = BLOG_POSTS
     .filter(p => !retired.has(p.id))
-    .sort((a, b) => (a.date === b.date ? b.id - a.id : (a.date < b.date ? 1 : -1)))
+    .sort((a, b) => (a.updated === b.updated ? b.id - a.id : (a.updated < b.updated ? 1 : -1)))
     .slice(0, MAX_ITEMS);
 
   const skipped = [];
   const items = posts.map(p => {
     const url = `${ORIGIN}/blog/${p.id}.html`;
-    const pubDate = toRFC822(p.date);
-    if (!pubDate) skipped.push(`${p.id} (날짜 '${p.date}' 를 해석하지 못함)`);
+    // 발행일은 쓰지 않는다 (posts-data.js 의 주석 참고 — 지어낸 날짜였다).
+    // 실제로 손댄 날짜를 그대로 내보낸다.
+    const pubDate = toRFC822(p.updated);
+    if (!pubDate) skipped.push(`${p.id} (날짜 '${p.updated}' 를 해석하지 못함)`);
     return [
       '    <item>',
       `      <title>${esc(p.title)}</title>`,
@@ -75,7 +77,7 @@ function main() {
     ].filter(Boolean).join('\n');
   }).join('\n');
 
-  const latest = posts.map(p => toRFC822(p.date)).find(Boolean) || new Date().toUTCString();
+  const latest = posts.map(p => toRFC822(p.updated)).find(Boolean) || new Date().toUTCString();
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">

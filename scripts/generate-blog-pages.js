@@ -25,7 +25,20 @@ const ADSENSE_CLIENT = 'ca-pub-5583100002281558';
 // sitemap 에 처음 써넣는 임시 lastmod 값. 이 스크립트 끝에서 scripts/sitemap-lastmod.js 가
 // 각 파일의 실제 git 커밋 날짜로 다시 덮어쓰므로, 결과물에는 보통 이 날짜가 남지 않는다.
 // (아직 한 번도 커밋되지 않은 새 글에만 남는다.)
-const REVIEWED_DATE = '2026-07-25';
+const SITEMAP_FALLBACK_DATE = '2026-08-29';
+
+// 읽기 시간은 저장하지 않고 본문에서 계산한다. 예전에는 posts-data.js 의 readTime 필드를
+// 손으로 적었는데, 글을 고쳐도 숫자를 같이 안 고쳐서 17편 전부가 실제 분량의 1.2~1.4배로
+// 부풀어 있었다 (예: 1,506자짜리 글이 "4분 읽기"). 계산해서 쓰면 어긋날 수가 없다.
+// 한국어 성인 묵독 속도는 분당 500~600자로 보는 자료가 많아 500자를 기준으로 잡았다.
+const CHARS_PER_MINUTE = 500;
+function readingTime(contentHtml) {
+  const text = String(contentHtml)
+    .replace(/<[^>]+>/g, '')
+    .replace(/&[a-z]+;/gi, ' ')
+    .replace(/\s+/g, '');
+  return `${Math.max(1, Math.round(text.length / CHARS_PER_MINUTE))}분`;
+}
 
 function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -117,17 +130,24 @@ function buildCtaHtml(postId) {
     </div>`;
 }
 
-// 글 안의 "⏱ N분 읽기" 는 본문 HTML 에 글자 그대로 박혀 있고, 목록 카드가 쓰는 readTime 은
-// 별도 필드다. 두 곳을 따로 관리하면 반드시 어긋난다 — 실제로 글을 늘렸을 때 목록은 6분,
-// 글은 4분으로 갈라졌다. 페이지를 만들 때 본문 쪽을 readTime 필드로 덮어써서 하나로 맞춘다.
-function syncReadTime(html, readTime) {
-  return html.replace(/⏱\s*\d+\s*분\s*읽기/g, `⏱ ${readTime} 읽기`);
+// 본문 맨 위 메타줄은 생성기가 통째로 다시 쓴다. 본문 HTML 에 글자로 박아두고 목록 카드는
+// 별도 필드를 쓰던 예전 방식은 반드시 어긋났다 — 글을 늘렸을 때 목록은 6분, 본문은 4분이 됐다.
+//
+// 발행일은 더 이상 쓰지 않는다. 예전에는 17편 전부가 2026-01-15 ~ 05-20 사이 날짜를 5일 간격으로
+// 달고 있었는데, 사이트 개설이 2026-07 이라 전부 사이트가 있기도 전의 날짜였다. 화면 텍스트와
+// JSON-LD datePublished 양쪽에 박혀 있어서 없던 발행 이력을 주장하는 꼴이었다.
+// 지어낸 발행일 대신 실제로 손댄 날(updated)만 밝힌다.
+function metaLine(post) {
+  return `<div class="article-meta">📅 최종 수정 ${escapeHtml(post.updated)} &nbsp;&bull;&nbsp; ⏱ ${readingTime(post.content)} 읽기</div>`;
+}
+function syncMeta(html, post) {
+  return html.replace(/<div class="article-meta">[\s\S]*?<\/div>/, () => metaLine(post));
 }
 
 function buildPostPage(post, related) {
   const canonical = `https://mddcalc.com/blog/${post.id}.html`;
   const description = post.excerpt;
-  const content = syncReadTime(post.content, post.readTime);
+  const content = syncMeta(post.content, post);
   const relatedHtml = related.map(p =>
     `<a href="/blog/${p.id}.html" class="related-chip">${escapeHtml(p.title)}</a>`
   ).join('');
@@ -171,8 +191,7 @@ function buildPostPage(post, related) {
   "@type": "BlogPosting",
   "headline": "${escapeHtml(post.title)}",
   "description": "${escapeHtml(description)}",
-  "datePublished": "${escapeHtml(post.date)}",
-  "dateModified": "${REVIEWED_DATE}",
+  "dateModified": "${escapeHtml(post.updated)}",
   "articleSection": "${escapeHtml(post.tag)}",
   "inLanguage": "ko",
   "url": "${canonical}",
@@ -255,7 +274,7 @@ ${headerHtml('blog')}
     ${tickerReportHtml}
     ${MARKET_LINKS_HTML}
     <p class="note">
-      📅 최초 작성 ${escapeHtml(post.date)} · 최종 검토 ${REVIEWED_DATE}<br>
+      📅 최종 수정 ${escapeHtml(post.updated)}<br>
       본 글은 정보 제공 및 교육 목적으로 작성되었으며 투자 자문이 아닙니다. 과거 데이터는 미래 수익을 보장하지 않고,
       주식 투자에는 원금 손실 위험이 있습니다. 투자 판단과 그 결과에 대한 책임은 투자자 본인에게 있습니다.
     </p>
@@ -277,9 +296,9 @@ function updateSitemap(posts) {
   // /stock/ 항목은 generate-stock-pages.js가 실제로 데이터를 다시 받아온 날짜로 따로 관리하므로
   // 여기서 건드리면 방금 갱신한 실제 기준일을 이 스크립트의 마지막 편집일로 덮어써 버리게 된다.
   xml = xml.replace(/<url><loc>(https:\/\/mddcalc\.com\/(?!stock\/)[^<]*)<\/loc>(?:<lastmod>[^<]*<\/lastmod>)?(<priority>[^<]*<\/priority>)<\/url>/g,
-    (_m, loc, prio) => `<url><loc>${loc}</loc><lastmod>${REVIEWED_DATE}</lastmod>${prio}</url>`);
+    (_m, loc, prio) => `<url><loc>${loc}</loc><lastmod>${SITEMAP_FALLBACK_DATE}</lastmod>${prio}</url>`);
   const entries = posts.map(p =>
-    `  <url><loc>https://mddcalc.com/blog/${p.id}.html</loc><lastmod>${REVIEWED_DATE}</lastmod><priority>0.6</priority></url>`
+    `  <url><loc>https://mddcalc.com/blog/${p.id}.html</loc><lastmod>${escapeHtml(p.updated)}</lastmod><priority>0.6</priority></url>`
   ).join('\n');
   xml = xml.replace('</urlset>', entries + '\n</urlset>');
   fs.writeFileSync(SITEMAP_PATH, xml);
@@ -297,7 +316,7 @@ function updateBlogIndex(posts) {
         <div class="blog-card-tag">${escapeHtml(post.tag)}</div>
         <div class="blog-card-title">${escapeHtml(post.title)}</div>
         <div class="blog-card-excerpt">${escapeHtml(post.excerpt)}</div>
-        <div class="blog-card-meta">${escapeHtml(post.date)} &bull; ${escapeHtml(post.readTime)} 읽기</div>
+        <div class="blog-card-meta">최종 수정 ${escapeHtml(post.updated)} &bull; ${readingTime(post.content)} 읽기</div>
       </div>
     </a>`).join('\n');
   const block = `<!-- BLOG_GRID_STATIC:START -->\n${cards}\n<!-- BLOG_GRID_STATIC:END -->`;
@@ -364,7 +383,7 @@ function main() {
     require('child_process').execFileSync(process.execPath, [path.join(__dirname, script)], { stdio: 'inherit' });
   run('generate-rss.js');
 
-  // 위 updateSitemap 은 lastmod 를 REVIEWED_DATE 로 일괄로 찍어놓는다. 그대로 두면 손대지도
+  // 위 updateSitemap 은 lastmod 를 SITEMAP_FALLBACK_DATE 로 일괄로 찍어놓는다. 그대로 두면 손대지도
   // 않은 페이지 40개의 수정일이 거짓이 되므로, 마지막에 실제 커밋 날짜로 되돌린다.
   run('sitemap-lastmod.js');
 }
