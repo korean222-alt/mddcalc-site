@@ -19,27 +19,6 @@
   <url><loc>https://mddcalc.com/privacy.html</loc><lastmod>2026-08-28</lastmod><priority>0.3</priority></url>
   <url><loc>https://mddcalc.com/terms.html</loc><lastmod>2026-08-28</lastmod><priority>0.3</priority></url>
   <url><loc>https://mddcalc.com/disclaimer.html</loc><lastmod>2026-08-28</lastmod><priority>0.3</priority></url>
-  <url><loc>https://mddcalc.com/stock/spy.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/qqq.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/voo.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/vti.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/schd.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/jepq.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/tqqq.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/soxl.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/soxx.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/nvda.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/avgo.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/tsm.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/mu.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/aapl.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/msft.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/googl.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/amzn.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/meta.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/tsla.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/pltr.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
-  <url><loc>https://mddcalc.com/stock/coin.html</loc><lastmod>2026-08-28</lastmod><priority>0.7</priority></url>
   <url><loc>https://mddcalc.com/blog/1.html</loc><lastmod>2026-08-28</lastmod><priority>0.6</priority></url>
   <url><loc>https://mddcalc.com/blog/2.html</loc><lastmod>2026-08-28</lastmod><priority>0.6</priority></url>
   <url><loc>https://mddcalc.com/blog/3.html</loc><lastmod>2026-08-28</lastmod><priority>0.6</priority></url>
@@ -57,4 +36,25 @@
   <url><loc>https://mddcalc.com/blog/23.html</loc><lastmod>2026-08-28</lastmod><priority>0.6</priority></url>
   <url><loc>https://mddcalc.com/blog/24.html</loc><lastmod>2026-08-28</lastmod><priority>0.6</priority></url>
   <url><loc>https://mddcalc.com/blog/25.html</loc><lastmod>2026-08-28</lastmod><priority>0.6</priority></url>
+  <url><loc>https://mddcalc.com/stock/spy.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/qqq.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/voo.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/vti.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/schd.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/jepq.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/tqqq.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/soxl.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/soxx.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/nvda.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/avgo.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/tsm.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/mu.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/aapl.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/msft.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/googl.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/amzn.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/meta.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/tsla.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/pltr.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
+  <url><loc>https://mddcalc.com/stock/coin.html</loc><lastmod>2026-08-31</lastmod><priority>0.7</priority></url>
 </urlset>
