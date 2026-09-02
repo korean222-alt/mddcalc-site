@@ -458,7 +458,7 @@
         </div>
         <div class="arrow">←</div>
         <div class="hero-box">
-          <h3>🏆 구간 최고가 (ATH)</h3>
+          <h3>🏆 구간 최고가</h3>
           <div class="big" id="athPrice">—</div>
           <div class="sub" id="athDate">—</div>
         </div>
@@ -469,6 +469,7 @@
           <div class="sub" id="ddInterpret">—</div>
         </div>
       </div>
+      <div id="athOutsideNote" style="display:none; font-size:12px; color:#975a16; background:#fefcbf; border-radius:8px; padding:10px 12px; margin-top:10px; line-height:1.7;"></div>
       <div id="signalCard" class="signal-card signal-none">
         <div class="signal-emoji" id="signalEmoji">⏸️</div>
         <div class="signal-title" id="signalTitle">—</div>
@@ -529,7 +530,7 @@
       <h2 class="section">🔍 심층 분석 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(조회된 전체 기간 데이터 기준)</span></h2>
 
       <div class="stats-grid" style="margin-bottom:16px;">
-        <div class="stat-box"><div class="label">현재 하락폭 순위</div><div class="value" id="ddPercentile" style="font-size:15px;">—</div></div>
+        <div class="stat-box"><div class="label">지금보다 깊었던 날</div><div class="value" id="ddPercentile" style="font-size:15px;">—</div></div>
         <div class="stat-box"><div class="label">하락 경과일</div><div class="value" id="ddDaysElapsed" style="font-size:15px;">—</div></div>
         <div class="stat-box"><div class="label">비슷한 깊이 평균 회복일</div><div class="value" id="ddAvgRecoveryDays" style="font-size:15px;">—</div></div>
       </div>
@@ -565,8 +566,8 @@
 
     <!-- S&P500(SPY) 대비 비교 -->
     <div class="card">
-      <h2 class="section">📊 S&P500 대비 비교 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(SPY 데이터는 하루 1회만 조회)</span></h2>
-      <div id="benchmarkLoading" style="text-align:center; padding:12px; color:#718096;">⏳ SPY 데이터와 비교 중...</div>
+      <h2 class="section" id="benchmarkTitle">📊 시장 대비 비교 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(벤치마크 데이터는 하루 1회만 조회)</span></h2>
+      <div id="benchmarkLoading" style="text-align:center; padding:12px; color:#718096;">⏳ 시장 지수와 비교 중...</div>
       <div id="benchmarkResult"></div>
     </div>
 
@@ -791,7 +792,6 @@ const KR_STOCKS = {
   "HD한국조선해양": "009540",
   "HD현대중공업": "329180",
   "한국항공우주": "047810",
-  "KAI": "047810",
   "고려아연": "010130",
   "SK이노베이션": "096770",
   "HMM": "011200",
@@ -815,6 +815,7 @@ const KR_STOCKS = {
   "SK텔레콤": "017670",
   "SKT": "017670",
   "KT": "030200",
+  "케이티": "030200",
   "LG유플러스": "032640",
   "LGU+": "032640",
   "LG유플": "032640",
@@ -852,7 +853,6 @@ const KR_STOCKS = {
   "카카오게임즈": "293490",
   "에스엠": "041510",
   "SM엔터": "041510",
-  "SM": "041510",
   "이오테크닉스": "039030",
   "원익IPS": "240810",
   "위메이드": "112040",
@@ -1060,7 +1060,21 @@ async function fetchPriceSeries(ticker, outputsize) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ symbol: key, interval: '1day', outputsize })
   });
-  const json = await res.json();
+  // 본문이 JSON 이 아닐 수 있습니다(백엔드 500, 프록시 오류 페이지 등). 그대로 res.json()
+  // 하면 "Unexpected token '<'" 이 사용자 화면까지 올라갑니다. 상태 코드로 먼저 말이 되는
+  // 오류를 만들고, 파싱은 실패해도 되는 것으로 다룹니다.
+  let json = null;
+  try {
+    json = await res.json();
+  } catch (parseErr) {
+    if (res.status === 429) {
+      const err = new Error('오늘 사용량을 모두 사용했어요.');
+      err.rateLimited429 = true;
+      throw err;
+    }
+    throw new Error(`HTTP ${res.status}`);
+  }
+  if (!json || typeof json !== 'object') throw new Error(`HTTP ${res.status}`);
 
   if (res.status === 429) {
     const err = new Error(json.message || '오늘 사용량을 모두 사용했어요.');
@@ -1108,6 +1122,7 @@ let STATE = {
   raw: null,
   filtered: null,
   ticker: '',
+  name: '',   // 한국 종목의 한글명 (예: '삼성전자'). 미국 종목은 빈 문자열.
   isKR: false,
   currency: 'USD',
   mode: 'high',
@@ -1270,6 +1285,9 @@ async function loadData() {
     // 미국 종목은 입력값을 그대로 씁니다 — 이 값이 SPY 벤치마크 판정·관심종목 키·
     // TradingView 심볼에 쓰이므로, 잘 동작하던 경로를 건드리지 않습니다.
     STATE.ticker = STATE.isKR ? ((meta && meta.symbol) || resolved.symbol) : ticker;
+    // 한글명은 따로 들고 다닙니다. STATE.ticker 는 벤치마크 판정·관심종목 키·TradingView
+    // 심볼로 쓰이므로 표시용 이름을 여기에 섞으면 안 됩니다.
+    STATE.name = (meta && meta.name) ? meta.name : '';
     STATE.currency = STATE.isKR ? ((meta && meta.currency) || 'KRW') : 'USD';
     setPreset(5);
     const latestDate = raw.length > 0 ? raw[raw.length-1].date : 'N/A';
@@ -1318,9 +1336,12 @@ function setPreset(preset) {
   const latest = new Date(STATE.raw[STATE.raw.length-1].date);
   const earliest = new Date(STATE.raw[0].date);
   let start;
+  // 날짜 문자열("2026-01-02")은 UTC 자정으로 파싱되므로 계산도 UTC 메서드로 맞춥니다.
+  // 로컬 생성자(new Date(y,0,1))를 쓰면 한국(UTC+9)에서 toISOString() 이 9시간 당겨져
+  // YTD 시작일이 전년 12월 31일로 찍혔습니다.
   if (preset === 'all') start = earliest;
-  else if (preset === 'ytd') start = new Date(latest.getFullYear(), 0, 1);
-  else { start = new Date(latest); start.setFullYear(start.getFullYear() - preset); }
+  else if (preset === 'ytd') start = new Date(Date.UTC(latest.getUTCFullYear(), 0, 1));
+  else { start = new Date(latest); start.setUTCFullYear(start.getUTCFullYear() - preset); }
 
   if (start < earliest) start = earliest;
   document.getElementById('startDate').value = start.toISOString().slice(0,10);
@@ -1439,9 +1460,17 @@ function isValidTickerFormat(t) {
   return /^[A-Z0-9.\-^&가-힣 ]{1,20}$/.test(t);
 }
 
+// 화면에 보여줄 이름. 한국 종목은 "삼성전자 (005930)" 처럼 한글명을 앞에 둡니다.
+// 큰 제목만 보는 사용자에게 005930.KS 는 자기가 찾은 종목인지 알아보기 어렵습니다.
+function tickerDisplayName() {
+  if (!STATE.name) return STATE.ticker;
+  const code = String(STATE.ticker).replace(/\.(KS|KQ)$/i, '');
+  return STATE.name === code ? code : `${STATE.name} (${code})`;
+}
+
 function render() {
   const A = analyze(STATE.filtered, STATE.mode);
-  const t = STATE.ticker;
+  const t = tickerDisplayName();
 
   document.getElementById('tickerLabel').textContent = t + ' (' + (STATE.mode === 'high' ? '장중 최고가 기준' : '종가 기준') + ')';
   updateFavBtn();
@@ -1450,6 +1479,24 @@ function render() {
   document.getElementById('currentDate').textContent = A.currentDate;
   document.getElementById('athPrice').textContent = money(A.athPrice);
   document.getElementById('athDate').textContent = A.athDate;
+
+  // 히어로의 "구간 최고가"는 선택한 조회 기간 안에서의 고점입니다. 기본값이 5년이라
+  // 사상 최고가가 구간 밖에 있는 경우가 흔하고(예: 2021년 고점), 그러면 실제보다
+  // 얕은 하락률로 보입니다. 그럴 때만 사상 최고가를 함께 알려 줍니다.
+  const athNoteEl = document.getElementById('athOutsideNote');
+  if (athNoteEl) {
+    const FULL = analyze(STATE.raw, STATE.mode);
+    if (FULL && FULL.athPrice > A.athPrice * 1.001) {
+      const fullDD = (A.currentPrice / FULL.athPrice - 1) * 100;
+      athNoteEl.innerHTML = `⚠️ 지금 보고 있는 <b>${escapeHtml(A.athDate)}</b>의 고점은 <b>선택한 조회 기간 안에서의</b> 최고가입니다.
+        보유한 전체 기록에서의 최고가는 <b>${escapeHtml(money(FULL.athPrice))}</b>(${escapeHtml(FULL.athDate)})이고,
+        그 기준으로 보면 지금은 <b>${fmtPct(fullDD)}</b>입니다. 전체 기간으로 보려면 위의 <b>전체</b> 버튼을 눌러 주세요.`;
+      athNoteEl.style.display = 'block';
+    } else {
+      athNoteEl.style.display = 'none';
+      athNoteEl.innerHTML = '';
+    }
+  }
 
   const ddEl = document.getElementById('currentDD');
   ddEl.textContent = fmtPct(A.currentDD);
@@ -1505,7 +1552,8 @@ function render() {
   renderStep('하락률 차트', () => drawDDChart(A));
   renderStep('주가 차트', () => drawPriceChart(A));
   renderStep('회복률 표', () => renderRecovery(A));
-  renderStep('TradingView 차트', () => renderTV(t));
+  // TradingView 에는 표시용 이름이 아니라 실제 심볼을 넘겨야 합니다.
+  renderStep('TradingView 차트', () => renderTV(STATE.ticker));
   renderStep('심층 분석', () => renderDeepAnalysis());
   renderStep('벤치마크 비교', () => renderBenchmarkComparison());
 }
@@ -1589,9 +1637,15 @@ function renderDeepAnalysis() {
   if (F.currentDD >= -0.01) {
     percentileEl.textContent = '신고가 근처';
   } else {
+    // 이 값은 "지금보다 깊거나 같았던 날의 비율"입니다. 값이 작을수록 드문 깊이이고,
+    // 크면 오히려 흔한(얕은) 하락입니다. 예전에는 80% 여도 "(심한 편)" 이 붙었습니다.
     const worseOrEqualDays = F.dd.filter(v => v <= F.currentDD).length;
     percentile = worseOrEqualDays / n * 100;
-    percentileEl.textContent = `상위 ${percentile.toFixed(1)}% (심한 편)`;
+    const tone = percentile <= 10 ? '아주 드문 깊이'
+      : percentile <= 25 ? '심한 편'
+      : percentile <= 60 ? '보통 수준'
+      : '흔한 수준';
+    percentileEl.textContent = `이보다 깊었던 날 ${percentile.toFixed(1)}% (${tone})`;
   }
 
   // 진행 중인(미회복) 에피소드 = 현재 하락 구간
@@ -2151,21 +2205,36 @@ async function renderBenchmarkComparison() {
   if (!loadingEl || !resultEl) return;
   if (!STATE.raw || !STATE.filtered || STATE.filtered.length < 2) return;
 
-  if (STATE.ticker === 'SPY') {
+  // 한국 종목을 SPY 와 견주면 "코스피가 통째로 빠진 날"도 개별 종목 이슈로 읽힙니다.
+  // 통화도 다르고(원화 vs 달러) 장이 열리는 날도 다르므로, 한국 종목은 코스피와 비교합니다.
+  const bench = STATE.isKR
+    ? { symbol: 'KS11', label: '코스피', full: '코스피(KOSPI)' }
+    : { symbol: 'SPY', label: 'SPY', full: 'S&P500' };
+
+  const titleEl = document.getElementById('benchmarkTitle');
+  if (titleEl) {
+    titleEl.innerHTML = `📊 ${bench.full} 대비 비교 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(${bench.label} 데이터는 하루 1회만 조회)</span>`;
+  }
+
+  const selfCompare = STATE.isKR
+    ? /^(KS11|\^KS11)$/i.test(STATE.ticker)
+    : STATE.ticker === 'SPY';
+  if (selfCompare) {
     loadingEl.style.display = 'none';
-    resultEl.innerHTML = '<div style="color:#a0aec0; font-size:13px;">지금 조회 중인 종목이 SPY(S&P500) 자체라서 비교가 필요 없어요.</div>';
+    resultEl.innerHTML = `<div style="color:#a0aec0; font-size:13px;">지금 조회 중인 종목이 ${escapeHtml(bench.full)} 자체라서 비교가 필요 없어요.</div>`;
     return;
   }
 
   loadingEl.style.display = 'block';
+  loadingEl.textContent = `⏳ ${bench.label} 데이터와 비교 중...`;
   resultEl.innerHTML = '';
   const requestTicker = STATE.ticker; // 응답 도착 전에 사용자가 다른 티커를 조회했는지 확인용
 
   try {
-    const { values } = await fetchBenchmarkSeries('SPY');
+    const { values } = await fetchBenchmarkSeries(bench.symbol);
     if (STATE.ticker !== requestTicker) return; // 그 사이 다른 종목을 조회했으면 이 결과는 버림
 
-    const spyRaw = values.map(v => ({
+    const benchRaw = values.map(v => ({
       date: v.datetime,
       open: parseFloat(v.open),
       high: parseFloat(v.high),
@@ -2173,48 +2242,42 @@ async function renderBenchmarkComparison() {
       close: parseFloat(v.close),
     })).reverse();
 
-    // 1) SPY 자체의 현재 하락 상태 (전체 히스토리 기준 — 심층분석과 동일한 analyze() 재사용)
-    const spyFull = analyze(spyRaw, STATE.mode);
+    // 1) 벤치마크 자체의 현재 하락 상태 (전체 히스토리 기준 — 심층분석과 동일한 analyze() 재사용)
+    const benchFull = analyze(benchRaw, STATE.mode);
     const F = analyze(STATE.raw, STATE.mode);
-    const tickerDD = F.currentDD, spyDD = spyFull.currentDD;
+    const tickerDD = F.currentDD, benchDD = benchFull.currentDD;
 
-    // 2) 조회 기간(현재 필터된 기간)과 같은 날짜 구간으로 SPY를 맞춰 누적수익률 비교
+    // 2) 조회 기간(현재 필터된 기간)과 같은 날짜 구간으로 벤치마크를 맞춰 누적수익률 비교
     const sd = STATE.filtered[0].date, ed = STATE.filtered[STATE.filtered.length - 1].date;
-    const spyFiltered = spyRaw.filter(r => r.date >= sd && r.date <= ed);
+    const benchFiltered = benchRaw.filter(r => r.date >= sd && r.date <= ed);
 
     let compareHtml = '';
-    if (spyFiltered.length >= 2) {
+    if (benchFiltered.length >= 2) {
       const tickerReturn = (STATE.filtered[STATE.filtered.length - 1].close / STATE.filtered[0].close - 1) * 100;
-      const spyReturn = (spyFiltered[spyFiltered.length - 1].close / spyFiltered[0].close - 1) * 100;
-      const alpha = tickerReturn - spyReturn;
+      const benchReturn = (benchFiltered[benchFiltered.length - 1].close / benchFiltered[0].close - 1) * 100;
+      const alpha = tickerReturn - benchReturn;
       const alphaColor = alpha >= 0 ? '#38a169' : '#e53e3e';
       compareHtml = `
         <div class="stats-grid" style="margin-bottom:14px;">
-          <div class="stat-box"><div class="label">${escapeHtml(STATE.ticker)} 조회기간 수익률</div><div class="value" style="font-size:15px;">${tickerReturn >= 0 ? '+' : ''}${tickerReturn.toFixed(1)}%</div></div>
-          <div class="stat-box"><div class="label">SPY 같은기간 수익률</div><div class="value" style="font-size:15px;">${spyReturn >= 0 ? '+' : ''}${spyReturn.toFixed(1)}%</div></div>
+          <div class="stat-box"><div class="label">${escapeHtml(tickerDisplayName())} 조회기간 수익률</div><div class="value" style="font-size:15px;">${tickerReturn >= 0 ? '+' : ''}${tickerReturn.toFixed(1)}%</div></div>
+          <div class="stat-box"><div class="label">${escapeHtml(bench.label)} 같은기간 수익률</div><div class="value" style="font-size:15px;">${benchReturn >= 0 ? '+' : ''}${benchReturn.toFixed(1)}%</div></div>
           <div class="stat-box"><div class="label">초과 수익률(알파)</div><div class="value" style="font-size:15px; color:${alphaColor};">${alpha >= 0 ? '+' : ''}${alpha.toFixed(1)}%p</div></div>
         </div>`;
-      // 한국 종목은 원화 기준, SPY는 달러 기준 수익률입니다. 환율 변동은 반영되지
-      // 않으므로 그대로 "달러로 환산한 성과"처럼 읽으면 안 됩니다.
-      if (STATE.isKR) {
-        compareHtml += `<p style="font-size:11px; color:#a0aec0; margin:-6px 0 12px;">
-          ※ 한국 종목은 원화, SPY는 달러 기준 수익률입니다. 환율 변동은 반영되어 있지 않습니다.</p>`;
-      }
     }
 
     // 3) 지금 하락이 이 종목만의 이슈인지, 시장 전체 하락인지
     let context;
-    if (spyDD <= -3) {
-      context = `📉 지금 S&P500 전체도 고점 대비 <b>${fmtPct(spyDD)}</b> 하락한 상태예요. 시장 전반이 조정을 받고 있는 시기입니다.`;
+    if (benchDD <= -3) {
+      context = `📉 지금 ${escapeHtml(bench.full)} 전체도 고점 대비 <b>${fmtPct(benchDD)}</b> 하락한 상태예요. 시장 전반이 조정을 받고 있는 시기입니다.`;
     } else {
-      context = `📈 S&P500 전체는 고점 대비 <b>${fmtPct(spyDD)}</b>로 신고가 근처예요. 지금 이 종목의 하락은 시장 전체보다는 <b>개별 종목 이슈에 가깝다</b>고 볼 수 있어요.`;
+      context = `📈 ${escapeHtml(bench.full)} 전체는 고점 대비 <b>${fmtPct(benchDD)}</b>로 신고가 근처예요. 지금 이 종목의 하락은 시장 전체보다는 <b>개별 종목 이슈에 가깝다</b>고 볼 수 있어요.`;
     }
-    const diff = tickerDD - spyDD; // 음수면 이 종목이 시장보다 더 빠진 것
+    const diff = tickerDD - benchDD; // 음수면 이 종목이 시장보다 더 빠진 것
     const diffText = diff < -0.01
-      ? `현재 이 종목은 SPY보다 <b style="color:#e53e3e;">${Math.abs(diff).toFixed(1)}%p 더 깊게</b> 하락한 상태입니다.`
+      ? `현재 이 종목은 ${escapeHtml(bench.label)}보다 <b style="color:#e53e3e;">${Math.abs(diff).toFixed(1)}%p 더 깊게</b> 하락한 상태입니다.`
       : diff > 0.01
-      ? `현재 이 종목은 SPY보다 <b style="color:#38a169;">${Math.abs(diff).toFixed(1)}%p 덜</b> 하락한, 시장보다 상대적으로 견고한 상태입니다.`
-      : `현재 이 종목의 하락폭은 SPY와 거의 비슷한 수준입니다.`;
+      ? `현재 이 종목은 ${escapeHtml(bench.label)}보다 <b style="color:#38a169;">${Math.abs(diff).toFixed(1)}%p 덜</b> 하락한, 시장보다 상대적으로 견고한 상태입니다.`
+      : `현재 이 종목의 하락폭은 ${escapeHtml(bench.label)}와(과) 거의 비슷한 수준입니다.`;
 
     resultEl.innerHTML = `
       ${compareHtml}
@@ -2222,11 +2285,11 @@ async function renderBenchmarkComparison() {
         <div>${context}</div>
         <div style="margin-top:6px;">${diffText}</div>
       </div>
-      <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ SPY 데이터는 API 사용량 절약을 위해 하루 한 번만 갱신됩니다 (브라우저 기준 당일 데이터 재사용).</p>
+      <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ ${escapeHtml(bench.label)} 데이터는 API 사용량 절약을 위해 하루 한 번만 갱신됩니다 (브라우저 기준 당일 데이터 재사용).</p>
     `;
   } catch (e) {
     if (STATE.ticker !== requestTicker) return;
-    resultEl.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px; font-size:13px;">❌ SPY 비교 데이터를 불러오지 못했어요: ${escapeHtml(e.message)}</div>`;
+    resultEl.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px; font-size:13px;">❌ ${escapeHtml(bench.label)} 비교 데이터를 불러오지 못했어요: ${escapeHtml(e.message)}</div>`;
   } finally {
     if (STATE.ticker === requestTicker) loadingEl.style.display = 'none';
   }
@@ -2414,7 +2477,10 @@ function computeRSI(prices, period) {
     avgGain = (avgGain * (period - 1) + gain) / period;
     avgLoss = (avgLoss * (period - 1) + loss) / period;
   }
-  const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+  // 손실이 한 번도 없으면 Wilder 정의상 RSI 는 100 입니다.
+  // rs 를 100 으로 두면 99.01 이 나와 100 에 닿지 못합니다.
+  if (avgLoss === 0) return { rsi: avgGain === 0 ? 50 : 100, avgGain, avgLoss };
+  const rs = avgGain / avgLoss;
   const rsi = 100 - (100 / (1 + rs));
   return { rsi, avgGain, avgLoss };
 }
@@ -2444,11 +2510,11 @@ function renderRSI(prices, period, tickerLabel) {
       <div style="font-size:14px; font-weight:700;">${plain}</div>
     </div>
     <div style="margin-top:14px;">
-      <div style="position:relative; height:14px; border-radius:7px; background:linear-gradient(90deg, #e53e3e 0%, #e53e3e 30%, #ecc94b 30%, #ecc94b 70%, #38a169 70%, #38a169 100%);">
+      <div style="position:relative; height:14px; border-radius:7px; background:linear-gradient(90deg, #38a169 0%, #38a169 30%, #ecc94b 30%, #ecc94b 70%, #e53e3e 70%, #e53e3e 100%);">
         <div style="position:absolute; top:-5px; left:${pos}%; transform:translateX(-50%); width:3px; height:24px; background:#1a202c; border-radius:2px;"></div>
       </div>
       <div style="display:flex; justify-content:space-between; font-size:10px; color:#a0aec0; margin-top:4px;">
-        <span>0 (많이 빠짐)</span><span>50</span><span>100 (많이 오름)</span>
+        <span>0 · 과매도</span><span>50 · 중립</span><span>100 · 과매수</span>
       </div>
     </div>
     <div class="stats-grid" style="margin-top:14px;">
@@ -2479,7 +2545,15 @@ async function calcRSIByTicker() {
     const closes = values.map(v => parseFloat(v.close)).reverse(); // 오래된 → 최신 순
     renderRSI(closes, period, ticker + (fromCache ? ' · 최근 조회 데이터 재사용' : ''));
   } catch (e) {
-    result.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ ${escapeHtml(e.message)} — 티커 오타이거나 일시적 오류일 수 있어요.</div>`;
+    // 진단용 원문은 콘솔에만. 화면에는 사람이 읽을 수 있는 문장만 보여줍니다.
+    console.error('RSI 조회 실패:', e && e.message, e);
+    let msg;
+    if (e && e.rateLimited429) msg = '⏳ 오늘 조회 한도를 모두 사용했어요. 내일 다시 시도해주세요.';
+    else if (e && e.rateLimitedMinute) msg = '⏳ 잠시 요청이 몰렸어요. 1분 뒤에 다시 시도해주세요.';
+    else if (e && e.krUnsupported) msg = '❌ 아직 지원하지 않는 한국 종목이에요. 홈 검색창 아래 버튼에서 지원 종목을 확인하실 수 있습니다.';
+    else if (e && /데이터가 없습니다/.test(e.message || '')) msg = `❌ '${escapeHtml(ticker)}' 종목을 찾지 못했어요. 티커를 다시 확인해주세요.`;
+    else msg = '❌ 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.';
+    result.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">${msg}</div>`;
   } finally {
     loading.style.display = 'none';
   }
@@ -2507,7 +2581,8 @@ function calcDividend() {
   const years = parseInt(document.getElementById('divYears').value) || 10;
   const result = document.getElementById('divResult');
 
-  if (!price || !annual || price <= 0 || annual < 0) {
+  // 배당금 0 은 정상 입력입니다(무배당 종목). 빈 칸·음수만 거절합니다.
+  if (isNaN(price) || price <= 0 || isNaN(annual) || annual < 0) {
     result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 주가와 연간 배당금을 입력해주세요.</div>';
     return;
   }
@@ -2534,7 +2609,11 @@ function calcDividend() {
   }
 
   const finalValue = totalShares * currentPrice;
-  const totalReturn = ((finalValue - price) / price * 100).toFixed(1);
+  const totalReturnNum = (finalValue - price) / price * 100;
+  const totalReturn = totalReturnNum.toFixed(1);
+  // 손실이면 "+-12.3%" 가 초록색으로 나오던 문제. 부호와 색을 값에서 뽑습니다.
+  const returnSign = totalReturnNum >= 0 ? '+' : '';
+  const returnColor = totalReturnNum >= 0 ? '#38a169' : '#e53e3e';
 
   let yieldColor = '#718096';
   if (yieldPct >= 4) yieldColor = '#d69e2e';
@@ -2545,7 +2624,7 @@ function calcDividend() {
       <div class="stat-box"><div class="label">배당 수익률</div><div class="value" style="color:${yieldColor};">${yieldPct.toFixed(2)}%</div></div>
       <div class="stat-box"><div class="label">분기 배당금</div><div class="value">$${(annual/4).toFixed(2)}</div></div>
       <div class="stat-box"><div class="label">${years}년 재투자 후 주수</div><div class="value">${totalShares.toFixed(2)}주</div></div>
-      <div class="stat-box"><div class="label">${years}년 재투자 수익</div><div class="value" style="color:#38a169;">+${totalReturn}%</div></div>
+      <div class="stat-box"><div class="label">${years}년 재투자 수익</div><div class="value" style="color:${returnColor};">${returnSign}${totalReturn}%</div></div>
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -2602,7 +2681,8 @@ async function submitContact() {
       document.getElementById('contactSubject').value = '';
       document.getElementById('contactMessage').value = '';
     } else {
-      result.innerHTML = `<span style="color:#e53e3e;">❌ ${escapeHtml(data.error) || '전송 실패. 다시 시도해주세요.'}</span>`;
+      // escapeHtml(undefined) 는 빈 문자열이 아니라서 || 기본값이 먹지 않았습니다.
+      result.innerHTML = `<span style="color:#e53e3e;">❌ ${data && data.error ? escapeHtml(data.error) : '전송 실패. 다시 시도해주세요.'}</span>`;
     }
   } catch (err) {
     result.innerHTML = '<span style="color:#e53e3e;">❌ 네트워크 오류가 발생했습니다. 다시 시도해주세요.</span>';
@@ -2614,12 +2694,13 @@ let KRW_RATE = 1380;
 
 function updateFxRate() {
   const newRate = parseFloat(document.getElementById('fxRate').value);
-  if (!isNaN(newRate) && newRate > 0) {
-    KRW_RATE = newRate;
-    document.getElementById('displayRate').textContent = `$1 = ₩${KRW_RATE.toLocaleString()}`;
-    calcFxFromUsd();
-    calcFxFromKrw();
-  }
+  if (isNaN(newRate) || newRate <= 0) return;
+  KRW_RATE = newRate;
+  document.getElementById('displayRate').textContent = `$1 = ₩${KRW_RATE.toLocaleString()}`;
+  // 값이 들어 있는 쪽만 다시 계산합니다. 둘 다 부르면 뒤에 불린 쪽이
+  // 빈 칸을 보고 결과 박스를 지워버립니다(환율만 바꿔도 결과가 사라지던 이유).
+  if (String(document.getElementById('fxUsd').value).trim() !== '') calcFxFromUsd();
+  else calcFxFromKrw();
 }
 
 function calcFxFromUsd() {
@@ -2650,9 +2731,11 @@ function calcFxFromKrw() {
 function calcROI() {
   const buy = parseFloat(document.getElementById('roiBuy').value);
   const sell = parseFloat(document.getElementById('roiSell').value);
-  const shares = parseFloat(document.getElementById('roiShares').value) || 1;
+  // 빈 칸일 때만 1주로 보정합니다. 0 을 직접 입력했다면 그대로 0 입니다.
+  const sharesRaw = String(document.getElementById('roiShares').value).trim();
+  const shares = sharesRaw === '' ? 1 : parseFloat(sharesRaw);
   const result = document.getElementById('roiResult');
-  if (isNaN(buy) || isNaN(sell) || buy <= 0) { result.innerHTML = ''; return; }
+  if (isNaN(buy) || isNaN(sell) || isNaN(shares) || shares < 0 || buy <= 0) { result.innerHTML = ''; return; }
   const pnl = (sell - buy) * shares;
   const pct = ((sell - buy) / buy) * 100;
   const pnlKrw = pnl * KRW_RATE;
@@ -2765,7 +2848,10 @@ function runLevSim(init, years, annRet, annVol, mult, annFee, trials = 200) {
       const u1 = Math.random(), u2 = Math.random();
       const z = Math.sqrt(-2 * Math.log(Math.max(u1, 1e-10))) * Math.cos(2 * Math.PI * u2);
       const dailyRet = dr + dv * z;
-      const levRet = mult * dailyRet - (mult * mult - mult) * dv * dv / 2 - df;
+      // 변동성 감쇠는 따로 빼지 않습니다. 매일 (1 + 배수×일간수익률) 을 곱해 나가면
+      // 감쇠가 복리 과정에서 저절로 생기기 때문입니다. 여기에 (n²-n)σ²/2 를 또 빼면
+      // 같은 손실을 두 번 반영하게 됩니다(3배·변동성 20% 기준 연 12%p 과다 차감).
+      const levRet = mult * dailyRet - df;
       v = Math.max(v * (1 + levRet), 0);
     }
     finals.push(v);
@@ -2833,19 +2919,24 @@ function calcDCA() {
   const targetAvg = isNaN(targetAvgInput) ? price * 0.95 : targetAvgInput;
   const result = document.getElementById('dcaResult');
 
+  // 예상 주가 흐름을 먼저 만듭니다. 계단식("하락시 더 많이")은 회차별 금액이
+  // 그 회차의 예상 주가에 따라 정해지므로 가중치보다 가격이 먼저 있어야 합니다.
+  // 난수는 넣지 않습니다 — 같은 입력에는 같은 계획이 나와야 합니다.
+  const priceProgression = Array.from({ length: rounds }, (_, i) => {
+    const t = i / Math.max(rounds - 1, 1);
+    const drift = -0.10 * Math.sin(Math.PI * t);
+    return Math.max(price * (1 + drift), 1);
+  });
+
   const weights = Array.from({ length: rounds }, (_, i) => {
     if (strategy === 'equal') return 1;
-    if (strategy === 'staircase') return rounds - i;
+    // 가중치를 예상 주가에 반비례시킵니다. 쌀수록 많이 사게 되므로 V자 저점 회차에
+    // 가장 큰 금액이 들어가고, 평균단가는 균등 분할보다 반드시 낮아집니다.
+    if (strategy === 'staircase') return price / priceProgression[i];
     if (strategy === 'backloaded') return i + 1;
     return 1;
   });
   const totalWeight = weights.reduce((a, b) => a + b, 0);
-
-  const priceProgression = Array.from({ length: rounds }, (_, i) => {
-    const t = i / Math.max(rounds - 1, 1);
-    const drift = -0.10 * Math.sin(Math.PI * t);
-    return Math.max(price * (1 + drift + (Math.random() - 0.5) * 0.02), 1);
-  });
 
   let cumShares = 0, cumCost = 0;
   const plan = Array.from({ length: rounds }, (_, i) => {
@@ -2876,7 +2967,7 @@ function calcDCA() {
       <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
     </div>
     <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
-      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 회수를 늘리거나 예산을 늘려보세요.'}
+      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 횟수를 늘리거나 예산을 늘려보세요.'}
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">

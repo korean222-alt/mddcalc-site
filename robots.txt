@@ -2,19 +2,26 @@ User-agent: *
 Allow: /
 Disallow: /docs/
 Disallow: /scripts/
-# 시세 원본(JSON). 페이지가 아니라 데이터 파일이라 색인할 이유가 없다.
-# 아직 한 번도 색인된 적 없는 새 경로라, /api/alerts 때와 달리 막아도 문제가 없다.
-Disallow: /data/
 
-# 다만 화면을 그리는 데 꼭 필요한 집계 파일 세 개는 연다.
+# 화면을 그리는 데 꼭 필요한 집계 파일 세 개는 먼저 연다.
 #
 # 섹터 RS·히트맵·공포탐욕 페이지의 본문은 HTML 에 없다. 브라우저가 이 파일들을 받아서
-# 그린다. robots.txt 로 막으면 구글봇도 못 받으므로, 렌더링해서 보는 페이지 내용이
+# 그린다. robots.txt 로 막으면 크롤러도 못 받으므로, 렌더링해서 보는 페이지 내용이
 # "불러오는 중..." 에서 끝난다. 색인은 되지만 정작 그 페이지의 알맹이인 숫자가 빠진 채로다.
-# 종목별 원본(/data/kr/, /data/us/)은 그대로 막아 둔다 — 200개가 넘고, 페이지를 그리는 데
-# 필요한 것은 아래 세 개로 이미 합쳐져 있다.
+#
+# Allow 를 Disallow 보다 **위에** 둔다. 구글봇은 더 긴(구체적인) 규칙을 우선하므로 순서를
+# 타지 않지만, 네이버·빙 계열은 먼저 일치하는 규칙을 적용한다. Disallow: /data/ 가 앞에
+# 있으면 네이버봇은 이 세 파일까지 함께 막아 버려서, 정작 한국 사용자가 주로 들어오는
+# 검색엔진에서 세 페이지가 빈 화면으로 색인된다.
 Allow: /data/sectors.json
 Allow: /data/fear-greed.json
 Allow: /data/ticker-sectors.json
+
+# 시세 원본(JSON). 페이지가 아니라 데이터 파일이라 색인할 이유가 없다.
+# 종목별 원본(/data/kr/, /data/us/)은 200개가 넘고, 페이지를 그리는 데 필요한 것은
+# 위 세 개로 이미 합쳐져 있다.
+Disallow: /data/kr/
+Disallow: /data/us/
+Disallow: /data/
 
 Sitemap: https://mddcalc.com/sitemap.xml

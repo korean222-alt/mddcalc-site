@@ -518,7 +518,7 @@ const BLOG_POSTS = [
     emoji: '🎮',
     bg: '#e6fffa',
     title: 'NVDA 역대 최대 하락률: AI 시대의 엔비디아',
-    excerpt: '엔비디아의 맹스러운 상승과 하락 역사를 MDD로 분석합니다.',
+    excerpt: '엔비디아의 맹렬한 상승과 하락 역사를 MDD로 분석합니다.',
     date: '2026-03-15',
     readTime: '6분',
     content: `
@@ -666,7 +666,7 @@ const BLOG_POSTS = [
     emoji: '🚀',
     bg: '#fef3c7',
     title: 'TQQQ vs QQQ: 레버리지 ETF의 진실 - MDD로 비교해보니',
-    excerpt: '3배 레버리지 ETF TQQQ는 정말 3배의 수익을 줌가요? 변동성 감쇠 효과와 MDD로 진실을 확인해보세요.',
+    excerpt: '3배 레버리지 ETF TQQQ는 정말 3배의 수익을 주나요? 변동성 감쇠 효과와 MDD로 진실을 확인해보세요.',
     date: '2026-04-05',
     readTime: '4분',
     content: `
