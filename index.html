@@ -1928,7 +1928,7 @@ function buildShareCard(A, ticker) {
   ctx.font = shareFont(600, 26);
   ctx.fillStyle = '#718096';
   ctx.fillText('지금 가격', inX, 632);
-  ctx.fillText('구간 최고가 (ATH)', colR, 632);
+  ctx.fillText('구간 최고가', colR, 632);
   const colW = cardW / 2 - 56;
   ctx.fillStyle = '#1a202c';
   fitShareFont(ctx, money(A.currentPrice), colW, 800, 44, 26);
