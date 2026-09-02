@@ -57,7 +57,8 @@ const KR_TICKERS = [
   { code: '042660', name: '한화오션', market: 'KS' },
   { code: '009540', name: 'HD한국조선해양', market: 'KS' },
   { code: '329180', name: 'HD현대중공업', market: 'KS' },
-  { code: '047810', name: '한국항공우주', market: 'KS', aliases: ['KAI'] },
+  // 'KAI' 는 뉴욕증권거래소 Kadant Inc. 의 티커라 별칭에서 뺐습니다.
+  { code: '047810', name: '한국항공우주', market: 'KS' },
   { code: '010130', name: '고려아연', market: 'KS' },
   { code: '096770', name: 'SK이노베이션', market: 'KS' },
   { code: '011200', name: 'HMM', market: 'KS' },
@@ -79,7 +80,7 @@ const KR_TICKERS = [
 
   // ── 통신·소비재 ──
   { code: '017670', name: 'SK텔레콤', market: 'KS', aliases: ['SKT'] },
-  { code: '030200', name: 'KT', market: 'KS' },
+  { code: '030200', name: 'KT', market: 'KS', aliases: ['케이티'] },
   { code: '032640', name: 'LG유플러스', market: 'KS', aliases: ['LGU+', 'LG유플'] },
   { code: '033780', name: 'KT&G', market: 'KS' },
   { code: '097950', name: 'CJ제일제당', market: 'KS' },
@@ -118,7 +119,8 @@ const KR_TICKERS = [
   { code: '277810', name: '레인보우로보틱스', market: 'KQ' },
   { code: '263750', name: '펄어비스', market: 'KQ' },
   { code: '293490', name: '카카오게임즈', market: 'KQ' },
-  { code: '041510', name: '에스엠', market: 'KQ', aliases: ['SM엔터', 'SM'] },
+  // 'SM' 은 뉴욕증권거래소 SM Energy 의 티커라 별칭에서 뺐습니다.
+  { code: '041510', name: '에스엠', market: 'KQ', aliases: ['SM엔터'] },
   { code: '039030', name: '이오테크닉스', market: 'KQ' },
   { code: '240810', name: '원익IPS', market: 'KQ' },
   { code: '112040', name: '위메이드', market: 'KQ' },

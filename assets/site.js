@@ -25,6 +25,7 @@ const KR_STOCKS = {
   // 종목을 추가하려면 scripts/kr-tickers.js 에 넣고 생성기를 다시 돌리세요.
   "삼성전자": "005930",
   "SK하이닉스": "000660",
+  "DB하이텍": "000990",
   "LG에너지솔루션": "373220",
   "삼성바이오로직스": "207940",
   "현대차": "005380",
@@ -41,6 +42,10 @@ const KR_STOCKS = {
   "포스코홀딩스": "005490",
   "포스코": "005490",
   "현대모비스": "012330",
+  "HL만도": "204320",
+  "만도": "204320",
+  "한국타이어앤테크놀로지": "161390",
+  "한국타이어": "161390",
   "LG전자": "066570",
   "삼성전기": "009150",
   "삼성물산": "028260",
@@ -55,6 +60,10 @@ const KR_STOCKS = {
   "삼성생명": "032830",
   "삼성화재": "000810",
   "카카오뱅크": "323410",
+  "미래에셋증권": "006800",
+  "삼성증권": "016360",
+  "한국금융지주": "071050",
+  "키움증권": "039490",
   "한국전력": "015760",
   "한전": "015760",
   "두산에너빌리티": "034020",
@@ -63,19 +72,43 @@ const KR_STOCKS = {
   "HD한국조선해양": "009540",
   "HD현대중공업": "329180",
   "한국항공우주": "047810",
-  "KAI": "047810",
   "고려아연": "010130",
   "SK이노베이션": "096770",
   "HMM": "011200",
   "대한항공": "003490",
   "현대건설": "000720",
+  "현대로템": "064350",
+  "LIG넥스원": "079550",
+  "삼성중공업": "010140",
+  "HD현대미포": "010620",
+  "HD현대일렉트릭": "267260",
+  "효성중공업": "298040",
+  "LSELECTRIC": "010120",
+  "LS일렉트릭": "010120",
+  "대우건설": "047040",
+  "GS건설": "006360",
+  "롯데케미칼": "011170",
+  "금호석유": "011780",
+  "금호석유화학": "011780",
+  "현대제철": "004020",
+  "팬오션": "028670",
   "SK텔레콤": "017670",
   "SKT": "017670",
   "KT": "030200",
+  "케이티": "030200",
+  "LG유플러스": "032640",
+  "LGU+": "032640",
+  "LG유플": "032640",
   "KT&G": "033780",
   "CJ제일제당": "097950",
   "이마트": "139480",
   "아모레퍼시픽": "090430",
+  "한국콜마": "161890",
+  "코스맥스": "192820",
+  "더존비즈온": "012510",
+  "한미약품": "128940",
+  "유한양행": "000100",
+  "두산로보틱스": "454910",
   "크래프톤": "259960",
   "하이브": "352820",
   "HYBE": "352820",
@@ -87,6 +120,9 @@ const KR_STOCKS = {
   "코덱스200": "069500",
   "KODEX레버리지": "122630",
   "코덱스레버리지": "122630",
+  "KOSEF국고채10년": "148070",
+  "코세프국고채10년": "148070",
+  "국고채10년": "148070",
   "에코프로비엠": "247540",
   "에코프로": "086520",
   "알테오젠": "196170",
@@ -97,17 +133,29 @@ const KR_STOCKS = {
   "카카오게임즈": "293490",
   "에스엠": "041510",
   "SM엔터": "041510",
-  "SM": "041510",
   "이오테크닉스": "039030",
   "원익IPS": "240810",
   "위메이드": "112040",
   "엘앤에프": "066970",
+  "ISC": "095340",
+  "HPSP": "403870",
+  "안랩": "053800",
+  "한글과컴퓨터": "030520",
+  "한컴": "030520",
+  "와이지엔터테인먼트": "122870",
+  "YG엔터": "122870",
+  "YG": "122870",
+  "JYPENT.": "035900",
+  "JYP엔터": "035900",
+  "JYP": "035900",
+  "로보티즈": "108490",
   "코스피": "KS11",
   "KOSPI": "KS11",
   "코스닥": "KQ11",
   "KOSDAQ": "KQ11",
   "005930": "005930",
   "000660": "000660",
+  "000990": "000990",
   "373220": "373220",
   "207940": "207940",
   "005380": "005380",
@@ -119,6 +167,8 @@ const KR_STOCKS = {
   "006400": "006400",
   "005490": "005490",
   "012330": "012330",
+  "204320": "204320",
+  "161390": "161390",
   "066570": "066570",
   "009150": "009150",
   "028260": "028260",
@@ -133,6 +183,10 @@ const KR_STOCKS = {
   "032830": "032830",
   "000810": "000810",
   "323410": "323410",
+  "006800": "006800",
+  "016360": "016360",
+  "071050": "071050",
+  "039490": "039490",
   "015760": "015760",
   "034020": "034020",
   "012450": "012450",
@@ -145,12 +199,32 @@ const KR_STOCKS = {
   "011200": "011200",
   "003490": "003490",
   "000720": "000720",
+  "064350": "064350",
+  "079550": "079550",
+  "010140": "010140",
+  "010620": "010620",
+  "267260": "267260",
+  "298040": "298040",
+  "010120": "010120",
+  "047040": "047040",
+  "006360": "006360",
+  "011170": "011170",
+  "011780": "011780",
+  "004020": "004020",
+  "028670": "028670",
   "017670": "017670",
   "030200": "030200",
+  "032640": "032640",
   "033780": "033780",
   "097950": "097950",
   "139480": "139480",
   "090430": "090430",
+  "161890": "161890",
+  "192820": "192820",
+  "012510": "012510",
+  "128940": "128940",
+  "000100": "000100",
+  "454910": "454910",
   "259960": "259960",
   "352820": "352820",
   "036570": "036570",
@@ -158,6 +232,7 @@ const KR_STOCKS = {
   "042700": "042700",
   "069500": "069500",
   "122630": "122630",
+  "148070": "148070",
   "247540": "247540",
   "086520": "086520",
   "196170": "196170",
@@ -171,6 +246,13 @@ const KR_STOCKS = {
   "240810": "240810",
   "112040": "112040",
   "066970": "066970",
+  "095340": "095340",
+  "403870": "403870",
+  "053800": "053800",
+  "030520": "030520",
+  "122870": "122870",
+  "035900": "035900",
+  "108490": "108490",
   "KS11": "KS11",
   "KQ11": "KQ11",
 };
@@ -258,7 +340,21 @@ async function fetchPriceSeries(ticker, outputsize) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ symbol: key, interval: '1day', outputsize })
   });
-  const json = await res.json();
+  // 본문이 JSON 이 아닐 수 있습니다(백엔드 500, 프록시 오류 페이지 등). 그대로 res.json()
+  // 하면 "Unexpected token '<'" 이 사용자 화면까지 올라갑니다. 상태 코드로 먼저 말이 되는
+  // 오류를 만들고, 파싱은 실패해도 되는 것으로 다룹니다.
+  let json = null;
+  try {
+    json = await res.json();
+  } catch (parseErr) {
+    if (res.status === 429) {
+      const err = new Error('오늘 사용량을 모두 사용했어요.');
+      err.rateLimited429 = true;
+      throw err;
+    }
+    throw new Error(`HTTP ${res.status}`);
+  }
+  if (!json || typeof json !== 'object') throw new Error(`HTTP ${res.status}`);
 
   if (res.status === 429) {
     const err = new Error(json.message || '오늘 사용량을 모두 사용했어요.');
@@ -306,6 +402,8 @@ let STATE = {
   raw: null,
   filtered: null,
   ticker: '',
+  name: '',
+  currency: 'USD',
   mode: 'high',
   startDate: null,
   endDate: null,
@@ -477,7 +575,7 @@ async function loadData() {
   } catch (e) {
     const errorMsg = e.message;
     console.error('API 에러:', errorMsg, e);
-    showStatus(`❌ ${errorMsg} — 티커 오타 / 백엔드 오류 / 무료 한도(분당 8회·일 800회) 확인`, 'error');
+    showStatus('❌ 데이터를 불러오지 못했어요. 티커를 확인하시고 잠시 후 다시 시도해주세요.', 'error');
   } finally {
     document.getElementById('loading').classList.remove('show');
   }
@@ -492,9 +590,12 @@ function setPreset(preset) {
   const latest = new Date(STATE.raw[STATE.raw.length-1].date);
   const earliest = new Date(STATE.raw[0].date);
   let start;
+  // 날짜 문자열("2026-01-02")은 UTC 자정으로 파싱되므로 계산도 UTC 메서드로 맞춥니다.
+  // 로컬 생성자(new Date(y,0,1))를 쓰면 한국(UTC+9)에서 toISOString() 이 9시간 당겨져
+  // YTD 시작일이 전년 12월 31일로 찍힙니다.
   if (preset === 'all') start = earliest;
-  else if (preset === 'ytd') start = new Date(latest.getFullYear(), 0, 1);
-  else { start = new Date(latest); start.setFullYear(start.getFullYear() - preset); }
+  else if (preset === 'ytd') start = new Date(Date.UTC(latest.getUTCFullYear(), 0, 1));
+  else { start = new Date(latest); start.setUTCFullYear(start.getUTCFullYear() - preset); }
 
   if (start < earliest) start = earliest;
   document.getElementById('startDate').value = start.toISOString().slice(0,10);
@@ -602,16 +703,23 @@ function isValidTickerFormat(t) {
   return /^[A-Z0-9.\-^&가-힣 ]{1,20}$/.test(t);
 }
 
+// 한국 종목은 원화입니다. 통화 기호를 '$' 로 하드코딩하면 005930 이 달러로 나옵니다.
+function money(n) {
+  if (STATE.currency === 'PT') return fmt(n, 2);
+  if (STATE.currency === 'KRW') return '\u20a9' + fmt(n, 0);
+  return '$' + fmt(n, 2);
+}
+
 function render() {
   const A = analyze(STATE.filtered, STATE.mode);
-  const t = STATE.ticker;
+  const t = STATE.name ? `${STATE.name} (${String(STATE.ticker).replace(/\.(KS|KQ)$/i, '')})` : STATE.ticker;
 
   document.getElementById('tickerLabel').textContent = t + ' (' + (STATE.mode === 'high' ? '장중 최고가 기준' : '종가 기준') + ')';
   updateFavBtn();
 
-  document.getElementById('currentPrice').textContent = '$' + fmt(A.currentPrice);
+  document.getElementById('currentPrice').textContent = money(A.currentPrice);
   document.getElementById('currentDate').textContent = A.currentDate;
-  document.getElementById('athPrice').textContent = '$' + fmt(A.athPrice);
+  document.getElementById('athPrice').textContent = money(A.athPrice);
   document.getElementById('athDate').textContent = A.athDate;
 
   const ddEl = document.getElementById('currentDD');
@@ -641,9 +749,9 @@ function render() {
   document.getElementById('signalDesc').textContent = sig.d;
 
   const t15 = A.athPrice * 0.85, t20 = A.athPrice * 0.80, t30 = A.athPrice * 0.70;
-  document.getElementById('t15').textContent = '$' + fmt(t15);
-  document.getElementById('t20').textContent = '$' + fmt(t20);
-  document.getElementById('t30').textContent = '$' + fmt(t30);
+  document.getElementById('t15').textContent = money(t15);
+  document.getElementById('t20').textContent = money(t20);
+  document.getElementById('t30').textContent = money(t30);
   document.getElementById('r15').classList.toggle('hidden', A.currentPrice > t15);
   document.getElementById('r20').classList.toggle('hidden', A.currentPrice > t20);
   document.getElementById('r30').classList.toggle('hidden', A.currentPrice > t30);
@@ -1072,7 +1180,10 @@ function computeRSI(prices, period) {
     avgGain = (avgGain * (period - 1) + gain) / period;
     avgLoss = (avgLoss * (period - 1) + loss) / period;
   }
-  const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+  // 손실이 한 번도 없으면 Wilder 정의상 RSI 는 100 입니다.
+  // rs 를 100 으로 두면 99.01 이 나와 100 에 닿지 못합니다.
+  if (avgLoss === 0) return { rsi: avgGain === 0 ? 50 : 100, avgGain, avgLoss };
+  const rs = avgGain / avgLoss;
   const rsi = 100 - (100 / (1 + rs));
   return { rsi, avgGain, avgLoss };
 }
@@ -1102,11 +1213,11 @@ function renderRSI(prices, period, tickerLabel) {
       <div style="font-size:14px; font-weight:700;">${plain}</div>
     </div>
     <div style="margin-top:14px;">
-      <div style="position:relative; height:14px; border-radius:7px; background:linear-gradient(90deg, #e53e3e 0%, #e53e3e 30%, #ecc94b 30%, #ecc94b 70%, #38a169 70%, #38a169 100%);">
+      <div style="position:relative; height:14px; border-radius:7px; background:linear-gradient(90deg, #38a169 0%, #38a169 30%, #ecc94b 30%, #ecc94b 70%, #e53e3e 70%, #e53e3e 100%);">
         <div style="position:absolute; top:-5px; left:${pos}%; transform:translateX(-50%); width:3px; height:24px; background:#1a202c; border-radius:2px;"></div>
       </div>
       <div style="display:flex; justify-content:space-between; font-size:10px; color:#a0aec0; margin-top:4px;">
-        <span>0 (많이 빠짐)</span><span>50</span><span>100 (많이 오름)</span>
+        <span>0 · 과매도</span><span>50 · 중립</span><span>100 · 과매수</span>
       </div>
     </div>
     <div class="stats-grid" style="margin-top:14px;">
@@ -1137,7 +1248,15 @@ async function calcRSIByTicker() {
     const closes = values.map(v => parseFloat(v.close)).reverse(); // 오래된 → 최신 순
     renderRSI(closes, period, ticker + (fromCache ? ' · 최근 조회 데이터 재사용' : ''));
   } catch (e) {
-    result.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ ${escapeHtml(e.message)} — 티커 오타이거나 일시적 오류일 수 있어요.</div>`;
+    // 진단용 원문은 콘솔에만. 화면에는 사람이 읽을 수 있는 문장만 보여줍니다.
+    console.error('RSI 조회 실패:', e && e.message, e);
+    let msg;
+    if (e && e.rateLimited429) msg = '⏳ 오늘 조회 한도를 모두 사용했어요. 내일 다시 시도해주세요.';
+    else if (e && e.rateLimitedMinute) msg = '⏳ 잠시 요청이 몰렸어요. 1분 뒤에 다시 시도해주세요.';
+    else if (e && e.krUnsupported) msg = '❌ 아직 지원하지 않는 한국 종목이에요. 홈 검색창 아래 버튼에서 지원 종목을 확인하실 수 있습니다.';
+    else if (e && /데이터가 없습니다/.test(e.message || '')) msg = `❌ '${escapeHtml(ticker)}' 종목을 찾지 못했어요. 티커를 다시 확인해주세요.`;
+    else msg = '❌ 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.';
+    result.innerHTML = `<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">${msg}</div>`;
   } finally {
     loading.style.display = 'none';
   }
@@ -1165,7 +1284,8 @@ function calcDividend() {
   const years = parseInt(document.getElementById('divYears').value) || 10;
   const result = document.getElementById('divResult');
 
-  if (!price || !annual || price <= 0 || annual < 0) {
+  // 배당금 0 은 정상 입력입니다(무배당 종목). 빈 칸·음수만 거절합니다.
+  if (isNaN(price) || price <= 0 || isNaN(annual) || annual < 0) {
     result.innerHTML = '<div style="background:#fed7d7; color:#742a2a; padding:12px; border-radius:8px;">❌ 주가와 연간 배당금을 입력해주세요.</div>';
     return;
   }
@@ -1192,7 +1312,11 @@ function calcDividend() {
   }
 
   const finalValue = totalShares * currentPrice;
-  const totalReturn = ((finalValue - price) / price * 100).toFixed(1);
+  const totalReturnNum = (finalValue - price) / price * 100;
+  const totalReturn = totalReturnNum.toFixed(1);
+  // 손실이면 "+-12.3%" 가 초록색으로 나오던 문제. 부호와 색을 값에서 뽑습니다.
+  const returnSign = totalReturnNum >= 0 ? '+' : '';
+  const returnColor = totalReturnNum >= 0 ? '#38a169' : '#e53e3e';
 
   let yieldColor = '#718096';
   if (yieldPct >= 4) yieldColor = '#d69e2e';
@@ -1203,7 +1327,7 @@ function calcDividend() {
       <div class="stat-box"><div class="label">배당 수익률</div><div class="value" style="color:${yieldColor};">${yieldPct.toFixed(2)}%</div></div>
       <div class="stat-box"><div class="label">분기 배당금</div><div class="value">$${(annual/4).toFixed(2)}</div></div>
       <div class="stat-box"><div class="label">${years}년 재투자 후 주수</div><div class="value">${totalShares.toFixed(2)}주</div></div>
-      <div class="stat-box"><div class="label">${years}년 재투자 수익</div><div class="value" style="color:#38a169;">+${totalReturn}%</div></div>
+      <div class="stat-box"><div class="label">${years}년 재투자 수익</div><div class="value" style="color:${returnColor};">${returnSign}${totalReturn}%</div></div>
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -1260,7 +1384,8 @@ async function submitContact() {
       document.getElementById('contactSubject').value = '';
       document.getElementById('contactMessage').value = '';
     } else {
-      result.innerHTML = `<span style="color:#e53e3e;">❌ ${escapeHtml(data.error) || '전송 실패. 다시 시도해주세요.'}</span>`;
+      // escapeHtml(undefined) 는 빈 문자열이 아니라서 || 기본값이 먹지 않았습니다.
+      result.innerHTML = `<span style="color:#e53e3e;">❌ ${data && data.error ? escapeHtml(data.error) : '전송 실패. 다시 시도해주세요.'}</span>`;
     }
   } catch (err) {
     result.innerHTML = '<span style="color:#e53e3e;">❌ 네트워크 오류가 발생했습니다. 다시 시도해주세요.</span>';
@@ -1272,12 +1397,13 @@ let KRW_RATE = 1380;
 
 function updateFxRate() {
   const newRate = parseFloat(document.getElementById('fxRate').value);
-  if (!isNaN(newRate) && newRate > 0) {
-    KRW_RATE = newRate;
-    document.getElementById('displayRate').textContent = `$1 = ₩${KRW_RATE.toLocaleString()}`;
-    calcFxFromUsd();
-    calcFxFromKrw();
-  }
+  if (isNaN(newRate) || newRate <= 0) return;
+  KRW_RATE = newRate;
+  document.getElementById('displayRate').textContent = `$1 = ₩${KRW_RATE.toLocaleString()}`;
+  // 값이 들어 있는 쪽만 다시 계산합니다. 둘 다 부르면 뒤에 불린 쪽이
+  // 빈 칸을 보고 결과 박스를 지워버립니다(환율만 바꿔도 결과가 사라지던 이유).
+  if (String(document.getElementById('fxUsd').value).trim() !== '') calcFxFromUsd();
+  else calcFxFromKrw();
 }
 
 function calcFxFromUsd() {
@@ -1308,9 +1434,11 @@ function calcFxFromKrw() {
 function calcROI() {
   const buy = parseFloat(document.getElementById('roiBuy').value);
   const sell = parseFloat(document.getElementById('roiSell').value);
-  const shares = parseFloat(document.getElementById('roiShares').value) || 1;
+  // 빈 칸일 때만 1주로 보정합니다. 0 을 직접 입력했다면 그대로 0 입니다.
+  const sharesRaw = String(document.getElementById('roiShares').value).trim();
+  const shares = sharesRaw === '' ? 1 : parseFloat(sharesRaw);
   const result = document.getElementById('roiResult');
-  if (isNaN(buy) || isNaN(sell) || buy <= 0) { result.innerHTML = ''; return; }
+  if (isNaN(buy) || isNaN(sell) || isNaN(shares) || shares < 0 || buy <= 0) { result.innerHTML = ''; return; }
   const pnl = (sell - buy) * shares;
   const pct = ((sell - buy) / buy) * 100;
   const pnlKrw = pnl * KRW_RATE;
@@ -1424,7 +1552,10 @@ function runLevSim(init, years, annRet, annVol, mult, annFee, trials = 200) {
       const u1 = Math.random(), u2 = Math.random();
       const z = Math.sqrt(-2 * Math.log(Math.max(u1, 1e-10))) * Math.cos(2 * Math.PI * u2);
       const dailyRet = dr + dv * z;
-      const levRet = mult * dailyRet - (mult * mult - mult) * dv * dv / 2 - df;
+      // 변동성 감쇠는 따로 빼지 않습니다. 매일 (1 + 배수×일간수익률) 을 곱해 나가면
+      // 감쇠가 복리 과정에서 저절로 생기기 때문입니다. 여기에 (n²-n)σ²/2 를 또 빼면
+      // 같은 손실을 두 번 반영하게 됩니다(3배·변동성 20% 기준 연 12%p 과다 차감).
+      const levRet = mult * dailyRet - df;
       v = Math.max(v * (1 + levRet), 0);
     }
     finals.push(v);
@@ -1492,19 +1623,24 @@ function calcDCA() {
   const targetAvg = isNaN(targetAvgInput) ? price * 0.95 : targetAvgInput;
   const result = document.getElementById('dcaResult');
 
+  // 예상 주가 흐름을 먼저 만듭니다. 계단식("하락시 더 많이")은 회차별 금액이
+  // 그 회차의 예상 주가에 따라 정해지므로 가중치보다 가격이 먼저 있어야 합니다.
+  // 난수는 넣지 않습니다 — 같은 입력에는 같은 계획이 나와야 합니다.
+  const priceProgression = Array.from({ length: rounds }, (_, i) => {
+    const t = i / Math.max(rounds - 1, 1);
+    const drift = -0.10 * Math.sin(Math.PI * t);
+    return Math.max(price * (1 + drift), 1);
+  });
+
   const weights = Array.from({ length: rounds }, (_, i) => {
     if (strategy === 'equal') return 1;
-    if (strategy === 'staircase') return rounds - i;
+    // 가중치를 예상 주가에 반비례시킵니다. 쌀수록 많이 사게 되므로 V자 저점 회차에
+    // 가장 큰 금액이 들어가고, 평균단가는 균등 분할보다 반드시 낮아집니다.
+    if (strategy === 'staircase') return price / priceProgression[i];
     if (strategy === 'backloaded') return i + 1;
     return 1;
   });
   const totalWeight = weights.reduce((a, b) => a + b, 0);
-
-  const priceProgression = Array.from({ length: rounds }, (_, i) => {
-    const t = i / Math.max(rounds - 1, 1);
-    const drift = -0.10 * Math.sin(Math.PI * t);
-    return Math.max(price * (1 + drift + (Math.random() - 0.5) * 0.02), 1);
-  });
 
   let cumShares = 0, cumCost = 0;
   const plan = Array.from({ length: rounds }, (_, i) => {
@@ -1535,7 +1671,7 @@ function calcDCA() {
       <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
     </div>
     <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
-      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 회수를 늘리거나 예산을 늘려보세요.'}
+      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 횟수를 늘리거나 예산을 늘려보세요.'}
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -1560,9 +1696,9 @@ function calcDCA() {
     <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ 예상 주가는 V자형 시나리오 기반으로 시뮬레이션된 값입니다. 실제 주가는 다를 수 있습니다.</p>`;
 }
 
-// 페이지 로드 시 복리 계산기 초기화
+// 복리 계산기 초기화 — 그 페이지에서만 돌립니다.
 document.addEventListener('DOMContentLoaded', () => {
-  calcCompound();
+  if (document.getElementById('cpResult')) calcCompound();
 });
 
 

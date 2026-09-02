@@ -210,7 +210,8 @@ async function fetchOne(t) {
   throw new Error(errors.join(' / '));
 }
 
-// 15개 HTML 안의 KR_STOCKS 표를 실제 생성된 종목만으로 다시 씁니다.
+// KR_STOCKS 표가 들어 있는 모든 파일(루트 HTML + assets/site.js)을 실제 생성된
+// 종목만으로 다시 씁니다.
 // 데이터 파일이 없는 종목이 검색어 표에 남아 있으면 "검색은 되는데 결과가 없는" 상태가
 // 되므로, 성공한 종목만 넣는 것이 핵심입니다.
 function syncNameTable(okTickers) {
@@ -239,8 +240,17 @@ function syncNameTable(okTickers) {
   const re = /const KR_STOCKS = \{[\s\S]*?\n\};/;
   let updated = 0;
 
-  for (const file of fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))) {
-    const p = path.join(ROOT, file);
+  // 루트 HTML 뿐 아니라 assets/site.js 도 갱신합니다. index.html 은 계산기 코드를 자체
+  // 복제해 두고 있고 나머지 페이지는 assets/site.js 를 읽는데, 예전에는 이 루프가 루트
+  // HTML 만 훑어서 site.js 쪽 표만 낡은 채로 남았습니다. 그 결과 홈에서는 찾아지는
+  // 종목명이 RSI 계산기에서는 미국 API 로 새어 나가 실패했습니다.
+  const files = fs.readdirSync(ROOT)
+    .filter(f => f.endsWith('.html'))
+    .map(f => path.join(ROOT, f));
+  files.push(path.join(ROOT, 'assets', 'site.js'));
+
+  for (const p of files) {
+    if (!fs.existsSync(p)) continue;
     const src = fs.readFileSync(p, 'utf8');
     if (!re.test(src)) continue;
     const next = src.replace(re, () => block);

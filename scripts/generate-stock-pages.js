@@ -328,7 +328,7 @@ function buildRecoveryStatsHtml(symbol, a) {
     return `<p>분석 기간 동안 ${symbol}이(가) -${TH}% 이상 하락한 구간은 없었습니다.</p>`;
   }
   if (!r.recoveredCount) {
-    return `<p>${symbol}은(는) 분석 기간 동안 -${TH}% 이상 하락한 구간을 <strong>${r.meaningfulCount}개</strong> 지나갔지만, 그중 이전 고점을 회복한 구간은 아직 없습니다.</p>`;
+    return `<p>${symbol}는 분석 기간 동안 -${TH}% 이상 하락한 구간을 <strong>${r.meaningfulCount}개</strong> 지나갔지만, 그중 이전 고점을 회복한 구간은 아직 없습니다.</p>`;
   }
   const nowLine = a.isAtAth
     ? `현재는 사상 최고가를 경신 중이라 진행 중인 하락 구간이 없습니다.`
@@ -347,7 +347,7 @@ function buildRecoveryStatsHtml(symbol, a) {
         <div class="value">${r.medianDays.toLocaleString()}일</div>
       </div>
     </div>
-    <p style="margin-top:12px;">${symbol}은(는) 분석 기간 동안 <strong>-${TH}% 이상 하락한 구간</strong>을 <strong>${r.meaningfulCount}개</strong> 지나갔고, 그중 <strong>${r.recoveredCount}개</strong>가 이전 고점을 회복했습니다. 회복까지 걸린 기간은 중앙값 기준 <strong>${r.medianDays.toLocaleString()}일</strong>, 가장 오래 걸린 경우는 <strong>${r.maxDays.toLocaleString()}일</strong>이었습니다.${ongoingLine}</p>
+    <p style="margin-top:12px;">${symbol}는 분석 기간 동안 <strong>-${TH}% 이상 하락한 구간</strong>을 <strong>${r.meaningfulCount}개</strong> 지나갔고, 그중 <strong>${r.recoveredCount}개</strong>가 이전 고점을 회복했습니다. 회복까지 걸린 기간은 중앙값 기준 <strong>${r.medianDays.toLocaleString()}일</strong>, 가장 오래 걸린 경우는 <strong>${r.maxDays.toLocaleString()}일</strong>이었습니다.${ongoingLine}</p>
     <p>${nowLine}</p>
     <p class="muted">일상적인 등락과 구분하기 위해 -${TH}% 이상 하락한 구간만 집계했습니다. 회복은 종가가 직전 고점을 다시 넘어선 시점을 기준으로 하며, 과거에 회복했다는 사실이 앞으로도 회복한다는 근거가 되지는 않습니다. 개별 종목은 사업 환경이 바뀌면 전고점을 영영 회복하지 못할 수도 있습니다.</p>`;
 }
