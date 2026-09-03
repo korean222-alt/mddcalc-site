@@ -1,7 +1,7 @@
 {
   "provider": "twelvedata",
-  "generatedAt": "2026-09-02T00:56:52.097Z",
-  "generatedAtKST": "2026-09-02 09:56 KST",
+  "generatedAt": "2026-09-03T01:03:27.624Z",
+  "generatedAtKST": "2026-09-03 10:03 KST",
   "producedBy": "scripts/generate-us-data.js",
   "consumedBy": [
     "data/us/*.json",
@@ -9,20 +9,36 @@
   ],
   "symbols": 209,
   "calls": 209,
-  "ok": 208,
-  "failed": 1,
+  "ok": 204,
+  "failed": 5,
   "usable": 208,
   "sources": {
-    "twelvedata": 208
+    "twelvedata": 204
   },
   "usage": {
     "measured": true,
     "before": 1,
-    "after": 211,
-    "delta": 210,
+    "after": 219,
+    "delta": 218,
     "limit": 800
   },
   "failures": [
+    {
+      "symbol": "EXTR",
+      "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 10 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a highe"
+    },
+    {
+      "symbol": "APH",
+      "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 11 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a highe"
+    },
+    {
+      "symbol": "GNRC",
+      "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 9 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a higher"
+    },
+    {
+      "symbol": "TT",
+      "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 10 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a highe"
+    },
     {
       "symbol": "CFLT",
       "reason": "fromTwelveData: HTTP 404 404 **symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data / fromStoo"
