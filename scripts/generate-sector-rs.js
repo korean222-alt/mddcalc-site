@@ -29,6 +29,19 @@ const AXIS_ROWS = 520;  // 거래일 축 길이. 12개월(250) 지표를 직전 
 const RS_ROWS = 250;    // 화면 차트에 그릴 RS 선의 길이 (약 1년)
 const RANK_LAG = 20;    // "1개월 전 순위"의 기준. 이 차이가 곧 수급 유입/이탈 방향입니다.
 
+// 거래대금 배율(turnMult)의 분모가 되는 "평소" 구간 길이. 고른 기간 직전 1년입니다.
+// 12개월(250일) 기간이면 250 + 250 = 500 < AXIS_ROWS 라서 축 안에 아슬아슬하게 들어갑니다.
+const BASE_DAYS = 250;
+
+// 거래대금이 "늘었다/줄었다"를 가르는 문턱. 이 사이는 보합으로 둡니다.
+// 문턱 없이 1.0 을 기준으로 가르면 1.02 배가 "유입"으로 찍혀, 아무 일도 없는 날에도
+// 화면이 매일 다른 이야기를 합니다.
+const MULT_UP = 1.15, MULT_DOWN = 0.85;
+
+// 매집·분산 방향(heavyRet 등)을 계산할 최소 창 길이.
+// 1일·1주 창에서 "거래가 터진 날"을 고르는 것은 표본이 1~5개라 뜻이 없습니다.
+const DIR_MIN_DAYS = 20;
+
 const round2 = v => (v == null || !Number.isFinite(v) ? null : Math.round(v * 100) / 100);
 
 // ── 시세 파일 읽기 ────────────────────────────────────────────────────
@@ -54,7 +67,7 @@ function readSeries(dir, code) {
     if (j.f[k] != null) foreign.set(j.d[fOff + k], j.f[k]);
   }
 
-  return { code, name: j.name || code, dates: j.d, close, volume, foreign };
+  return { code, name: j.name || code, currency: j.currency || null, dates: j.d, close, volume, foreign };
 }
 
 // 거래일 축 위에 종가를 늘어놓습니다. 그 날 거래가 없으면 마지막으로 알려진 종가를 씁니다
@@ -139,6 +152,110 @@ function turnoverSum(series, axis, from, to) {
   return sum;
 }
 
+// 축 위에 하루치 거래대금을 그대로 늘어놓습니다. 구간 합계(turnoverSum)만으로는
+// "거래가 터진 날 가격이 어느 쪽으로 갔는가"를 볼 수 없어서, 일별 배열이 따로 필요합니다.
+function dailyTurnover(series, axis) {
+  const out = new Array(axis.length).fill(0);
+  for (let i = 0; i < axis.length; i++) {
+    const day = axis[i];
+    const v = series.volume.get(day);
+    if (v == null || v === 0) continue;
+    const c = series.close.get(day);
+    if (c == null) continue;
+    out[i] = c * v;
+  }
+  return out;
+}
+
+// [from, to) 평균. 구간이 축을 벗어나면 null — 0 으로 때우면 배율이 무한대가 됩니다.
+function windowMean(arr, from, to) {
+  if (from < 0 || to > arr.length || to - from <= 0) return null;
+  let sum = 0;
+  for (let i = from; i < to; i++) sum += arr[i];
+  return sum / (to - from);
+}
+
+// ── 거래대금 배율 ─────────────────────────────────────────────────────
+// 왜 비중(turnShare)만으로는 부족한가:
+//   비중은 분모가 시장 전체 거래대금이라, 내 섹터가 그대로여도 남들이 조용해지면 올라갑니다.
+//   드문 일이 아닙니다 — 2026-09-03 데이터에서 "비중은 늘었는데 배율은 1 미만"인 칸이
+//   세 시장 합쳐 29개였고, 그중에는 그날 비중이 가장 많이 오른 섹터(미국 반도체 1일,
+//   +5.38%p)도 배율 0.9배로 들어 있었습니다.
+//
+//   화면 문구에 이런 실제 사례를 숫자째 박아 두지는 마십시오. 데이터가 매 거래일 갱신되므로
+//   며칠이면 거짓이 됩니다(실제로 그렇게 틀린 문장을 한 번 넣었다가 걷어냈습니다).
+//   설명은 원리로 쓰고, 사례는 화면의 살아 있는 숫자가 대신하게 둡니다.
+//
+// 그래서 절대 금액을 "평소"와 견줍니다. 최근 기간의 하루 평균 거래대금이 그 직전 1년의
+// 하루 평균 대비 몇 배인가. 1.0 이면 평소만큼, 2.0 이면 평소의 두 배가 오갔다는 뜻입니다.
+function turnoverMultiple(turn, last, days) {
+  const cur = windowMean(turn, last + 1 - days, last + 1);
+  const base = windowMean(turn, last + 1 - days - BASE_DAYS, last + 1 - days);
+  if (cur == null || base == null || base <= 0) return null;
+  return cur / base;
+}
+
+// ── 거래가 터진 날, 가격은 어느 쪽으로 갔는가 ─────────────────────────
+// 거래대금은 매수 금액과 매도 금액이 언제나 같습니다. 그래서 거래대금이 늘었다는 사실
+// 하나만으로는 매집인지 분산인지 알 수 없습니다 — 알 수 있는 건 "손바뀜이 컸다"뿐입니다.
+//
+// 방향을 짐작할 수 있는 가장 정직한 방법은, 거래가 유난히 많았던 날 가격이 어느 쪽으로
+// 움직였는지를 보는 것입니다. 큰 거래가 오른 날에 몰렸다면 사려는 쪽이 급했다는 뜻이고,
+// 빠진 날에 몰렸다면 팔려는 쪽이 급했다는 뜻입니다. 어디까지나 정황이지 증거가 아니며,
+// 그래서 화면에서도 "매집"이라 단정하지 않고 이 숫자 그대로 보여줍니다.
+//
+//   heavyRet   거래대금 상위 25% 날들의 평균 등락률 (%)
+//   lightRet   하위 25% 날들의 평균 등락률 (%)
+//   flowRatio  오른 날 거래대금에서 내린 날 거래대금을 뺀 값을 전체로 나눈 비율 (%)
+//              +100 이면 오른 날에만 거래가 있었다는 뜻, -100 이면 그 반대입니다.
+function turnoverDirection(idx, turn, last, days) {
+  if (days < DIR_MIN_DAYS) return null;   // 표본이 너무 적으면 아예 내놓지 않습니다
+  const from = last + 1 - days;
+  if (from - 1 < 0) return null;          // 첫날의 등락률을 내려면 하루 앞이 있어야 합니다
+
+  const rows = [];
+  for (let i = from; i <= last; i++) {
+    const prev = idx[i - 1];
+    if (!Number.isFinite(prev) || prev <= 0 || !Number.isFinite(idx[i])) continue;
+    rows.push({ ret: (idx[i] / prev - 1) * 100, turn: turn[i] });
+  }
+  if (rows.length < DIR_MIN_DAYS) return null;
+
+  const total = rows.reduce((a, r) => a + r.turn, 0);
+  if (total <= 0) return null;
+
+  const signed = rows.reduce((a, r) => a + Math.sign(r.ret) * r.turn, 0);
+
+  const sorted = [...rows].sort((a, b) => b.turn - a.turn);
+  const q = Math.max(1, Math.round(sorted.length / 4));
+  const mean = list => list.reduce((a, r) => a + r.ret, 0) / list.length;
+
+  return {
+    heavyRet: mean(sorted.slice(0, q)),
+    lightRet: mean(sorted.slice(-q)),
+    flowRatio: (signed / total) * 100,
+  };
+}
+
+// ── 4분면 ─────────────────────────────────────────────────────────────
+// 거래대금(평소 대비 배율)과 상대강도(벤치마크 대비)를 엮으면 네 가지 상태가 나옵니다.
+// 같은 "거래대금 증가"라도 가격이 따라 오르는 중인지 아닌지에 따라 뜻이 정반대입니다.
+//
+//   lead    거래 ↑ · 강함 ↑   주도 — 돈이 들어오면서 가격도 따라옵니다
+//   churn   거래 ↑ · 약함 ↓   손바뀜 — 거래는 터지는데 가격은 밀립니다
+//   quiet   거래 ↓ · 강함 ↑   조용한 상승 — 관심 밖에서 오릅니다
+//   cold    거래 ↓ · 약함 ↓   소외 — 돈도 관심도 빠졌습니다
+//   null    문턱 안(보합)이거나 판단할 값이 없음
+function quadrantOf(mult, alpha) {
+  if (mult == null || alpha == null) return null;
+  // 벤치마크와 정확히 같으면(반올림 후 0.00%p) 강한 것도 약한 것도 아닙니다.
+  // 이걸 약한 쪽에 넣으면 "가격은 시장에 뒤집니다"가 비긴 섹터에 붙습니다.
+  if (alpha === 0) return null;
+  if (mult >= MULT_UP) return alpha > 0 ? 'lead' : 'churn';
+  if (mult <= MULT_DOWN) return alpha > 0 ? 'quiet' : 'cold';
+  return null;
+}
+
 // 축의 index 시점에서 유효한 마지막 외국인소진율. 없으면 null.
 function foreignAt(series, axis, index) {
   for (let i = index; i >= 0 && i > index - 30; i--) {
@@ -146,6 +263,37 @@ function foreignAt(series, axis, index) {
     if (f != null) return f;
   }
   return null;
+}
+
+// ── 마지막 봉이 장중인가 ──────────────────────────────────────────────
+// 수집이 장 마감 전에 돌면 마지막 날 거래량이 하루치가 아니라 그때까지의 누적입니다.
+// 실제로 2026-09-03 한국 파일의 삼성전자는 180만 주였습니다 — 평소 1500만 주의 12%.
+//
+// 비중(turnShare)은 모든 섹터가 똑같이 덜 찼으니 비율이 대체로 유지돼 티가 안 납니다.
+// 하지만 거래대금 배율은 절대 금액이라 그대로 드러납니다. "평소의 0.09배"는 노이즈가
+// 아니라 틀린 문장입니다 — 아직 안 끝난 하루를 끝난 하루와 비교한 것이기 때문입니다.
+//
+// 그래서 직전 20거래일 중앙값의 60% 에 못 미치면 장중으로 봅니다. 반휴장일도 걸릴 수
+// 있으므로 단정하지 않고 표시만 하고, 화면이 그 사실을 사용자에게 말합니다.
+const PARTIAL_RATIO = 0.6;
+
+function partialLastBar(universeList, axis) {
+  const last = axis.length - 1;
+  if (last < 21) return null;
+  const dayTotal = i => universeList.reduce((a, u) => {
+    const v = u.volume.get(axis[i]);
+    const c = u.close.get(axis[i]);
+    return a + ((v == null || c == null) ? 0 : c * v);
+  }, 0);
+
+  const prev = [];
+  for (let i = last - 20; i < last; i++) prev.push(dayTotal(i));
+  prev.sort((a, b) => a - b);
+  const median = prev[Math.floor(prev.length / 2)];
+  if (!(median > 0)) return null;
+
+  const ratio = dayTotal(last) / median;
+  return ratio < PARTIAL_RATIO ? round2(ratio) : null;
 }
 
 // ── 한 시장 계산 ──────────────────────────────────────────────────────
@@ -184,12 +332,16 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf, meta) {
       continue;
     }
     const aligned = members.map(m => alignForward(m, axis));
-    sectors.push({ def, members, aligned, idx: equalWeightIndex(aligned) });
+    // 섹터의 하루치 거래대금 = 구성 종목 합계. 배율과 방향 지표가 이 배열 위에서 계산됩니다.
+    const daily = members.map(m => dailyTurnover(m, axis));
+    const turn = axis.map((_, i) => daily.reduce((a, d) => a + d[i], 0));
+    sectors.push({ def, members, aligned, daily, turn, idx: equalWeightIndex(aligned) });
   }
   if (sectors.length === 0) throw new Error(`${marketKey}: 계산 가능한 섹터가 없습니다`);
 
   const last = axis.length - 1;
   const universeList = [...universe.values()];
+  const partialRatio = hasTurnover ? partialLastBar(universeList, axis) : null;
 
   // 기간별 지표. rating 은 섹터들끼리의 순위이므로 시장 단위로 한 번에 계산합니다.
   const perPeriod = {};
@@ -231,14 +383,29 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf, meta) {
         if (now != null && then != null) deltas.push(now - then);
       }
 
+      // 절대 거래대금 지표. 비중과 달리 남의 사정에 흔들리지 않습니다.
+      // 마지막 봉이 장중이면 1일 창은 그 봉 하나가 전부입니다. 덜 찬 하루를 꽉 찬
+      // 하루들과 견준 배율은 노이즈가 아니라 오답이라, 아예 내놓지 않습니다.
+      // 기간이 길수록 한 봉의 몫이 작아지므로 5일 이상은 그대로 둡니다.
+      const partialWindow = partialRatio != null && P.days <= 1;
+      const mult = round2((hasTurnover && !partialWindow) ? turnoverMultiple(s.turn, last, P.days) : null);
+      const dir = hasTurnover ? turnoverDirection(s.idx, s.turn, last, P.days) : null;
+      const alpha = (rets[i] != null && benchRet != null) ? rets[i] - benchRet : null;
+
       return {
         ret: round2(rets[i]),
-        alpha: round2(rets[i] != null && benchRet != null ? rets[i] - benchRet : null),
+        alpha: round2(alpha),
         rating: ratings[i],
         ratingPrev: ratingsPrev[i],
         rankChg: (ratings[i] != null && ratingsPrev[i] != null) ? ratings[i] - ratingsPrev[i] : null,
         turnShare: round2(share),
         turnShareChg: round2(share != null && sharePrev != null ? share - sharePrev : null),
+        turnAvgM: (hasTurnover && !partialWindow) ? Math.round(cur / P.days / 1e6) : null,  // 하루 평균 거래대금 (백만 단위)
+        turnMult: mult,
+        quadrant: quadrantOf(mult, round2(alpha)),
+        heavyRet: dir ? round2(dir.heavyRet) : null,
+        lightRet: dir ? round2(dir.lightRet) : null,
+        flowRatio: dir ? round2(dir.flowRatio) : null,
         foreign: nowVals.length ? round2(nowVals.reduce((a, b) => a + b, 0) / nowVals.length) : null,
         foreignChg: deltas.length ? round2(deltas.reduce((a, b) => a + b, 0) / deltas.length) : null,
       };
@@ -268,13 +435,28 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf, meta) {
         const end = a.length - 1;
         const ret = {};
         const turn = {};
+        const mult = {};   // 평소 대비 거래대금 배율
+        const fChg = info.hasForeign ? {} : null;   // 외국인 소진율 변화 (한국 종목에만 있습니다)
         for (const P of PERIODS) {
           const from = a[end - P.days];
           const to = a[end];
           ret[P.key] = (from == null || to == null || from <= 0) ? null : round2((to / from - 1) * 100);
           turn[P.key] = memberTurn[P.key][i][mi];
+          // 섹터 배율과 같은 이유로, 장중이면 1일 배율은 내놓지 않습니다.
+          mult[P.key] = (hasTurnover && !(partialRatio != null && P.days <= 1))
+            ? round2(turnoverMultiple(s.daily[mi], last, P.days)) : null;
+
+          // 섹터 평균만 보면 "누가" 사 모이는지는 가려집니다. 반도체·메모리처럼 종목마다
+          // 외국인 방향이 갈리는 섹터에서는 이 줄이 섹터 평균보다 많은 것을 말해 줍니다.
+          if (fChg) {
+            const now = foreignAt(m, axis, last);
+            const then = foreignAt(m, axis, last - P.days);
+            fChg[P.key] = (now != null && then != null) ? round2(now - then) : null;
+          }
         }
-        return { code: m.code, name: nameOf(m), ret, turn };
+        const out = { code: m.code, name: nameOf(m), ret, turn, mult };
+        if (fChg) out.fChg = fChg;
+        return out;
       }),
     };
   });
@@ -292,6 +474,8 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf, meta) {
       flag: info.flag || '',
       hasForeign: !!info.hasForeign,
       hasTurnover,
+      partialLast: partialRatio,   // 장중 수집이면 그 비율, 아니면 null
+      currency: (universeList.find(u => u.currency && u.currency !== 'PT') || {}).currency || null,
       benchmark: { code: bench.code, name: bench.name, ret: benchPeriods },
       updated: new Date(axis[last] * 86400000).toISOString().slice(0, 10),
       universeCount: universeList.length,
@@ -361,6 +545,10 @@ function buildTickerIndex(markets) {
           rankChg: p.rankChg == null ? null : p.rankChg,
           turnShare: p.turnShare == null ? null : p.turnShare,
           turnShareChg: p.turnShareChg == null ? null : p.turnShareChg,
+          // 비중만 담으면 홈 카드도 섹터 화면과 똑같은 오독을 부릅니다 — 남이 조용해져도
+          // 비중은 오릅니다. 절대 금액 배율과 4분면을 같이 실어 보냅니다.
+          turnMult: p.turnMult == null ? null : p.turnMult,
+          quadrant: p.quadrant || null,
           foreignChg: p.foreignChg == null ? null : p.foreignChg,
           t: themes[mem.code],
         };
@@ -476,4 +664,7 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { equalWeightIndex, alignForward, periodReturn, toRatings, readSeries, buildMarket, buildTickerIndex, usProvenance };
+module.exports = {
+  equalWeightIndex, alignForward, periodReturn, toRatings, readSeries, buildMarket,
+  buildTickerIndex, usProvenance, dailyTurnover, turnoverMultiple, turnoverDirection, quadrantOf,
+};
