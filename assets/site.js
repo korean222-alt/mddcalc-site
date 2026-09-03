@@ -1719,6 +1719,12 @@ const RS = {
   sortDir: -1,   // -1 내림차순
   openKey: null,
   chart: null,
+  // 거래대금 추이(일별·주별)는 data/sector-flow.json 에 따로 있습니다. 섹터를 처음
+  // 펼칠 때 한 번만 받습니다 — 표만 보고 나가는 사람이 치를 값이 아닙니다.
+  flow: null,
+  flowState: 'idle',   // idle | loading | ready | error
+  trendMode: 'd',      // d 일별 · w 주별
+  trendChart: null,
 };
 
 const RS_PERIODS = [
@@ -1761,6 +1767,18 @@ function rsQuadBadge(key, small) {
   return `<span style="display:inline-block; background:${q.bg}; color:${q.fg}; border:1px solid ${q.fg}22; ` +
     `border-radius:6px; padding:1px 6px; font-size:${small ? 10 : 11}px; font-weight:600; white-space:nowrap;">` +
     `${q.emoji} ${q.label}</span>`;
+}
+
+// 4분면 판정. scripts/generate-sector-rs.js 의 quadrantOf 와 같은 규칙입니다.
+// 섹터 값은 생성기가 이미 붙여 주지만(periods[].quadrant), 종목별로는 붙어 있지 않습니다 —
+// 종목 6기간 × 380개를 파일에 더 담느니 여기서 같은 규칙으로 계산합니다.
+// 두 곳에 같은 규칙이 있다는 뜻이므로, 문턱을 고칠 때는 반드시 양쪽을 함께 고치세요.
+const RS_MULT_UP = 1.15, RS_MULT_DOWN = 0.85;
+function rsQuadrantOf(mult, alpha) {
+  if (mult == null || alpha == null || alpha === 0) return null;
+  if (mult >= RS_MULT_UP) return alpha > 0 ? 'lead' : 'churn';
+  if (mult <= RS_MULT_DOWN) return alpha > 0 ? 'quiet' : 'cold';
+  return null;
 }
 
 // 배율은 1.0 이 기준선입니다. 부호(+/-)가 아니라 "몇 배"라서 rsNum 을 쓸 수 없습니다.
@@ -2193,11 +2211,13 @@ function toggleSectorDetail(key) {
 
 function renderSectorDetail() {
   const card = document.getElementById('rsDetail');
-  if (!RS.openKey) { card.classList.add('hidden'); return; }
+  // 카드를 닫을 때 추이 차트는 직접 버립니다. 카드만 숨기면 화면에서 사라져도
+  // Chart 인스턴스가 캔버스를 붙든 채 남습니다 (시장을 옮겨 다니면 계속 쌓입니다).
+  if (!RS.openKey) { card.classList.add('hidden'); rsCloseTrend(); return; }
 
   const m = rsMarketData();
   const s = m.sectors.find(x => x.key === RS.openKey);
-  if (!s) { card.classList.add('hidden'); return; }
+  if (!s) { card.classList.add('hidden'); rsCloseTrend(); return; }
   card.classList.remove('hidden');
 
   document.getElementById('rsDetailTitle').textContent = `📈 ${s.name} — ${m.benchmark.name} 대비 RS`;
@@ -2208,8 +2228,14 @@ function renderSectorDetail() {
     if (bv == null) return -1;
     return bv - av;
   });
+  // 기간 지표(💰 거래대금 추적)와 일별 추이(💵 거래대금 추이)는 서로 다른 칸에 그립니다.
+  // 추이는 파일을 따로 받아 늦게 도착하므로, 도착했을 때 구성 종목 목록까지 다시 그리지
+  // 않으려면 자리가 나뉘어 있어야 합니다.
+  document.getElementById('rsFlow').innerHTML = rsFlowPanel(s, m);
+  renderSectorTrend();
+
+  const benchRet = m.benchmark.ret[RS.period];
   document.getElementById('rsMembers').innerHTML =
-    rsFlowPanel(s, m) +
     `<h3 style="font-size:14px; color:#4a5568; margin:0 0 8px;">구성 종목 ${rsPeriodLabel()} 수익률 ` +
     `<span style="font-weight:400; color:#a0aec0; font-size:12px;">— 종목을 누르면 MDD 계산기로 갑니다</span></h3>` +
     `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
@@ -2221,8 +2247,14 @@ function renderSectorDetail() {
       // 나가는 종목이 동시에 있습니다.
       const mult = mem.mult ? mem.mult[RS.period] : null;
       const f = mem.fChg ? mem.fChg[RS.period] : null;
+      // 섹터에 붙이는 4분면을 종목에도 그대로 붙입니다. "이 섹터가 주도"라는 말과
+      // "이 섹터 안에서 어느 종목이 주도"는 다른 질문이고, 뒤엣것이 대개 알고 싶은 쪽입니다.
+      // 새 데이터가 필요하지 않습니다 — 이미 있는 종목 수익률·배율과 벤치마크 수익률로
+      // 섹터와 똑같은 규칙(rsQuadrantOf)을 적용한 값입니다.
+      const q = rsQuadrantOf(mult, (v == null || benchRet == null) ? null : Math.round((v - benchRet) * 100) / 100);
       const extra = [
         mult == null ? '' : `<span style="color:${rsFlowColor}; font-size:11px;">${mult.toFixed(2)}x</span>`,
+        q ? `<span style="font-size:11px;" title="${RS_QUADRANT[q].label} — ${RS_QUADRANT[q].desc}">${RS_QUADRANT[q].emoji}</span>` : '',
         f == null ? '' : `<span style="font-size:11px; color:${f > 0 ? rsUp : (f < 0 ? rsDown : rsFlat)};">외 ${f > 0 ? '+' : ''}${f.toFixed(2)}%p</span>`,
       ].filter(Boolean).join(' ');
       // 종목 이름을 누르면 그 종목의 MDD 계산기로 갑니다. 여기서 "이 섹터가 강하다"까지
@@ -2233,9 +2265,10 @@ function renderSectorDetail() {
         `<b style="color:${color};">${v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + '%'}</b>` +
         (extra ? ` ${extra}` : '') + `</a>`;
     }).join('') + '</div>' +
-    (m.hasForeign
-      ? '<div style="font-size:11px; color:#a0aec0; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금, 외 = 외국인 소진율 변화</div>'
-      : '<div style="font-size:11px; color:#a0aec0; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금</div>');
+    `<div style="font-size:11px; color:#a0aec0; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금` +
+    (m.hasForeign ? ', 외 = 외국인 소진율 변화' : '') +
+    `<br>🔥 주도 = 거래 늘고 벤치마크보다 강함 · 🔄 손바뀜 = 거래 늘었는데 약함 · ` +
+    `🌱 조용한 상승 = 거래 줄었는데 강함 · 💤 소외 = 둘 다 식음 (배율 0.85~1.15배는 보합이라 표시 없음)</div>`;
 
   drawSectorChart(s, m);
 }
@@ -2312,6 +2345,272 @@ function rsFlowPanel(s, m) {
       rsDirSentence(gap, p.flowRatio) +
       ` 어디까지나 정황이며, 누가 사 모으는지는 거래대금으로 알 수 없습니다.</div>` : '') +
     `</div>`;
+}
+
+// ── 거래대금 추이 (일별 · 주별) ────────────────────────────────────────
+// 💰 거래대금 추적의 배율은 "지금 평소의 몇 배인가"라는 한 숫자입니다. 그 하나로는
+// 늘어나는 중인지 이미 식는 중인지 알 수 없습니다 — 2.0배는 3.0배에서 내려온 값일 수도,
+// 1.2배에서 올라온 값일 수도 있고 둘은 정반대 이야기입니다. 그래서 하루치·주간치를
+// 그대로 늘어놓습니다. 매집이냐 분산이냐는 여전히 알 수 없지만, 손바뀜이 커지는 중인지
+// 작아지는 중인지, 그리고 그게 오르는 쪽에서였는지 내리는 쪽에서였는지는 보입니다.
+//
+// 데이터는 data/sector-flow.json 입니다. 섹터를 처음 펼칠 때 한 번만 받습니다 —
+// 표만 보고 나가는 사람이 치를 값이 아닙니다.
+//
+// 위 기간 버튼(1일~12개월)과는 무관하게 언제나 최근 1년 창 위에서 그립니다.
+// 기간을 따라 창까지 움직이면 "1일" 을 골랐을 때 막대가 하나만 남습니다.
+const RS_TREND_MODES = [
+  { key: 'd', label: '일별', bars: 60, ma: 20, unit: '거래일', cmp: 20, span: '최근 60거래일' },
+  { key: 'w', label: '주별', bars: 52, ma: 13, unit: '주',     cmp: 4,  span: '최근 52주' },
+];
+
+// 에포크일 다루기. 생성기(scripts/generate-sector-rs.js)의 weekStart 와 같은 식입니다.
+// 에포크일 0 = 1970-01-01 목요일이라 +3 / +4 가 붙습니다.
+function rsWeekStart(day) { return day - ((day + 3) % 7); }
+function rsWeekday(day) { return (day + 4) % 7; }   // 0 일요일 … 5 금요일
+
+function rsLoadFlow() {
+  if (RS.flowState === 'loading' || RS.flowState === 'ready') return;
+  RS.flowState = 'loading';
+  fetch('/data/sector-flow.json')
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(j => { RS.flow = j; RS.flowState = 'ready'; })
+    .catch(e => { console.error('[sector] 거래대금 추이를 받지 못했습니다:', e); RS.flowState = 'error'; })
+    .then(() => renderSectorTrend())    // 성공이든 실패든 화면은 다시 그립니다
+    .catch(e => console.error('[sector] 거래대금 추이 렌더 실패:', e));
+}
+
+// 일별 → 주별. 한 주의 방향은 그 주에 오른 날 거래대금과 내린 날 거래대금 중 어느 쪽이
+// 컸는가로 정합니다. 막대 하나가 하루일 때 이 규칙은 곧 그날의 등락이라, 일별과 주별이
+// 규칙 하나를 나눠 씁니다 — 막대 색의 뜻이 화면을 바꿀 때마다 달라지지 않게.
+function rsWeeklyBars(dates, values, dir) {
+  const groups = [];
+  let cur = null;
+  for (let i = 0; i < dates.length; i++) {
+    const w = rsWeekStart(dates[i]);
+    if (!cur || cur.week !== w) { cur = { week: w, end: dates[i], sum: 0, signed: 0, days: 0 }; groups.push(cur); }
+    const c = dir.charAt(i);
+    cur.sum += values[i];
+    cur.signed += c === 'u' ? values[i] : (c === 'd' ? -values[i] : 0);
+    cur.days++;
+    cur.end = dates[i];
+  }
+  return {
+    starts: groups.map(g => g.week),
+    ends: groups.map(g => g.end),
+    values: groups.map(g => g.sum),
+    dir: groups.map(g => (g.signed > 0 ? 'u' : (g.signed < 0 ? 'd' : 'f'))).join(''),
+    days: groups.map(g => g.days),
+  };
+}
+
+// 날짜 축은 시장 하나에 하나(fm.dates)이고, 거래대금·방향은 섹터마다(fsec)입니다.
+function rsTrendBars(dates, fsec, mode) {
+  if (mode.key === 'w') return rsWeeklyBars(dates, fsec.t, fsec.dir);
+  return {
+    starts: dates.slice(), ends: dates.slice(),
+    values: fsec.t.slice(), dir: fsec.dir, days: dates.map(() => 1),
+  };
+}
+
+// 이동평균. 창이 덜 찬 앞쪽과, 아직 안 끝난 마지막 막대는 점을 찍지 않습니다.
+function rsMovingAvg(values, n, dropLast) {
+  return values.map((_, i) => {
+    if (dropLast && i === values.length - 1) return null;
+    if (i + 1 < n) return null;
+    let sum = 0;
+    for (let k = i + 1 - n; k <= i; k++) sum += values[k];
+    return sum / n;
+  });
+}
+
+// 마지막 막대가 아직 안 끝났는가.
+//   일별 — 장중에 수집이 돌면 그날 거래량이 하루치가 아닙니다 (market.partialLast).
+//   주별 — 마지막 거래일이 금요일이 아니면 그 주는 아직 진행 중입니다.
+// 덜 찬 막대를 다른 막대와 똑같이 그리면 "거래대금이 급감했다"로 읽힙니다. 흐리게
+// 그리고, 평균·비교 계산에서는 아예 뺍니다.
+function rsTrendIncomplete(mode, m, lastDate) {
+  if (m.partialLast != null) return true;
+  return mode.key === 'w' && rsWeekday(lastDate) !== 5;
+}
+
+const rsMonthDay = d => {
+  const t = new Date(d * 86400000);
+  return `${t.getUTCMonth() + 1}/${t.getUTCDate()}`;
+};
+
+// 막대 색. 오른 쪽은 초록, 내린 쪽은 빨강입니다.
+// 이 화면의 다른 거래대금 숫자(비중 변화 등)는 일부러 중립 파랑 하나만 쓰는데, 여기서는
+// 색이 곧 "그 사이 지수가 어느 쪽으로 갔나"를 뜻하므로 등락 색을 그대로 씁니다.
+// 막대 높이가 거래대금이고 색이 방향입니다 — 아래 설명줄이 그 말을 합니다.
+function rsTrendColor(c, faded) {
+  const a = faded ? 0.22 : 0.62;
+  if (c === 'u') return `rgba(56,161,105,${a})`;
+  if (c === 'd') return `rgba(229,62,62,${a})`;
+  return `rgba(160,174,192,${a})`;
+}
+
+// 요약 한 줄. "최근 N구간 평균이 그 직전 N구간 대비 몇 %" 와, 그 구간 거래대금이 오른 쪽
+// 막대에 몇 % 쌓였는지입니다. 뒤엣것은 방향 프록시라 100%·0% 로 갈 수 있고, 반반(50%)이면
+// 아무 쪽도 아니라는 뜻입니다.
+function rsTrendNote(bars, mode, m, incomplete) {
+  const values = incomplete ? bars.values.slice(0, -1) : bars.values;
+  const dir = incomplete ? bars.dir.slice(0, -1) : bars.dir;
+  const n = mode.cmp;
+  if (values.length < n * 2) return '';
+
+  const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+  const recent = mean(values.slice(-n));
+  const prev = mean(values.slice(-n * 2, -n));
+  const chg = prev > 0 ? (recent / prev - 1) * 100 : null;
+
+  let up = 0, total = 0;
+  for (let i = values.length - n; i < values.length; i++) {
+    total += values[i];
+    if (dir.charAt(i) === 'u') up += values[i];
+  }
+  const upShare = total > 0 ? (up / total) * 100 : null;
+
+  return `최근 ${n}${mode.unit} 평균 <b>${rsTurnover(Math.round(recent), m.currency)}</b>` +
+    (chg == null ? '' : ` · 그 직전 ${n}${mode.unit} 대비 ${rsFlow(chg, 0, '%')}`) +
+    (upShare == null ? '' : `<br>이 구간 거래대금의 <b>${upShare.toFixed(0)}%</b>가 오른 ${mode.unit}에 쌓였습니다` +
+      ` (반반이면 50%). 오른 쪽에 몰렸다고 해서 누가 사 모았다는 뜻은 아닙니다 — ` +
+      `그 거래에도 판 사람이 같은 금액만큼 있었습니다.`);
+}
+
+function rsCloseTrend() {
+  if (RS.trendChart) { RS.trendChart.destroy(); RS.trendChart = null; }
+  const box = document.getElementById('rsTrend');
+  if (box) { box.classList.add('hidden'); box.innerHTML = ''; }
+}
+
+function renderSectorTrend() {
+  const box = document.getElementById('rsTrend');
+  if (!box) return;
+  if (RS.trendChart) { RS.trendChart.destroy(); RS.trendChart = null; }
+
+  const m = rsMarketData();
+  const s = RS.openKey ? m.sectors.find(x => x.key === RS.openKey) : null;
+  // 거래대금을 비교할 수 없는 시장에서는 블록 자체를 그리지 않습니다.
+  if (!s || !m.hasTurnover) { rsCloseTrend(); return; }
+  box.classList.remove('hidden');
+
+  const mode = RS_TREND_MODES.find(t => t.key === RS.trendMode) || RS_TREND_MODES[0];
+  const head = `<h3 style="font-size:14px; color:#2d3748; margin:0 0 4px;">💵 거래대금 추이 ` +
+    `<span style="font-weight:400; color:#a0aec0; font-size:12px;">— ${mode.span}</span></h3>`;
+
+  if (RS.flowState !== 'ready') {
+    box.innerHTML = head + (RS.flowState === 'error'
+      ? `<div style="font-size:12.5px; color:#718096;">거래대금 추이를 불러오지 못했습니다. ` +
+        `새로고침하면 다시 시도합니다 — 위 숫자들은 그대로 유효합니다.</div>`
+      : `<div style="font-size:12.5px; color:#718096;">⏳ 거래대금 추이 불러오는 중…</div>`);
+    rsLoadFlow();
+    return;
+  }
+
+  const fm = (RS.flow.markets || {})[RS.market];
+  const fsec = fm && fm.sectors ? fm.sectors[RS.openKey] : null;
+  // 파일은 받았는데 이 섹터가 없는 경우(섹터를 새로 넣고 데이터 갱신 전). 조용히 접습니다.
+  if (!fsec || !fsec.t.length) { rsCloseTrend(); return; }
+
+  const all = rsTrendBars(fm.dates, fsec, mode);
+  const from = Math.max(0, all.values.length - mode.bars);
+  const bars = {
+    starts: all.starts.slice(from), ends: all.ends.slice(from),
+    values: all.values.slice(from), dir: all.dir.slice(from), days: all.days.slice(from),
+  };
+  const incomplete = rsTrendIncomplete(mode, m, bars.ends[bars.ends.length - 1]);
+  // 이동평균은 잘라낸 앞쪽까지 써서 구합니다. 보이는 60개만으로 20일 평균을 구하면
+  // 왼쪽 20개 자리가 비어 "최근에야 거래가 생긴 섹터"처럼 보입니다.
+  const ma = rsMovingAvg(all.values, mode.ma, incomplete).slice(from);
+
+  box.innerHTML = head +
+    `<div style="font-size:11.5px; color:#718096; margin-bottom:8px;">` +
+    `막대 높이는 그 ${mode.key === 'd' ? '하루' : '한 주'}의 거래대금, 색은 그 사이 섹터지수가 ` +
+    `<span style="color:${rsUp}; font-weight:600;">오른 쪽</span>인지 ` +
+    `<span style="color:${rsDown}; font-weight:600;">내린 쪽</span>인지입니다. ` +
+    `위 기간 버튼과 무관하게 최근 1년 안에서 그립니다.</div>` +
+    `<div style="display:flex; gap:6px; margin-bottom:8px;">` +
+    RS_TREND_MODES.map(t => `<button type="button" class="preset-btn ${t.key === mode.key ? 'active' : ''}" ` +
+      `onclick="setSectorTrendMode('${t.key}')">${t.label}</button>`).join('') +
+    `</div>` +
+    `<div class="chart-wrap" id="rsTrendWrap" style="height:220px;"><canvas id="rsTrendChart"></canvas></div>` +
+    `<div style="font-size:12px; color:#4a5568; line-height:1.7; margin-top:8px;">` +
+    rsTrendNote(bars, mode, m, incomplete) +
+    (incomplete ? `<br><span style="color:#9c4221;">마지막 막대는 아직 끝나지 않은 ` +
+      `${mode.key === 'd' ? '하루' : '주'}라 흐리게 그렸고, 위 평균에서도 뺐습니다.</span>` : '') +
+    `</div>`;
+
+  drawTrendChart(bars, ma, mode, m, incomplete);
+}
+
+function setSectorTrendMode(key) {
+  if (RS.trendMode === key) return;
+  RS.trendMode = key;
+  renderSectorTrend();
+}
+
+function drawTrendChart(bars, ma, mode, m, incomplete) {
+  if (typeof Chart === 'undefined') {
+    const wrap = document.getElementById('rsTrendWrap');
+    if (wrap) wrap.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; ` +
+      `background:#f7fafc; border-radius:10px; color:#718096; font-size:13px; text-align:center; padding:16px;">` +
+      `차트를 불러오지 못했습니다. (광고 차단 확장 프로그램이 원인일 수 있습니다)</div>`;
+    return;
+  }
+  const last = bars.values.length - 1;
+  const labels = bars.starts.map(rsMonthDay);
+  const colors = bars.values.map((_, i) => rsTrendColor(bars.dir.charAt(i), incomplete && i === last));
+
+  try {
+    RS.trendChart = new Chart(document.getElementById('rsTrendChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: mode.key === 'd' ? '하루 거래대금' : '한 주 거래대금',
+            data: bars.values, backgroundColor: colors, borderWidth: 0, order: 2 },
+          { type: 'line', label: `${mode.ma}${mode.unit} 이동평균`, data: ma,
+            borderColor: rsFlowColor, borderWidth: 1.6, pointRadius: 0, fill: false, spanGaps: false, order: 1 },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              title: items => {
+                const i = items[0].dataIndex;
+                const start = new Date(bars.starts[i] * 86400000).toISOString().slice(0, 10);
+                return mode.key === 'd' ? start : `${start} ~ ${rsMonthDay(bars.ends[i])} (${bars.days[i]}거래일)`;
+              },
+              label: item => {
+                if (item.datasetIndex === 1) {
+                  return item.raw == null ? '' : `${mode.ma}${mode.unit} 이동평균 ${rsTurnover(Math.round(item.raw), m.currency)}`;
+                }
+                const c = bars.dir.charAt(item.dataIndex);
+                const word = c === 'u' ? '오른 쪽' : (c === 'd' ? '내린 쪽' : '보합');
+                return `${rsTurnover(item.raw, m.currency)} · ${word}` +
+                  (incomplete && item.dataIndex === last ? ' (아직 진행 중)' : '');
+              },
+            },
+          },
+        },
+        scales: {
+          x: { ticks: { maxTicksLimit: 10, font: { size: 10 } }, grid: { display: false }, stacked: false },
+          // 0 은 "0백만원"이 아니라 그냥 0 입니다. 축 맨 아래 눈금에 단위를 붙이면
+          // 그 단위가 축 전체의 단위처럼 읽힙니다.
+          y: { beginAtZero: true, ticks: { font: { size: 10 }, callback: v => (v === 0 ? '0' : rsTurnover(v, m.currency)) } },
+        },
+      },
+    });
+  } catch (e) {
+    // 차트 하나가 죽는다고 페이지 전체가 멈추면 안 됩니다. (RS 선 차트와 같은 처리)
+    console.error('[sector] 거래대금 추이 렌더 실패:', e);
+    RS.trendChart = null;
+  }
 }
 
 // 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 표와 숫자는 멀쩡해야 하므로

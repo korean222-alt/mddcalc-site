@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   equalWeightIndex, alignForward, periodReturn, toRatings, buildMarket,
-  turnoverMultiple, turnoverDirection, quadrantOf,
+  turnoverMultiple, turnoverDirection, quadrantOf, weekStart,
 } = require('./generate-sector-rs');
 
 const ROOT = path.join(__dirname, '..');
@@ -148,6 +148,17 @@ check('방향: 창이 20거래일보다 짧으면 계산하지 않는다', () =>
   assert.ok(turnoverDirection(idx, turn, 59, 20) != null);
 });
 
+// ── 주 경계 ──────────────────────────────────────────────────────────
+// 거래대금 추이의 주별 막대가 이 함수 하나에 걸려 있습니다. 하루라도 어긋나면 막대가
+// 엉뚱한 주에 얹히는데, 화면에서는 그냥 그럴듯한 막대로 보입니다.
+check('weekStart: 에포크일을 그 주 월요일로 내린다', () => {
+  const mon = Math.round(Date.UTC(2026, 7, 31) / 86400000);   // 2026-08-31 월요일
+  assert.strictEqual(new Date(mon * 86400000).getUTCDay(), 1, '기준일이 월요일이어야 합니다');
+  for (let i = 0; i < 7; i++) assert.strictEqual(weekStart(mon + i), mon, `${i}일 뒤`);
+  assert.strictEqual(weekStart(mon + 7), mon + 7);
+  assert.strictEqual(weekStart(mon - 1), mon - 7);
+});
+
 // ── 4분면 ────────────────────────────────────────────────────────────
 check('4분면: 거래·강도 조합이 네 이름으로 갈린다', () => {
   assert.strictEqual(quadrantOf(2.0, 5), 'lead');    // 거래 ↑ 강함 ↑
@@ -252,7 +263,8 @@ try {
     { key: 'flat', name: '횡보', codes: ['FLAT'] },
     { key: 'down', name: '하락', codes: ['DOWN'] },
   ];
-  const { market } = buildMarket('KR', FIXTURE_DIR, defs, m => m.name);
+  const built = buildMarket('KR', FIXTURE_DIR, defs, m => m.name);
+  const market = built.market;
   const by = Object.fromEntries(market.sectors.map(s => [s.key, s]));
 
   check('벤치마크가 횡보면 알파 = 수익률', () => {
@@ -398,6 +410,60 @@ try {
     // 매일 멀쩡한 데이터에 "아직 덜 찼습니다" 경고가 붙습니다.
     assert.strictEqual(market.partialLast, null);
     assert.ok(by.flat.periods['1d'].turnMult != null);
+  });
+
+  // ── 거래대금 추이 (data/sector-flow.json) ───────────────────────────
+  // 화면이 이 배열 위에 막대를 그립니다. 길이가 하루 어긋나거나 방향 문자가 뒤집혀도
+  // 막대는 똑같이 그럴듯하게 그려지므로, 눈으로는 잘못을 알 수 없습니다.
+  check('추이: 섹터마다 날짜·거래대금·방향 길이가 같다', () => {
+    const f = built.flow;
+    assert.ok(f && f.dates.length > 0, '추이가 비어 있습니다');
+    for (const [key, sec] of Object.entries(f.sectors)) {
+      assert.strictEqual(sec.t.length, f.dates.length, `${key} 거래대금 길이`);
+      assert.strictEqual(sec.dir.length, f.dates.length, `${key} 방향 길이`);
+    }
+    assert.deepStrictEqual(Object.keys(f.sectors).sort(), ['down', 'flat', 'up']);
+  });
+
+  check('추이: 창은 주 경계에서 시작한다 (잘린 첫 주를 버린다)', () => {
+    // 첫날 바로 앞 거래일이 같은 주에 있으면, 첫 주가 잘린 채로 시작한 것입니다.
+    // 그 상태로 주별 막대를 그리면 첫 막대만 하루이틀짜리로 짧게 나옵니다.
+    const first = built.flow.dates[0];
+    const axisAll = market.dates;   // RS 선과 같은 창(250일). 그 앞 축은 여기 없습니다.
+    assert.ok(first >= axisAll[0], '추이 창이 RS 창보다 앞설 수 없습니다');
+    assert.strictEqual(weekStart(first - 1), weekStart(first) - 7, '첫날이 그 주의 첫 거래일이 아닙니다');
+  });
+
+  check('추이: 마지막 날짜가 RS 창의 마지막 날과 같다', () => {
+    const f = built.flow;
+    assert.strictEqual(f.dates[f.dates.length - 1], market.dates[market.dates.length - 1]);
+  });
+
+  check('추이: 거래대금은 백만 단위 정수', () => {
+    // DOWN 의 마지막 날은 종가 100 × (1 − 299/600) ≈ 50.2, 거래량 100000
+    // → 하루 거래대금 약 502만 원. 백만 단위로 담기면 5 입니다.
+    const t = built.flow.sectors.down.t;
+    const last = t[t.length - 1];
+    const expected = Math.round(100 * (1 - (N - 1) / (N * 2)) * 100000 / 1e6);
+    assert.ok(Number.isInteger(last), `정수가 아닙니다: ${last}`);
+    assert.strictEqual(last, expected);
+  });
+
+  check('추이: 방향은 그 섹터가 오른 날 u, 내린 날 d', () => {
+    const up = built.flow.sectors.up.dir;
+    const down = built.flow.sectors.down.dir;
+    const count = (str, c) => [...str].filter(x => x === c).length;
+    assert.ok(count(up, 'u') > up.length * 0.9, `상승 섹터의 u 비율 ${count(up, 'u')}/${up.length}`);
+    assert.ok(count(down, 'd') > down.length * 0.9, `하락 섹터의 d 비율 ${count(down, 'd')}/${down.length}`);
+  });
+
+  check('추이: 거래가 터진 구간이 막대에도 그대로 보인다', () => {
+    // 배율(turnMult)만 맞고 배열이 어긋나면 화면의 막대는 엉뚱한 자리에 섭니다.
+    // DOWN 은 마지막 30일에만 거래량이 100배입니다.
+    const t = built.flow.sectors.down.t;
+    const tail = t.slice(-30).reduce((a, b) => a + b, 0) / 30;
+    const before = t.slice(-90, -30).reduce((a, b) => a + b, 0) / 60;
+    assert.ok(tail > before * 50, `최근 ${tail} vs 이전 ${before}`);
   });
 
   check('데이터 파일이 없는 구성 종목은 크래시 없이 빠진다', () => {

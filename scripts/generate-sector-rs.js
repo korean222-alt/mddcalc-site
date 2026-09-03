@@ -24,6 +24,7 @@ const {
 const ROOT = path.join(__dirname, '..');
 const OUT_FILE = path.join(ROOT, 'data', 'sectors.json');
 const TICKER_FILE = path.join(ROOT, 'data', 'ticker-sectors.json');
+const FLOW_FILE = path.join(ROOT, 'data', 'sector-flow.json');
 
 const AXIS_ROWS = 520;  // 거래일 축 길이. 12개월(250) 지표를 직전 12개월과 비교하는 데 필요.
 const RS_ROWS = 250;    // 화면 차트에 그릴 RS 선의 길이 (약 1년)
@@ -256,6 +257,55 @@ function quadrantOf(mult, alpha) {
   return null;
 }
 
+// ── 거래대금 추이 (별도 파일) ─────────────────────────────────────────
+// 기간 지표(배율 한 숫자)는 "지금 평소보다 몇 배인가"만 말합니다. "요즘 늘고 있나 줄고
+// 있나"는 하루치를 그대로 늘어놓아야 보입니다. 그 배열을 여기서 만듭니다.
+//
+// 왜 sectors.json 에 넣지 않는가:
+//   그 파일은 히트맵도 함께 읽습니다. 히트맵은 이 배열을 한 번도 쓰지 않는데, 섹터
+//   91개 × 250일을 담으면 파일이 눈에 띄게 커지고 그 값을 히트맵 사용자도 매번 받습니다.
+//   ticker-sectors.json 을 따로 뺀 것과 같은 이유입니다. 이 파일은 섹터를 실제로 펼친
+//   사람만 받습니다.
+const FLOW_UNIT = 1e6;   // 백만 단위. turnAvgM 과 같은 단위입니다.
+
+// 에포크일 → 그 주 월요일의 에포크일. (에포크일 0 = 1970-01-01 목요일이라 +3)
+function weekStart(day) { return day - ((day + 3) % 7); }
+
+// 화면이 그릴 일별 거래대금과 그날의 방향입니다.
+//
+//   dates  거래일 축 (에포크일)
+//   t      하루 거래대금, 백만 단위 정수
+//   dir    그날 섹터지수가 오른 날 'u' / 내린 날 'd' / 보합·판단불가 'f'
+//
+// dir 을 함께 담는 이유: 막대 높이만으로는 손바뀜의 크기밖에 말할 수 없습니다.
+// "거래가 터진 날이 오른 날이었나"까지 보여야 매집·분산을 가늠할 여지가 생깁니다.
+// 등락률을 통째로 담으면 파일이 배로 커지는데, 색을 칠하는 데는 부호면 충분합니다.
+function buildFlowSeries(sectors, axis, from) {
+  // 창의 첫 주가 중간에서 잘려 있으면 그 주를 통째로 버립니다. 주 단위로 묶었을 때
+  // 첫 막대만 거래일 하루이틀짜리로 짧게 나오는데, 화면에서 그건 "그 주엔 거래가 거의
+  // 없었다"로 읽힙니다 — 실제로는 우리가 창을 그 자리에서 끊었을 뿐입니다.
+  let start = from;
+  if (start > 0 && weekStart(axis[start - 1]) === weekStart(axis[start])) {
+    const w = weekStart(axis[start]);
+    while (start < axis.length && weekStart(axis[start]) === w) start++;
+  }
+  if (start >= axis.length) return null;
+
+  const out = {};
+  for (const s of sectors) {
+    const t = [];
+    let dir = '';
+    for (let i = start; i < axis.length; i++) {
+      t.push(Math.round(s.turn[i] / FLOW_UNIT));
+      const prev = s.idx[i - 1], cur = s.idx[i];
+      const known = i > 0 && Number.isFinite(prev) && prev > 0 && Number.isFinite(cur);
+      dir += !known ? 'f' : (cur > prev ? 'u' : (cur < prev ? 'd' : 'f'));
+    }
+    out[s.def.key] = { name: s.def.name, t, dir };
+  }
+  return { dates: axis.slice(start), sectors: out };
+}
+
 // 축의 index 시점에서 유효한 마지막 외국인소진율. 없으면 null.
 function foreignAt(series, axis, index) {
   for (let i = index; i >= 0 && i > index - 30; i--) {
@@ -469,6 +519,8 @@ function buildMarket(marketKey, dir, sectorDefs, nameOf, meta) {
     + '     오래 뒤처진 종목은 상장폐지·합병일 수 있습니다. scripts/sectors.js 에서 빼는 것을 검토하세요.');
 
   return {
+    // 일별 거래대금 추이는 data/sector-flow.json 으로 따로 나갑니다 (위 buildFlowSeries 주석).
+    flow: hasTurnover ? buildFlowSeries(sectors, axis, rsFrom) : null,
     market: {
       label: info.label,
       flag: info.flag || '',
@@ -600,6 +652,7 @@ function main() {
 
   const krName = new Map(KR_TICKERS.map(t => [t.code, t.name]));
   const markets = {};
+  const flows = {};   // 일별 거래대금 추이. 섹터를 펼친 사람만 받는 별도 파일로 나갑니다.
 
   // 한 시장의 데이터가 통째로 없어도(수집 실패, 야후 차단) 나머지 시장은 살립니다.
   // 화면도 실제로 들어 있는 시장만 탭으로 보여줍니다. 여기서 죽이면 사고 하나에
@@ -612,6 +665,14 @@ function main() {
     try {
       const built = buildMarket(info.key, info.dir, SECTOR_DEFS[info.key], nameOfFor(info.dir), info);
       markets[info.key] = built.market;
+      if (built.flow) flows[info.key] = {
+        updated: built.market.updated,
+        currency: built.market.currency,
+        // 마지막 봉이 장중이면 그 하루는 아직 덜 찬 막대입니다. 화면이 그 막대를 다르게
+        // 그리도록 여기서도 같이 알려 줍니다 (sectors.json 의 partialLast 와 같은 값).
+        partialLast: built.market.partialLast,
+        ...built.flow,
+      };
       console.log('   ' + built.market.label + ' ' + built.stats.sectors + '섹터'
         + ' (기준일 ' + built.market.updated + ', 수록 ' + built.market.universeCount + '종목)');
     } catch (err) {
@@ -647,6 +708,17 @@ function main() {
     + (provenance.US.apiUsage ? ` · 마지막 수집 ${provenance.US.apiUsage.generatedAtKST}`
       + ` (Twelve Data ${provenance.US.apiUsage.calls}회)` : ''));
 
+  // 거래대금 추이. 거래대금을 비교할 수 없는 시장은 아예 빠지고, 화면은 그 시장에서
+  // 추이 블록을 그리지 않습니다.
+  fs.writeFileSync(FLOW_FILE, JSON.stringify({
+    updated: new Date().toISOString().slice(0, 10),
+    generatedAt: new Date().toISOString(),
+    unit: 'M',          // t 배열의 단위 = 백만 (통화는 시장별 currency)
+    markets: flows,
+  }));
+  console.log('✅ data/sector-flow.json — ' + Object.keys(flows).length + '시장, '
+    + Math.round(fs.statSync(FLOW_FILE).size / 1024) + 'KB');
+
   const tickers = buildTickerIndex(markets);
   fs.writeFileSync(TICKER_FILE, JSON.stringify({
     updated: new Date().toISOString().slice(0, 10),
@@ -667,4 +739,5 @@ if (require.main === module) main();
 module.exports = {
   equalWeightIndex, alignForward, periodReturn, toRatings, readSeries, buildMarket,
   buildTickerIndex, usProvenance, dailyTurnover, turnoverMultiple, turnoverDirection, quadrantOf,
+  buildFlowSeries, weekStart,
 };
