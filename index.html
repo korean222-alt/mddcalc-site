@@ -3013,6 +3013,10 @@ function loadTickerSectors() {
 }
 
 // null 과 0 은 다릅니다. 값이 없으면 0 이라고 우기지 말고 — 로 둡니다.
+// 거래대금 4분면 — 섹터 RS 화면(assets/site.js 의 RS_QUADRANT)과 같은 어휘입니다.
+// 홈 카드는 한 줄짜리라 이름만 씁니다. 뜻은 섹터 화면에 적혀 있습니다.
+const SUPPLY_QUAD = { lead: '🔥 주도', churn: '🔄 손바뀜', quiet: '🌱 조용한 상승', cold: '💤 소외' };
+
 function supplyNum(v, digits, unit) {
   if (v == null) return '<span style="color:#cbd5e0;">—</span>';
   const color = v > 0 ? '#38a169' : (v < 0 ? '#e53e3e' : '#a0aec0');
@@ -3064,7 +3068,11 @@ async function renderSupplyCard(ticker) {
         `<div style="font-size:11px; color:#718096; margin-top:4px;">1~99, 괄호는 한 달 전 순위 대비</div></div>` +
       `<div class="stat-box"><div class="label">거래대금 비중 변화</div>` +
         `<div class="value">${supplyNum(t.turnShareChg, 2, '%p')}</div>` +
-        `<div style="font-size:11px; color:#718096; margin-top:4px;">늘고 있으면 돈이 들어오는 중</div></div>` +
+        `<div style="font-size:11px; color:#718096; margin-top:4px;">다른 섹터가 조용해져도 오릅니다</div></div>` +
+      (t.turnMult == null ? '' :
+      `<div class="stat-box"><div class="label">거래대금 배율</div>` +
+        `<div class="value">${t.turnMult.toFixed(2)}x${SUPPLY_QUAD[t.quadrant] ? ` <span style="font-size:12px;">${SUPPLY_QUAD[t.quadrant]}</span>` : ''}</div>` +
+        `<div style="font-size:11px; color:#718096; margin-top:4px;">절대 금액 · 평소(직전 1년) 대비</div></div>`) +
       (t.foreignChg == null ? '' :
       `<div class="stat-box"><div class="label">외국인 소진율 변화</div>` +
         `<div class="value">${supplyNum(t.foreignChg, 2, '%p')}</div>` +

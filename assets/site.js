@@ -1738,8 +1738,51 @@ const RS_COLS = [
   { key: 'alpha', label: '벤치마크 대비' },
   { key: 'rankChg', label: '순위 변화', hint: '1개월 전 대비' },
   { key: 'turnShare', label: '거래대금 비중', needs: 'hasTurnover' },
+  { key: 'turnMult', label: '거래대금 배율', hint: '평소 대비', needs: 'hasTurnover' },
   { key: 'foreignChg', label: '외국인 소진율', needs: 'hasForeign' },
 ];
+
+// ── 거래대금 4분면 ────────────────────────────────────────────────────
+// 거래대금 배율(평소 대비 몇 배)과 상대강도(벤치마크 대비)를 엮은 상태입니다.
+// 같은 "거래대금 급증"이라도 가격이 따라 오르는지에 따라 뜻이 정반대입니다.
+//
+// 이름을 "매집"·"세력" 으로 쓰지 않은 이유: 거래대금은 산 금액과 판 금액이 언제나 같아서
+// 누가 이겼는지를 말해 주지 않습니다. 말할 수 있는 것은 손바뀜의 크기와 방향뿐입니다.
+const RS_QUADRANT = {
+  lead:  { label: '주도',        emoji: '🔥', bg: '#f0fff4', fg: '#276749', desc: '거래대금이 늘면서 가격도 시장을 이기는 중입니다.' },
+  churn: { label: '손바뀜',      emoji: '🔄', bg: '#fffaf0', fg: '#9c4221', desc: '거래는 평소보다 크게 터졌는데 가격은 시장에 뒤집니다. 사는 쪽만큼 파는 쪽도 많았다는 뜻입니다.' },
+  quiet: { label: '조용한 상승', emoji: '🌱', bg: '#ebf8ff', fg: '#2c5282', desc: '거래대금은 평소보다 적은데 가격은 시장을 이깁니다. 아직 관심이 몰리지 않았습니다.' },
+  cold:  { label: '소외',        emoji: '💤', bg: '#f7fafc', fg: '#718096', desc: '거래대금도 가격도 함께 식었습니다.' },
+};
+
+function rsQuadBadge(key, small) {
+  const q = RS_QUADRANT[key];
+  if (!q) return '';
+  return `<span style="display:inline-block; background:${q.bg}; color:${q.fg}; border:1px solid ${q.fg}22; ` +
+    `border-radius:6px; padding:1px 6px; font-size:${small ? 10 : 11}px; font-weight:600; white-space:nowrap;">` +
+    `${q.emoji} ${q.label}</span>`;
+}
+
+// 배율은 1.0 이 기준선입니다. 부호(+/-)가 아니라 "몇 배"라서 rsNum 을 쓸 수 없습니다.
+// 색은 수익률과 헷갈리지 않도록 거래대금 계열의 파랑 하나만 씁니다.
+function rsMult(v) {
+  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  const strong = v >= 1.15 || v <= 0.85;
+  return `<span style="color:${strong ? rsFlowColor : rsFlat}; font-weight:${strong ? 700 : 500};">${v.toFixed(2)}x</span>`;
+}
+
+// 하루 평균 거래대금. 데이터는 백만 단위(turnAvgM)로 들어옵니다.
+// 원화는 조·억으로, 달러는 B·M 으로 씁니다 — 12자리 숫자를 그대로 보여줘도 아무도 못 읽습니다.
+function rsTurnover(millions, currency) {
+  if (millions == null) return '—';
+  if (currency === 'KRW') {
+    if (millions >= 1e6) return (millions / 1e6).toFixed(2) + '조원';
+    if (millions >= 100) return Math.round(millions / 100).toLocaleString('ko-KR') + '억원';
+    return Math.round(millions).toLocaleString('ko-KR') + '백만원';
+  }
+  if (millions >= 1000) return '$' + (millions / 1000).toFixed(1) + 'B';
+  return '$' + Math.round(millions).toLocaleString('en-US') + 'M';
+}
 
 const rsEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const rsUp = '#38a169', rsDown = '#e53e3e', rsFlat = '#a0aec0';
@@ -1985,7 +2028,13 @@ function renderSectorAll() {
   document.getElementById('rsMeta').innerHTML =
     `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> ` +
     `${rsPeriodLabel()} ${benchRet == null ? '—' : (benchRet > 0 ? '+' : '') + benchRet.toFixed(1) + '%'} · ` +
-    `수록 ${m.universeCount}종목 / ${m.sectors.length}섹터`;
+    `수록 ${m.universeCount}종목 / ${m.sectors.length}섹터` +
+    // 장 마감 전에 수집이 돌면 마지막 날 거래량이 하루치가 아닙니다. 비중은 모든 섹터가
+    // 똑같이 덜 차서 티가 안 나지만, 거래대금 배율은 절대 금액이라 그대로 어긋납니다.
+    (m.partialLast != null
+      ? `<br><span style="color:#9c4221;">⏳ 오늘 거래대금이 아직 평소의 ${Math.round(m.partialLast * 100)}% 수준입니다 — ` +
+        `장중에 받아온 값이라 짧은 기간의 거래대금 지표는 장 마감 뒤 갱신에서 채워집니다.</span>`
+      : '');
   rsRenderRefresh('rsUpdate', RS.data);
   document.getElementById('rsSummaryPeriod').textContent = rsPeriodLabel();
 
@@ -2035,10 +2084,25 @@ function renderSectorSummary() {
     // 옮겨갔는지를 같이 적으면 숫자 모양만 봐도 이게 비중이라는 게 드러납니다.
     const f = inflow.periods[RS.period];
     const before = (f.turnShare != null && f.turnShareChg != null) ? f.turnShare - f.turnShareChg : null;
+    // 비중은 남들이 조용해져도 올라갑니다. 그래서 절대 거래대금 배율을 같은 타일에
+    // 붙여 둡니다 — 비중만 보고 "돈이 들어온다"고 읽는 것이 이 화면의 가장 흔한 오독입니다.
     html.push(tile('수급이 몰린 섹터', rsEsc(inflow.name),
       (before == null ? '' : `<span style="color:#4a5568;">${before.toFixed(1)}% → ${f.turnShare.toFixed(1)}%</span> `) +
       rsFlow(f.turnShareChg, 2, '%p'),
-      '거래대금 비중 — 가격 등락이 아닙니다'));
+      f.turnMult == null ? '거래대금 비중 — 가격 등락이 아닙니다'
+        : `거래대금 비중 · 절대 금액은 평소의 <b>${f.turnMult.toFixed(2)}배</b>`));
+
+    // 비중과 달리 "실제로 얼마가 오갔나"로 줄 세운 타일. 둘의 1위가 다르면
+    // 비중 1위는 남이 조용해져서 올라온 자리라는 뜻입니다.
+    const hottest = rows.filter(x => x.periods[RS.period].turnMult != null)
+      .sort((a, b) => b.periods[RS.period].turnMult - a.periods[RS.period].turnMult)[0];
+    if (hottest) {
+      const h = hottest.periods[RS.period];
+      html.push(tile('거래가 가장 터진 섹터', rsEsc(hottest.name),
+        `<span style="color:${rsFlowColor}; font-weight:700;">평소의 ${h.turnMult.toFixed(2)}배</span>` +
+        (h.quadrant ? ' ' + rsQuadBadge(h.quadrant, true) : ''),
+        `하루 평균 ${rsTurnover(h.turnAvgM, m.currency)} · 매수·매도 금액은 늘 같습니다`));
+    }
   } else if (m.hasTurnover) {
     html.push(tile('수급이 몰린 섹터', '—', '<span style="color:#cbd5e0;">거래대금 데이터 준비 중</span>', ''));
   } else {
@@ -2098,6 +2162,12 @@ function renderSectorTable() {
         return `<td style="white-space:nowrap;">${rsPlain(p.turnShare, 1, '%')}<br>` +
           `<span style="font-size:11px;">${rsFlow(p.turnShareChg, 2, '%p')}</span></td>`;
       }
+      if (c.key === 'turnMult') {
+        const badge = p.turnMult == null ? ''
+          : (rsQuadBadge(p.quadrant, true) || '<span style="color:#cbd5e0;">보합</span>');
+        return `<td style="white-space:nowrap;">${rsMult(p.turnMult)}` +
+          (badge ? `<br><span style="font-size:11px;">${badge}</span>` : '') + `</td>`;
+      }
       if (c.key === 'foreignChg') {
         return `<td style="white-space:nowrap;">${rsPlain(p.foreign, 1, '%')}<br>` +
           `<span style="font-size:11px;">${rsNum(p.foreignChg, 2, '%p')}</span></td>`;
@@ -2139,20 +2209,109 @@ function renderSectorDetail() {
     return bv - av;
   });
   document.getElementById('rsMembers').innerHTML =
-    `<h3 style="font-size:14px; color:#4a5568; margin-bottom:8px;">구성 종목 ${rsPeriodLabel()} 수익률 ` +
+    rsFlowPanel(s, m) +
+    `<h3 style="font-size:14px; color:#4a5568; margin:0 0 8px;">구성 종목 ${rsPeriodLabel()} 수익률 ` +
     `<span style="font-weight:400; color:#a0aec0; font-size:12px;">— 종목을 누르면 MDD 계산기로 갑니다</span></h3>` +
     `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
     members.map(mem => {
       const v = mem.ret[RS.period];
       const color = v == null ? rsFlat : (v > 0 ? rsUp : rsDown);
+      // 배율과 외국인 변화를 칩 안에 같이 답니다. 섹터 평균만 보면 종목마다 방향이
+      // 갈리는 경우가 가려집니다 — 같은 메모리 안에서도 외국인이 들어오는 종목과
+      // 나가는 종목이 동시에 있습니다.
+      const mult = mem.mult ? mem.mult[RS.period] : null;
+      const f = mem.fChg ? mem.fChg[RS.period] : null;
+      const extra = [
+        mult == null ? '' : `<span style="color:${rsFlowColor}; font-size:11px;">${mult.toFixed(2)}x</span>`,
+        f == null ? '' : `<span style="font-size:11px; color:${f > 0 ? rsUp : (f < 0 ? rsDown : rsFlat)};">외 ${f > 0 ? '+' : ''}${f.toFixed(2)}%p</span>`,
+      ].filter(Boolean).join(' ');
       // 종목 이름을 누르면 그 종목의 MDD 계산기로 갑니다. 여기서 "이 섹터가 강하다"까지
       // 봤으면 다음 질문은 대개 "그럼 이 종목은 고점 대비 얼마나 빠져 있나"입니다.
       return `<a class="fav-chip" href="/?ticker=${encodeURIComponent(mem.code)}" ` +
-        `title="${rsEsc(mem.name)} MDD 계산기에서 보기">${rsEsc(mem.name)} ` +
-        `<b style="color:${color};">${v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + '%'}</b></a>`;
-    }).join('') + '</div>';
+        `title="${rsEsc(mem.name)} — 거래대금 배율 ${mult == null ? '—' : mult.toFixed(2) + '배'}, MDD 계산기에서 보기">` +
+        `${rsEsc(mem.name)} ` +
+        `<b style="color:${color};">${v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + '%'}</b>` +
+        (extra ? ` ${extra}` : '') + `</a>`;
+    }).join('') + '</div>' +
+    (m.hasForeign
+      ? '<div style="font-size:11px; color:#a0aec0; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금, 외 = 외국인 소진율 변화</div>'
+      : '<div style="font-size:11px; color:#a0aec0; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금</div>');
 
   drawSectorChart(s, m);
+}
+
+// ── 거래대금 추적 패널 ────────────────────────────────────────────────
+// 섹터를 펼쳤을 때 나오는 블록입니다. 표에는 배율과 4분면만 넣고, 방향 지표는 여기에
+// 둡니다 — 설명 없이 숫자만 던지면 "거래 터진 날 -1.13%" 가 무슨 뜻인지 알 수 없고,
+// 표에는 그 설명을 넣을 자리가 없기 때문입니다.
+// 방향 프록시는 둘입니다 — "거래 터진 날이 더 올랐나"(gap)와 "오른 날에 거래가 더 있었나"
+// (flowRatio). 대개 같은 쪽을 가리키지만 갈릴 때가 있고, 그때 한쪽만 골라 문장을 쓰면
+// 화면이 없는 확신을 만들어 냅니다. 갈리면 갈린다고 씁니다.
+function rsDirSentence(gap, flowRatio) {
+  const up = gap > 0
+    ? `거래가 몰린 날이 조용한 날보다 <b>${gap.toFixed(2)}%p 더 올랐습니다</b>`
+    : `거래가 몰린 날이 조용한 날보다 <b>${Math.abs(gap).toFixed(2)}%p 더 빠졌습니다</b>`;
+  if (flowRatio == null || flowRatio === 0 || (gap > 0) === (flowRatio > 0)) {
+    return up + (gap > 0
+      ? '. 큰 거래가 오르는 날에 몰렸다는 뜻으로, 사려는 쪽이 급했던 정황입니다.'
+      : '. 큰 거래가 빠지는 날에 몰렸다는 뜻으로, 팔려는 쪽이 급했던 정황입니다.');
+  }
+  return up + `. 다만 거래대금 자체는 ${flowRatio > 0 ? '오른' : '내린'} 날에 더 쌓였습니다` +
+    ` (${flowRatio > 0 ? '+' : ''}${flowRatio.toFixed(1)}%). <b>두 방향 지표가 엇갈립니다</b> —` +
+    ` 한쪽만 골라 읽지 마세요.`;
+}
+
+function rsFlowPanel(s, m) {
+  if (!m.hasTurnover) return '';
+  const p = s.periods[RS.period];
+  if (p.turnMult == null) {
+    // 값이 없는 데 이유가 있으면 말해 줍니다. 빈칸만 남기면 고장난 것처럼 보입니다.
+    if (m.partialLast == null) return '';
+    return `<div style="background:#fffaf0; border:1px solid #9c422122; border-radius:10px; padding:12px; ` +
+      `margin-bottom:16px; font-size:12.5px; color:#9c4221; line-height:1.7;">` +
+      `⏳ <b>오늘치 거래대금이 아직 다 차지 않았습니다.</b> 장 마감 전에 받아온 값이라 ` +
+      `지금 하루 거래대금은 평소의 ${Math.round(m.partialLast * 100)}% 수준입니다. ` +
+      `덜 끝난 하루를 꽉 찬 하루들과 비교하면 "평소의 0.1배" 같은 틀린 숫자가 나오므로, ` +
+      `1일 거래대금 지표는 장 마감 뒤 갱신에서 채웁니다. 그동안은 <b>1주 이상</b> 기간으로 보세요.</div>`;
+  }
+
+  const q = RS_QUADRANT[p.quadrant];
+  const cell = (label, value, note) =>
+    `<div style="flex:1 1 130px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">` +
+    `<div style="font-size:11px; color:#718096; font-weight:600;">${label}</div>` +
+    `<div style="font-size:15px; font-weight:700; color:#2d3748; margin-top:3px;">${value}</div>` +
+    (note ? `<div style="font-size:10.5px; color:#a0aec0; margin-top:2px;">${note}</div>` : '') +
+    `</div>`;
+
+  // 방향 지표는 20거래일 이상인 기간에만 있습니다. 1일·1주 창에서 "거래가 터진 날"을
+  // 고르는 것은 표본이 1~5개라 뜻이 없어서 생성기가 아예 null 로 둡니다.
+  const hasDir = p.heavyRet != null && p.lightRet != null;
+  const gap = hasDir ? p.heavyRet - p.lightRet : null;
+
+  return `<div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">` +
+    `<h3 style="font-size:14px; color:#2d3748; margin:0 0 4px;">💰 거래대금 추적 <span style="font-weight:400; color:#a0aec0; font-size:12px;">— ${rsPeriodLabel()}</span></h3>` +
+    `<div style="font-size:11.5px; color:#718096; margin-bottom:10px;">` +
+    `거래대금은 <b>산 금액과 판 금액이 언제나 같습니다</b>. 늘었다는 것은 손바뀜이 컸다는 뜻이지, ` +
+    `사는 쪽이 이겼다는 뜻이 아닙니다. 아래 숫자는 그 손바뀜의 크기와 방향까지만 말해 줍니다.</div>` +
+
+    `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
+    cell('하루 평균 거래대금', rsTurnover(p.turnAvgM, m.currency), `수록 종목 전체의 ${p.turnShare == null ? '—' : p.turnShare.toFixed(1) + '%'}`) +
+    cell('평소 대비 배율', rsMult(p.turnMult),
+      m.partialLast != null && RS.period === '1w'
+        ? '직전 1년 대비 · 오늘치가 덜 차 낮게 나옵니다'
+        : '직전 1년 하루 평균과 비교') +
+    (hasDir ? cell('거래 터진 날 등락', rsNum(p.heavyRet, 2, '%'), '거래대금 상위 25% 날 평균') : '') +
+    (hasDir ? cell('조용한 날 등락', rsNum(p.lightRet, 2, '%'), '거래대금 하위 25% 날 평균') : '') +
+    (p.flowRatio == null ? '' : cell('오른 날 거래 비중', rsFlow(p.flowRatio, 1, '%'), '오른 날 − 내린 날 거래대금')) +
+    `</div>` +
+
+    (q ? `<div style="margin-top:10px; background:${q.bg}; border:1px solid ${q.fg}22; border-radius:8px; padding:10px; font-size:12.5px; color:${q.fg};">` +
+      `<b>${q.emoji} ${q.label}</b> — ${q.desc}</div>` : '') +
+
+    (hasDir ? `<div style="margin-top:8px; font-size:12px; color:#4a5568; line-height:1.7;">` +
+      rsDirSentence(gap, p.flowRatio) +
+      ` 어디까지나 정황이며, 누가 사 모으는지는 거래대금으로 알 수 없습니다.</div>` : '') +
+    `</div>`;
 }
 
 // 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 표와 숫자는 멀쩡해야 하므로
@@ -2751,7 +2910,81 @@ function drawFearGreedChart(m) {
   const wrap = document.getElementById('fgChartWrap');
   if (!wrap) return;
   if (typeof Chart === 'undefined') {
-    // 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 숫자는 멀쩡해야 하므로
+    // ── 거래대금 추적 패널 ────────────────────────────────────────────────
+// 섹터를 펼쳤을 때 나오는 블록입니다. 표에는 배율과 4분면만 넣고, 방향 지표는 여기에
+// 둡니다 — 설명 없이 숫자만 던지면 "거래 터진 날 -1.13%" 가 무슨 뜻인지 알 수 없고,
+// 표에는 그 설명을 넣을 자리가 없기 때문입니다.
+// 방향 프록시는 둘입니다 — "거래 터진 날이 더 올랐나"(gap)와 "오른 날에 거래가 더 있었나"
+// (flowRatio). 대개 같은 쪽을 가리키지만 갈릴 때가 있고, 그때 한쪽만 골라 문장을 쓰면
+// 화면이 없는 확신을 만들어 냅니다. 갈리면 갈린다고 씁니다.
+function rsDirSentence(gap, flowRatio) {
+  const up = gap > 0
+    ? `거래가 몰린 날이 조용한 날보다 <b>${gap.toFixed(2)}%p 더 올랐습니다</b>`
+    : `거래가 몰린 날이 조용한 날보다 <b>${Math.abs(gap).toFixed(2)}%p 더 빠졌습니다</b>`;
+  if (flowRatio == null || flowRatio === 0 || (gap > 0) === (flowRatio > 0)) {
+    return up + (gap > 0
+      ? '. 큰 거래가 오르는 날에 몰렸다는 뜻으로, 사려는 쪽이 급했던 정황입니다.'
+      : '. 큰 거래가 빠지는 날에 몰렸다는 뜻으로, 팔려는 쪽이 급했던 정황입니다.');
+  }
+  return up + `. 다만 거래대금 자체는 ${flowRatio > 0 ? '오른' : '내린'} 날에 더 쌓였습니다` +
+    ` (${flowRatio > 0 ? '+' : ''}${flowRatio.toFixed(1)}%). <b>두 방향 지표가 엇갈립니다</b> —` +
+    ` 한쪽만 골라 읽지 마세요.`;
+}
+
+function rsFlowPanel(s, m) {
+  if (!m.hasTurnover) return '';
+  const p = s.periods[RS.period];
+  if (p.turnMult == null) {
+    // 값이 없는 데 이유가 있으면 말해 줍니다. 빈칸만 남기면 고장난 것처럼 보입니다.
+    if (m.partialLast == null) return '';
+    return `<div style="background:#fffaf0; border:1px solid #9c422122; border-radius:10px; padding:12px; ` +
+      `margin-bottom:16px; font-size:12.5px; color:#9c4221; line-height:1.7;">` +
+      `⏳ <b>오늘치 거래대금이 아직 다 차지 않았습니다.</b> 장 마감 전에 받아온 값이라 ` +
+      `지금 하루 거래대금은 평소의 ${Math.round(m.partialLast * 100)}% 수준입니다. ` +
+      `덜 끝난 하루를 꽉 찬 하루들과 비교하면 "평소의 0.1배" 같은 틀린 숫자가 나오므로, ` +
+      `1일 거래대금 지표는 장 마감 뒤 갱신에서 채웁니다. 그동안은 <b>1주 이상</b> 기간으로 보세요.</div>`;
+  }
+
+  const q = RS_QUADRANT[p.quadrant];
+  const cell = (label, value, note) =>
+    `<div style="flex:1 1 130px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">` +
+    `<div style="font-size:11px; color:#718096; font-weight:600;">${label}</div>` +
+    `<div style="font-size:15px; font-weight:700; color:#2d3748; margin-top:3px;">${value}</div>` +
+    (note ? `<div style="font-size:10.5px; color:#a0aec0; margin-top:2px;">${note}</div>` : '') +
+    `</div>`;
+
+  // 방향 지표는 20거래일 이상인 기간에만 있습니다. 1일·1주 창에서 "거래가 터진 날"을
+  // 고르는 것은 표본이 1~5개라 뜻이 없어서 생성기가 아예 null 로 둡니다.
+  const hasDir = p.heavyRet != null && p.lightRet != null;
+  const gap = hasDir ? p.heavyRet - p.lightRet : null;
+
+  return `<div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">` +
+    `<h3 style="font-size:14px; color:#2d3748; margin:0 0 4px;">💰 거래대금 추적 <span style="font-weight:400; color:#a0aec0; font-size:12px;">— ${rsPeriodLabel()}</span></h3>` +
+    `<div style="font-size:11.5px; color:#718096; margin-bottom:10px;">` +
+    `거래대금은 <b>산 금액과 판 금액이 언제나 같습니다</b>. 늘었다는 것은 손바뀜이 컸다는 뜻이지, ` +
+    `사는 쪽이 이겼다는 뜻이 아닙니다. 아래 숫자는 그 손바뀜의 크기와 방향까지만 말해 줍니다.</div>` +
+
+    `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
+    cell('하루 평균 거래대금', rsTurnover(p.turnAvgM, m.currency), `수록 종목 전체의 ${p.turnShare == null ? '—' : p.turnShare.toFixed(1) + '%'}`) +
+    cell('평소 대비 배율', rsMult(p.turnMult),
+      m.partialLast != null && RS.period === '1w'
+        ? '직전 1년 대비 · 오늘치가 덜 차 낮게 나옵니다'
+        : '직전 1년 하루 평균과 비교') +
+    (hasDir ? cell('거래 터진 날 등락', rsNum(p.heavyRet, 2, '%'), '거래대금 상위 25% 날 평균') : '') +
+    (hasDir ? cell('조용한 날 등락', rsNum(p.lightRet, 2, '%'), '거래대금 하위 25% 날 평균') : '') +
+    (p.flowRatio == null ? '' : cell('오른 날 거래 비중', rsFlow(p.flowRatio, 1, '%'), '오른 날 − 내린 날 거래대금')) +
+    `</div>` +
+
+    (q ? `<div style="margin-top:10px; background:${q.bg}; border:1px solid ${q.fg}22; border-radius:8px; padding:10px; font-size:12.5px; color:${q.fg};">` +
+      `<b>${q.emoji} ${q.label}</b> — ${q.desc}</div>` : '') +
+
+    (hasDir ? `<div style="margin-top:8px; font-size:12px; color:#4a5568; line-height:1.7;">` +
+      rsDirSentence(gap, p.flowRatio) +
+      ` 어디까지나 정황이며, 누가 사 모으는지는 거래대금으로 알 수 없습니다.</div>` : '') +
+    `</div>`;
+}
+
+// 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 숫자는 멀쩡해야 하므로
     // 캔버스만 안내 문구로 바꾸고 나머지는 그대로 둡니다. (섹터 RS 화면과 같은 처리)
     wrap.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; ` +
       `background:#f7fafc; border-radius:10px; color:#718096; font-size:13px; text-align:center; padding:16px;">` +

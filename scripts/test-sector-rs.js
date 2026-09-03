@@ -13,6 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   equalWeightIndex, alignForward, periodReturn, toRatings, buildMarket,
+  turnoverMultiple, turnoverDirection, quadrantOf,
 } = require('./generate-sector-rs');
 
 const ROOT = path.join(__dirname, '..');
@@ -91,6 +92,76 @@ check('RS Rating: null 은 순위에서 빠지고 null 로 남는다', () => {
 
 check('RS Rating: 섹터가 하나뿐이면 50', () => {
   assert.deepStrictEqual(toRatings([7]), [50]);
+});
+
+// ── 거래대금 배율 ────────────────────────────────────────────────────
+check('거래대금 배율: 평소의 두 배면 2.0', () => {
+  // 앞 250일은 100, 마지막 20일은 200. 20일 창의 배율이 정확히 2 여야 합니다.
+  const turn = [...Array(250).fill(100), ...Array(20).fill(200)];
+  assert.strictEqual(turnoverMultiple(turn, turn.length - 1, 20), 2);
+});
+
+check('거래대금 배율: 축이 모자라면 null (0 으로 때우지 않는다)', () => {
+  // 분모 구간(직전 250일)이 축 밖으로 나갑니다. 0 으로 채우면 배율이 무한대가 됩니다.
+  assert.strictEqual(turnoverMultiple(Array(30).fill(100), 29, 20), null);
+});
+
+check('거래대금 배율: 평소가 0 이면 null', () => {
+  const turn = [...Array(250).fill(0), ...Array(20).fill(500)];
+  assert.strictEqual(turnoverMultiple(turn, turn.length - 1, 20), null);
+});
+
+// ── 매집·분산 방향 ───────────────────────────────────────────────────
+check('방향: 거래가 오르는 날에만 몰리면 heavy > light, flowRatio 양수', () => {
+  // 지수는 하루 걸러 오르내리고, 오르는 날에만 거래가 10배 터집니다.
+  const idx = [100];
+  const turn = [0];
+  for (let i = 1; i <= 60; i++) {
+    const up = i % 2 === 1;
+    idx.push(idx[i - 1] * (up ? 1.02 : 0.99));
+    turn.push(up ? 1000 : 100);
+  }
+  const d = turnoverDirection(idx, turn, idx.length - 1, 60);
+  assert.ok(d.heavyRet > d.lightRet, `heavy ${d.heavyRet} light ${d.lightRet}`);
+  assert.ok(d.flowRatio > 0, `flowRatio ${d.flowRatio}`);
+});
+
+check('방향: 거래가 빠지는 날에만 몰리면 부호가 뒤집힌다', () => {
+  const idx = [100];
+  const turn = [0];
+  for (let i = 1; i <= 60; i++) {
+    const up = i % 2 === 1;
+    idx.push(idx[i - 1] * (up ? 1.02 : 0.99));
+    turn.push(up ? 100 : 1000);   // 내리는 날에 거래가 터집니다
+  }
+  const d = turnoverDirection(idx, turn, idx.length - 1, 60);
+  assert.ok(d.heavyRet < d.lightRet, `heavy ${d.heavyRet} light ${d.lightRet}`);
+  assert.ok(d.flowRatio < 0, `flowRatio ${d.flowRatio}`);
+});
+
+check('방향: 창이 20거래일보다 짧으면 계산하지 않는다', () => {
+  // 1일·1주 창에서 "거래가 터진 날"을 고르는 것은 표본이 1~5개라 뜻이 없습니다.
+  const idx = Array.from({ length: 60 }, (_, i) => 100 + i);
+  const turn = Array(60).fill(100);
+  assert.strictEqual(turnoverDirection(idx, turn, 59, 1), null);
+  assert.strictEqual(turnoverDirection(idx, turn, 59, 5), null);
+  assert.ok(turnoverDirection(idx, turn, 59, 20) != null);
+});
+
+// ── 4분면 ────────────────────────────────────────────────────────────
+check('4분면: 거래·강도 조합이 네 이름으로 갈린다', () => {
+  assert.strictEqual(quadrantOf(2.0, 5), 'lead');    // 거래 ↑ 강함 ↑
+  assert.strictEqual(quadrantOf(2.0, -5), 'churn');  // 거래 ↑ 약함 ↓
+  assert.strictEqual(quadrantOf(0.5, 5), 'quiet');   // 거래 ↓ 강함 ↑
+  assert.strictEqual(quadrantOf(0.5, -5), 'cold');   // 거래 ↓ 약함 ↓
+});
+
+check('4분면: 문턱 안(0.85~1.15배)은 이름을 붙이지 않는다', () => {
+  // 1.02 배를 "유입"이라 부르면 아무 일 없는 날에도 화면이 매일 다른 말을 합니다.
+  assert.strictEqual(quadrantOf(1.02, 5), null);
+  assert.strictEqual(quadrantOf(0.9, -5), null);
+  assert.strictEqual(quadrantOf(null, 5), null);
+  assert.strictEqual(quadrantOf(2.0, null), null);
 });
 
 // ── 갱신 시각 안내가 실제 cron 과 같은가 ──────────────────────────────
@@ -223,6 +294,104 @@ try {
     assert.ok(m.ret['12m'] > 0, `12m ${m.ret['12m']}`);
     const expected = Math.round((((100 * (1 + 299 / 300)) / (100 * (1 + 49 / 300))) - 1) * 100);
     assert.strictEqual(Math.round(m.ret['12m']), expected);
+  });
+
+  check('거래대금 배율: 최근 거래가 급증한 섹터만 배율이 뛴다', () => {
+    // DOWN 은 마지막 30일 거래량이 100배입니다. FLAT 은 종가도 거래량도 내내 그대로라
+    // 배율이 정확히 1.0 이어야 합니다.
+    assert.ok(by.down.periods['1m'].turnMult > 10, `DOWN ${by.down.periods['1m'].turnMult}`);
+    assert.strictEqual(by.flat.periods['1m'].turnMult, 1);
+  });
+
+  check('거래대금 배율은 거래량이 아니라 거래대금을 본다', () => {
+    // UP 은 거래량이 한 번도 변한 적 없지만 주가가 오릅니다. 거래대금 = 가격 × 거래량
+    // 이므로 배율은 1 이 아니라 그 가격 상승분만큼 올라야 맞습니다.
+    // (이걸 1 로 만들려면 거래량을 세야 하는데, 그러면 "10만원짜리 100주"와
+    //  "1000원짜리 100주"가 같은 크기가 됩니다 — 수급을 보는 데 쓸 수 없습니다.)
+    assert.ok(by.up.periods['1m'].turnMult > 1.2, `${by.up.periods['1m'].turnMult}`);
+  });
+
+  check('거래대금 배율은 비중과 다른 것을 본다', () => {
+    // FLAT 은 거래대금이 한 번도 변한 적 없지만, DOWN 이 폭증하면서 비중은 밀립니다.
+    // 배율이 1 인데 비중이 줄었다면 "내가 식은 게 아니라 남이 뜨거워진 것"입니다.
+    // 비중만 보고 수급을 읽으면 안 되는 이유가 정확히 이 자리입니다.
+    const p = by.flat.periods['1m'];
+    assert.ok(p.turnShareChg < 0, `비중 변화 ${p.turnShareChg}`);
+    assert.strictEqual(p.turnMult, 1);
+  });
+
+  check('4분면: 거래가 터지면서 하락하는 섹터는 손바뀜', () => {
+    assert.strictEqual(by.down.periods['1m'].quadrant, 'churn');
+  });
+
+  check('방향 지표는 1일·1주에는 없고 1개월부터 있다', () => {
+    assert.strictEqual(by.down.periods['1d'].heavyRet, null);
+    assert.strictEqual(by.down.periods['1w'].flowRatio, null);
+    assert.ok(by.down.periods['1m'].heavyRet != null);
+    assert.ok(by.down.periods['1m'].flowRatio != null);
+  });
+
+  check('하루 평균 거래대금이 백만 단위로 담긴다', () => {
+    // FLAT 은 종가 100, 거래량 1000 → 하루 10만. 백만 단위로는 0 입니다.
+    // 0 과 null 은 다릅니다 — 거래가 작은 것과 값이 없는 것을 섞으면 안 됩니다.
+    assert.strictEqual(by.flat.periods['1m'].turnAvgM, 0);
+    assert.ok(by.down.periods['1m'].turnAvgM > 0, `${by.down.periods['1m'].turnAvgM}`);
+  });
+
+  check('구성 종목에도 배율과 외국인 변화가 붙는다', () => {
+    const flat = by.flat.members[0];
+    assert.ok(flat.mult['1m'] != null, '멤버 배율이 없습니다');
+    assert.ok(flat.fChg['1m'] > 0, `멤버 외국인 변화 ${flat.fChg['1m']}`);
+  });
+
+  check('외국인 데이터가 없는 시장에는 fChg 키 자체가 없다', () => {
+    // 값이 전부 null 인 키를 6기간씩 담으면 파일만 17KB 커지고 화면은 아무것도 못 그립니다.
+    // 벤치마크는 픽스처에 있는 KS11 을 써야 하므로 시장 키는 KR 그대로 두고,
+    // hasForeign 만 꺼서 넘깁니다.
+    const noForeign = buildMarket('KR', FIXTURE_DIR, [{ key: 'flat', name: '횡보', codes: ['FLAT'] }],
+      m => m.name, { label: '테스트', hasForeign: false });
+    const mem = noForeign.market.sectors[0].members[0];
+    assert.strictEqual('fChg' in mem, false);
+    assert.ok('mult' in mem, '배율은 그대로 있어야 합니다');
+  });
+
+  // ── 장중 수집 감지 ──────────────────────────────────────────────────
+  // 실제로 걸렸던 문제입니다. 한국 수집이 장 마감 전에 돌면 마지막 봉의 거래량이
+  // 하루치가 아니라 그때까지의 누적이고, 그대로 계산하면 "거래대금이 평소의 0.09배"
+  // 라는 틀린 문장이 화면에 나옵니다.
+  check('마지막 봉이 장중이면 1일 거래대금 지표를 내놓지 않는다', () => {
+    const dir = FIXTURE_DIR + '2';
+    const dirPath = path.join(ROOT, 'data', dir);
+    fs.mkdirSync(dirPath, { recursive: true });
+    try {
+      const write = (code, volumeAt) => {
+        const c = axis.map(() => 100);
+        fs.writeFileSync(path.join(dirPath, `${code}.json`), JSON.stringify({
+          code, symbol: code, name: code, market: 'KS', currency: 'KRW',
+          d: axis.slice(), h: c, c, v: axis.map((_, i) => volumeAt(i)),
+        }));
+      };
+      write('KS11', () => 1000);
+      // 마지막 하루만 평소의 5% — 장중에 받아온 봉입니다.
+      write('A', i => (i === axis.length - 1 ? 50 : 1000));
+
+      const { market } = buildMarket('KR', dir, [{ key: 'a', name: 'A', codes: ['A'] }], m => m.name);
+      assert.ok(market.partialLast != null && market.partialLast < 0.6, `partialLast ${market.partialLast}`);
+      assert.strictEqual(market.sectors[0].periods['1d'].turnMult, null);
+      assert.strictEqual(market.sectors[0].periods['1d'].turnAvgM, null);
+      assert.strictEqual(market.sectors[0].members[0].mult['1d'], null);
+      // 기간이 길면 한 봉의 몫이 작아지므로 그대로 둡니다.
+      assert.ok(market.sectors[0].periods['1m'].turnMult != null, '1개월은 살아 있어야 합니다');
+    } finally {
+      fs.rmSync(dirPath, { recursive: true, force: true });
+    }
+  });
+
+  check('거래량이 정상이면 장중으로 오인하지 않는다', () => {
+    // FLAT·UP·DOWN 픽스처의 마지막 봉은 멀쩡합니다. 여기서 partialLast 가 잡히면
+    // 매일 멀쩡한 데이터에 "아직 덜 찼습니다" 경고가 붙습니다.
+    assert.strictEqual(market.partialLast, null);
+    assert.ok(by.flat.periods['1d'].turnMult != null);
   });
 
   check('데이터 파일이 없는 구성 종목은 크래시 없이 빠진다', () => {
