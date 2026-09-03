@@ -156,6 +156,12 @@ check('4분면: 거래·강도 조합이 네 이름으로 갈린다', () => {
   assert.strictEqual(quadrantOf(0.5, -5), 'cold');   // 거래 ↓ 약함 ↓
 });
 
+check('4분면: 벤치마크와 비기면(alpha 0) 이름을 붙이지 않는다', () => {
+  // 약한 쪽으로 넣으면 "가격은 시장에 뒤집니다"가 비긴 섹터에 붙습니다.
+  assert.strictEqual(quadrantOf(2.0, 0), null);
+  assert.strictEqual(quadrantOf(0.5, 0), null);
+});
+
 check('4분면: 문턱 안(0.85~1.15배)은 이름을 붙이지 않는다', () => {
   // 1.02 배를 "유입"이라 부르면 아무 일 없는 날에도 화면이 매일 다른 말을 합니다.
   assert.strictEqual(quadrantOf(1.02, 5), null);
