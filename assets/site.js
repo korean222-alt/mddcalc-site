@@ -1663,6 +1663,29 @@ function calcDCA() {
   const achievable = last.cumAvgPrice <= targetAvg * 1.02;
   const strategyLabel = { equal: '균등 분할', staircase: '계단식', backloaded: '후반 집중' }[strategy];
 
+  // 예산은 평균단가를 바꾸지 못한다. 회차별 금액이 (가중치 ÷ 가중치합) × 예산이라
+  // 예산을 2배로 늘리면 모든 회차의 매수금액과 주수가 같은 비율로 커지고,
+  // 평균단가 = 총매수금액 ÷ 총주수는 그대로다. 예산 증액을 권하면 안 된다.
+  // 실제로 평균단가를 낮추는 것은 (1) 계단식 전략, (2) 회차 늘리기 두 가지뿐이다.
+  // 이 시나리오의 하한을 계산해 "얼마까지 가능한지"를 그대로 알려 준다.
+  const bestAvg = (() => {
+    if (achievable) return null;
+    const bestRounds = 60;
+    const pp = Array.from({ length: bestRounds }, (_, i) => {
+      const t = i / (bestRounds - 1);
+      return Math.max(price * (1 - 0.10 * Math.sin(Math.PI * t)), 1);
+    });
+    const w = pp.map(p => price / p);
+    const tw = w.reduce((a, b) => a + b, 0);
+    let sh = 0;
+    for (let i = 0; i < bestRounds; i++) sh += (w[i] / tw) / pp[i];
+    return 1 / sh;   // 예산 1 기준: 총매수금액 ÷ 총주수
+  })();
+  const missTxt = bestAvg == null ? '' :
+    (targetAvg < bestAvg
+      ? `이 V자 시나리오에서는 회차를 아무리 늘려도 평균단가가 약 ${'$'}${bestAvg.toFixed(2)} 아래로 내려가지 않습니다. 목표를 그 위로 조정해 보세요.`
+      : `계단식 전략을 고르거나 매수 횟수를 늘리면 평균단가가 조금 더 내려갑니다. 총 예산은 평균단가에 영향을 주지 않습니다 — 회차별 금액이 같은 비율로 커질 뿐입니다.`);
+
   result.innerHTML = `
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="label">전략</div><div class="value">${strategyLabel}</div></div>
@@ -1671,7 +1694,7 @@ function calcDCA() {
       <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
     </div>
     <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
-      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 횟수를 늘리거나 예산을 늘려보세요.'}
+      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. ' + missTxt}
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">

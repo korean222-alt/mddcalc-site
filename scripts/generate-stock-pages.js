@@ -238,6 +238,15 @@ function drawdownSeries(series) {
   return out;
 }
 
+// 표본이 짝수면 가운데 두 값의 평균이 중앙값이다. 위쪽 값 하나만 쓰면
+// (예: 10일·30일 → 30일) 실제 중앙값 20일보다 회복이 느려 보인다.
+function median(sortedNums) {
+  const n = sortedNums.length;
+  if (!n) return null;
+  const mid = n >> 1;
+  return n % 2 ? sortedNums[mid] : Math.round((sortedNums[mid - 1] + sortedNums[mid]) / 2);
+}
+
 function analyze(series) {
   const { episodes, ongoing, athPrice, athDate } = computeDrawdowns(series);
   const all = ongoing ? [...episodes, ongoing] : episodes;
@@ -265,7 +274,7 @@ function analyze(series) {
     meaningfulCount: meaningful.length,
     recoveredCount: recovered.length,
     ongoingCount: meaningful.length - recovered.length,
-    medianDays: recDays.length ? recDays[Math.floor(recDays.length / 2)] : null,
+    medianDays: median(recDays),
     maxDays: recDays.length ? recDays[recDays.length - 1] : null,
   };
 

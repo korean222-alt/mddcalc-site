@@ -1516,8 +1516,16 @@ function render() {
   let deeperDays = 0;
   for (let i = 0; i < A.n; i++) if (A.dd[i] < A.currentDD) deeperDays++;
   const deeperPct = A.n ? (deeperDays / A.n) * 100 : 0;
+  // 낙폭이 가장 깊은 것과 가격이 가장 낮은 것은 다른 이야기다. 고점이 그 사이에
+  // 올라갔다면 현재 낙폭이 최대여도 현재가는 기간 최저가보다 높을 수 있다.
+  // (예: 종가 100 → 200 → 140 이면 현재 낙폭 -30%가 최대지만 최저가는 100이다.)
+  let minIdx = 0;
+  for (let i = 1; i < A.n; i++) if (A.closes[i] < A.closes[minIdx]) minIdx = i;
+  const lowTxt = minIdx === A.n - 1
+    ? ' 현재가가 이 기간의 최저 종가이기도 합니다.'
+    : ` 다만 기간 최저 종가는 ${A.dates[minIdx]}의 ${money(A.closes[minIdx])}로 현재가보다 낮습니다(그사이 고점이 올라갔기 때문입니다).`;
   const deepTxt = deeperDays === 0
-    ? '조회 기간 중 지금보다 더 깊이 내려간 날은 없었습니다. 현재가 이 기간의 최저점입니다.'
+    ? '조회 기간 중 지금보다 더 깊이 내려간 날은 없었습니다. 현재 낙폭이 이 기간에서 가장 깊습니다.' + lowTxt
     : `조회 기간 ${A.n.toLocaleString()}거래일 중 지금보다 더 깊이 내려가 있던 날은 ${deeperDays.toLocaleString()}일(${deeperPct.toFixed(1)}%)이었습니다.`;
 
   let sig;
@@ -2959,6 +2967,29 @@ function calcDCA() {
   const achievable = last.cumAvgPrice <= targetAvg * 1.02;
   const strategyLabel = { equal: '균등 분할', staircase: '계단식', backloaded: '후반 집중' }[strategy];
 
+  // 예산은 평균단가를 바꾸지 못한다. 회차별 금액이 (가중치 ÷ 가중치합) × 예산이라
+  // 예산을 2배로 늘리면 모든 회차의 매수금액과 주수가 같은 비율로 커지고,
+  // 평균단가 = 총매수금액 ÷ 총주수는 그대로다. 예산 증액을 권하면 안 된다.
+  // 실제로 평균단가를 낮추는 것은 (1) 계단식 전략, (2) 회차 늘리기 두 가지뿐이다.
+  // 이 시나리오의 하한을 계산해 "얼마까지 가능한지"를 그대로 알려 준다.
+  const bestAvg = (() => {
+    if (achievable) return null;
+    const bestRounds = 60;
+    const pp = Array.from({ length: bestRounds }, (_, i) => {
+      const t = i / (bestRounds - 1);
+      return Math.max(price * (1 - 0.10 * Math.sin(Math.PI * t)), 1);
+    });
+    const w = pp.map(p => price / p);
+    const tw = w.reduce((a, b) => a + b, 0);
+    let sh = 0;
+    for (let i = 0; i < bestRounds; i++) sh += (w[i] / tw) / pp[i];
+    return 1 / sh;   // 예산 1 기준: 총매수금액 ÷ 총주수
+  })();
+  const missTxt = bestAvg == null ? '' :
+    (targetAvg < bestAvg
+      ? `이 V자 시나리오에서는 회차를 아무리 늘려도 평균단가가 약 ${'$'}${bestAvg.toFixed(2)} 아래로 내려가지 않습니다. 목표를 그 위로 조정해 보세요.`
+      : `계단식 전략을 고르거나 매수 횟수를 늘리면 평균단가가 조금 더 내려갑니다. 총 예산은 평균단가에 영향을 주지 않습니다 — 회차별 금액이 같은 비율로 커질 뿐입니다.`);
+
   result.innerHTML = `
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="label">전략</div><div class="value">${strategyLabel}</div></div>
@@ -2967,7 +2998,7 @@ function calcDCA() {
       <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
     </div>
     <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
-      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 횟수를 늘리거나 예산을 늘려보세요.'}
+      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. ' + missTxt}
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">
