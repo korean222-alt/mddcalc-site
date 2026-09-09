@@ -158,6 +158,13 @@ function fmtPct(n) { return `${n >= 0 ? '+' : ''}${n.toFixed(1)}%`; }
 function fmtPrice(n) { return `$${n.toFixed(2)}`; }
 function fmtDate(d) { return d; } // 이미 YYYY-MM-DD 문자열
 
+// 상류 요청에는 반드시 타임아웃이 있어야 한다.
+// 타임아웃이 없으면 Twelve Data 가 응답하지 않을 때 이 스크립트가 그대로 매달리고,
+// 워크플로에 job 타임아웃도 없으면 GitHub Actions 기본값(6시간)까지 러너를 붙잡는다.
+// 실제로 한 번 그렇게 멈춰서 이 주석이 생겼다.
+const FETCH_TIMEOUT_MS = 20000;
+const FETCH_RETRIES = 2;      // 최초 1회 + 재시도 2회
+
 async function fetchSeries(symbol) {
   const url = new URL('https://api.twelvedata.com/time_series');
   url.searchParams.set('symbol', symbol);
@@ -165,14 +172,30 @@ async function fetchSeries(symbol) {
   url.searchParams.set('outputsize', '5000');
   url.searchParams.set('apikey', API_KEY);
 
-  const res = await fetch(url.toString());
-  const json = await res.json();
+  let lastErr;
+  for (let attempt = 0; attempt <= FETCH_RETRIES; attempt++) {
+    if (attempt > 0) {
+      // 분당 한도(무료 8회)에 걸린 경우가 대부분이라 넉넉히 쉬었다 다시 묻는다.
+      const wait = 15000 * attempt;
+      console.log(`  ↻ ${symbol} 재시도 ${attempt}/${FETCH_RETRIES} (${wait / 1000}초 대기) — ${lastErr.message}`);
+      await sleep(wait);
+    }
+    try {
+      const res = await fetch(url.toString(), { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+      const json = await res.json();
 
-  if (json.status === 'error') throw new Error(`${symbol}: ${json.message}`);
-  if (!json.values || !json.values.length) throw new Error(`${symbol}: 데이터 없음`);
+      if (json.status === 'error') throw new Error(`${symbol}: ${json.message}`);
+      if (!json.values || !json.values.length) throw new Error(`${symbol}: 데이터 없음`);
 
-  // Twelve Data는 최신순으로 내려주므로 오래된 순으로 뒤집는다
-  return json.values.map(v => ({ date: v.datetime, close: parseFloat(v.close) })).reverse();
+      // Twelve Data는 최신순으로 내려주므로 오래된 순으로 뒤집는다
+      return json.values.map(v => ({ date: v.datetime, close: parseFloat(v.close) })).reverse();
+    } catch (err) {
+      lastErr = err;
+      // 티커 자체가 없는 경우는 다시 물어도 같은 답이라 바로 포기한다.
+      if (/not found|does not exist|데이터 없음/i.test(err.message)) break;
+    }
+  }
+  throw lastErr;
 }
 
 function daysBetween(d1, d2) {

@@ -19,6 +19,9 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # 상류가 응답하지 않아도 러너를 붙잡고 있지 않도록 상한을 둔다.
+    # 정상 실행은 4분 안쪽이다 (21개 종목 × 8초 간격 + 재시도 여유).
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
