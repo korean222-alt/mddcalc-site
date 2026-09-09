@@ -9,9 +9,60 @@ const DB_TIMEOUT_MS = 1500;
 const DB_COOLDOWN_MS = 5 * 60 * 1000;
 const TD_USAGE_CACHE_MS = 2 * 60 * 1000;
 
+// 시세 응답 캐시.
+//
+// 자동 수집(GitHub Actions)과 방문자가 같은 무료 플랜 한도(하루 800회)를 나눠 쓴다.
+// 캐시가 없으면 같은 종목을 연달아 조회하는 것만으로 크레딧이 그대로 나간다.
+// 일봉은 하루 한 번만 바뀌므로 10분 캐시로도 결과가 달라지지 않는다.
+//
+// 한계: Vercel 서버리스는 인스턴스마다 메모리가 따로라 이 캐시는 인스턴스 단위다.
+// 인스턴스가 여러 개면 그만큼 미스가 난다. 진짜 공유 캐시가 필요하면 Redis 같은
+// 외부 저장소를 붙여야 하는데, 지금 트래픽에서는 이것만으로도 호출 수가 크게 준다.
+const QUOTE_CACHE_MS = 10 * 60 * 1000;
+// 상류가 죽었을 때 "마지막 정상 응답"으로 버티는 한도. 이 기간이 지나면
+// 오래된 값을 보여 주느니 실패를 알린다.
+const QUOTE_STALE_MAX_MS = 24 * 60 * 60 * 1000;
+const QUOTE_CACHE_MAX_ENTRIES = 200;
+const TD_FETCH_TIMEOUT_MS = 8000;
+
 let _pool = null;
 let _dbDownUntil = 0;
 let _tdDaily = null;
+const _quoteCache = new Map();   // key -> { data, fetchedAt }
+
+function cacheKey(symbol, interval, outputsize) {
+  return `${String(symbol).toUpperCase()}|${interval}|${outputsize}`;
+}
+
+function readCache(key, maxAgeMs) {
+  const hit = _quoteCache.get(key);
+  if (!hit) return null;
+  if (Date.now() - hit.fetchedAt > maxAgeMs) return null;
+  return hit;
+}
+
+function writeCache(key, data) {
+  // Map 은 삽입 순서를 지키므로 가장 오래된 것부터 버리면 된다.
+  if (_quoteCache.size >= QUOTE_CACHE_MAX_ENTRIES) {
+    const oldest = _quoteCache.keys().next().value;
+    if (oldest !== undefined) _quoteCache.delete(oldest);
+  }
+  _quoteCache.set(key, { data, fetchedAt: Date.now() });
+}
+
+// 캐시에서 내보낼 때 "언제 받은 값인지"를 응답에 실어 준다.
+// 프론트엔드가 화면에 기준 시각을 표시할 수 있어야 오래된 값이 조용히 섞이지 않는다.
+function withCacheMeta(data, hit, stale) {
+  return {
+    ...data,
+    _cache: {
+      cached: true,
+      stale: !!stale,
+      fetchedAt: new Date(hit.fetchedAt).toISOString(),
+      ageSeconds: Math.round((Date.now() - hit.fetchedAt) / 1000),
+    },
+  };
+}
 
 function utcDay() {
   return new Date().toISOString().slice(0, 10);
@@ -144,6 +195,15 @@ module.exports = async function handler(req, res) {
       return;
     }
 
+    // 최근에 받아 둔 응답이 있으면 그대로 돌려줍니다. 일봉은 하루 한 번만 바뀌므로
+    // 10분 안에 다시 물어봐도 답이 같습니다. 크레딧을 아끼는 가장 확실한 지점입니다.
+    const key = cacheKey(symbol, interval, outputsize);
+    const fresh = readCache(key, QUOTE_CACHE_MS);
+    if (fresh) {
+      res.status(200).json(withCacheMeta(fresh.data, fresh, false));
+      return;
+    }
+
     // 시세 조회와 한도 조회를 같이 시작합니다. DB는 조회 경로를 막지 않습니다.
     const tdUsagePromise = getTwelveDailyUsage(apiKey);
 
@@ -153,17 +213,42 @@ module.exports = async function handler(req, res) {
     url.searchParams.set('outputsize', String(outputsize));
     url.searchParams.set('apikey', apiKey);
 
-    const response = await fetch(url.toString());
-    const data = await response.json();
+    // 타임아웃이 없으면 상류가 늘어질 때 함수가 그대로 매달려 있다가 플랫폼 한도에서
+    // 끊긴다. 그 사이 사용자는 아무 안내도 못 받는다. 8초에서 끊고 아래 폴백으로 넘긴다.
+    let response, data;
+    try {
+      response = await fetch(url.toString(), { signal: AbortSignal.timeout(TD_FETCH_TIMEOUT_MS) });
+      data = await response.json();
+    } catch (err) {
+      // 상류 실패. 마지막으로 정상 조회한 값이 하루 안쪽이면 그것을 보여 준다.
+      // 화면이 비어 있는 것보다, 기준 시각을 밝힌 지난 값이 낫다.
+      const stale = readCache(key, QUOTE_STALE_MAX_MS);
+      logApiUsage(symbol, 'error', null);
+      if (stale) {
+        console.warn(`[TD] ${symbol} 조회 실패(${err.message}) — 캐시된 값으로 응답`);
+        res.status(200).json(withCacheMeta(stale.data, stale, true));
+        return;
+      }
+      res.status(504).json({ error: `시세 조회에 실패했습니다: ${err.message}` });
+      return;
+    }
 
     if (!response.ok) {
       logApiUsage(symbol, 'error', response.status);
+      // 한도 초과(429)나 상류 오류도 같은 이유로 지난 값을 먼저 시도한다.
+      const stale = readCache(key, QUOTE_STALE_MAX_MS);
+      if (stale) {
+        console.warn(`[TD] ${symbol} HTTP ${response.status} — 캐시된 값으로 응답`);
+        res.status(200).json(withCacheMeta(stale.data, stale, true));
+        return;
+      }
       res.status(response.status).json(data);
       return;
     }
 
     logApiUsage(symbol, 'success', 200);
     bumpLocalDailyUsage();
+    writeCache(key, data);
 
     const td = await tdUsagePromise;
     const metadata = td

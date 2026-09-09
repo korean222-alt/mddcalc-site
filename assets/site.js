@@ -316,6 +316,25 @@ async function fetchKrSeries(code) {
   return { values, meta: { symbol: j.symbol, name: j.name, currency: j.currency, updated: j.updated } };
 }
 
+// 조회된 시세의 마지막 날짜가 오늘보다 한참 뒤처져 있으면 그대로 알려 준다.
+//
+// 거래정지·상장폐지·티커 변경·수집 실패 중 무엇인지는 이 자리에서 알 수 없다.
+// 원인을 단정하지 않고 "며칠 치 데이터인지"만 사실대로 밝힌다. 아무 표시 없이
+// 몇 달 전 가격을 현재가처럼 보여 주는 것이 가장 나쁜 경우다.
+//
+// 주말·공휴일로 최대 닷새까지는 정상적으로 비므로 7일을 넘길 때만 말한다.
+function stalenessNote(latestDate) {
+  if (!latestDate || latestDate === 'N/A') return '';
+  const last = new Date(latestDate + 'T00:00:00Z');
+  if (isNaN(last)) return '';
+  const days = Math.floor((Date.now() - last.getTime()) / 86400000);
+  if (days <= 7) return '';
+  const span = days >= 60 ? `${Math.round(days / 30)}개월` : `${days}일`;
+  return `\n⚠️ 이 종목의 최신 데이터는 ${latestDate} (약 ${span} 전)입니다. `
+       + `거래정지·상장 변경으로 시세가 멈췄거나 수집이 중단된 경우일 수 있습니다. `
+       + `아래 계산은 모두 이 날짜까지의 데이터 기준입니다.`;
+}
+
 async function fetchPriceSeries(ticker, outputsize) {
   const resolved = resolveSymbol(ticker);
   const key = resolved.symbol;
@@ -372,7 +391,10 @@ async function fetchPriceSeries(ticker, outputsize) {
   if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
 
   PRICE_CACHE[key] = { values: json.values, meta: json.meta || null, time: Date.now() };
-  return { fromCache: false, values: json.values, metadata: json._metadata || null, meta: json.meta || null, resolved };
+  // 서버가 상류 장애 때문에 지난 응답으로 대신 답한 경우, 그 사실을 화면까지 올려 보냅니다.
+  // 오래된 값이 아무 표시 없이 최신 시세인 척 섞이는 것이 가장 나쁜 경우입니다.
+  const staleInfo = (json._cache && json._cache.stale) ? json._cache : null;
+  return { fromCache: false, values: json.values, metadata: json._metadata || null, meta: json.meta || null, resolved, staleInfo };
 }
 
 // 벤치마크(SPY 등)는 하루 1회만 API를 쓰도록 localStorage에 날짜와 함께 저장해 재사용합니다.
@@ -565,6 +587,7 @@ async function loadData() {
     
     // 사용량 정보 표시
     let usageMsg = `✅ ${ticker} 데이터 ${raw.length}일치 로드 완료 (최신: ${latestDate})`;
+    usageMsg += stalenessNote(latestDate);
     if (fromCache) {
       usageMsg += `\n♻️ 방금 조회한 데이터를 재사용했어요 (API 미사용)`;
     } else if (metadata) {
