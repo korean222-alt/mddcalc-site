@@ -316,6 +316,25 @@ async function fetchKrSeries(code) {
   return { values, meta: { symbol: j.symbol, name: j.name, currency: j.currency, updated: j.updated } };
 }
 
+// 조회된 시세의 마지막 날짜가 오늘보다 한참 뒤처져 있으면 그대로 알려 준다.
+//
+// 거래정지·상장폐지·티커 변경·수집 실패 중 무엇인지는 이 자리에서 알 수 없다.
+// 원인을 단정하지 않고 "며칠 치 데이터인지"만 사실대로 밝힌다. 아무 표시 없이
+// 몇 달 전 가격을 현재가처럼 보여 주는 것이 가장 나쁜 경우다.
+//
+// 주말·공휴일로 최대 닷새까지는 정상적으로 비므로 7일을 넘길 때만 말한다.
+function stalenessNote(latestDate) {
+  if (!latestDate || latestDate === 'N/A') return '';
+  const last = new Date(latestDate + 'T00:00:00Z');
+  if (isNaN(last)) return '';
+  const days = Math.floor((Date.now() - last.getTime()) / 86400000);
+  if (days <= 7) return '';
+  const span = days >= 60 ? `${Math.round(days / 30)}개월` : `${days}일`;
+  return `\n⚠️ 이 종목의 최신 데이터는 ${latestDate} (약 ${span} 전)입니다. `
+       + `거래정지·상장 변경으로 시세가 멈췄거나 수집이 중단된 경우일 수 있습니다. `
+       + `아래 계산은 모두 이 날짜까지의 데이터 기준입니다.`;
+}
+
 async function fetchPriceSeries(ticker, outputsize) {
   const resolved = resolveSymbol(ticker);
   const key = resolved.symbol;
@@ -372,7 +391,10 @@ async function fetchPriceSeries(ticker, outputsize) {
   if (!json.values || json.values.length === 0) throw new Error('데이터가 없습니다. 티커를 확인해주세요.');
 
   PRICE_CACHE[key] = { values: json.values, meta: json.meta || null, time: Date.now() };
-  return { fromCache: false, values: json.values, metadata: json._metadata || null, meta: json.meta || null, resolved };
+  // 서버가 상류 장애 때문에 지난 응답으로 대신 답한 경우, 그 사실을 화면까지 올려 보냅니다.
+  // 오래된 값이 아무 표시 없이 최신 시세인 척 섞이는 것이 가장 나쁜 경우입니다.
+  const staleInfo = (json._cache && json._cache.stale) ? json._cache : null;
+  return { fromCache: false, values: json.values, metadata: json._metadata || null, meta: json.meta || null, resolved, staleInfo };
 }
 
 // 벤치마크(SPY 등)는 하루 1회만 API를 쓰도록 localStorage에 날짜와 함께 저장해 재사용합니다.
@@ -565,6 +587,7 @@ async function loadData() {
     
     // 사용량 정보 표시
     let usageMsg = `✅ ${ticker} 데이터 ${raw.length}일치 로드 완료 (최신: ${latestDate})`;
+    usageMsg += stalenessNote(latestDate);
     if (fromCache) {
       usageMsg += `\n♻️ 방금 조회한 데이터를 재사용했어요 (API 미사용)`;
     } else if (metadata) {
@@ -1663,6 +1686,29 @@ function calcDCA() {
   const achievable = last.cumAvgPrice <= targetAvg * 1.02;
   const strategyLabel = { equal: '균등 분할', staircase: '계단식', backloaded: '후반 집중' }[strategy];
 
+  // 예산은 평균단가를 바꾸지 못한다. 회차별 금액이 (가중치 ÷ 가중치합) × 예산이라
+  // 예산을 2배로 늘리면 모든 회차의 매수금액과 주수가 같은 비율로 커지고,
+  // 평균단가 = 총매수금액 ÷ 총주수는 그대로다. 예산 증액을 권하면 안 된다.
+  // 실제로 평균단가를 낮추는 것은 (1) 계단식 전략, (2) 회차 늘리기 두 가지뿐이다.
+  // 이 시나리오의 하한을 계산해 "얼마까지 가능한지"를 그대로 알려 준다.
+  const bestAvg = (() => {
+    if (achievable) return null;
+    const bestRounds = 60;
+    const pp = Array.from({ length: bestRounds }, (_, i) => {
+      const t = i / (bestRounds - 1);
+      return Math.max(price * (1 - 0.10 * Math.sin(Math.PI * t)), 1);
+    });
+    const w = pp.map(p => price / p);
+    const tw = w.reduce((a, b) => a + b, 0);
+    let sh = 0;
+    for (let i = 0; i < bestRounds; i++) sh += (w[i] / tw) / pp[i];
+    return 1 / sh;   // 예산 1 기준: 총매수금액 ÷ 총주수
+  })();
+  const missTxt = bestAvg == null ? '' :
+    (targetAvg < bestAvg
+      ? `이 V자 시나리오에서는 회차를 아무리 늘려도 평균단가가 약 ${'$'}${bestAvg.toFixed(2)} 아래로 내려가지 않습니다. 목표를 그 위로 조정해 보세요.`
+      : `계단식 전략을 고르거나 매수 횟수를 늘리면 평균단가가 조금 더 내려갑니다. 총 예산은 평균단가에 영향을 주지 않습니다 — 회차별 금액이 같은 비율로 커질 뿐입니다.`);
+
   result.innerHTML = `
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="label">전략</div><div class="value">${strategyLabel}</div></div>
@@ -1671,7 +1717,7 @@ function calcDCA() {
       <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
     </div>
     <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
-      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. 매수 횟수를 늘리거나 예산을 늘려보세요.'}
+      ${achievable ? '✅ 목표 평균단가 달성 가능!' : '⚠️ 목표 평균단가 달성 어려움. ' + missTxt}
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12px;">

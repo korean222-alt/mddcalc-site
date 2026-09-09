@@ -25,7 +25,26 @@ const ADSENSE_CLIENT = 'ca-pub-5583100002281558';
 // sitemap 에 처음 써넣는 임시 lastmod 값. 이 스크립트 끝에서 scripts/sitemap-lastmod.js 가
 // 각 파일의 실제 git 커밋 날짜로 다시 덮어쓰므로, 결과물에는 보통 이 날짜가 남지 않는다.
 // (아직 한 번도 커밋되지 않은 새 글에만 남는다.)
+// 글별 검토일이 없을 때 쓰는 기본값. 전수 검토를 마지막으로 돌린 날이다.
+// 글을 실제로 고쳤다면 posts-data.js 의 그 글에 reviewed 와 revisions 를 적어야 한다.
+// 하나로 고정해 두면 손대지도 않은 글까지 "오늘 검토함"이라고 말하게 된다.
 const REVIEWED_DATE = '2026-07-25';
+const reviewedDateOf = post => post.reviewed || REVIEWED_DATE;
+
+// 본문을 고친 글에는 무엇을 왜 고쳤는지 남긴다. 숫자를 조용히 바꿔 놓으면
+// 예전 값을 보고 계산해 본 독자가 무엇이 달라졌는지 확인할 방법이 없다.
+function revisionsHtml(post) {
+  if (!post.revisions || !post.revisions.length) return '';
+  const items = post.revisions
+    .map(r => `<li><strong>${escapeHtml(r.date)}</strong> — ${escapeHtml(r.note)}</li>`)
+    .join('\n      ');
+  return `<div class="revisions" style="margin-top:20px; padding:14px 16px; background:#f7fafc; border-left:3px solid #cbd5e0; border-radius:8px;">
+      <div style="font-size:13px; font-weight:700; color:#4a5568; margin-bottom:8px;">📝 이 글의 수정 이력</div>
+      <ul style="font-size:13px; color:#4a5568; line-height:1.8; margin:0; padding-left:18px;">
+      ${items}
+      </ul>
+    </div>`;
+}
 
 function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -172,7 +191,7 @@ function buildPostPage(post, related) {
   "headline": "${escapeHtml(post.title)}",
   "description": "${escapeHtml(description)}",
   "datePublished": "${escapeHtml(post.date)}",
-  "dateModified": "${REVIEWED_DATE}",
+  "dateModified": "${reviewedDateOf(post)}",
   "articleSection": "${escapeHtml(post.tag)}",
   "inLanguage": "ko",
   "url": "${canonical}",
@@ -254,8 +273,10 @@ ${headerHtml('blog')}
     </div>
     ${tickerReportHtml}
     ${MARKET_LINKS_HTML}
+    ${revisionsHtml(post)}
     <p class="note">
-      📅 최초 작성 ${escapeHtml(post.date)} · 최종 검토 ${REVIEWED_DATE}<br>
+      📅 원고 작성 ${escapeHtml(post.date)} · 최종 검토 ${reviewedDateOf(post)}<br>
+      <span style="color:#a0aec0;">이 사이트는 2026년 7월에 문을 열었습니다. 그 이전 날짜는 웹 공개일이 아니라 원고를 쓴 날입니다.</span><br>
       본 글은 정보 제공 및 교육 목적으로 작성되었으며 투자 자문이 아닙니다. 과거 데이터는 미래 수익을 보장하지 않고,
       주식 투자에는 원금 손실 위험이 있습니다. 투자 판단과 그 결과에 대한 책임은 투자자 본인에게 있습니다.
     </p>

@@ -57,6 +57,13 @@
     { "source": "/blog/14.html", "destination": "/blog/4.html", "statusCode": 301 },
     { "source": "/blog/18.html", "destination": "/fx-calculator.html", "statusCode": 301 },
     { "source": "/blog/19.html", "destination": "/roi-calculator.html", "statusCode": 301 },
-    { "source": "/mdd.html", "destination": "/", "statusCode": 301 }
+    { "source": "/mdd.html", "destination": "/", "statusCode": 301 },
+    { "source": "/index.html", "destination": "/", "statusCode": 301 }
+  ],
+  "headers": [
+    {
+      "source": "/data/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    }
   ]
 }

@@ -32,7 +32,7 @@
   "headline": "TQQQ vs QQQ: 레버리지 ETF의 진실 - MDD로 비교해보니",
   "description": "3배 레버리지 ETF TQQQ는 정말 3배의 수익을 주나요? 변동성 감쇠 효과와 MDD로 진실을 확인해보세요.",
   "datePublished": "2026-04-05",
-  "dateModified": "2026-07-25",
+  "dateModified": "2026-09-09",
   "articleSection": "레버리지 ETF",
   "inLanguage": "ko",
   "url": "https://mddcalc.com/blog/16.html",
@@ -142,7 +142,7 @@
       <h2>레버리지 ETF의 주요 위험성</h2>
       <p>레버리지 ETF는 다음과 같은 여러 가지 위험 요소를 내포하고 있어 장기 투자에는 적합하지 않습니다.</p>
       <ul>
-        <li><strong>복리 효과의 역작용 (Volatility Decay)</strong>: 시장이 횡보하거나 변동성이 큰 경우, 레버리지 ETF는 기초 지수보다 훨씬 큰 손실을 보게 됩니다. 예를 들어, 기초 지수가 첫날 10% 상승하고 다음 날 10% 하락하면 원금으로 돌아오지만, 2배 레버리지 ETF는 첫날 20% 상승 후 다음 날 20% 하락하면 원금보다 손실이 발생합니다. 이러한 복리 효과의 역작용은 장기적으로 손실을 가속화시키는 주된 원인입니다.</li>
+        <li><strong>복리 효과의 역작용 (Volatility Decay)</strong>: 시장이 횡보하거나 변동성이 큰 경우, 레버리지 ETF는 기초 지수보다 훨씬 큰 손실을 보게 됩니다. 예를 들어 100에서 출발한 기초 지수가 첫날 10% 상승하고 다음 날 10% 하락하면 100 → 110 → 99가 되어 <strong>-1%</strong>가 됩니다. 같은 이틀 동안 2배 레버리지 ETF는 100 → 120 → 96으로 <strong>-4%</strong>가 됩니다. 즉 지수 자체도 원금으로 정확히 돌아오지는 못하지만(+10%와 -10%는 서로 상쇄되지 않습니다), 레버리지 상품의 손실은 그보다 훨씬 큽니다. 이 격차는 배율의 제곱에 비례해 벌어지므로 3배 상품이라면 100 → 130 → 91, <strong>-9%</strong>가 됩니다. 이러한 복리 효과의 역작용은 장기적으로 손실을 가속화시키는 주된 원인입니다.</li>
         <li><strong>롤오버 비용 (Roll-over Cost)</strong>: 레버리지 ETF는 주로 선물 계약을 통해 운용됩니다. 선물 계약은 만기가 존재하므로, 만기가 도래하면 다음 달 선물 계약으로 교체(롤오버)해야 합니다. 이 과정에서 발생하는 비용이 롤오버 비용이며, 이는 ETF의 운용 비용을 증가시켜 장기 수익률을 갉아먹는 요인이 됩니다.</li>
         <li><strong>괴리율 (Tracking Error)</strong>: 레버리지 ETF는 파생상품을 통해 지수를 추종하므로, 기초 지수의 움직임과 레버리지 ETF의 실제 수익률 사이에 차이(괴리율)가 발생할 수 있습니다. 이는 운용사의 전략, 시장 상황, 거래 비용 등 다양한 요인에 의해 발생하며, 투자자가 예상한 수익률을 얻지 못하게 할 수 있습니다.</li>
         <li><strong>유동성 위험</strong>: 일부 레버리지 ETF는 거래량이 적어 유동성 위험이 존재할 수 있습니다. 이는 투자자가 원하는 가격에 매수 또는 매도하기 어렵게 만들 수 있습니다.</li>
@@ -190,8 +190,15 @@
       <div class="related-title">지금 시장은 어떤가</div>
       <a href="/fear-greed.html" class="related-chip">😱 공포·탐욕 지수 — 지금 시장 심리</a><a href="/sector-rs.html" class="related-chip">📊 섹터 상대강도(RS) — 어디로 돈이 몰리나</a><a href="/heatmap.html" class="related-chip">🔥 주식 히트맵 — 오늘의 등락 지도</a>
     </div>
+    <div class="revisions" style="margin-top:20px; padding:14px 16px; background:#f7fafc; border-left:3px solid #cbd5e0; border-radius:8px;">
+      <div style="font-size:13px; font-weight:700; color:#4a5568; margin-bottom:8px;">📝 이 글의 수정 이력</div>
+      <ul style="font-size:13px; color:#4a5568; line-height:1.8; margin:0; padding-left:18px;">
+      <li><strong>2026-09-09</strong> — 수치 정정 — &quot;+10% 뒤 -10%면 원금으로 돌아온다&quot;를 바로잡음(100 → 110 → 99, -1%). 배율별 감쇠(2배 -4%, 3배 -9%)를 추가.</li>
+      </ul>
+    </div>
     <p class="note">
-      📅 최초 작성 2026-04-05 · 최종 검토 2026-07-25<br>
+      📅 원고 작성 2026-04-05 · 최종 검토 2026-09-09<br>
+      <span style="color:#a0aec0;">이 사이트는 2026년 7월에 문을 열었습니다. 그 이전 날짜는 웹 공개일이 아니라 원고를 쓴 날입니다.</span><br>
       본 글은 정보 제공 및 교육 목적으로 작성되었으며 투자 자문이 아닙니다. 과거 데이터는 미래 수익을 보장하지 않고,
       주식 투자에는 원금 손실 위험이 있습니다. 투자 판단과 그 결과에 대한 책임은 투자자 본인에게 있습니다.
     </p>

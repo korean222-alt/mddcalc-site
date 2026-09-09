@@ -81,7 +81,10 @@ function fearGreedSummary() {
     const inScore = (m.components || []).filter(c => c.inScore !== false);
     const source = m.source === 'cnn'
       ? `<a href="${esc(m.sourceUrl || 'https://www.cnn.com/markets/fear-and-greed')}" target="_blank" rel="noopener nofollow">CNN Business</a> 공식 값으로`
-      : 'CNN 과 같은 방식으로 계산해';
+      // "CNN 과 같은 방식"은 과한 표현이다. 한국 지수는 CNN 의 7개 지표 중 5개만 쓰고,
+      // 수록 종목·변동성 계산·정규화 기준이 모두 우리 것이다. 구성 아이디어를 참고한
+      // 자체 지수라고 밝히는 편이 정확하다. (미국 탭은 CNN 공식 값 그대로라 구분된다.)
+      : 'CNN 의 구성 아이디어를 참고한 자체 지수로 계산해';
 
     const prev = [
       m.prev && m.prev.d1 != null ? `어제 ${m.prev.d1}` : null,

@@ -238,6 +238,15 @@ function drawdownSeries(series) {
   return out;
 }
 
+// 표본이 짝수면 가운데 두 값의 평균이 중앙값이다. 위쪽 값 하나만 쓰면
+// (예: 10일·30일 → 30일) 실제 중앙값 20일보다 회복이 느려 보인다.
+function median(sortedNums) {
+  const n = sortedNums.length;
+  if (!n) return null;
+  const mid = n >> 1;
+  return n % 2 ? sortedNums[mid] : Math.round((sortedNums[mid - 1] + sortedNums[mid]) / 2);
+}
+
 function analyze(series) {
   const { episodes, ongoing, athPrice, athDate } = computeDrawdowns(series);
   const all = ongoing ? [...episodes, ongoing] : episodes;
@@ -265,7 +274,7 @@ function analyze(series) {
     meaningfulCount: meaningful.length,
     recoveredCount: recovered.length,
     ongoingCount: meaningful.length - recovered.length,
-    medianDays: recDays.length ? recDays[Math.floor(recDays.length / 2)] : null,
+    medianDays: median(recDays),
     maxDays: recDays.length ? recDays[recDays.length - 1] : null,
   };
 
@@ -343,11 +352,11 @@ function buildRecoveryStatsHtml(symbol, a) {
         <div class="value">${r.recoveredCount}회 / ${r.meaningfulCount}회</div>
       </div>
       <div class="stat">
-        <div class="label">회복까지 걸린 기간(중앙값)</div>
+        <div class="label">저점→전고점 회복(중앙값)</div>
         <div class="value">${r.medianDays.toLocaleString()}일</div>
       </div>
     </div>
-    <p style="margin-top:12px;">${symbol}는 분석 기간 동안 <strong>-${TH}% 이상 하락한 구간</strong>을 <strong>${r.meaningfulCount}개</strong> 지나갔고, 그중 <strong>${r.recoveredCount}개</strong>가 이전 고점을 회복했습니다. 회복까지 걸린 기간은 중앙값 기준 <strong>${r.medianDays.toLocaleString()}일</strong>, 가장 오래 걸린 경우는 <strong>${r.maxDays.toLocaleString()}일</strong>이었습니다.${ongoingLine}</p>
+    <p style="margin-top:12px;">${symbol}는 분석 기간 동안 <strong>-${TH}% 이상 하락한 구간</strong>을 <strong>${r.meaningfulCount}개</strong> 지나갔고, 그중 <strong>${r.recoveredCount}개</strong>가 이전 고점을 회복했습니다. 회복까지 걸린 기간은 중앙값 기준 <strong>${r.medianDays.toLocaleString()}일</strong>, 가장 오래 걸린 경우는 <strong>${r.maxDays.toLocaleString()}일</strong>이었습니다. 이 일수는 <strong>저점을 찍은 날부터 이전 고점을 되찾은 날까지</strong>를 센 값입니다(고점에서 내려간 기간은 포함하지 않습니다).${ongoingLine}</p>
     <p>${nowLine}</p>
     <p class="muted">일상적인 등락과 구분하기 위해 -${TH}% 이상 하락한 구간만 집계했습니다. 회복은 종가가 직전 고점을 다시 넘어선 시점을 기준으로 하며, 과거에 회복했다는 사실이 앞으로도 회복한다는 근거가 되지는 않습니다. 개별 종목은 사업 환경이 바뀌면 전고점을 영영 회복하지 못할 수도 있습니다.</p>`;
 }
@@ -536,7 +545,7 @@ function buildPage(symbol, a, spyA, generatedDate) {
   // 설명문에는 숫자를 앞에 둔다. 검색 결과에서 "지금 몇 % 빠졌는지"가 먼저 보이는 쪽이
   // 같은 순위에서도 클릭을 더 가져간다. 매주 자동 갱신되므로 숫자도 같이 최신화된다.
   const description = a.isAtAth
-    ? `${label}은 현재 사상 최고가 부근입니다. 역대 최대 낙폭(MDD) ${fmtPct(a.worstDrawdownPct)}, 주요 하락 구간과 전고점 회복까지 걸린 기간을 실제 시세로 계산해 정리했습니다.`
+    ? `${label}은 현재 조회 구간 최고가 부근입니다. 역대 최대 낙폭(MDD) ${fmtPct(a.worstDrawdownPct)}, 주요 하락 구간과 전고점 회복까지 걸린 기간을 실제 시세로 계산해 정리했습니다.`
     : `${label}의 현재 고점 대비 하락률은 ${fmtPct(a.currentDrawdownPct)}입니다. 역대 최대 낙폭(MDD) ${fmtPct(a.worstDrawdownPct)}, 주요 하락 구간과 전고점 회복까지 걸린 기간을 실제 시세로 계산해 정리했습니다.`;
 
   let spyCompareHtml = '';
@@ -651,7 +660,7 @@ ${headerHtml('tools')}
          문서인지" 선언하는 자리가 비어 있던 셈이라, 제목과 같은 문구로 채운다. -->
     <h1 class="ticker-name">${escapeHtml(label)} MDD·고점 대비 하락률</h1>
     <div class="hero ${heroClass}">${heroText}</div>
-    <div class="hero-label">${a.isAtAth ? `사상 최고가 ${fmtPrice(a.athPrice)} 경신 중` : `사상 최고가(ATH) ${fmtPrice(a.athPrice)} (${a.athDate}) 대비 · 현재가 ${fmtPrice(a.currentPrice)}`} · 기준일 ${a.currentDate}</div>
+    <div class="hero-label">${a.isAtAth ? `조회 데이터 내 최고가 ${fmtPrice(a.athPrice)} 경신 중` : `조회 데이터 내 최고가 ${fmtPrice(a.athPrice)} (${a.athDate}) 대비 · 현재가 ${fmtPrice(a.currentPrice)}`} · 기준일 ${a.currentDate}</div>
     <div class="data-range">📅 데이터 기간: ${a.startDate} ~ ${a.endDate} (약 ${yearsLabel}년, 일봉 기준)</div>
 
     <div class="stat-grid">
@@ -666,8 +675,8 @@ ${headerHtml('tools')}
     </div>
 
     <p>${symbol} 종목은 ${a.isAtAth
-      ? `현재 사상 최고가(${a.athDate} 기록, ${fmtPrice(a.athPrice)})를 경신하며 거래되고 있습니다.`
-      : `현재 사상 최고가(${a.athDate} 기록, ${fmtPrice(a.athPrice)}) 대비 <strong>${heroText}</strong> 상태입니다.`}
+      ? `현재 조회 데이터 내 최고가(${a.athDate} 기록, ${fmtPrice(a.athPrice)})를 경신하며 거래되고 있습니다.`
+      : `현재 조회 데이터 내 최고가(${a.athDate} 기록, ${fmtPrice(a.athPrice)}) 대비 <strong>${heroText}</strong> 상태입니다.`}
     분석 기간(${yearsLabel}년) 동안 가장 크게 하락했던 구간은 <strong>${a.topDrawdowns[0].declinePct.toFixed(1)}%</strong> 하락한 사례로,
     ${a.topDrawdowns[0].peakDate}부터 ${a.topDrawdowns[0].troughDate}까지 낙폭이 커졌${a.topDrawdowns[0].recoveryDate ? `고, 이후 ${a.topDrawdowns[0].recoveryDays.toLocaleString()}일 만에 이전 고점을 회복했습니다.` : `으며, 이 분석 시점까지 아직 이전 고점을 회복하지 못한 상태입니다.`}</p>
   </div>
@@ -676,7 +685,7 @@ ${buildTickerNoteHtml(symbol)}
     <h2>📋 역대 주요 하락 구간 (하락률 상위 ${a.topDrawdowns.length}개)</h2>
     <div style="overflow-x:auto;">
       <table>
-        <thead><tr><th>고점</th><th>저점</th><th>하락률</th><th>회복</th></tr></thead>
+        <thead><tr><th>고점</th><th>저점</th><th>하락률</th><th>회복(저점→전고점)</th></tr></thead>
         <tbody>${buildDrawdownTableHtml(a.topDrawdowns)}</tbody>
       </table>
     </div>
@@ -714,7 +723,7 @@ ${buildTickerNoteHtml(symbol)}
       ${buildRelatedTickersHtml(symbol)}
     </div>
     ${buildRelatedBlogHtml(symbol)}
-    <p class="freshness">📅 데이터 기준일: ${generatedDate} · 이 페이지는 매주 자동으로 최신 데이터로 갱신됩니다. 지금 보시는 수치가 실제 시세와 최대 ${REFRESH_CYCLE_DAYS}일 정도 차이가 날 수 있습니다.</p>
+    <p class="freshness">📅 페이지 생성일: ${generatedDate} (시세 기준일은 ${a.currentDate} — 위 표의 모든 수치는 이 날짜까지의 데이터입니다) · 이 페이지는 매주 자동으로 갱신됩니다. 지금 보시는 수치가 실제 시세와 최대 ${REFRESH_CYCLE_DAYS}일 정도 차이가 날 수 있습니다.</p>
     <p class="note">본 페이지는 정보 제공 목적이며 투자 자문이 아닙니다. 데이터 출처: Twelve Data. 오류 제보: <a href="mailto:gktgkt2309@gmail.com">gktgkt2309@gmail.com</a></p>
   </div>
 </div>
