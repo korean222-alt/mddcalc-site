@@ -1,7 +1,7 @@
 {
   "provider": "twelvedata",
-  "generatedAt": "2026-09-11T00:54:41.494Z",
-  "generatedAtKST": "2026-09-11 09:54 KST",
+  "generatedAt": "2026-09-12T00:59:20.447Z",
+  "generatedAtKST": "2026-09-12 09:59 KST",
   "producedBy": "scripts/generate-us-data.js",
   "consumedBy": [
     "data/us/*.json",
@@ -9,11 +9,11 @@
   ],
   "symbols": 209,
   "calls": 209,
-  "ok": 207,
-  "failed": 2,
+  "ok": 208,
+  "failed": 1,
   "usable": 208,
   "sources": {
-    "twelvedata": 207
+    "twelvedata": 208
   },
   "usage": {
     "measured": true,
@@ -23,10 +23,6 @@
     "limit": 800
   },
   "failures": [
-    {
-      "symbol": "SO",
-      "reason": "fromTwelveData: HTTP 200 — JSON 아님 / fromStooq: CSV 헤더 없음 (응답 앞부분: <!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"></head><body><noscript>T) / fromYahoo"
-    },
     {
       "symbol": "CFLT",
       "reason": "fromTwelveData: HTTP 404 404 **symbol** or **figi** parameter is missing or invalid. Please provide a valid symbol according to API documentation: https://twelvedata.com/docs#reference-data / fromStoo"
