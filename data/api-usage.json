@@ -1,7 +1,7 @@
 {
   "provider": "twelvedata",
-  "generatedAt": "2026-10-07T02:14:53.807Z",
-  "generatedAtKST": "2026-10-07 11:14 KST",
+  "generatedAt": "2026-10-08T02:42:41.299Z",
+  "generatedAtKST": "2026-10-08 11:42 KST",
   "producedBy": "scripts/generate-us-data.js",
   "consumedBy": [
     "data/us/*.json",
@@ -17,14 +17,14 @@
   },
   "usage": {
     "measured": true,
-    "before": 3,
-    "after": 216,
-    "delta": 213,
+    "before": 1,
+    "after": 213,
+    "delta": 212,
     "limit": 800
   },
   "failures": [
     {
-      "symbol": "WMT",
+      "symbol": "EMR",
       "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 9 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a higher"
     },
     {
