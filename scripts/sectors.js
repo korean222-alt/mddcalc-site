@@ -231,6 +231,7 @@ const US_NAMES = {
   CRSP: '크리스퍼테라퓨틱스', NTLA: '인텔리아테라퓨틱스', BEAM: '빔테라퓨틱스', ILMN: '일루미나',
   NVO: '노보노디스크', VKTX: '바이킹테라퓨틱스',
   ISRG: '인튜이티브서지컬', MDT: '메드트로닉', SYK: '스트라이커', BSX: '보스턴사이언티픽',
+  TLT: '미국 장기국채 ETF',
 };
 
 // 거래대금 비중을 시장 안에서 비교해도 되는가.
@@ -287,15 +288,18 @@ const REFRESH_SCHEDULE = {
 // 순환일 뿐이라 "주식에서 돈이 빠져나가는가"를 보지 못합니다. 국고채 ETF 를 한 종목
 // 더 받아오는 비용이 훨씬 쌉니다.
 //
-// 미국은 CNN 공식 값을 그대로 쓰므로(scripts/fetch-cnn-fear-greed.js) 여기 필요 없습니다.
+// 미국도 2026-10-30 부터 CNN 값을 옮겨 싣지 않고 같은 방식으로 직접 계산합니다.
+// 다른 사이트의 지수를 그대로 다시 게시하는 것은 애드센스의 "가치 없는 콘텐츠"(복제 콘텐츠)에
+// 걸리고, CNN 데이터의 재게시 권한도 확인되지 않았기 때문입니다.
 const FG_BOND = {
   KR: '148070',   // KOSEF 국고채10년 (scripts/kr-tickers.js 에 있어야 합니다)
+  US: 'TLT',      // iShares 미국 장기국채 ETF. 섹터 목록에는 없으므로 usSymbols() 가 따로 넣습니다.
 };
 
-// 미국에서 실제로 받아와야 하는 심볼 = US·THEME 두 목록의 구성 심볼 + 벤치마크.
+// 미국에서 실제로 받아와야 하는 심볼 = US·THEME 두 목록의 구성 심볼 + 벤치마크 + 공포·탐욕용 국채 ETF.
 // generate-us-data.js 가 이 함수를 수집 목록으로 씁니다.
 function usSymbols() {
-  const set = new Set([BENCHMARKS.US.code, BENCHMARKS.THEME.code]);
+  const set = new Set([BENCHMARKS.US.code, BENCHMARKS.THEME.code, FG_BOND.US]);
   for (const s of [...US_SECTORS, ...THEME_SECTORS]) for (const c of s.codes) set.add(c);
   return [...set];
 }
