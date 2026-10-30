@@ -29,7 +29,11 @@ const ADSENSE_CLIENT = 'ca-pub-5583100002281558';
 // 글을 실제로 고쳤다면 posts-data.js 의 그 글에 reviewed 와 revisions 를 적어야 한다.
 // 하나로 고정해 두면 손대지도 않은 글까지 "오늘 검토함"이라고 말하게 된다.
 const REVIEWED_DATE = '2026-07-25';
-const reviewedDateOf = post => post.reviewed || REVIEWED_DATE;
+// 검토일이 작성일보다 앞설 수는 없다. 일괄 검토(2026-07-25) 뒤에 쓴 글은 작성일을 검토일로 본다.
+const reviewedDateOf = post => {
+  const r = post.reviewed || REVIEWED_DATE;
+  return post.date && post.date > r ? post.date : r;
+};
 
 // 본문을 고친 글에는 무엇을 왜 고쳤는지 남긴다. 숫자를 조용히 바꿔 놓으면
 // 예전 값을 보고 계산해 본 독자가 무엇이 달라졌는지 확인할 방법이 없다.
