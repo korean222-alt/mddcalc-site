@@ -543,9 +543,9 @@ function renderFavorites() {
   }
   panel.classList.remove('hidden');
   list.innerHTML = favorites.map(t => `
-    <span class="fav-chip" onclick="loadFavoriteTicker('${escapeHtml(t)}')">
-      ${escapeHtml(t)}
-      <button class="fav-remove" onclick="removeFavorite('${escapeHtml(t)}', event)" title="삭제">✕</button>
+    <span class="fav-chip">
+      <button type="button" class="fav-load" onclick="loadFavoriteTicker('${escapeHtml(t)}')">${escapeHtml(t)}</button>
+      <button type="button" class="fav-remove" onclick="removeFavorite('${escapeHtml(t)}', event)" title="삭제" aria-label="${escapeHtml(t)} 관심종목에서 삭제">✕</button>
     </span>
   `).join('');
 }
@@ -881,13 +881,13 @@ function renderDeepAnalysis() {
   const simBox = document.getElementById('similarCasesBody');
   if (!currentEp) {
     avgBox.textContent = '해당 없음';
-    simBox.innerHTML = '<span style="color:#a0aec0;">현재 신고가 부근이라 비교할 하락 사례가 없습니다.</span>';
+    simBox.innerHTML = '<span style="color:#5f6e82;">현재 신고가 부근이라 비교할 하락 사례가 없습니다.</span>';
   } else {
     const depth = currentEp.troughDD;
     const comparable = episodes.filter(ep => ep !== currentEp && ep.recovered && ep.troughDD <= depth + 1e-9);
     if (comparable.length === 0) {
       avgBox.textContent = '비교 사례 없음';
-      simBox.innerHTML = '<span style="color:#a0aec0;">이 정도로 깊은 하락은 조회 기간 내 처음이라 비교할 과거 사례가 없습니다.</span>';
+      simBox.innerHTML = '<span style="color:#5f6e82;">이 정도로 깊은 하락은 조회 기간 내 처음이라 비교할 과거 사례가 없습니다.</span>';
     } else {
       const avgDays = comparable.reduce((a, e) => a + e.daysToRecover, 0) / comparable.length;
       avgBox.textContent = `약 ${Math.round(avgDays).toLocaleString()}일`;
@@ -898,8 +898,8 @@ function renderDeepAnalysis() {
         .sort((a, b) => Math.abs(a.troughDD - depth) - Math.abs(b.troughDD - depth))
         .slice(0, 3);
       simBox.innerHTML = closest.length ? closest.map(ep =>
-        `<div style="margin-bottom:6px;">📌 <b>${ep.peakDate}</b> 고점 이후 <b style="color:#e53e3e;">${ep.troughDD.toFixed(1)}%</b> 하락 → <b style="color:#38a169;">${ep.daysToRecover}일</b> 만에 회복 (${ep.recoverDate})</div>`
-      ).join('') : '<span style="color:#a0aec0;">비교 사례 없음</span>';
+        `<div style="margin-bottom:6px;">📌 <b>${ep.peakDate}</b> 고점 이후 <b style="color:#c53030;">${ep.troughDD.toFixed(1)}%</b> 하락 → <b style="color:#287a4f;">${ep.daysToRecover}일</b> 만에 회복 (${ep.recoverDate})</div>`
+      ).join('') : '<span style="color:#5f6e82;">비교 사례 없음</span>';
     }
   }
 
@@ -924,9 +924,9 @@ function renderDeepAnalysis() {
     <tr>
       <td>${i + 1}위</td>
       <td>${ep.peakDate}</td>
-      <td style="color:#e53e3e; font-weight:700;">${ep.troughDD.toFixed(1)}%</td>
+      <td style="color:#c53030; font-weight:700;">${ep.troughDD.toFixed(1)}%</td>
       <td>${ep.recovered ? `✅ ${ep.daysToRecover}일 만에 회복` : `⏳ 진행 중 (${ep.daysSoFar}일째)`}</td>
-    </tr>`).join('') : '<tr><td colspan="4" style="color:#a0aec0;">데이터가 부족합니다</td></tr>';
+    </tr>`).join('') : '<tr><td colspan="4" style="color:#5f6e82;">데이터가 부족합니다</td></tr>';
 
   STATE.deepAnalysis = { percentile, currentEp, top5 };
 }
@@ -972,7 +972,7 @@ async function renderBenchmarkComparison() {
 
   if (STATE.ticker === 'SPY') {
     loadingEl.style.display = 'none';
-    resultEl.innerHTML = '<div style="color:#a0aec0; font-size:13px;">지금 조회 중인 종목이 SPY(S&P500) 자체라서 비교가 필요 없어요.</div>';
+    resultEl.innerHTML = '<div style="color:#5f6e82; font-size:13px;">지금 조회 중인 종목이 SPY(S&P500) 자체라서 비교가 필요 없어요.</div>';
     return;
   }
 
@@ -1006,7 +1006,7 @@ async function renderBenchmarkComparison() {
       const tickerReturn = (STATE.filtered[STATE.filtered.length - 1].close / STATE.filtered[0].close - 1) * 100;
       const spyReturn = (spyFiltered[spyFiltered.length - 1].close / spyFiltered[0].close - 1) * 100;
       const alpha = tickerReturn - spyReturn;
-      const alphaColor = alpha >= 0 ? '#38a169' : '#e53e3e';
+      const alphaColor = alpha >= 0 ? '#287a4f' : '#c53030';
       compareHtml = `
         <div class="stats-grid" style="margin-bottom:14px;">
           <div class="stat-box"><div class="label">${escapeHtml(STATE.ticker)} 조회기간 수익률</div><div class="value" style="font-size:15px;">${tickerReturn >= 0 ? '+' : ''}${tickerReturn.toFixed(1)}%</div></div>
@@ -1024,9 +1024,9 @@ async function renderBenchmarkComparison() {
     }
     const diff = tickerDD - spyDD; // 음수면 이 종목이 시장보다 더 빠진 것
     const diffText = diff < -0.01
-      ? `현재 이 종목은 SPY보다 <b style="color:#e53e3e;">${Math.abs(diff).toFixed(1)}%p 더 깊게</b> 하락한 상태입니다.`
+      ? `현재 이 종목은 SPY보다 <b style="color:#c53030;">${Math.abs(diff).toFixed(1)}%p 더 깊게</b> 하락한 상태입니다.`
       : diff > 0.01
-      ? `현재 이 종목은 SPY보다 <b style="color:#38a169;">${Math.abs(diff).toFixed(1)}%p 덜</b> 하락한, 시장보다 상대적으로 견고한 상태입니다.`
+      ? `현재 이 종목은 SPY보다 <b style="color:#287a4f;">${Math.abs(diff).toFixed(1)}%p 덜</b> 하락한, 시장보다 상대적으로 견고한 상태입니다.`
       : `현재 이 종목의 하락폭은 SPY와 거의 비슷한 수준입니다.`;
 
     resultEl.innerHTML = `
@@ -1035,7 +1035,7 @@ async function renderBenchmarkComparison() {
         <div>${context}</div>
         <div style="margin-top:6px;">${diffText}</div>
       </div>
-      <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ SPY 데이터는 API 사용량 절약을 위해 하루 한 번만 갱신됩니다 (브라우저 기준 당일 데이터 재사용).</p>
+      <p style="font-size:11px; color:#5f6e82; margin-top:8px;">⚠️ SPY 데이터는 API 사용량 절약을 위해 하루 한 번만 갱신됩니다 (브라우저 기준 당일 데이터 재사용).</p>
     `;
   } catch (e) {
     if (STATE.ticker !== requestTicker) return;
@@ -1133,10 +1133,10 @@ function renderRecovery(A) {
     const barClass = r.everHit ? '' : 'zero';
 
     tr.innerHTML = `
-      <td><b>-${r.bucket}%</b>${i === currentIdx ? ' 👈 <span style="color:#d69e2e;">지금 여기</span>' : ''}</td>
+      <td><b>-${r.bucket}%</b>${i === currentIdx ? ' 👈 <span style="color:#975a16;">지금 여기</span>' : ''}</td>
       <td>${r.hit.toLocaleString()}일</td>
       <td>${pct.toFixed(1)}%</td>
-      <td><b>${r.rate.toFixed(0)}%</b>${!r.everHit ? ' <span style="color:#a0aec0; font-size:11px;">(미도달)</span>' : ''}</td>
+      <td><b>${r.rate.toFixed(0)}%</b>${!r.everHit ? ' <span style="color:#5f6e82; font-size:11px;">(미도달)</span>' : ''}</td>
       <td><div class="bar-container"><div class="bar-fill ${barClass}" style="width:${barWidth}%"></div></div></td>
     `;
     body.appendChild(tr);
@@ -1182,7 +1182,9 @@ function navigate(page) {
 }
 
 function toggleNav() {
-  document.getElementById('siteNav').classList.toggle('open');
+  const open = document.getElementById('siteNav').classList.toggle('open');
+  const btn = document.querySelector('.nav-hamburger');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
 // ========== RSI 계산기 ==========
@@ -1227,7 +1229,7 @@ function renderRSI(prices, period, tickerLabel) {
   else { plain = '🟡 보통 수준이에요 — 특별한 신호 없음'; signalColor = '#744210'; signalBg = '#fefcbf'; }
 
   const pos = Math.min(100, Math.max(0, rsi));
-  const label = tickerLabel ? `<div style="font-size:13px; color:#718096; margin-bottom:6px;">📌 ${escapeHtml(tickerLabel)} · 최근 ${prices.length}일 데이터 기준</div>` : '';
+  const label = tickerLabel ? `<div style="font-size:13px; color:#566275; margin-bottom:6px;">📌 ${escapeHtml(tickerLabel)} · 최근 ${prices.length}일 데이터 기준</div>` : '';
 
   result.innerHTML = `
     ${label}
@@ -1239,15 +1241,15 @@ function renderRSI(prices, period, tickerLabel) {
       <div style="position:relative; height:14px; border-radius:7px; background:linear-gradient(90deg, #38a169 0%, #38a169 30%, #ecc94b 30%, #ecc94b 70%, #e53e3e 70%, #e53e3e 100%);">
         <div style="position:absolute; top:-5px; left:${pos}%; transform:translateX(-50%); width:3px; height:24px; background:#1a202c; border-radius:2px;"></div>
       </div>
-      <div style="display:flex; justify-content:space-between; font-size:10px; color:#a0aec0; margin-top:4px;">
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:#5f6e82; margin-top:4px;">
         <span>0 · 과매도</span><span>50 · 중립</span><span>100 · 과매수</span>
       </div>
     </div>
     <div class="stats-grid" style="margin-top:14px;">
       <div class="stat-box"><div class="label">사용 데이터</div><div class="value">${prices.length}일</div></div>
       <div class="stat-box"><div class="label">RSI 기간</div><div class="value">${period}일</div></div>
-      <div class="stat-box"><div class="label">평균 상승폭</div><div class="value" style="color:#38a169;">+${(avgGain).toFixed(2)}</div></div>
-      <div class="stat-box"><div class="label">평균 하락폭</div><div class="value" style="color:#e53e3e;">-${(avgLoss).toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">평균 상승폭</div><div class="value" style="color:#287a4f;">+${(avgGain).toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">평균 하락폭</div><div class="value" style="color:#c53030;">-${(avgLoss).toFixed(2)}</div></div>
     </div>
   `;
 }
@@ -1339,11 +1341,11 @@ function calcDividend() {
   const totalReturn = totalReturnNum.toFixed(1);
   // 손실이면 "+-12.3%" 가 초록색으로 나오던 문제. 부호와 색을 값에서 뽑습니다.
   const returnSign = totalReturnNum >= 0 ? '+' : '';
-  const returnColor = totalReturnNum >= 0 ? '#38a169' : '#e53e3e';
+  const returnColor = totalReturnNum >= 0 ? '#287a4f' : '#c53030';
 
-  let yieldColor = '#718096';
+  let yieldColor = '#566275';
   if (yieldPct >= 4) yieldColor = '#d69e2e';
-  else if (yieldPct >= 2) yieldColor = '#38a169';
+  else if (yieldPct >= 2) yieldColor = '#287a4f';
 
   result.innerHTML = `
     <div class="stats-grid" style="margin-bottom:16px;">
@@ -1375,43 +1377,54 @@ function calcDividend() {
 
 // ========== 문의 폼 제출 ==========
 async function submitContact() {
+  const typeEl = document.getElementById('contactType');
+  const type = typeEl ? typeEl.value : 'general';
   const name = document.getElementById('contactName').value.trim();
   const email = document.getElementById('contactEmail').value.trim();
   const subject = document.getElementById('contactSubject').value.trim();
   const message = document.getElementById('contactMessage').value.trim();
+  const agreeEl = document.getElementById('contactAgree');
+  const agree = !!(agreeEl && agreeEl.checked);
   const result = document.getElementById('contactResult');
 
-  if (!name || !email || !subject || !message) {
-    result.innerHTML = '<span style="color:#e53e3e;">❌ 모든 항목을 입력해주세요.</span>';
+  // 이름은 선택 항목입니다. 답변에 필요한 것은 이메일뿐이라 받지 않아도 되는 정보는 강제하지 않습니다.
+  if (!email || !subject || !message) {
+    result.innerHTML = '<span style="color:#c53030;">❌ 이메일·제목·내용을 입력해주세요.</span>';
     return;
   }
   if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-    result.innerHTML = '<span style="color:#e53e3e;">❌ 올바른 이메일 주소를 입력해주세요.</span>';
+    result.innerHTML = '<span style="color:#c53030;">❌ 올바른 이메일 주소를 입력해주세요.</span>';
+    return;
+  }
+  if (!agree) {
+    result.innerHTML = '<span style="color:#c53030;">❌ 개인정보 수집·이용에 동의해 주셔야 양식으로 접수할 수 있습니다. 동의하지 않으시면 이메일로 직접 보내주세요.</span>';
+    if (agreeEl) agreeEl.focus();
     return;
   }
 
-  result.innerHTML = '<span style="color:#4299e1;">⏳ 전송 중...</span>';
+  result.innerHTML = '<span style="color:#2b6cb0;">⏳ 전송 중...</span>';
   
   try {
     const response = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, subject, message })
+      body: JSON.stringify({ type, name, email, subject, message, agree })
     });
     const data = await response.json();
     
     if (response.ok && data.success) {
-      result.innerHTML = '<span style="color:#38a169;">✅ 문의가 접수되었습니다. 빠른 시일 내 답변 드리겠습니다.</span>';
+      result.innerHTML = '<span style="color:#287a4f;">✅ 문의가 접수되었습니다. 빠른 시일 내 답변 드리겠습니다.</span>';
       document.getElementById('contactName').value = '';
       document.getElementById('contactEmail').value = '';
       document.getElementById('contactSubject').value = '';
       document.getElementById('contactMessage').value = '';
+      if (agreeEl) agreeEl.checked = false;
     } else {
       // escapeHtml(undefined) 는 빈 문자열이 아니라서 || 기본값이 먹지 않았습니다.
-      result.innerHTML = `<span style="color:#e53e3e;">❌ ${data && data.error ? escapeHtml(data.error) : '전송 실패. 다시 시도해주세요.'}</span>`;
+      result.innerHTML = `<span style="color:#c53030;">❌ ${data && data.error ? escapeHtml(data.error) : '전송 실패. 다시 시도해주세요.'}</span>`;
     }
   } catch (err) {
-    result.innerHTML = '<span style="color:#e53e3e;">❌ 네트워크 오류가 발생했습니다. 다시 시도해주세요.</span>';
+    result.innerHTML = '<span style="color:#c53030;">❌ 네트워크 오류가 발생했습니다. 다시 시도해주세요.</span>';
   }
 }
 
@@ -1466,7 +1479,7 @@ function calcROI() {
   const pct = ((sell - buy) / buy) * 100;
   const pnlKrw = pnl * KRW_RATE;
   const isProfit = pnl >= 0;
-  const color = isProfit ? '#38a169' : '#e53e3e';
+  const color = isProfit ? '#287a4f' : '#c53030';
   const sign = isProfit ? '+' : '';
   result.innerHTML = `
     <div class="stats-grid">
@@ -1524,7 +1537,7 @@ function calcCompound() {
 
   const tableRows = visibleRows.map(r => {
     const rowProfit = r.balance - r.totalContrib;
-    const rowColor = rowProfit >= 0 ? '#38a169' : '#e53e3e';
+    const rowColor = rowProfit >= 0 ? '#287a4f' : '#c53030';
     return `<tr>
       <td>${r.year}년차</td>
       <td>${fmt(r.totalContrib)}원</td>
@@ -1540,8 +1553,8 @@ function calcCompound() {
     </div>
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="label">총 납입 원금</div><div class="value">${fmt(totalContrib)}원</div></div>
-      <div class="stat-box"><div class="label">투자 수익</div><div class="value" style="color:${isProfit ? '#38a169' : '#e53e3e'};">${isProfit ? '+' : ''}${fmt(totalProfit)}원</div></div>
-      <div class="stat-box"><div class="label">수익률</div><div class="value" style="color:${isProfit ? '#38a169' : '#e53e3e'};">${isProfit ? '+' : ''}${profitPct.toFixed(1)}%</div></div>
+      <div class="stat-box"><div class="label">투자 수익</div><div class="value" style="color:${isProfit ? '#287a4f' : '#c53030'};">${isProfit ? '+' : ''}${fmt(totalProfit)}원</div></div>
+      <div class="stat-box"><div class="label">수익률</div><div class="value" style="color:${isProfit ? '#287a4f' : '#c53030'};">${isProfit ? '+' : ''}${profitPct.toFixed(1)}%</div></div>
     </div>
     <div style="overflow-x:auto;">
       <table>
@@ -1599,20 +1612,20 @@ function runLeverageSim() {
   const years = parseInt(document.getElementById('levYears').value) || 5;
   const sc = SCENARIOS[scenario];
   const result = document.getElementById('leverageResult');
-  result.innerHTML = '<div style="color:#4299e1; padding:12px;">⏳ 시뮬레이션 실행 중... (200회 시뮬레이션)</div>';
+  result.innerHTML = '<div style="color:#2b6cb0; padding:12px;">⏳ 시뮬레이션 실행 중... (200회 시뮬레이션)</div>';
   setTimeout(() => {
     const etfs = etfKey === 'COMPARE' ? ['QQQ','QLD','TQQQ'] : [etfKey];
     const rows = etfs.map(key => {
       const info = ETF_INFO[key];
       const sim = runLevSim(init, years, sc.annualReturn, sc.annualVol, info.mult, info.fee);
       const medRoi = ((sim.median - init) / init * 100).toFixed(1);
-      const medColor = sim.median >= init ? '#38a169' : '#e53e3e';
+      const medColor = sim.median >= init ? '#287a4f' : '#c53030';
       return `<tr style="border-bottom:1px solid #e2e8f0;">
         <td style="padding:10px 12px; font-weight:700;">${info.name}</td>
         <td style="padding:10px 12px; text-align:right; color:${medColor}; font-weight:700;">$${Math.round(sim.median).toLocaleString()}</td>
         <td style="padding:10px 12px; text-align:right; color:${medColor};">${medRoi >= 0 ? '+' : ''}${medRoi}%</td>
-        <td style="padding:10px 12px; text-align:right; color:#718096;">$${Math.round(sim.p25).toLocaleString()}</td>
-        <td style="padding:10px 12px; text-align:right; color:#718096;">$${Math.round(sim.p75).toLocaleString()}</td>
+        <td style="padding:10px 12px; text-align:right; color:#566275;">$${Math.round(sim.p25).toLocaleString()}</td>
+        <td style="padding:10px 12px; text-align:right; color:#566275;">$${Math.round(sim.p75).toLocaleString()}</td>
         <td style="padding:10px 12px; text-align:center;">${info.riskLabel}</td>
       </tr>`;
     }).join('');
@@ -1713,7 +1726,7 @@ function calcDCA() {
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="label">전략</div><div class="value">${strategyLabel}</div></div>
       <div class="stat-box"><div class="label">총 매수 주수</div><div class="value">${last.cumShares.toFixed(3)}주</div></div>
-      <div class="stat-box"><div class="label">예상 평균단가</div><div class="value" style="color:${achievable?'#38a169':'#e53e3e'};">$${last.cumAvgPrice.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">예상 평균단가</div><div class="value" style="color:${achievable?'#287a4f':'#c53030'};">$${last.cumAvgPrice.toFixed(2)}</div></div>
       <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
     </div>
     <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
@@ -1739,7 +1752,7 @@ function calcDCA() {
         </tr>`).join('')}</tbody>
       </table>
     </div>
-    <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ 예상 주가는 V자형 시나리오 기반으로 시뮬레이션된 값입니다. 실제 주가는 다를 수 있습니다.</p>`;
+    <p style="font-size:11px; color:#5f6e82; margin-top:8px;">⚠️ 예상 주가는 V자형 시나리오 기반으로 시뮬레이션된 값입니다. 실제 주가는 다를 수 있습니다.</p>`;
 }
 
 // 복리 계산기 초기화 — 그 페이지에서만 돌립니다.
@@ -1798,7 +1811,7 @@ const RS_QUADRANT = {
   lead:  { label: '주도',        emoji: '🔥', bg: '#f0fff4', fg: '#276749', desc: '거래대금이 늘면서 가격도 시장을 이기는 중입니다.' },
   churn: { label: '손바뀜',      emoji: '🔄', bg: '#fffaf0', fg: '#9c4221', desc: '거래는 평소보다 크게 터졌는데 가격은 시장에 뒤집니다. 사는 쪽만큼 파는 쪽도 많았다는 뜻입니다.' },
   quiet: { label: '조용한 상승', emoji: '🌱', bg: '#ebf8ff', fg: '#2c5282', desc: '거래대금은 평소보다 적은데 가격은 시장을 이깁니다. 아직 관심이 몰리지 않았습니다.' },
-  cold:  { label: '소외',        emoji: '💤', bg: '#f7fafc', fg: '#718096', desc: '거래대금도 가격도 함께 식었습니다.' },
+  cold:  { label: '소외',        emoji: '💤', bg: '#f7fafc', fg: '#566275', desc: '거래대금도 가격도 함께 식었습니다.' },
 };
 
 function rsQuadBadge(key, small) {
@@ -1812,7 +1825,7 @@ function rsQuadBadge(key, small) {
 // 배율은 1.0 이 기준선입니다. 부호(+/-)가 아니라 "몇 배"라서 rsNum 을 쓸 수 없습니다.
 // 색은 수익률과 헷갈리지 않도록 거래대금 계열의 파랑 하나만 씁니다.
 function rsMult(v) {
-  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  if (v == null) return '<span style="color:#5f6e82;">—</span>';
   const strong = v >= 1.15 || v <= 0.85;
   return `<span style="color:${strong ? rsFlowColor : rsFlat}; font-weight:${strong ? 700 : 500};">${v.toFixed(2)}x</span>`;
 }
@@ -1831,11 +1844,11 @@ function rsTurnover(millions, currency) {
 }
 
 const rsEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const rsUp = '#38a169', rsDown = '#e53e3e', rsFlat = '#a0aec0';
+const rsUp = '#287a4f', rsDown = '#c53030', rsFlat = '#5f6e82';
 
 // null 과 0 은 다릅니다. 데이터가 없으면 0% 라고 우기지 말고 — 로 둡니다.
 function rsNum(v, digits, unit) {
-  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  if (v == null) return '<span style="color:#5f6e82;">—</span>';
   const sign = v > 0 ? '+' : '';
   const color = v > 0 ? rsUp : (v < 0 ? rsDown : rsFlat);
   return `<span style="color:${color}; font-weight:600;">${sign}${v.toFixed(digits)}${unit}</span>`;
@@ -1846,18 +1859,18 @@ function rsNum(v, digits, unit) {
 // 읽힙니다. 방향은 부호로만 말하고 색은 중립 파랑 하나만 씁니다.
 const rsFlowColor = '#2b6cb0';
 function rsFlow(v, digits, unit) {
-  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  if (v == null) return '<span style="color:#5f6e82;">—</span>';
   const sign = v > 0 ? '+' : '';
   return `<span style="color:${v === 0 ? rsFlat : rsFlowColor}; font-weight:600;">${sign}${v.toFixed(digits)}${unit}</span>`;
 }
 
 function rsPlain(v, digits, unit) {
-  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  if (v == null) return '<span style="color:#5f6e82;">—</span>';
   return `${v.toFixed(digits)}${unit}`;
 }
 
 function rsRankChg(v) {
-  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
+  if (v == null) return '<span style="color:#5f6e82;">—</span>';
   if (v === 0) return `<span style="color:${rsFlat};">— 0</span>`;
   const arrow = v > 0 ? '▲' : '▼';
   return `<span style="color:${v > 0 ? rsUp : rsDown}; font-weight:600;">${arrow} ${Math.abs(v)}</span>`;
@@ -2117,7 +2130,7 @@ function renderSectorSummary() {
     `<div class="stat-box"><div class="label">${label}</div>` +
     `<div class="value" style="font-size:16px;">${name}</div>` +
     `<div style="font-size:13px; margin-top:4px;">${value}</div>` +
-    `<div style="font-size:11px; color:#718096; margin-top:2px;">${note}</div></div>`;
+    `<div style="font-size:11px; color:#566275; margin-top:2px;">${note}</div></div>`;
 
   const html = [
     tile('가장 강한 섹터', rsEsc(strongest.name),
@@ -2150,7 +2163,7 @@ function renderSectorSummary() {
         `하루 평균 ${rsTurnover(h.turnAvgM, m.currency)} · 매수·매도 금액은 늘 같습니다`));
     }
   } else if (m.hasTurnover) {
-    html.push(tile('수급이 몰린 섹터', '—', '<span style="color:#cbd5e0;">거래대금 데이터 준비 중</span>', ''));
+    html.push(tile('수급이 몰린 섹터', '—', '<span style="color:#5f6e82;">거래대금 데이터 준비 중</span>', ''));
   } else {
     // 거래대금을 비교할 수 없는 시장에서는 대신 "가장 빠르게 올라오는 섹터"를 보여줍니다.
     // 자리를 비워 두는 것보다, 같은 질문(어디로 가고 있나)에 답하는 다른 숫자가 낫습니다.
@@ -2171,7 +2184,7 @@ function renderSectorTable() {
     const active = RS.sortKey === c.key ? (RS.sortDir === -1 ? ' ▼' : ' ▲') : '';
     return `<th style="cursor:pointer; text-align:${c.align || 'center'}; white-space:nowrap;" onclick="sortSectorTable('${c.key}')">` +
       `${c.label}${active}` +
-      (c.hint ? `<div style="font-weight:400; color:#a0aec0; font-size:10px;">${c.hint}</div>` : '') +
+      (c.hint ? `<div style="font-weight:400; color:#5f6e82; font-size:10px;">${c.hint}</div>` : '') +
       `</th>`;
   }).join('');
 
@@ -2190,11 +2203,11 @@ function renderSectorTable() {
     const open = RS.openKey === s.key;
     const cells = cols.map(c => {
       if (c.key === 'name') {
-        return `<td style="text-align:left; white-space:nowrap;"><b>${rsEsc(s.name)}</b> <span style="color:#a0aec0;">${open ? '▲' : '▼'}</span></td>`;
+        return `<td style="text-align:left; white-space:nowrap;"><b>${rsEsc(s.name)}</b> <span style="color:#5f6e82;">${open ? '▲' : '▼'}</span></td>`;
       }
       if (c.key === 'rating') {
         const v = p.rating;
-        if (v == null) return '<td><span style="color:#cbd5e0;">—</span></td>';
+        if (v == null) return '<td><span style="color:#5f6e82;">—</span></td>';
         // 막대는 표를 훑을 때 눈이 먼저 잡는 부분입니다. 강한 쪽 파랑, 약한 쪽 회색.
         const fill = v >= 50 ? '' : ' zero';
         return `<td><div style="display:flex; align-items:center; gap:8px; min-width:120px;">` +
@@ -2210,7 +2223,7 @@ function renderSectorTable() {
       }
       if (c.key === 'turnMult') {
         const badge = p.turnMult == null ? ''
-          : (rsQuadBadge(p.quadrant, true) || '<span style="color:#cbd5e0;">보합</span>');
+          : (rsQuadBadge(p.quadrant, true) || '<span style="color:#5f6e82;">보합</span>');
         return `<td style="white-space:nowrap;">${rsMult(p.turnMult)}` +
           (badge ? `<br><span style="font-size:11px;">${badge}</span>` : '') + `</td>`;
       }
@@ -2220,7 +2233,7 @@ function renderSectorTable() {
       }
       return '<td></td>';
     }).join('');
-    return `<tr style="cursor:pointer;${open ? ' background:#ebf8ff;' : ''}" onclick="toggleSectorDetail('${s.key}')">${cells}</tr>`;
+    return `<tr style="cursor:pointer;${open ? ' background:#ebf8ff;' : ''}" tabindex="0" onclick="toggleSectorDetail('${s.key}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSectorDetail('${s.key}')}">${cells}</tr>`;
   }).join('');
 }
 
@@ -2257,7 +2270,7 @@ function renderSectorDetail() {
   document.getElementById('rsMembers').innerHTML =
     rsFlowPanel(s, m) +
     `<h3 style="font-size:14px; color:#4a5568; margin:0 0 8px;">구성 종목 ${rsPeriodLabel()} 수익률 ` +
-    `<span style="font-weight:400; color:#a0aec0; font-size:12px;">— 종목을 누르면 MDD 계산기로 갑니다</span></h3>` +
+    `<span style="font-weight:400; color:#5f6e82; font-size:12px;">— 종목을 누르면 MDD 계산기로 갑니다</span></h3>` +
     `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
     members.map(mem => {
       const v = mem.ret[RS.period];
@@ -2280,8 +2293,8 @@ function renderSectorDetail() {
         (extra ? ` ${extra}` : '') + `</a>`;
     }).join('') + '</div>' +
     (m.hasForeign
-      ? '<div style="font-size:11px; color:#a0aec0; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금, 외 = 외국인 소진율 변화</div>'
-      : '<div style="font-size:11px; color:#a0aec0; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금</div>');
+      ? '<div style="font-size:11px; color:#5f6e82; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금, 외 = 외국인 소진율 변화</div>'
+      : '<div style="font-size:11px; color:#5f6e82; margin-top:8px;">배율 = 평소(직전 1년) 대비 거래대금</div>');
 
   drawSectorChart(s, m);
 }
@@ -2324,9 +2337,9 @@ function rsFlowPanel(s, m) {
   const q = RS_QUADRANT[p.quadrant];
   const cell = (label, value, note) =>
     `<div style="flex:1 1 130px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px;">` +
-    `<div style="font-size:11px; color:#718096; font-weight:600;">${label}</div>` +
+    `<div style="font-size:11px; color:#566275; font-weight:600;">${label}</div>` +
     `<div style="font-size:15px; font-weight:700; color:#2d3748; margin-top:3px;">${value}</div>` +
-    (note ? `<div style="font-size:10.5px; color:#a0aec0; margin-top:2px;">${note}</div>` : '') +
+    (note ? `<div style="font-size:10.5px; color:#5f6e82; margin-top:2px;">${note}</div>` : '') +
     `</div>`;
 
   // 방향 지표는 20거래일 이상인 기간에만 있습니다. 1일·1주 창에서 "거래가 터진 날"을
@@ -2335,8 +2348,8 @@ function rsFlowPanel(s, m) {
   const gap = hasDir ? p.heavyRet - p.lightRet : null;
 
   return `<div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">` +
-    `<h3 style="font-size:14px; color:#2d3748; margin:0 0 4px;">💰 거래대금 추적 <span style="font-weight:400; color:#a0aec0; font-size:12px;">— ${rsPeriodLabel()}</span></h3>` +
-    `<div style="font-size:11.5px; color:#718096; margin-bottom:10px;">` +
+    `<h3 style="font-size:14px; color:#2d3748; margin:0 0 4px;">💰 거래대금 추적 <span style="font-weight:400; color:#5f6e82; font-size:12px;">— ${rsPeriodLabel()}</span></h3>` +
+    `<div style="font-size:11.5px; color:#566275; margin-bottom:10px;">` +
     `거래대금은 <b>산 금액과 판 금액이 언제나 같습니다</b>. 늘었다는 것은 손바뀜이 컸다는 뜻이지, ` +
     `사는 쪽이 이겼다는 뜻이 아닙니다. 아래 숫자는 그 손바뀜의 크기와 방향까지만 말해 줍니다.</div>` +
 
@@ -2366,8 +2379,8 @@ function sectorChartUnavailable(msg) {
   const wrap = document.getElementById('rsChartWrap');
   if (!wrap) return;
   wrap.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; ` +
-    `background:#f7fafc; border-radius:10px; color:#718096; font-size:13px; text-align:center; padding:16px;">` +
-    `${msg}<br><span style="font-size:12px; color:#a0aec0;">아래 표와 숫자는 정상입니다.</span></div>`;
+    `background:#f7fafc; border-radius:10px; color:#566275; font-size:13px; text-align:center; padding:16px;">` +
+    `${msg}<br><span style="font-size:12px; color:#5f6e82;">아래 표와 숫자는 정상입니다.</span></div>`;
 }
 
 function drawSectorChart(s, m) {
@@ -2377,7 +2390,7 @@ function drawSectorChart(s, m) {
     return;
   }
   // 이전에 안내 문구로 바꿔 놓았다면 캔버스를 되살립니다.
-  if (!document.getElementById('rsChart')) wrap.innerHTML = '<canvas id="rsChart"></canvas>';
+  if (!document.getElementById('rsChart')) wrap.innerHTML = '<canvas id="rsChart" role="img" aria-label="섹터별 상대강도(RS) 추이 차트"></canvas>';
 
   try {
     if (RS.chart) RS.chart.destroy();
@@ -2458,7 +2471,7 @@ const HM_STOPS = [
 ];
 
 function hmColor(v, clamp) {
-  if (v == null) return { bg: '#edf2f7', fg: '#a0aec0' };
+  if (v == null) return { bg: '#edf2f7', fg: '#5f6e82' };
   const t = Math.max(-1, Math.min(1, v / clamp));
   let lo = HM_STOPS[0], hi = HM_STOPS[HM_STOPS.length - 1];
   for (let i = 0; i < HM_STOPS.length - 1; i++) {
@@ -2723,8 +2736,8 @@ function renderHeatmap() {
   // 이 줄이 사실상 유일한 확인 수단입니다.
   const tipFor = it => {
     const sign = it.ret > 0 ? '+' : '';
-    const color = it.ret > 0 ? '#38a169' : (it.ret < 0 ? '#e53e3e' : '#718096');
-    return `<b>${rsEsc(it.name)}</b> <span style="color:#a0aec0;">(${rsEsc(it.sector)})</span> · ` +
+    const color = it.ret > 0 ? '#287a4f' : (it.ret < 0 ? '#c53030' : '#566275');
+    return `<b>${rsEsc(it.name)}</b> <span style="color:#5f6e82;">(${rsEsc(it.sector)})</span> · ` +
       `${hmPeriodLabel()} <b style="color:${color};">${sign}${it.ret.toFixed(1)}%</b>` +
       (it.turn != null ? ` · 거래대금 비중 <b>${it.turn.toFixed(2)}%</b>` : '') +
       // 칸에서 바로 그 종목의 MDD 로 갈 수 있게 합니다. 여기서 "많이 빠졌네"를 본 다음
@@ -2878,7 +2891,7 @@ function fgPrevBox(label, score) {
   return `<div class="stat-box">` +
     `<div class="label">${rsEsc(label)}</div>` +
     `<div class="value" style="color:${b ? b.color : '#cbd5e0'};">${score == null ? '—' : score}</div>` +
-    `<div style="font-size:11px; color:#718096; margin-top:4px;">${b ? rsEsc(b.label) : '이력 부족'}</div>` +
+    `<div style="font-size:11px; color:#566275; margin-top:4px;">${b ? rsEsc(b.label) : '이력 부족'}</div>` +
     `</div>`;
 }
 
@@ -2902,7 +2915,7 @@ function renderFearGreed() {
   document.getElementById('fgScore').innerHTML =
     `<div style="font-size:52px; font-weight:800; line-height:1; color:${b.color};">${m.score}</div>` +
     `<div style="font-size:20px; font-weight:700; margin-top:6px; color:${b.color};">${rsEsc(m.emoji)} ${rsEsc(m.bandLabel)}</div>` +
-    `<div style="font-size:12px; color:#718096; margin-top:6px;">` +
+    `<div style="font-size:12px; color:#566275; margin-top:6px;">` +
     `최근 ${m.history.scores.length}거래일 범위 ${m.range.min}~${m.range.max} · 평균 ${m.range.avg}</div>`;
 
   document.getElementById('fgPrev').innerHTML =
@@ -2919,10 +2932,10 @@ function renderFearGreed() {
     return `<div style="padding:12px 0; border-bottom:1px solid #edf2f7;">` +
       `<div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px;">` +
         `<div><b style="font-size:14px;">${rsEsc(c.label)}</b>` +
-        `<div style="font-size:11px; color:#a0aec0; margin-top:2px;">${rsEsc(c.hint)}</div></div>` +
+        `<div style="font-size:11px; color:#5f6e82; margin-top:2px;">${rsEsc(c.hint)}</div></div>` +
         `<div style="text-align:right; white-space:nowrap;">` +
           `<b style="font-size:18px; color:${cb ? cb.color : '#cbd5e0'};">${c.score == null ? '—' : c.score}</b>` +
-          `<div style="font-size:11px; color:#718096;">${cb ? rsEsc(cb.label) : '데이터 부족'}</div>` +
+          `<div style="font-size:11px; color:#566275;">${cb ? rsEsc(cb.label) : '데이터 부족'}</div>` +
         `</div>` +
       `</div>` +
       `<div class="bar-container" style="margin:8px 0 6px;"><div class="bar-fill${c.score != null && c.score < 50 ? ' zero' : ''}" style="width:${width}%;"></div></div>` +
@@ -2933,7 +2946,7 @@ function renderFearGreed() {
       (c.note
         ? `<div style="font-size:12px; color:#4a5568;">${rsEsc(c.note)}</div>`
         : (c.score == null
-          ? `<div style="font-size:12px; color:#a0aec0;">계산에 필요한 데이터가 모자랍니다</div>`
+          ? `<div style="font-size:12px; color:#5f6e82;">계산에 필요한 데이터가 모자랍니다</div>`
           : '')) +
       `</div>`;
   };
@@ -2945,7 +2958,7 @@ function renderFearGreed() {
     inScore.map(componentRow).join('') +
     (extras.length
       ? `<div style="margin-top:18px; padding-top:14px; border-top:2px dashed #e2e8f0;">` +
-        `<div style="font-size:12px; color:#a0aec0; margin-bottom:2px;">참고 지표 — CNN 에 없는 항목이라 <b>위 점수에는 들어가지 않습니다</b></div>` +
+        `<div style="font-size:12px; color:#5f6e82; margin-bottom:2px;">참고 지표 — CNN 에 없는 항목이라 <b>위 점수에는 들어가지 않습니다</b></div>` +
         extras.map(componentRow).join('') + `</div>`
       : '');
 
@@ -2959,13 +2972,13 @@ function drawFearGreedChart(m) {
     // 광고 차단기가 CDN 을 막으면 Chart 가 없습니다. 그때도 숫자는 멀쩡해야 하므로
     // 캔버스만 안내 문구로 바꾸고 나머지는 그대로 둡니다. (섹터 RS 화면과 같은 처리)
     wrap.innerHTML = `<div style="height:100%; display:flex; align-items:center; justify-content:center; ` +
-      `background:#f7fafc; border-radius:10px; color:#718096; font-size:13px; text-align:center; padding:16px;">` +
+      `background:#f7fafc; border-radius:10px; color:#566275; font-size:13px; text-align:center; padding:16px;">` +
       `차트를 불러오지 못했습니다. (광고 차단 확장 프로그램이 원인일 수 있습니다)<br>` +
-      `<span style="font-size:12px; color:#a0aec0;">위 점수와 구성 요소는 정상입니다.</span></div>`;
+      `<span style="font-size:12px; color:#5f6e82;">위 점수와 구성 요소는 정상입니다.</span></div>`;
     return;
   }
   if (FGP.chart) { FGP.chart.destroy(); FGP.chart = null; }
-  wrap.innerHTML = '<canvas id="fgChart"></canvas>';
+  wrap.innerHTML = '<canvas id="fgChart" role="img" aria-label="공포·탐욕 지수 추이 차트"></canvas>';
 
   const labels = m.history.dates.map(d => new Date(d * 86400000).toISOString().slice(0, 10));
   FGP.chart = new Chart(document.getElementById('fgChart'), {

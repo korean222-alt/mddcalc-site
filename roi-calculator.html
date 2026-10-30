@@ -51,7 +51,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -78,17 +78,17 @@
     <h2 class="section">💹 주식 수익률 계산기</h2>
     <div style="display:grid; gap:12px; max-width:480px; margin-bottom:16px;">
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매수가 (USD)</label>
+        <label for="roiBuy" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매수가 (USD)</label>
         <input type="number" id="roiBuy" placeholder="예: 150.00" step="0.01" oninput="calcROI()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:15px;">
       </div>
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매도가 (USD)</label>
+        <label for="roiSell" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매도가 (USD)</label>
         <input type="number" id="roiSell" placeholder="예: 200.00" step="0.01" oninput="calcROI()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:15px;">
       </div>
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">보유 수량 (주)</label>
+        <label for="roiShares" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">보유 수량 (주)</label>
         <input type="number" id="roiShares" placeholder="예: 10 (미입력 시 1주로 계산)" step="1" oninput="calcROI()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:15px;">
       </div>
@@ -109,7 +109,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8;">
       <strong>수익률</strong>은 투자한 돈 대비 "몇 %" 벌었는지를 보여주고, <strong>수익금</strong>은 실제로 손에 쥐는 "금액"이에요. 예를 들어 매수가 $50, 매도가 $60, 10주를 보유했다면 수익률은 (60-50)÷50×100 = <strong>20%</strong>이고, 수익금은 (60-50)×10 = <strong>$100</strong>입니다. 같은 20% 수익이라도 1주면 $10, 100주면 $1,000이 되니 두 숫자를 같이 봐야 실제 손익 규모를 알 수 있어요.
     </p>
-    <p style="font-size:13px; color:#718096; margin-top:12px; line-height:1.7;">
+    <p style="font-size:13px; color:#566275; margin-top:12px; line-height:1.7;">
       ⚠️ 이 계산기는 매매 수수료와 양도소득세(해외주식은 통상 22%, 연 250만원 공제 후)를 반영하지 않은 <strong>세전·수수료 제외 단순 수익률</strong>입니다. 실제 손에 들어오는 금액은 이보다 적을 수 있으니, 매도 전에는 증권사 앱에서 세금·수수료까지 포함한 예상 정산 금액을 함께 확인하세요.
     </p>
   </div>
@@ -133,14 +133,14 @@
     <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
       <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">$250에 40주를 사서 $310에 판 경우입니다.</p>
       <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
-        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">값</th></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">투자 원금</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$10,000 ($250 × 40주)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">매도 금액</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$12,400 ($310 × 40주)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">수익률</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>+24.00%</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">수익금</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>+$2,400.00</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">원화 환산 수익</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>+₩3,312,000 (환율 1,380원 기준)</strong></td></tr>
       </table>
-      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">해외 주식은 수익률이 두 개입니다. 달러 기준 +24%와, 환율까지 반영한 원화 기준 수익률입니다. 매수 시점보다 환율이 내려가면 달러로는 벌고도 원화로는 덜 벌 수 있습니다.</p>
+      <p style="font-size:12px; color:#566275; line-height:1.7; margin:10px 0 0;">해외 주식은 수익률이 두 개입니다. 달러 기준 +24%와, 환율까지 반영한 원화 기준 수익률입니다. 매수 시점보다 환율이 내려가면 달러로는 벌고도 원화로는 덜 벌 수 있습니다.</p>
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 배당도 수익률에 포함해야 하나요?</strong><br>네. 총수익률(Total Return)은 시세 차익에 배당을 더해 계산합니다. 배당을 빼고 비교하면 배당주의 성과가 실제보다 낮아 보입니다.</p>
@@ -148,7 +148,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 환율이 수익률에 얼마나 영향을 주나요?</strong><br>작지 않습니다. 달러 기준 +24%를 벌어도 매수 때 1,400원이던 환율이 매도 때 1,300원이 되면 원화 수익률은 약 +15%로 줄어듭니다. 반대로 환율이 오르면 달러 손실이 원화로는 만회되기도 합니다. 해외 주식은 종목과 환율 두 가지에 동시에 투자하는 셈입니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 해외 주식 양도소득세는 어떻게 계산되나요?</strong><br>1년간 실현한 매매 차익을 모두 합산해 250만원을 공제한 뒤, 남은 금액에 22%(지방소득세 포함)가 부과됩니다. 손실 난 종목이 있으면 이익과 상계됩니다. 팔지 않고 보유만 하고 있으면 과세되지 않습니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 수수료를 빼고 계산하려면 어떻게 하나요?</strong><br>매수가에는 수수료를 더하고 매도가에서는 수수료를 뺀 값을 넣으시면 실제 손익에 가까워집니다. 예를 들어 매수 수수료가 주당 $0.25였다면 매수가를 $250.25로 입력하는 식입니다. 환전 스프레드도 함께 고려하시면 더 정확합니다.</p>
-    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 세금 관련 내용은 일반적인 정보이며 개인별 상황과 세법 개정에 따라 달라질 수 있습니다. 본 도구의 결과는 교육 목적이며 투자 권유가 아닙니다.</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:14px;">⚠️ 세금 관련 내용은 일반적인 정보이며 개인별 상황과 세법 개정에 따라 달라질 수 있습니다. 본 도구의 결과는 교육 목적이며 투자 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->

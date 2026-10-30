@@ -92,7 +92,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -119,7 +119,7 @@
     <div class="controls" style="margin-bottom:0;">
       <div class="mode-toggle" id="fgMarketToggle"></div>
     </div>
-    <div id="fgMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
+    <div id="fgMeta" style="font-size:12px; color:#566275; margin-top:10px;"></div>
     <!-- 갱신 시각·주기. 섹터 RS·히트맵과 같은 문구를 같은 함수가 만듭니다. -->
     <div id="fgUpdate" style="font-size:12px; color:#4a5568; margin-top:6px; padding-top:8px; border-top:1px solid #edf2f7;"></div>
   </div>
@@ -136,7 +136,7 @@
 
     <div class="card">
       <h2 class="section">🧩 무엇이 이 점수를 만들었나</h2>
-      <div style="font-size:12px; color:#718096; margin-bottom:4px;">
+      <div style="font-size:12px; color:#566275; margin-bottom:4px;">
         지표 각각을 <b>평균에서 몇 표준편차 떨어져 있는지</b>로 0~100 환산한 뒤 <b>동일 가중</b> 평균한 값이 위 점수입니다
         (CNN 의 구성 아이디어를 참고한 자체 지수). 한국 지표에는 환산 전의 실제 값을 함께 적었습니다 —
         CNN 은 지표별 원본 값을 공개하지 않아 미국 탭에는 점수만 있습니다.
@@ -146,10 +146,10 @@
 
     <div class="card">
       <h2 class="section">📉 지수 흐름</h2>
-      <div style="font-size:12px; color:#718096; margin-bottom:10px;">
+      <div style="font-size:12px; color:#566275; margin-bottom:10px;">
         오늘 점수 하나만으로는 높은지 낮은지 알 수 없습니다. 같은 시장의 최근 흐름 위에서 보세요.
       </div>
-      <div class="chart-wrap" id="fgChartWrap"><canvas id="fgChart"></canvas></div>
+      <div class="chart-wrap" id="fgChartWrap"><canvas id="fgChart" role="img" aria-label="공포·탐욕 지수 추이 차트"></canvas></div>
     </div>
   </div>
 
@@ -158,7 +158,7 @@
       <h2 class="section">📌 2026-10-29 기준 요약</h2>
             <p style="font-size:14px; color:#4a5568; line-height:1.9; margin-bottom:10px;">🇰🇷 <b>한국</b> 공포·탐욕 지수는 CNN 의 구성 아이디어를 참고한 자체 지수로 계산해 <b>15점 — 극단적 공포</b> 구간입니다 (어제 18, 1주 전 16, 1개월 전 44). 지표별로는 시장 모멘텀 2, 주가 강도 5, 주가 폭 7, 시장 변동성 48, 안전자산 선호 11 입니다.</p>
       <p style="font-size:14px; color:#4a5568; line-height:1.9; margin-bottom:10px;">🇺🇸 <b>미국</b> 공포·탐욕 지수는 <a href="https://www.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener nofollow">CNN Business</a> 공식 값으로 <b>35점 — 공포</b> 구간입니다 (어제 36, 1주 전 20, 1개월 전 31). 지표별로는 시장 모멘텀 35, 주가 강도 32, 주가 폭 35, 풋/콜 옵션 30, 시장 변동성 50, 정크본드 수요 50, 안전자산 선호 10 입니다.</p>
-      <p style="font-size:11px; color:#a0aec0; margin-top:10px;">이 요약은 매 거래일 자동으로 갱신됩니다. 위 화면은 같은 데이터를 기간·시장을 바꿔가며 보여줍니다.</p>
+      <p style="font-size:11px; color:#5f6e82; margin-top:10px;">이 요약은 매 거래일 자동으로 갱신됩니다. 위 화면은 같은 데이터를 기간·시장을 바꿔가며 보여줍니다.</p>
     </section>
     <!-- FG_SUMMARY_END -->
 
@@ -168,22 +168,22 @@
       <div class="stat-box">
         <div class="label">0 ~ 24</div>
         <div class="value" style="color:#c53030;">😱 극단적 공포</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">거의 모든 구성 요소가 평소보다 나쁜 쪽으로 치우친 상태입니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">거의 모든 구성 요소가 평소보다 나쁜 쪽으로 치우친 상태입니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">25 ~ 44</div>
-        <div class="value" style="color:#dd6b20;">😨 공포</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">시장이 움츠러들어 있습니다. 방어주로 돈이 숨는 구간에서 자주 나옵니다.</div>
+        <div class="value" style="color:#b45309;">😨 공포</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">시장이 움츠러들어 있습니다. 방어주로 돈이 숨는 구간에서 자주 나옵니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">45 ~ 55</div>
-        <div class="value" style="color:#718096;">😐 중립</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">평소와 비슷합니다. 이 지수로 말할 수 있는 게 별로 없는 구간입니다.</div>
+        <div class="value" style="color:#566275;">😐 중립</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">평소와 비슷합니다. 이 지수로 말할 수 있는 게 별로 없는 구간입니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">56 ~ 100</div>
-        <div class="value" style="color:#38a169;">🙂 🤑 탐욕</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">위험을 기꺼이 지는 구간입니다. 75를 넘으면 극단적 탐욕입니다.</div>
+        <div class="value" style="color:#287a4f;">🙂 🤑 탐욕</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">위험을 기꺼이 지는 구간입니다. 75를 넘으면 극단적 탐욕입니다.</div>
       </div>
     </div>
     <div class="info-banner" style="margin-top:12px;">
@@ -224,7 +224,7 @@
         </ul>
         <p style="margin-top:8px;">따라서 <b>CNN 이 같은 날 한국 지수를 계산했다면 나왔을 값과 일치한다고
         보장할 수 없습니다.</b> 아래 표에 어떤 지표를 무엇으로 대체했고 무엇을 뺐는지 그대로 적어 두었습니다.</p>
-        <p style="margin-top:8px; color:#718096;">CNN 값을 받지 못한 날에는 미국도 같은 방식으로 계산해 채우고,
+        <p style="margin-top:8px; color:#566275;">CNN 값을 받지 못한 날에는 미국도 같은 방식으로 계산해 채우고,
         화면 위 안내줄에 "직접 계산했습니다"라고 적힙니다. 남의 서버가 막혔다고 탭이 사라지면
         우리가 고장 난 것처럼 보이기 때문입니다.</p>
       </div>
@@ -245,8 +245,8 @@
               <tr><td style="text-align:left;">주가 폭</td><td style="text-align:left;">오른 날·내린 날에 실린 거래대금 — <b>그대로</b></td></tr>
               <tr><td style="text-align:left;">시장 변동성</td><td style="text-align:left;">VIX 대신 <b>코스피 20일 실현변동성</b> (비교 방식은 같은 50일 평균 대비)</td></tr>
               <tr><td style="text-align:left;">안전자산 선호</td><td style="text-align:left;">코스피 vs <b>국고채10년 ETF</b> 20거래일 수익률 차이</td></tr>
-              <tr><td style="text-align:left; color:#a0aec0;">풋/콜 옵션</td><td style="text-align:left; color:#a0aec0;">없음 — 국내 옵션 데이터 미보유</td></tr>
-              <tr><td style="text-align:left; color:#a0aec0;">정크본드 수요</td><td style="text-align:left; color:#a0aec0;">없음 — 국내 하이일드 스프레드 미보유</td></tr>
+              <tr><td style="text-align:left; color:#5f6e82;">풋/콜 옵션</td><td style="text-align:left; color:#5f6e82;">없음 — 국내 옵션 데이터 미보유</td></tr>
+              <tr><td style="text-align:left; color:#5f6e82;">정크본드 수요</td><td style="text-align:left; color:#5f6e82;">없음 — 국내 하이일드 스프레드 미보유</td></tr>
             </tbody>
           </table>
         </div>

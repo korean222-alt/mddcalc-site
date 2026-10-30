@@ -51,7 +51,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -79,7 +79,7 @@
     <div style="display:grid; gap:12px; max-width:560px; margin-bottom:16px;">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">ETF 선택</label>
+          <label for="levEtf" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">ETF 선택</label>
           <select id="levEtf" style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
             <option value="QQQ">QQQ (1x)</option>
             <option value="QLD">QLD (2x)</option>
@@ -88,7 +88,7 @@
           </select>
         </div>
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">시나리오</label>
+          <label for="levScenario" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">시나리오</label>
           <select id="levScenario" style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
             <option value="bull">📈 강세 (+20%/년)</option>
             <option value="base" selected>📊 기본 (+12%/년)</option>
@@ -99,12 +99,12 @@
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">초기 투자금 (USD)</label>
+          <label for="levInvestment" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">초기 투자금 (USD)</label>
           <input type="number" id="levInvestment" value="10000" min="100" step="100"
             style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
         </div>
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">투자 기간 (년)</label>
+          <label for="levYears" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">투자 기간 (년)</label>
           <input type="number" id="levYears" value="5" min="1" max="20" step="1"
             style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
         </div>
@@ -143,14 +143,14 @@
     <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
       <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">지수가 하루 −10% 빠진 뒤 다음 날 +11.1% 올라 <b>정확히 제자리로</b> 돌아온 상황을 3배 ETF와 비교해 보겠습니다.</p>
       <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
-        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">값</th></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">지수 첫날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>100 → 90 (−10%)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">지수 둘째 날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>90 → 100 (+11.1%) — 본전</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">3배 ETF 첫날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>100 → 70 (−30%)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">3배 ETF 둘째 날</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>70 → 93.3 (+33.3%)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">이틀 뒤 결과</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>지수 0%, 3배 ETF <b>−6.7%</b></strong></td></tr>
       </table>
-      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">지수는 본전인데 3배 상품만 손실이 남았습니다. 매일 배수를 다시 맞추기 때문에 생기는 현상이고, 이것을 변동성 감쇠(volatility decay)라고 합니다. 등락이 반복될수록 손실이 쌓이므로, 3배 상품의 장기 수익률은 지수 수익률의 3배가 아닙니다.</p>
+      <p style="font-size:12px; color:#566275; line-height:1.7; margin:10px 0 0;">지수는 본전인데 3배 상품만 손실이 남았습니다. 매일 배수를 다시 맞추기 때문에 생기는 현상이고, 이것을 변동성 감쇠(volatility decay)라고 합니다. 등락이 반복될수록 손실이 쌓이므로, 3배 상품의 장기 수익률은 지수 수익률의 3배가 아닙니다.</p>
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 레버리지 ETF는 장기 투자에 적합한가요?</strong><br>일반적으로 레버리지 ETF는 단기 트레이딩 도구로 설계되었으며, 운용사들도 장기 보유 시 기초지수 배수와 괴리가 커질 수 있음을 명시하고 있습니다. 장기 보유를 고려한다면 변동성 잠식과 최대 -80~-90%에 이를 수 있는 하락폭을 감내할 수 있는지 신중히 판단해야 합니다.</p>
@@ -158,7 +158,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 그럼 레버리지 ETF는 오래 들고 있으면 안 되나요?</strong><br>방향이 한쪽으로 꾸준히 이어지면 장기 보유가 배수보다 더 큰 수익을 내기도 합니다. 문제는 <b>오르내림이 반복되는 구간</b>입니다. 위 예시처럼 지수가 제자리여도 손실이 남기 때문에, 횡보장이 길어질수록 불리해집니다. 방향을 확신할 수 없다면 보유 기간이 길수록 위험이 커집니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 3배 상품이 −90% 빠지면 어떻게 되나요?</strong><br>원금을 되찾으려면 저점에서 +900%가 필요합니다. 실제로 SOXL은 2021년 12월 고점에서 −90.5%까지 빠졌고, 전고점을 회복하는 데 1,274일이 걸렸습니다. 기초지수가 회복해도 감쇠 때문에 레버리지 상품의 회복은 훨씬 오래 걸립니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 인버스(−3배)는 하락장에서 안전한가요?</strong><br>아닙니다. 인버스도 같은 감쇠를 겪고, 방향이 반대일 뿐입니다. 게다가 주식시장이 장기적으로 우상향해 온 만큼 인버스는 시간이 갈수록 구조적으로 불리합니다. 하락을 맞혀도 시점이 어긋나면 손실이 납니다.</p>
-    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 레버리지 상품은 원금 대부분을 잃을 수 있는 고위험 상품입니다. 본 도구의 결과는 교육 목적의 시뮬레이션이며 투자 권유가 아닙니다.</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:14px;">⚠️ 레버리지 상품은 원금 대부분을 잃을 수 있는 고위험 상품입니다. 본 도구의 결과는 교육 목적의 시뮬레이션이며 투자 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->

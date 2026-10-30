@@ -60,7 +60,7 @@ function card(dateLabel, inner, note) {
   return `    <section class="card" style="background:#f7fafc;">
       <h2 class="section">📌 ${esc(dateLabel)} 기준 요약</h2>
       ${inner}
-      <p style="font-size:11px; color:#a0aec0; margin-top:10px;">${note}</p>
+      <p style="font-size:11px; color:#5f6e82; margin-top:10px;">${note}</p>
     </section>`;
 }
 

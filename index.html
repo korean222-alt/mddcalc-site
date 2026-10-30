@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MDD 계산기 — 고점 대비 하락률 분석기 | 무료 주식 도구</title>
-<meta name="description" content="TSLA, NVDA 등 미국 주식의 고점 대비 하락률(MDD)을 무료로 계산하는 주식 하락 및 회복 패턴 분석 도구입니다.">
+<title>MDD 계산기 — 주식 고점 대비 하락률(최대낙폭) 조회 사이트</title>
+<meta name="description" content="삼성전자·SK하이닉스·코스피 같은 한국 주식과 TSLA·NVDA·SPY 같은 미국 주식의 MDD(최대낙폭, 고점 대비 하락률)를 무료로 계산하는 사이트입니다. 회원가입 없이 종목만 입력하면 하락폭과 회복 기간을 바로 보여 줍니다.">
 <meta name="robots" content="index, follow">
 <meta name="naver-site-verification" content="5608bbcdc4ea6aa3460c24bd203c34e556942c11" />
 <link rel="canonical" href="https://mddcalc.com/">
 <link rel="alternate" type="application/rss+xml" title="MDD 분석기 블로그" href="https://mddcalc.com/rss.xml">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="website">
-<meta property="og:title" content="MDD 계산기 — 고점 대비 하락률 분석기">
-<meta property="og:description" content="TSLA, NVDA 등 미국 주식의 고점 대비 하락률(MDD)을 무료로 계산하는 주식 하락 및 회복 패턴 분석 도구입니다.">
+<meta property="og:title" content="MDD 계산기 — 주식 고점 대비 하락률 조회">
+<meta property="og:description" content="삼성전자·SK하이닉스·코스피 같은 한국 주식과 TSLA·NVDA·SPY 같은 미국 주식의 MDD(최대낙폭, 고점 대비 하락률)를 무료로 계산하는 사이트입니다. 회원가입 없이 종목만 입력하면 하락폭과 회복 기간을 바로 보여 줍니다.">
 <meta property="og:url" content="https://mddcalc.com/">
 <meta property="og:site_name" content="MDD 분석기">
 <meta property="og:locale" content="ko_KR">
@@ -25,8 +25,8 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="MDD 분석기 — 고점 대비 얼마나 떨어졌을까?">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MDD 계산기 — 고점 대비 하락률 분석기">
-<meta name="twitter:description" content="TSLA, NVDA 등 미국 주식의 고점 대비 하락률(MDD)을 무료로 계산하는 주식 하락 및 회복 패턴 분석 도구입니다.">
+<meta name="twitter:title" content="MDD 계산기 — 주식 고점 대비 하락률 조회">
+<meta name="twitter:description" content="삼성전자·SK하이닉스·코스피 같은 한국 주식과 TSLA·NVDA·SPY 같은 미국 주식의 MDD(최대낙폭, 고점 대비 하락률)를 무료로 계산하는 사이트입니다. 회원가입 없이 종목만 입력하면 하락폭과 회복 기간을 바로 보여 줍니다.">
 <meta name="twitter:image" content="https://mddcalc.com/og-image.jpg">
 <script type="application/ld+json">
 {
@@ -50,7 +50,7 @@
          background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.5; padding: 16px; }
   .container { max-width: 1200px; margin: 0 auto; }
   h1 { font-size: 28px; margin-bottom: 6px; color: #2d3748; }
-  .subtitle { color: #718096; margin-bottom: 20px; font-size: 14px; }
+  .subtitle { color: #566275; margin-bottom: 20px; font-size: 14px; }
 
   .card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px;
           box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -99,10 +99,13 @@
               border-radius: 20px; padding: 6px 6px 6px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
               transition: background 0.2s; }
   .fav-chip:hover { background: #bee3f8; }
-  .fav-chip .fav-remove { background: none; border: none; color: #63b3ed; font-size: 15px; cursor: pointer;
+  .fav-chip .fav-load { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 3px solid #2b6cb0; outline-offset: 2px; }
+  .site-header a:focus-visible, .site-header button:focus-visible, .site-footer a:focus-visible { outline-color: #90cdf4; }
+  .fav-chip .fav-remove { background: none; border: none; color: #2b6cb0; font-size: 15px; cursor: pointer;
                            padding: 2px 6px; line-height: 1; border-radius: 50%; }
-  .fav-chip .fav-remove:hover { color: #e53e3e; background: rgba(255,255,255,0.6); }
-  .fav-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #cbd5e0; padding: 0 4px;
+  .fav-chip .fav-remove:hover { color: #c53030; background: rgba(255,255,255,0.6); }
+  .fav-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #5f6e82; padding: 0 4px;
              line-height: 1; transition: color 0.2s, transform 0.15s; vertical-align: middle; }
   .fav-btn:hover { transform: scale(1.15); }
   .fav-btn.active { color: #f6ad55; }
@@ -112,21 +115,21 @@
   .controls input[type=date] { padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; }
   .preset-btn { padding: 6px 12px; background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 6px;
                 cursor: pointer; font-size: 12px; }
-  .preset-btn.active { background: #4299e1; color: #fff; border-color: #4299e1; }
+  .preset-btn.active { background: #2b6cb0; color: #fff; border-color: #2b6cb0; }
   .mode-toggle { display: inline-flex; background: #edf2f7; border-radius: 8px; padding: 3px; }
   .mode-toggle button { padding: 6px 14px; border: none; background: transparent; cursor: pointer;
                         border-radius: 6px; font-size: 13px; font-weight: 600; }
-  .mode-toggle button.active { background: #4299e1; color: #fff; }
+  .mode-toggle button.active { background: #2b6cb0; color: #fff; }
 
   .hero { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center;
           text-align: center; padding: 24px 16px; }
-  .hero-box h3 { font-size: 12px; color: #718096; font-weight: 600; margin-bottom: 6px; }
+  .hero-box h3 { font-size: 12px; color: #566275; font-weight: 600; margin-bottom: 6px; }
   .hero-box .big { font-size: 28px; font-weight: 800; color: #2d3748; }
-  .hero-box .sub { font-size: 12px; color: #718096; margin-top: 4px; }
-  .hero .arrow { font-size: 24px; color: #a0aec0; }
-  .hero-dd { color: #e53e3e !important; }
-  .hero-dd.mild { color: #d69e2e !important; }
-  .hero-dd.small { color: #38a169 !important; }
+  .hero-box .sub { font-size: 12px; color: #566275; margin-top: 4px; }
+  .hero .arrow { font-size: 24px; color: #5f6e82; }
+  .hero-dd { color: #c53030 !important; }
+  .hero-dd.mild { color: #975a16 !important; }
+  .hero-dd.small { color: #287a4f !important; }
 
   .signal-card { padding: 20px; border-radius: 12px; text-align: center; margin-top: 14px; }
   .signal-strong { background: #fed7d7; border: 2px solid #e53e3e; }
@@ -140,8 +143,8 @@
   .share-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
   .share-img-btn { background: #3182ce; color: #fff; font-size: 13px; padding: 9px 16px; }
   .share-img-btn:hover { background: #2b6cb0; }
-  .share-status { font-size: 12px; color: #38a169; }
-  .share-hint { font-size: 11px; color: #a0aec0; margin-top: 6px; }
+  .share-status { font-size: 12px; color: #287a4f; }
+  .share-hint { font-size: 11px; color: #5f6e82; margin-top: 6px; }
 
   /* 캡처 미리보기 창. 캡처가 끝난 뒤 여기서 한 번 더 눌러 저장/공유한다.
      이렇게 나눠둔 이유: iOS 사파리는 navigator.share 를 사용자가 누른 직후에만 허용하는데,
@@ -154,7 +157,7 @@
                       padding: 12px 14px; border-bottom: 1px solid #e2e8f0;
                       font-size: 15px; font-weight: 800; color: #2d3748; }
   .share-modal-close { background: none; border: none; font-size: 18px; cursor: pointer;
-                       color: #718096; padding: 4px 8px; line-height: 1; }
+                       color: #566275; padding: 4px 8px; line-height: 1; }
   .share-modal-body { overflow-y: auto; background: #eef2f7; padding: 10px; flex: 1;
                       -webkit-overflow-scrolling: touch; }
   .share-modal-body img { display: block; width: 100%; height: auto; border-radius: 8px;
@@ -165,7 +168,7 @@
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
   .stat-box { background: #f7fafc; padding: 14px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
-  .stat-box .label { font-size: 11px; color: #718096; margin-bottom: 4px; font-weight: 600; }
+  .stat-box .label { font-size: 11px; color: #566275; margin-bottom: 4px; font-weight: 600; }
   .stat-box .value { font-size: 18px; font-weight: 700; color: #2d3748; }
 
   .target-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
@@ -182,7 +185,7 @@
   th, td { padding: 10px; text-align: center; border-bottom: 1px solid #e2e8f0; }
   th { background: #f7fafc; font-size: 12px; color: #4a5568; font-weight: 700; }
   tr.current { background: #fefcbf !important; font-weight: 700; }
-  tr.never { color: #a0aec0; }
+  tr.never { color: #5f6e82; }
   .bar-container { background: #edf2f7; height: 14px; border-radius: 7px; overflow: hidden; }
   .bar-fill { height: 100%; background: linear-gradient(90deg, #4299e1, #3182ce); }
   .bar-fill.zero { background: #cbd5e0; }
@@ -196,7 +199,7 @@
 
   h2.section { font-size: 18px; margin-bottom: 12px; color: #2d3748; }
   .chart-wrap { position: relative; height: 320px; }
-  .loading { display: none; text-align: center; padding: 30px; color: #718096; }
+  .loading { display: none; text-align: center; padding: 30px; color: #566275; }
   .loading.show { display: block; }
   .hidden { display: none !important; }
 
@@ -242,7 +245,7 @@
   .footer-col a:hover { color: #fff; }
   .footer-col p { font-size: 12px; line-height: 1.6; }
   .footer-bottom { border-top: 1px solid #4a5568; padding-top: 16px; font-size: 12px; text-align: center; }
-  .footer-disclaimer { font-size: 11px; color: #718096; margin-top: 8px; line-height: 1.5; }
+  .footer-disclaimer { font-size: 11px; color: #a0aec0; margin-top: 8px; line-height: 1.5; }
 
   /* 페이지 콘텐츠 */
   .page { display: none; }
@@ -258,10 +261,10 @@
   .blog-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
   .blog-card-img { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
   .blog-card-body { padding: 16px; }
-  .blog-card-tag { font-size: 11px; font-weight: 700; color: #4299e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .blog-card-tag { font-size: 11px; font-weight: 700; color: #2b6cb0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .blog-card-title { font-size: 15px; font-weight: 700; color: #2d3748; margin-bottom: 8px; line-height: 1.4; }
-  .blog-card-excerpt { font-size: 12px; color: #718096; line-height: 1.6; }
-  .blog-card-meta { font-size: 11px; color: #a0aec0; margin-top: 10px; }
+  .blog-card-excerpt { font-size: 12px; color: #566275; line-height: 1.6; }
+  .blog-card-meta { font-size: 11px; color: #5f6e82; margin-top: 10px; }
 
   /* 블로그 상세 */
   .blog-article { max-width: 780px; margin: 0 auto; }
@@ -273,10 +276,10 @@
   .blog-article li { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 6px; }
   .blog-article .highlight-box { background: #ebf8ff; border-left: 4px solid #4299e1; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
   .blog-article .highlight-box p { margin: 0; }
-  .blog-article .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #4299e1; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+  .blog-article .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #2b6cb0; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
   .blog-article .back-btn:hover { color: #2b6cb0; }
   .blog-article table { margin: 16px 0; }
-  .blog-article .article-meta { font-size: 13px; color: #a0aec0; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+  .blog-article .article-meta { font-size: 13px; color: #5f6e82; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
 
   /* 관련 글 & CTA */
   .related-posts { max-width: 780px; margin: 40px auto 0; padding-top: 28px; border-top: 1px solid #e2e8f0; }
@@ -284,7 +287,7 @@
   .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
   .related-card { background: #f7fafc; border-radius: 10px; padding: 14px; cursor: pointer; transition: background 0.2s; }
   .related-card:hover { background: #edf2f7; }
-  .related-card-tag { font-size: 10px; font-weight: 700; color: #4299e1; text-transform: uppercase; margin-bottom: 6px; }
+  .related-card-tag { font-size: 10px; font-weight: 700; color: #2b6cb0; text-transform: uppercase; margin-bottom: 6px; }
   .related-card-title { font-size: 13px; font-weight: 600; color: #2d3748; line-height: 1.5; }
   .blog-cta { max-width: 780px; margin: 24px auto 0; background: linear-gradient(135deg, #4299e1, #3182ce); border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .blog-cta-text { color: #fff; font-size: 14px; font-weight: 600; }
@@ -297,7 +300,7 @@
   .tool-card:hover { transform: translateY(-2px); }
   .tool-card .tool-icon { font-size: 36px; margin-bottom: 12px; }
   .tool-card h3 { font-size: 16px; font-weight: 700; color: #2d3748; margin-bottom: 8px; }
-  .tool-card p { font-size: 13px; color: #718096; line-height: 1.6; }
+  .tool-card p { font-size: 13px; color: #566275; line-height: 1.6; }
   .tool-badge { display: inline-block; background: #c6f6d5; color: #276749; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-top: 10px; }
 
   /* About/Contact/Policy 페이지 */
@@ -309,15 +312,15 @@
   .prose li { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 4px; }
   .contact-form input, .contact-form textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
   .contact-form textarea { height: 120px; resize: vertical; }
-  .contact-form .submit-btn { background: #4299e1; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .contact-form .submit-btn:hover { background: #3182ce; }
+  .contact-form .submit-btn { background: #2b6cb0; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .contact-form .submit-btn:hover { background: #2c5282; }
 </style>
 </head>
 <body>
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -344,7 +347,7 @@
   <div class="card api-panel">
     <h2>🔑 1단계: 종목 입력 (미국 · 한국)</h2>
     <div class="api-row">
-      <label>종목</label>
+      <label for="ticker">종목</label>
       <input type="text" id="ticker" placeholder="예: TSLA, NVDA, SPY / 005930, 삼성전자, SK하이닉스">
       <button class="btn btn-primary" onclick="loadData()">📡 데이터 불러오기</button>
     </div>
@@ -371,7 +374,7 @@
         <div style="margin-bottom:8px;"><b>코스피</b> (80) — <span class="kr-name">삼성전자</span>, <span class="kr-name">SK하이닉스</span>, <span class="kr-name">DB하이텍</span>, <span class="kr-name">LG에너지솔루션</span>, <span class="kr-name">삼성바이오로직스</span>, <span class="kr-name">현대차</span>, <span class="kr-name">기아</span>, <span class="kr-name">셀트리온</span>, <span class="kr-name">NAVER</span>, <span class="kr-name">카카오</span>, <span class="kr-name">LG화학</span>, <span class="kr-name">삼성SDI</span>, <span class="kr-name">POSCO홀딩스</span>, <span class="kr-name">현대모비스</span>, <span class="kr-name">HL만도</span>, <span class="kr-name">한국타이어앤테크놀로지</span>, <span class="kr-name">LG전자</span>, <span class="kr-name">삼성전기</span>, <span class="kr-name">삼성물산</span>, <span class="kr-name">SK</span>, <span class="kr-name">LG</span>, <span class="kr-name">SK스퀘어</span>, <span class="kr-name">KB금융</span>, <span class="kr-name">신한지주</span>, <span class="kr-name">하나금융지주</span>, <span class="kr-name">우리금융지주</span>, <span class="kr-name">기업은행</span>, <span class="kr-name">삼성생명</span>, <span class="kr-name">삼성화재</span>, <span class="kr-name">카카오뱅크</span>, <span class="kr-name">미래에셋증권</span>, <span class="kr-name">삼성증권</span>, <span class="kr-name">한국금융지주</span>, <span class="kr-name">키움증권</span>, <span class="kr-name">한국전력</span>, <span class="kr-name">두산에너빌리티</span>, <span class="kr-name">한화에어로스페이스</span>, <span class="kr-name">한화오션</span>, <span class="kr-name">HD한국조선해양</span>, <span class="kr-name">HD현대중공업</span>, <span class="kr-name">한국항공우주</span>, <span class="kr-name">고려아연</span>, <span class="kr-name">SK이노베이션</span>, <span class="kr-name">HMM</span>, <span class="kr-name">대한항공</span>, <span class="kr-name">현대건설</span>, <span class="kr-name">현대로템</span>, <span class="kr-name">LIG넥스원</span>, <span class="kr-name">삼성중공업</span>, <span class="kr-name">HD현대미포</span>, <span class="kr-name">HD현대일렉트릭</span>, <span class="kr-name">효성중공업</span>, <span class="kr-name">LS ELECTRIC</span>, <span class="kr-name">대우건설</span>, <span class="kr-name">GS건설</span>, <span class="kr-name">롯데케미칼</span>, <span class="kr-name">금호석유</span>, <span class="kr-name">현대제철</span>, <span class="kr-name">팬오션</span>, <span class="kr-name">SK텔레콤</span>, <span class="kr-name">KT</span>, <span class="kr-name">LG유플러스</span>, <span class="kr-name">KT&G</span>, <span class="kr-name">CJ제일제당</span>, <span class="kr-name">이마트</span>, <span class="kr-name">아모레퍼시픽</span>, <span class="kr-name">한국콜마</span>, <span class="kr-name">코스맥스</span>, <span class="kr-name">더존비즈온</span>, <span class="kr-name">한미약품</span>, <span class="kr-name">유한양행</span>, <span class="kr-name">두산로보틱스</span>, <span class="kr-name">크래프톤</span>, <span class="kr-name">하이브</span>, <span class="kr-name">엔씨소프트</span>, <span class="kr-name">넷마블</span>, <span class="kr-name">한미반도체</span>, <span class="kr-name">KODEX 200</span>, <span class="kr-name">KODEX 레버리지</span>, <span class="kr-name">KOSEF 국고채10년</span></div>
         <div style="margin-bottom:8px;"><b>코스닥</b> (20) — <span class="kr-name">에코프로비엠</span>, <span class="kr-name">에코프로</span>, <span class="kr-name">알테오젠</span>, <span class="kr-name">HLB</span>, <span class="kr-name">리노공업</span>, <span class="kr-name">레인보우로보틱스</span>, <span class="kr-name">펄어비스</span>, <span class="kr-name">카카오게임즈</span>, <span class="kr-name">에스엠</span>, <span class="kr-name">이오테크닉스</span>, <span class="kr-name">원익IPS</span>, <span class="kr-name">위메이드</span>, <span class="kr-name">엘앤에프</span>, <span class="kr-name">ISC</span>, <span class="kr-name">HPSP</span>, <span class="kr-name">안랩</span>, <span class="kr-name">한글과컴퓨터</span>, <span class="kr-name">와이지엔터테인먼트</span>, <span class="kr-name">JYP Ent.</span>, <span class="kr-name">로보티즈</span></div>
         <div style="margin-bottom:8px;"><b>지수</b> (2) — <span class="kr-name">코스피</span>, <span class="kr-name">코스닥</span></div>
-        <div style="margin-top:8px; color:#718096;">목록에 없는 종목도 6자리 코드로 요청해 주시면 추가합니다.</div>
+        <div style="margin-top:8px; color:#566275;">목록에 없는 종목도 6자리 코드로 요청해 주시면 추가합니다.</div>
       </div>
       <!-- KR_SUPPORTED_END -->
     </details>
@@ -407,7 +410,7 @@
         🟡 <b>-10% ~ -20%</b> : 흔히 조정(correction)이라고 부르는 범위<br>
         🟠 <b>-20% ~ -30%</b> : 흔히 약세장(bear market)이라고 부르는 범위<br>
         🔥 <b>-30% 이하</b> : 과거 사례가 드문 깊은 하락 범위<br>
-        <span style="color:#718096;">구간 이름은 시장에서 통용되는 명칭일 뿐이고, 어느 구간이 매수·매도에 적절한지를 뜻하지 않습니다.
+        <span style="color:#566275;">구간 이름은 시장에서 통용되는 명칭일 뿐이고, 어느 구간이 매수·매도에 적절한지를 뜻하지 않습니다.
         같은 −20%라도 종목마다 얼마나 자주 일어나는 일인지가 크게 다르므로, 아래 <b>구간별 회복률</b>과 <b>역대 낙폭 Top 5</b>에서 이 종목의 실제 이력을 확인하세요.</span><br><br>
         <b>⚠️ 수치가 네이버/Yahoo와 살짝 다른 이유</b><br>
         1. <b>종가 vs 장중고가</b>: 네이버는 보통 장중고가(High), API도 High 제공 → 이 앱은 <b>기본 High 기준</b><br>
@@ -425,7 +428,7 @@
           <button id="modeHigh" class="active" onclick="setMode('high')">📈 장중 최고가</button>
           <button id="modeClose" onclick="setMode('close')">🕘 종가</button>
         </div>
-        <span style="color:#718096; font-size:12px;">← 네이버/Yahoo 수치 맞추려면 장중고가</span>
+        <span style="color:#566275; font-size:12px;">← 네이버/Yahoo 수치 맞추려면 장중고가</span>
       </div>
       <div class="controls">
         <label>빠른 기간:</label>
@@ -437,9 +440,9 @@
         <button class="preset-btn" data-years="ytd" onclick="setPreset('ytd')">올해</button>
       </div>
       <div class="controls" style="margin-top:8px;">
-        <label>시작일:</label>
+        <label for="startDate">시작일:</label>
         <input type="date" id="startDate" onchange="rerender()">
-        <label>종료일:</label>
+        <label for="endDate">종료일:</label>
         <input type="date" id="endDate" onchange="rerender()">
       </div>
     </div>
@@ -485,7 +488,7 @@
     <!-- 참고 가격대 -->
     <div class="card">
       <h2 class="section">📊 고점 대비 하락률별 환산 가격</h2>
-      <p style="font-size:13px; color:#718096; margin:0 0 12px;">구간 최고가를 기준으로 각 하락률에 해당하는 가격이 얼마인지 계산한 값입니다.
+      <p style="font-size:13px; color:#566275; margin:0 0 12px;">구간 최고가를 기준으로 각 하락률에 해당하는 가격이 얼마인지 계산한 값입니다.
       "✅ 지나감"은 조회 기간 중 실제로 그 가격 아래로 내려간 적이 있다는 뜻이며, 매수·매도 가격을 제시하는 것이 아닙니다.</p>
       <div class="target-grid">
         <div class="target-box t-15">
@@ -527,7 +530,7 @@
 
     <!-- 심층 분석 (전체 히스토리 기준, 추가 API 호출 없이 기존 데이터로 계산) -->
     <div class="card">
-      <h2 class="section">🔍 심층 분석 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(조회된 전체 기간 데이터 기준)</span></h2>
+      <h2 class="section">🔍 심층 분석 <span style="font-size:12px; font-weight:400; color:#5f6e82;">(조회된 전체 기간 데이터 기준)</span></h2>
 
       <div class="stats-grid" style="margin-bottom:16px;">
         <div class="stat-box"><div class="label">지금보다 깊었던 날</div><div class="value" id="ddPercentile" style="font-size:15px;">—</div></div>
@@ -557,29 +560,29 @@
       <div style="margin-bottom:16px;">
         <div style="font-size:13px; font-weight:700; color:#4a5568; margin-bottom:8px;">🔎 비슷한 깊이의 과거 사례</div>
         <div id="similarCasesBody" style="font-size:13px; color:#4a5568; line-height:1.8;"></div>
-        <p style="font-size:11px; color:#a0aec0; margin-top:6px;">⚠️ 하락 깊이만 비교한 참고용 사례이며, 과거와 똑같이 흘러간다는 뜻은 아닙니다.</p>
+        <p style="font-size:11px; color:#5f6e82; margin-top:6px;">⚠️ 하락 깊이만 비교한 참고용 사례이며, 과거와 똑같이 흘러간다는 뜻은 아닙니다.</p>
       </div>
 
       <button class="btn btn-sm" style="background:#718096; color:#fff;" onclick="copyResultSummary()">📋 결과 요약 복사하기</button>
-      <div id="copyStatus" style="font-size:12px; color:#38a169; margin-top:6px;"></div>
+      <div id="copyStatus" style="font-size:12px; color:#287a4f; margin-top:6px;"></div>
     </div>
 
     <!-- S&P500(SPY) 대비 비교 -->
     <div class="card">
-      <h2 class="section" id="benchmarkTitle">📊 시장 대비 비교 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(벤치마크 데이터는 하루 1회만 조회)</span></h2>
-      <div id="benchmarkLoading" style="text-align:center; padding:12px; color:#718096;">⏳ 시장 지수와 비교 중...</div>
+      <h2 class="section" id="benchmarkTitle">📊 시장 대비 비교 <span style="font-size:12px; font-weight:400; color:#5f6e82;">(벤치마크 데이터는 하루 1회만 조회)</span></h2>
+      <div id="benchmarkLoading" style="text-align:center; padding:12px; color:#566275;">⏳ 시장 지수와 비교 중...</div>
       <div id="benchmarkResult"></div>
     </div>
 
     <!-- 차트 -->
     <div class="card">
       <h2 class="section">📉 고점 대비 하락률 차트</h2>
-      <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="ddChart" role="img" aria-label="고점 대비 하락률(낙폭) 추이 차트. 주요 수치는 위 요약과 아래 표에 글로 나와 있습니다."></canvas></div>
     </div>
 
     <div class="card">
       <h2 class="section">💵 주가 흐름 차트</h2>
-      <div class="chart-wrap"><canvas id="priceChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="priceChart" role="img" aria-label="주가와 사상 최고가 추이 차트"></canvas></div>
     </div>
 
     <!-- 회복률 표 -->
@@ -614,7 +617,7 @@
     <div class="card no-capture">
       <h2 class="section">📺 TradingView 실시간 차트 (참고)</h2>
       <div id="tvContainer" style="height:400px; display:flex; align-items:center; justify-content:center; background:#f7fafc; border-radius:8px;">
-        <button onclick="loadTVChart()" style="padding:12px 24px; background:#4299e1; color:white; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">📊 TradingView 차트 로드</button>
+        <button onclick="loadTVChart()" style="padding:12px 24px; background:#2b6cb0; color:white; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">📊 TradingView 차트 로드</button>
       </div>
     </div>
 
@@ -642,13 +645,13 @@
     <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
       <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">고점 10만원까지 올랐다가 6만원까지 빠진 뒤 현재 8만원인 종목이 있다고 해보겠습니다.</p>
       <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
-        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">값</th></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">최대 낙폭(MDD)</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>(60,000 − 100,000) ÷ 100,000 = −40%</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">현재 고점 대비 하락률</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>(80,000 − 100,000) ÷ 100,000 = −20%</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">저점에서 지금까지 상승률</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>(80,000 − 60,000) ÷ 60,000 = +33.3%</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">전고점 회복에 필요한 상승률</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>(100,000 ÷ 80,000) − 1 = +25%</strong></td></tr>
       </table>
-      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">MDD(−40%)와 현재 낙폭(−20%)은 다른 숫자입니다. MDD는 <b>과거에 가장 깊었던</b> 지점이고, 현재 낙폭은 <b>지금</b> 어디에 있는지입니다. 이 계산기는 둘을 함께 보여줍니다.</p>
+      <p style="font-size:12px; color:#566275; line-height:1.7; margin:10px 0 0;">MDD(−40%)와 현재 낙폭(−20%)은 다른 숫자입니다. MDD는 <b>과거에 가장 깊었던</b> 지점이고, 현재 낙폭은 <b>지금</b> 어디에 있는지입니다. 이 계산기는 둘을 함께 보여줍니다.</p>
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 이 도구는 무료인가요?</strong><br>네, 모든 기능이 무료입니다. 회원가입 없이 사용할 수 있습니다.</p>
@@ -659,7 +662,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. "장중 최고가 기준"과 "종가 기준"은 뭐가 다른가요?</strong><br>장중 최고가 기준은 하루 중 가장 높았던 가격을 고점으로 봅니다. 실제로 계좌에서 겪은 낙폭에 가깝지만 수치가 더 크게 나옵니다. 종가 기준은 마감 가격만 쓰기 때문에 장중의 순간적인 급등락에 덜 흔들립니다. 장기 추세를 볼 때는 종가 기준이 더 안정적입니다. 공식과 코스피로 직접 계산한 예는 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 있습니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 한국 종목과 미국 종목은 데이터 출처가 다른가요?</strong><br>다릅니다. 미국 종목은 Twelve Data API에서 조회 시점에 받아오고, 한국 종목은 네이버 금융에서 받아 매 거래일 장 마감 뒤 미리 만들어 둔 파일을 읽습니다. 그래서 한국 종목은 API 사용량 제한이나 조회 실패가 없는 대신, 항상 전일 종가까지만 반영됩니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 숫자는 어떻게 계산하나요?</strong><br>최대 낙폭은 (저점 − 고점) / 고점 입니다. 홈 계산기는 장중 최고가와 종가를 고를 수 있고, 종목 리포트는 종가만 씁니다. 데이터 출처와 코스피 6,000거래일로 직접 계산한 예는 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 공개돼 있습니다.</p>
-    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->
@@ -1245,9 +1248,9 @@ function renderFavorites() {
   }
   panel.classList.remove('hidden');
   list.innerHTML = favorites.map(t => `
-    <span class="fav-chip" onclick="loadFavoriteTicker('${escapeHtml(t)}')">
-      ${escapeHtml(t)}
-      <button class="fav-remove" onclick="removeFavorite('${escapeHtml(t)}', event)" title="삭제">✕</button>
+    <span class="fav-chip">
+      <button type="button" class="fav-load" onclick="loadFavoriteTicker('${escapeHtml(t)}')">${escapeHtml(t)}</button>
+      <button type="button" class="fav-remove" onclick="removeFavorite('${escapeHtml(t)}', event)" title="삭제" aria-label="${escapeHtml(t)} 관심종목에서 삭제">✕</button>
     </span>
   `).join('');
 }
@@ -1701,13 +1704,13 @@ function renderDeepAnalysis() {
   const simBox = document.getElementById('similarCasesBody');
   if (!currentEp) {
     avgBox.textContent = '해당 없음';
-    simBox.innerHTML = '<span style="color:#a0aec0;">현재 신고가 부근이라 비교할 하락 사례가 없습니다.</span>';
+    simBox.innerHTML = '<span style="color:#5f6e82;">현재 신고가 부근이라 비교할 하락 사례가 없습니다.</span>';
   } else {
     const depth = currentEp.troughDD;
     const comparable = episodes.filter(ep => ep !== currentEp && ep.recovered && ep.troughDD <= depth + 1e-9);
     if (comparable.length === 0) {
       avgBox.textContent = '비교 사례 없음';
-      simBox.innerHTML = '<span style="color:#a0aec0;">이 정도로 깊은 하락은 조회 기간 내 처음이라 비교할 과거 사례가 없습니다.</span>';
+      simBox.innerHTML = '<span style="color:#5f6e82;">이 정도로 깊은 하락은 조회 기간 내 처음이라 비교할 과거 사례가 없습니다.</span>';
     } else {
       const avgDays = comparable.reduce((a, e) => a + e.daysToRecover, 0) / comparable.length;
       avgBox.textContent = `약 ${Math.round(avgDays).toLocaleString()}일`;
@@ -1718,8 +1721,8 @@ function renderDeepAnalysis() {
         .sort((a, b) => Math.abs(a.troughDD - depth) - Math.abs(b.troughDD - depth))
         .slice(0, 3);
       simBox.innerHTML = closest.length ? closest.map(ep =>
-        `<div style="margin-bottom:6px;">📌 <b>${ep.peakDate}</b> 고점 이후 <b style="color:#e53e3e;">${ep.troughDD.toFixed(1)}%</b> 하락 → <b style="color:#38a169;">${ep.daysToRecover}일</b> 만에 회복 (${ep.recoverDate})</div>`
-      ).join('') : '<span style="color:#a0aec0;">비교 사례 없음</span>';
+        `<div style="margin-bottom:6px;">📌 <b>${ep.peakDate}</b> 고점 이후 <b style="color:#c53030;">${ep.troughDD.toFixed(1)}%</b> 하락 → <b style="color:#287a4f;">${ep.daysToRecover}일</b> 만에 회복 (${ep.recoverDate})</div>`
+      ).join('') : '<span style="color:#5f6e82;">비교 사례 없음</span>';
     }
   }
 
@@ -1744,9 +1747,9 @@ function renderDeepAnalysis() {
     <tr>
       <td>${i + 1}위</td>
       <td>${ep.peakDate}</td>
-      <td style="color:#e53e3e; font-weight:700;">${ep.troughDD.toFixed(1)}%</td>
+      <td style="color:#c53030; font-weight:700;">${ep.troughDD.toFixed(1)}%</td>
       <td>${ep.recovered ? `✅ ${ep.daysToRecover}일 만에 회복` : `⏳ 진행 중 (${ep.daysSoFar}일째)`}</td>
-    </tr>`).join('') : '<tr><td colspan="4" style="color:#a0aec0;">데이터가 부족합니다</td></tr>';
+    </tr>`).join('') : '<tr><td colspan="4" style="color:#5f6e82;">데이터가 부족합니다</td></tr>';
 
   STATE.deepAnalysis = { percentile, currentEp, top5 };
 }
@@ -1938,7 +1941,7 @@ function buildShareCard(A, ticker) {
   ctx.fillStyle = '#718096';
   ctx.fillText('고점 대비 하락률', inX, 318);
 
-  const ddColor = A.currentDD > -5 ? '#38a169' : A.currentDD > -15 ? '#d69e2e' : '#e53e3e';
+  const ddColor = A.currentDD > -5 ? '#287a4f' : A.currentDD > -15 ? '#d69e2e' : '#c53030';
   ctx.font = shareFont(800, 150);
   ctx.fillStyle = ddColor;
   ctx.fillText(fmtPct(A.currentDD), inX, 480);
@@ -2252,7 +2255,7 @@ async function renderBenchmarkComparison() {
 
   const titleEl = document.getElementById('benchmarkTitle');
   if (titleEl) {
-    titleEl.innerHTML = `📊 ${bench.full} 대비 비교 <span style="font-size:12px; font-weight:400; color:#a0aec0;">(${bench.label} 데이터는 하루 1회만 조회)</span>`;
+    titleEl.innerHTML = `📊 ${bench.full} 대비 비교 <span style="font-size:12px; font-weight:400; color:#5f6e82;">(${bench.label} 데이터는 하루 1회만 조회)</span>`;
   }
 
   const selfCompare = STATE.isKR
@@ -2260,7 +2263,7 @@ async function renderBenchmarkComparison() {
     : STATE.ticker === 'SPY';
   if (selfCompare) {
     loadingEl.style.display = 'none';
-    resultEl.innerHTML = `<div style="color:#a0aec0; font-size:13px;">지금 조회 중인 종목이 ${escapeHtml(bench.full)} 자체라서 비교가 필요 없어요.</div>`;
+    resultEl.innerHTML = `<div style="color:#5f6e82; font-size:13px;">지금 조회 중인 종목이 ${escapeHtml(bench.full)} 자체라서 비교가 필요 없어요.</div>`;
     return;
   }
 
@@ -2295,7 +2298,7 @@ async function renderBenchmarkComparison() {
       const tickerReturn = (STATE.filtered[STATE.filtered.length - 1].close / STATE.filtered[0].close - 1) * 100;
       const benchReturn = (benchFiltered[benchFiltered.length - 1].close / benchFiltered[0].close - 1) * 100;
       const alpha = tickerReturn - benchReturn;
-      const alphaColor = alpha >= 0 ? '#38a169' : '#e53e3e';
+      const alphaColor = alpha >= 0 ? '#287a4f' : '#c53030';
       compareHtml = `
         <div class="stats-grid" style="margin-bottom:14px;">
           <div class="stat-box"><div class="label">${escapeHtml(tickerDisplayName())} 조회기간 수익률</div><div class="value" style="font-size:15px;">${tickerReturn >= 0 ? '+' : ''}${tickerReturn.toFixed(1)}%</div></div>
@@ -2313,9 +2316,9 @@ async function renderBenchmarkComparison() {
     }
     const diff = tickerDD - benchDD; // 음수면 이 종목이 시장보다 더 빠진 것
     const diffText = diff < -0.01
-      ? `현재 이 종목은 ${escapeHtml(bench.label)}보다 <b style="color:#e53e3e;">${Math.abs(diff).toFixed(1)}%p 더 깊게</b> 하락한 상태입니다.`
+      ? `현재 이 종목은 ${escapeHtml(bench.label)}보다 <b style="color:#c53030;">${Math.abs(diff).toFixed(1)}%p 더 깊게</b> 하락한 상태입니다.`
       : diff > 0.01
-      ? `현재 이 종목은 ${escapeHtml(bench.label)}보다 <b style="color:#38a169;">${Math.abs(diff).toFixed(1)}%p 덜</b> 하락한, 시장보다 상대적으로 견고한 상태입니다.`
+      ? `현재 이 종목은 ${escapeHtml(bench.label)}보다 <b style="color:#287a4f;">${Math.abs(diff).toFixed(1)}%p 덜</b> 하락한, 시장보다 상대적으로 견고한 상태입니다.`
       : `현재 이 종목의 하락폭은 ${escapeHtml(bench.label)}와(과) 거의 비슷한 수준입니다.`;
 
     resultEl.innerHTML = `
@@ -2324,7 +2327,7 @@ async function renderBenchmarkComparison() {
         <div>${context}</div>
         <div style="margin-top:6px;">${diffText}</div>
       </div>
-      <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ ${escapeHtml(bench.label)} 데이터는 API 사용량 절약을 위해 하루 한 번만 갱신됩니다 (브라우저 기준 당일 데이터 재사용).</p>
+      <p style="font-size:11px; color:#5f6e82; margin-top:8px;">⚠️ ${escapeHtml(bench.label)} 데이터는 API 사용량 절약을 위해 하루 한 번만 갱신됩니다 (브라우저 기준 당일 데이터 재사용).</p>
     `;
   } catch (e) {
     if (STATE.ticker !== requestTicker) return;
@@ -2342,7 +2345,7 @@ function chartUnavailable(canvasId) {
   if (!canvas || !canvas.parentElement) return;
   canvas.parentElement.innerHTML =
     '<div style="display:flex; align-items:center; justify-content:center; height:100%; ' +
-    'color:#718096; font-size:13px; text-align:center; padding:16px;">' +
+    'color:#566275; font-size:13px; text-align:center; padding:16px;">' +
     '차트를 불러오지 못했습니다 (광고 차단기·네트워크 차단). 아래 숫자 분석은 정상입니다.</div>';
 }
 
@@ -2436,10 +2439,10 @@ function renderRecovery(A) {
     const barClass = r.everHit ? '' : 'zero';
 
     tr.innerHTML = `
-      <td><b>-${r.bucket}%</b>${i === currentIdx ? ' 👈 <span style="color:#d69e2e;">지금 여기</span>' : ''}</td>
+      <td><b>-${r.bucket}%</b>${i === currentIdx ? ' 👈 <span style="color:#975a16;">지금 여기</span>' : ''}</td>
       <td>${r.hit.toLocaleString()}일</td>
       <td>${pct.toFixed(1)}%</td>
-      <td><b>${r.rate.toFixed(0)}%</b>${!r.everHit ? ' <span style="color:#a0aec0; font-size:11px;">(미도달)</span>' : ''}</td>
+      <td><b>${r.rate.toFixed(0)}%</b>${!r.everHit ? ' <span style="color:#5f6e82; font-size:11px;">(미도달)</span>' : ''}</td>
       <td><div class="bar-container"><div class="bar-fill ${barClass}" style="width:${barWidth}%"></div></div></td>
     `;
     body.appendChild(tr);
@@ -2495,7 +2498,9 @@ function navigate(page) {
 }
 
 function toggleNav() {
-  document.getElementById('siteNav').classList.toggle('open');
+  const open = document.getElementById('siteNav').classList.toggle('open');
+  const btn = document.querySelector('.nav-hamburger');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
 // ========== RSI 계산기 ==========
@@ -2540,7 +2545,7 @@ function renderRSI(prices, period, tickerLabel) {
   else { plain = '🟡 보통 수준이에요 — 특별한 신호 없음'; signalColor = '#744210'; signalBg = '#fefcbf'; }
 
   const pos = Math.min(100, Math.max(0, rsi));
-  const label = tickerLabel ? `<div style="font-size:13px; color:#718096; margin-bottom:6px;">📌 ${escapeHtml(tickerLabel)} · 최근 ${prices.length}일 데이터 기준</div>` : '';
+  const label = tickerLabel ? `<div style="font-size:13px; color:#566275; margin-bottom:6px;">📌 ${escapeHtml(tickerLabel)} · 최근 ${prices.length}일 데이터 기준</div>` : '';
 
   result.innerHTML = `
     ${label}
@@ -2552,15 +2557,15 @@ function renderRSI(prices, period, tickerLabel) {
       <div style="position:relative; height:14px; border-radius:7px; background:linear-gradient(90deg, #38a169 0%, #38a169 30%, #ecc94b 30%, #ecc94b 70%, #e53e3e 70%, #e53e3e 100%);">
         <div style="position:absolute; top:-5px; left:${pos}%; transform:translateX(-50%); width:3px; height:24px; background:#1a202c; border-radius:2px;"></div>
       </div>
-      <div style="display:flex; justify-content:space-between; font-size:10px; color:#a0aec0; margin-top:4px;">
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:#5f6e82; margin-top:4px;">
         <span>0 · 과매도</span><span>50 · 중립</span><span>100 · 과매수</span>
       </div>
     </div>
     <div class="stats-grid" style="margin-top:14px;">
       <div class="stat-box"><div class="label">사용 데이터</div><div class="value">${prices.length}일</div></div>
       <div class="stat-box"><div class="label">RSI 기간</div><div class="value">${period}일</div></div>
-      <div class="stat-box"><div class="label">평균 상승폭</div><div class="value" style="color:#38a169;">+${(avgGain).toFixed(2)}</div></div>
-      <div class="stat-box"><div class="label">평균 하락폭</div><div class="value" style="color:#e53e3e;">-${(avgLoss).toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">평균 상승폭</div><div class="value" style="color:#287a4f;">+${(avgGain).toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">평균 하락폭</div><div class="value" style="color:#c53030;">-${(avgLoss).toFixed(2)}</div></div>
     </div>
   `;
 }
@@ -2652,11 +2657,11 @@ function calcDividend() {
   const totalReturn = totalReturnNum.toFixed(1);
   // 손실이면 "+-12.3%" 가 초록색으로 나오던 문제. 부호와 색을 값에서 뽑습니다.
   const returnSign = totalReturnNum >= 0 ? '+' : '';
-  const returnColor = totalReturnNum >= 0 ? '#38a169' : '#e53e3e';
+  const returnColor = totalReturnNum >= 0 ? '#287a4f' : '#c53030';
 
-  let yieldColor = '#718096';
+  let yieldColor = '#566275';
   if (yieldPct >= 4) yieldColor = '#d69e2e';
-  else if (yieldPct >= 2) yieldColor = '#38a169';
+  else if (yieldPct >= 2) yieldColor = '#287a4f';
 
   result.innerHTML = `
     <div class="stats-grid" style="margin-bottom:16px;">
@@ -2695,15 +2700,15 @@ async function submitContact() {
   const result = document.getElementById('contactResult');
 
   if (!name || !email || !subject || !message) {
-    result.innerHTML = '<span style="color:#e53e3e;">❌ 모든 항목을 입력해주세요.</span>';
+    result.innerHTML = '<span style="color:#c53030;">❌ 모든 항목을 입력해주세요.</span>';
     return;
   }
   if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-    result.innerHTML = '<span style="color:#e53e3e;">❌ 올바른 이메일 주소를 입력해주세요.</span>';
+    result.innerHTML = '<span style="color:#c53030;">❌ 올바른 이메일 주소를 입력해주세요.</span>';
     return;
   }
 
-  result.innerHTML = '<span style="color:#4299e1;">⏳ 전송 중...</span>';
+  result.innerHTML = '<span style="color:#2b6cb0;">⏳ 전송 중...</span>';
   
   try {
     const response = await fetch('/api/contact', {
@@ -2714,17 +2719,17 @@ async function submitContact() {
     const data = await response.json();
     
     if (response.ok && data.success) {
-      result.innerHTML = '<span style="color:#38a169;">✅ 문의가 접수되었습니다. 빠른 시일 내 답변 드리겠습니다.</span>';
+      result.innerHTML = '<span style="color:#287a4f;">✅ 문의가 접수되었습니다. 빠른 시일 내 답변 드리겠습니다.</span>';
       document.getElementById('contactName').value = '';
       document.getElementById('contactEmail').value = '';
       document.getElementById('contactSubject').value = '';
       document.getElementById('contactMessage').value = '';
     } else {
       // escapeHtml(undefined) 는 빈 문자열이 아니라서 || 기본값이 먹지 않았습니다.
-      result.innerHTML = `<span style="color:#e53e3e;">❌ ${data && data.error ? escapeHtml(data.error) : '전송 실패. 다시 시도해주세요.'}</span>`;
+      result.innerHTML = `<span style="color:#c53030;">❌ ${data && data.error ? escapeHtml(data.error) : '전송 실패. 다시 시도해주세요.'}</span>`;
     }
   } catch (err) {
-    result.innerHTML = '<span style="color:#e53e3e;">❌ 네트워크 오류가 발생했습니다. 다시 시도해주세요.</span>';
+    result.innerHTML = '<span style="color:#c53030;">❌ 네트워크 오류가 발생했습니다. 다시 시도해주세요.</span>';
   }
 }
 
@@ -2779,7 +2784,7 @@ function calcROI() {
   const pct = ((sell - buy) / buy) * 100;
   const pnlKrw = pnl * KRW_RATE;
   const isProfit = pnl >= 0;
-  const color = isProfit ? '#38a169' : '#e53e3e';
+  const color = isProfit ? '#287a4f' : '#c53030';
   const sign = isProfit ? '+' : '';
   result.innerHTML = `
     <div class="stats-grid">
@@ -2837,7 +2842,7 @@ function calcCompound() {
 
   const tableRows = visibleRows.map(r => {
     const rowProfit = r.balance - r.totalContrib;
-    const rowColor = rowProfit >= 0 ? '#38a169' : '#e53e3e';
+    const rowColor = rowProfit >= 0 ? '#287a4f' : '#c53030';
     return `<tr>
       <td>${r.year}년차</td>
       <td>${fmt(r.totalContrib)}원</td>
@@ -2853,8 +2858,8 @@ function calcCompound() {
     </div>
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="label">총 납입 원금</div><div class="value">${fmt(totalContrib)}원</div></div>
-      <div class="stat-box"><div class="label">투자 수익</div><div class="value" style="color:${isProfit ? '#38a169' : '#e53e3e'};">${isProfit ? '+' : ''}${fmt(totalProfit)}원</div></div>
-      <div class="stat-box"><div class="label">수익률</div><div class="value" style="color:${isProfit ? '#38a169' : '#e53e3e'};">${isProfit ? '+' : ''}${profitPct.toFixed(1)}%</div></div>
+      <div class="stat-box"><div class="label">투자 수익</div><div class="value" style="color:${isProfit ? '#287a4f' : '#c53030'};">${isProfit ? '+' : ''}${fmt(totalProfit)}원</div></div>
+      <div class="stat-box"><div class="label">수익률</div><div class="value" style="color:${isProfit ? '#287a4f' : '#c53030'};">${isProfit ? '+' : ''}${profitPct.toFixed(1)}%</div></div>
     </div>
     <div style="overflow-x:auto;">
       <table>
@@ -2911,20 +2916,20 @@ function runLeverageSim() {
   const years = parseInt(document.getElementById('levYears').value) || 5;
   const sc = SCENARIOS[scenario];
   const result = document.getElementById('leverageResult');
-  result.innerHTML = '<div style="color:#4299e1; padding:12px;">⏳ 시뮬레이션 실행 중... (200회 시뮬레이션)</div>';
+  result.innerHTML = '<div style="color:#2b6cb0; padding:12px;">⏳ 시뮬레이션 실행 중... (200회 시뮬레이션)</div>';
   setTimeout(() => {
     const etfs = etfKey === 'COMPARE' ? ['QQQ','QLD','TQQQ'] : [etfKey];
     const rows = etfs.map(key => {
       const info = ETF_INFO[key];
       const sim = runLevSim(init, years, sc.annualReturn, sc.annualVol, info.mult, info.fee);
       const medRoi = ((sim.median - init) / init * 100).toFixed(1);
-      const medColor = sim.median >= init ? '#38a169' : '#e53e3e';
+      const medColor = sim.median >= init ? '#287a4f' : '#c53030';
       return `<tr style="border-bottom:1px solid #e2e8f0;">
         <td style="padding:10px 12px; font-weight:700;">${info.name}</td>
         <td style="padding:10px 12px; text-align:right; color:${medColor}; font-weight:700;">$${Math.round(sim.median).toLocaleString()}</td>
         <td style="padding:10px 12px; text-align:right; color:${medColor};">${medRoi >= 0 ? '+' : ''}${medRoi}%</td>
-        <td style="padding:10px 12px; text-align:right; color:#718096;">$${Math.round(sim.p25).toLocaleString()}</td>
-        <td style="padding:10px 12px; text-align:right; color:#718096;">$${Math.round(sim.p75).toLocaleString()}</td>
+        <td style="padding:10px 12px; text-align:right; color:#566275;">$${Math.round(sim.p25).toLocaleString()}</td>
+        <td style="padding:10px 12px; text-align:right; color:#566275;">$${Math.round(sim.p75).toLocaleString()}</td>
         <td style="padding:10px 12px; text-align:center;">${info.riskLabel}</td>
       </tr>`;
     }).join('');
@@ -3025,7 +3030,7 @@ function calcDCA() {
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-box"><div class="label">전략</div><div class="value">${strategyLabel}</div></div>
       <div class="stat-box"><div class="label">총 매수 주수</div><div class="value">${last.cumShares.toFixed(3)}주</div></div>
-      <div class="stat-box"><div class="label">예상 평균단가</div><div class="value" style="color:${achievable?'#38a169':'#e53e3e'};">$${last.cumAvgPrice.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">예상 평균단가</div><div class="value" style="color:${achievable?'#287a4f':'#c53030'};">$${last.cumAvgPrice.toFixed(2)}</div></div>
       <div class="stat-box"><div class="label">목표 평균단가</div><div class="value">$${targetAvg.toFixed(2)}</div></div>
     </div>
     <div style="background:${achievable?'#c6f6d5':'#fed7d7'}; color:${achievable?'#22543d':'#742a2a'}; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:14px;">
@@ -3051,7 +3056,7 @@ function calcDCA() {
         </tr>`).join('')}</tbody>
       </table>
     </div>
-    <p style="font-size:11px; color:#a0aec0; margin-top:8px;">⚠️ 예상 주가는 V자형 시나리오 기반으로 시뮬레이션된 값입니다. 실제 주가는 다를 수 있습니다.</p>`;
+    <p style="font-size:11px; color:#5f6e82; margin-top:8px;">⚠️ 예상 주가는 V자형 시나리오 기반으로 시뮬레이션된 값입니다. 실제 주가는 다를 수 있습니다.</p>`;
 }
 
 // ========== 이 종목 최근 수급 카드 ==========
@@ -3080,16 +3085,16 @@ function loadTickerSectors() {
 const SUPPLY_QUAD = { lead: '🔥 주도', churn: '🔄 손바뀜', quiet: '🌱 조용한 상승', cold: '💤 소외' };
 
 function supplyNum(v, digits, unit) {
-  if (v == null) return '<span style="color:#cbd5e0;">—</span>';
-  const color = v > 0 ? '#38a169' : (v < 0 ? '#e53e3e' : '#a0aec0');
+  if (v == null) return '<span style="color:#5f6e82;">—</span>';
+  const color = v > 0 ? '#287a4f' : (v < 0 ? '#c53030' : '#5f6e82');
   return `<span style="color:${color}; font-weight:700;">${v > 0 ? '+' : ''}${v.toFixed(digits)}${unit}</span>`;
 }
 
 function supplyRankChg(v) {
   if (v == null) return '';
-  if (v === 0) return ' <span style="color:#a0aec0; font-size:12px;">(변화 없음)</span>';
+  if (v === 0) return ' <span style="color:#5f6e82; font-size:12px;">(변화 없음)</span>';
   const up = v > 0;
-  return ` <span style="color:${up ? '#38a169' : '#e53e3e'}; font-size:12px;">(${up ? '▲' : '▼'} ${Math.abs(v)})</span>`;
+  return ` <span style="color:${up ? '#287a4f' : '#c53030'}; font-size:12px;">(${up ? '▲' : '▼'} ${Math.abs(v)})</span>`;
 }
 
 async function renderSupplyCard(ticker) {
@@ -3127,18 +3132,18 @@ async function renderSupplyCard(ticker) {
         `<div class="value">${supplyNum(t.sectorRet, 1, '%')}</div></div>` +
       `<div class="stat-box"><div class="label">섹터 RS 점수</div>` +
         `<div class="value">${t.rating == null ? '—' : t.rating}${supplyRankChg(t.rankChg)}</div>` +
-        `<div style="font-size:11px; color:#718096; margin-top:4px;">1~99, 괄호는 한 달 전 순위 대비</div></div>` +
+        `<div style="font-size:11px; color:#566275; margin-top:4px;">1~99, 괄호는 한 달 전 순위 대비</div></div>` +
       `<div class="stat-box"><div class="label">거래대금 비중 변화</div>` +
         `<div class="value">${supplyNum(t.turnShareChg, 2, '%p')}</div>` +
-        `<div style="font-size:11px; color:#718096; margin-top:4px;">다른 섹터가 조용해져도 오릅니다</div></div>` +
+        `<div style="font-size:11px; color:#566275; margin-top:4px;">다른 섹터가 조용해져도 오릅니다</div></div>` +
       (t.turnMult == null ? '' :
       `<div class="stat-box"><div class="label">거래대금 배율</div>` +
         `<div class="value">${t.turnMult.toFixed(2)}x${SUPPLY_QUAD[t.quadrant] ? ` <span style="font-size:12px;">${SUPPLY_QUAD[t.quadrant]}</span>` : ''}</div>` +
-        `<div style="font-size:11px; color:#718096; margin-top:4px;">절대 금액 · 평소(직전 1년) 대비</div></div>`) +
+        `<div style="font-size:11px; color:#566275; margin-top:4px;">절대 금액 · 평소(직전 1년) 대비</div></div>`) +
       (t.foreignChg == null ? '' :
       `<div class="stat-box"><div class="label">외국인 소진율 변화</div>` +
         `<div class="value">${supplyNum(t.foreignChg, 2, '%p')}</div>` +
-        `<div style="font-size:11px; color:#718096; margin-top:4px;">섹터 구성 종목 평균</div></div>`) +
+        `<div style="font-size:11px; color:#566275; margin-top:4px;">섹터 구성 종목 평균</div></div>`) +
     `</div>` +
     `<div class="link-chips">` +
       `<a class="link-chip" href="/sector-rs.html?${qs}&s=${encodeURIComponent(t.s)}">📊 ${escapeHtml(t.sn)} 섹터 자세히 보기</a>` +
@@ -3146,7 +3151,7 @@ async function renderSupplyCard(ticker) {
       `<a class="link-chip" href="/fear-greed.html?m=${encodeURIComponent(t.m)}">😱 지금 시장 심리는</a>` +
       themeChips +
     `</div>` +
-    `<div style="font-size:11px; color:#a0aec0; margin-top:10px;">` +
+    `<div style="font-size:11px; color:#5f6e82; margin-top:10px;">` +
       `전일 종가 기준입니다. 섹터 구분은 공식 산업분류가 아니라 투자자들이 실제로 묶어 부르는 테마 기준입니다.` +
     `</div>`;
 

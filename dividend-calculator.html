@@ -51,7 +51,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -78,19 +78,19 @@
     <h2 class="section">💰 배당 수익률 계산기</h2>
     <div style="display:grid; gap:12px; max-width:480px;">
       <div class="api-row">
-        <label>현재 주가 ($)</label>
+        <label for="divPrice">현재 주가 ($)</label>
         <input type="number" id="divPrice" placeholder="예: 150.00" step="0.01" style="flex:1; padding:8px 12px; border:1px solid #cbd5e0; border-radius:6px; font-size:14px;">
       </div>
       <div class="api-row">
-        <label>연간 배당금 ($)</label>
+        <label for="divAnnual">연간 배당금 ($)</label>
         <input type="number" id="divAnnual" placeholder="예: 3.60" step="0.01" style="flex:1; padding:8px 12px; border:1px solid #cbd5e0; border-radius:6px; font-size:14px;">
       </div>
       <div class="api-row">
-        <label>연간 주가 상승률 (%)</label>
+        <label for="divGrowth">연간 주가 상승률 (%)</label>
         <input type="number" id="divGrowth" placeholder="예: 5 (선택사항)" step="0.1" style="flex:1; padding:8px 12px; border:1px solid #cbd5e0; border-radius:6px; font-size:14px;">
       </div>
       <div class="api-row">
-        <label>보유 기간 (년)</label>
+        <label for="divYears">보유 기간 (년)</label>
         <input type="number" id="divYears" value="10" min="1" max="50" style="flex:1; padding:8px 12px; border:1px solid #cbd5e0; border-radius:6px; font-size:14px;">
       </div>
     </div>
@@ -101,14 +101,14 @@
     <h2 class="section">📖 배당 수익률이란?</h2>
     <p style="font-size:14px; color:#4a5568; line-height:1.8;">배당 수익률은 <strong>주가 대비 연간 배당금의 비율</strong>입니다. 예를 들어 주가 $100에 연간 배당금이 $4라면 배당 수익률은 4%입니다.</p>
     <div class="stats-grid" style="margin-top:12px;">
-      <div class="stat-box"><div class="label">낮은 배당</div><div class="value" style="color:#718096;">0~2%</div></div>
-      <div class="stat-box"><div class="label">적정 배당</div><div class="value" style="color:#38a169;">2~4%</div></div>
-      <div class="stat-box"><div class="label">높은 배당</div><div class="value" style="color:#d69e2e;">4%+</div></div>
+      <div class="stat-box"><div class="label">낮은 배당</div><div class="value" style="color:#566275;">0~2%</div></div>
+      <div class="stat-box"><div class="label">적정 배당</div><div class="value" style="color:#287a4f;">2~4%</div></div>
+      <div class="stat-box"><div class="label">높은 배당</div><div class="value" style="color:#975a16;">4%+</div></div>
     </div>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-top:16px;">
       위 계산기의 <strong>"연간 주가 상승률"</strong>과 <strong>"보유 기간"</strong>은 배당을 재투자했을 때의 장기 효과를 보여주기 위한 항목이에요. 배당금을 현금으로 받지 않고 같은 종목을 다시 사는 데 쓰면(배당 재투자), 시간이 지날수록 보유 주식 수 자체가 늘어나서 그 다음 배당금도 커지는 <strong>복리 효과</strong>가 생깁니다. 예를 들어 배당 수익률 4%, 연 주가 상승률 5%인 종목을 10년 보유하며 배당을 계속 재투자하면, 단순히 주가 상승분만 봤을 때보다 최종 자산이 눈에 띄게 커져요.
     </p>
-    <p style="font-size:13px; color:#718096; margin-top:12px; line-height:1.7;">
+    <p style="font-size:13px; color:#566275; margin-top:12px; line-height:1.7;">
       ⚠️ 배당 수익률이 지나치게 높다면(8% 이상 등) 회사 실적 악화로 주가가 급락해서 생긴 착시일 수도 있어요. 배당은 회사가 실적이 나빠지면 언제든 줄이거나(감액) 아예 없앨(배당컷) 수 있으니, 배당 수익률 숫자 하나만 보지 말고 최근 몇 년간 배당을 꾸준히 유지하거나 늘려온 회사인지도 함께 확인하는 걸 추천해요.
     </p>
   </div>
@@ -135,7 +135,7 @@
     <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
       <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">주가 $80, 연간 배당금 $2.40, 연 주가 상승률 5%, 보유 기간 10년으로 넣으면 이렇게 나옵니다.</p>
       <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
-        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">값</th></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">배당 수익률</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>3.00% ($2.40 ÷ $80)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">분기 배당금</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$0.60</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">10년 뒤 주당 배당금</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$3.00</strong></td></tr>
@@ -143,7 +143,7 @@
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">배당 재투자 시 1주 → </td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>1.29주</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">10년 재투자 총수익</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>+109.9%</strong></td></tr>
       </table>
-      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">배당을 다시 사들이면 주수가 늘고, 늘어난 주수가 다시 배당을 받습니다. 10년 뒤 1주가 1.29주가 되는 게 그 효과입니다. 이 계산은 배당이 매년 지급·재투자된다고 가정하며, 배당 성장률은 입력한 주가 상승률의 <b>절반</b>으로 보수적으로 잡습니다(주가 상승률 5% → 배당 성장률 2.5%).</p>
+      <p style="font-size:12px; color:#566275; line-height:1.7; margin:10px 0 0;">배당을 다시 사들이면 주수가 늘고, 늘어난 주수가 다시 배당을 받습니다. 10년 뒤 1주가 1.29주가 되는 게 그 효과입니다. 이 계산은 배당이 매년 지급·재투자된다고 가정하며, 배당 성장률은 입력한 주가 상승률의 <b>절반</b>으로 보수적으로 잡습니다(주가 상승률 5% → 배당 성장률 2.5%).</p>
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 배당수익률이 높을수록 좋은 건가요?</strong><br>아닙니다. 지속 가능성이 핵심입니다. 배당의 원천인 이익이 안정적인지, 배당성향이 무리하지 않은지를 함께 봐야 합니다.</p>
@@ -151,7 +151,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 배당 수익률이 높으면 좋은 종목인가요?</strong><br>아닙니다. 배당 수익률은 배당금 ÷ 주가라서, 주가가 급락하면 배당금이 그대로여도 수익률이 올라갑니다. 사업이 나빠져 주가가 반토막 난 종목이 배당률 상위에 오르는 일이 흔합니다. 배당을 계속 줄 수 있는 상태인지를 함께 보셔야 합니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 배당은 언제 받을 수 있나요?</strong><br>배당락일 전날까지 주식을 보유해야 배당을 받습니다. 배당락일 당일에 사면 그 분기 배당은 받지 못합니다. 실제 입금은 지급일에 이뤄지며, 미국 주식은 보통 배당락일로부터 2~4주 뒤입니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 미국 주식 배당에는 세금이 얼마나 붙나요?</strong><br>미국 주식 배당은 현지에서 15%가 원천징수된 뒤 입금됩니다. 국내에서 추가 과세되지 않는 것이 일반적이지만, 금융소득이 연 2,000만원을 넘으면 금융소득종합과세 대상이 될 수 있습니다. 개인별 상황에 따라 다르므로 세무 전문가와 확인하시는 것이 정확합니다.</p>
-    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 세금 관련 내용은 일반적인 정보이며 개인별 상황과 세법 개정에 따라 달라질 수 있습니다. 본 도구의 결과는 교육 목적이며 투자 권유가 아닙니다.</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:14px;">⚠️ 세금 관련 내용은 일반적인 정보이며 개인별 상황과 세법 개정에 따라 달라질 수 있습니다. 본 도구의 결과는 교육 목적이며 투자 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->

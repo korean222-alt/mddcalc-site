@@ -51,7 +51,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -78,25 +78,25 @@
     <h2 class="section">💱 USD ↔ KRW 환율 계산기</h2>
     <div style="display:grid; gap:16px; max-width:480px; margin-bottom:16px;">
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">🇺🇸 미국 달러 (USD)</label>
+        <label for="fxUsd" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">🇺🇸 미국 달러 (USD)</label>
         <input type="number" id="fxUsd" placeholder="예: 1000" step="0.01" oninput="calcFxFromUsd()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:16px;">
       </div>
-      <div style="text-align:center; font-size:24px; color:#718096;">⇅</div>
+      <div style="text-align:center; font-size:24px; color:#566275;">⇅</div>
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">🇰🇷 한국 원화 (KRW)</label>
+        <label for="fxKrw" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">🇰🇷 한국 원화 (KRW)</label>
         <input type="number" id="fxKrw" placeholder="예: 1,350,000" oninput="calcFxFromKrw()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:16px;">
       </div>
     </div>
     <div id="fxResult" style="margin-top:12px;"></div>
     <div style="margin-top:16px; padding:12px; background:#edf2f7; border-radius:8px; border-left:4px solid #3182ce;">
-      <label style="font-size:12px; font-weight:600; color:#2d3748; display:block; margin-bottom:6px;">💱 환율 직접 설정 ($1 = ₩)</label>
+      <label for="fxRate" style="font-size:12px; font-weight:600; color:#2d3748; display:block; margin-bottom:6px;">💱 환율 직접 설정 ($1 = ₩)</label>
       <input type="number" id="fxRate" value="1380" min="100" max="2000" oninput="updateFxRate()"
         style="width:100%; padding:8px 12px; border:1px solid #cbd5e0; border-radius:6px; font-size:14px;">
-      <p style="font-size:11px; color:#718096; margin-top:4px;">달러 환율이 변경되면 여기 입력하여 다시 계산하세요.</p>
+      <p style="font-size:11px; color:#566275; margin-top:4px;">달러 환율이 변경되면 여기 입력하여 다시 계산하세요.</p>
     </div>
-    <p style="font-size:12px; color:#a0aec0; margin-top:12px;">📊 사용 환율: <strong id="displayRate">$1 = ₩1,380</strong> (참고용 환율. 실제 거래 시 실시간 환율을 확인하세요.)</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:12px;">📊 사용 환율: <strong id="displayRate">$1 = ₩1,380</strong> (참고용 환율. 실제 거래 시 실시간 환율을 확인하세요.)</p>
   </div>
   <div class="card" style="background:#f7fafc;">
     <h2 class="section">💡 환율이 내 수익에 미치는 영향</h2>
@@ -129,12 +129,12 @@
     <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
       <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">환율이 $1 = ₩1,380일 때 $1,000를 환산한 결과입니다.</p>
       <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
-        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">값</th></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">환산 원화</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>₩1,380,000</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">환율이 1,300원으로 내렸다면</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>₩1,300,000 (8만원 감소)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">환율이 1,450원으로 올랐다면</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>₩1,450,000 (7만원 증가)</strong></td></tr>
       </table>
-      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">같은 $1,000인데 환율에 따라 원화 가치가 15만원 넘게 벌어집니다. 미국 주식을 들고 있다면 주가가 그대로여도 환율만으로 원화 평가금액이 이만큼 움직입니다.</p>
+      <p style="font-size:12px; color:#566275; line-height:1.7; margin:10px 0 0;">같은 $1,000인데 환율에 따라 원화 가치가 15만원 넘게 벌어집니다. 미국 주식을 들고 있다면 주가가 그대로여도 환율만으로 원화 평가금액이 이만큼 움직입니다.</p>
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 환율이 높을 때(원화 약세) 미국 주식을 사면 손해인가요?</strong><br>단정할 수 없습니다. 환율의 방향은 주가만큼이나 예측이 어렵습니다. 환율 타이밍을 맞추기보다 분할 환전으로 평균 환율을 만드는 접근이 널리 쓰입니다.</p>
@@ -142,7 +142,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 매매기준율, 살 때, 팔 때는 뭐가 다른가요?</strong><br>매매기준율은 은행이 고시하는 기준 가격이고, 실제로 달러를 살 때는 여기에 수수료가 붙어 더 비싸게, 팔 때는 더 싸게 적용됩니다. 이 차이를 스프레드라고 합니다. 증권사 환전 우대율은 이 스프레드를 몇 % 깎아주는지를 뜻합니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 환전은 언제 하는 게 유리한가요?</strong><br>환율의 방향을 미리 맞히는 것은 주가를 맞히는 것만큼 어렵습니다. 시점을 고르기보다 환전 자체를 여러 번에 나누는 편이 현실적입니다. 이 계산기로 환율 구간별 원화 금액을 미리 계산해 두면 어느 선에서 나눠 환전할지 정하기 쉽습니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 원화로 계산한 수익률과 달러 수익률 중 뭘 봐야 하나요?</strong><br>생활비를 원화로 쓰신다면 원화 기준이 실제 구매력에 가깝습니다. 다만 종목 자체의 성과를 판단할 때는 달러 기준이 맞습니다. 환율 때문에 좋은 종목이 나빠 보이거나 그 반대가 될 수 있어, 두 가지를 나눠 보시는 편이 좋습니다.</p>
-    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 투자 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->

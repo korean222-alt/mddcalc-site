@@ -132,7 +132,27 @@ async function logApiUsage(symbol, status, statusCode) {
   } catch (err) {
     markDbDown();
     console.warn('[DB] usage 기록 실패:', err.message);
+    return;
   }
+  pruneOldUsage();
+}
+
+// 개인정보 처리방침에 "시세 조회 기록은 최대 90일 보유 후 삭제" 라고 적어 두었는데,
+// 실제로 지우는 코드가 없었다. 인스턴스마다 UTC 하루에 한 번만 오래된 행을 지운다.
+// 사용자 응답을 기다리게 하지 않으려고 await 하지 않고, 실패해도 기록 자체는 막지 않는다.
+const USAGE_RETENTION_DAYS = 90;
+let _prunedDay = null;
+function pruneOldUsage() {
+  const day = utcDay();
+  if (_prunedDay === day || dbIsCoolingDown()) return;
+  _prunedDay = day;
+  withTimeout(
+    getPool().execute(
+      `DELETE FROM api_usage WHERE createdAt < UTC_TIMESTAMP() - INTERVAL ${USAGE_RETENTION_DAYS} DAY`
+    ),
+    DB_TIMEOUT_MS,
+    'DB prune'
+  ).catch(err => console.warn('[DB] 오래된 usage 삭제 실패:', err.message));
 }
 
 // 하루 사용량만 읽습니다. current_usage/plan_limit 는 분당 한도(무료 8회)라 쓰면 안 됩니다.

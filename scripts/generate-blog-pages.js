@@ -217,32 +217,33 @@ function buildPostPage(post, related) {
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
          background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.75; padding: 0; }
   .container { max-width: 720px; margin: 0 auto; padding: 0 16px; }
-  a { color: #4299e1; }
+  a { color: #2b6cb0; }
   .card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
-  .article-meta { font-size: 13px; color: #a0aec0; margin: 4px 0 20px; }
+  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #566275; }
+  .article-meta { font-size: 13px; color: #5f6e82; margin: 4px 0 20px; }
   .highlight-box { background: #f7fafc; border-left: 3px solid #4299e1; border-radius: 6px; padding: 12px 16px; margin: 14px 0; }
   h1 { font-size: 24px; margin-bottom: 4px; color: #2d3748; }
   h2 { font-size: 19px; margin: 22px 0 10px; color: #2d3748; }
   p { margin-bottom: 12px; }
   ul { margin: 10px 0 14px 20px; } li { margin-bottom: 6px; }
   .related { margin-top: 20px; padding-top: 16px; border-top: 1px solid #edf2f7; }
-  .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
+  .related-title { font-size: 13px; color: #566275; margin-bottom: 8px; }
   .related-chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
                   border-radius: 20px; font-size: 13px; font-weight: 600; margin: 0 6px 6px 0; text-decoration: none; }
-  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; line-height: 1.7; }
+  .note { font-size: 12px; color: #5f6e82; margin-top: 16px; line-height: 1.7; }
   .author-box { display: flex; gap: 14px; align-items: flex-start; margin-top: 26px; padding: 16px;
                 background: #f7fafc; border-radius: 10px; border: 1px solid #edf2f7; }
   .author-avatar { flex: none; width: 44px; height: 44px; border-radius: 50%; background: #edf2f7;
                    display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .author-name { font-size: 14px; font-weight: 700; color: #2d3748; margin-bottom: 4px; }
-  .author-bio { font-size: 13px; color: #718096; line-height: 1.7; margin: 0; }
+  .author-bio { font-size: 13px; color: #566275; line-height: 1.7; margin: 0; }
   .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
              background: #ebf8ff; border-radius: 10px; padding: 14px 18px; margin-top: 20px; }
   .cta-text { font-size: 14px; color: #2c5282; font-weight: 600; }
   .cta-btn { display: inline-block; background: #2b6cb0; color: #fff !important; padding: 9px 18px; border-radius: 8px;
              font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
   .cta-btn:hover { background: #2c5282; }
+  .cta-btn { max-width: 100%; white-space: normal; text-align: center; }
 ${chromeCss()}
 </style>
 </head>
@@ -276,7 +277,7 @@ ${headerHtml('blog')}
     ${revisionsHtml(post)}
     <p class="note">
       📅 원고 작성 ${escapeHtml(post.date)} · 최종 검토 ${reviewedDateOf(post)}<br>
-      <span style="color:#a0aec0;">이 사이트는 2026년 7월에 문을 열었습니다. 그 이전 날짜는 웹 공개일이 아니라 원고를 쓴 날입니다.</span><br>
+      <span style="color:#5f6e82;">이 사이트는 2026년 7월에 문을 열었습니다. 그 이전 날짜는 웹 공개일이 아니라 원고를 쓴 날입니다.</span><br>
       본 글은 정보 제공 및 교육 목적으로 작성되었으며 투자 자문이 아닙니다. 과거 데이터는 미래 수익을 보장하지 않고,
       주식 투자에는 원금 손실 위험이 있습니다. 투자 판단과 그 결과에 대한 책임은 투자자 본인에게 있습니다.
     </p>

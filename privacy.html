@@ -44,7 +44,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -64,50 +64,80 @@
   <div class="page-hero">
     <div class="inner">
       <h1>🔒 개인정보 처리방침</h1>
-      <p>최종 업데이트: 2026년 8월 10일</p>
+      <p>최종 업데이트: 2026년 10월 30일 · 시행일: 2026년 10월 30일</p>
     </div>
   </div>
   <div class="prose">
     <div class="card">
-      <h2>1. 수집하는 정보</h2>
-      <p>MDD 분석기는 다음과 같은 정보를 수집할 수 있습니다:</p>
+      <p>MDD 분석기(이하 "사이트")는 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하고, 관련 고충을 신속하게 처리하기 위해 다음과 같이 개인정보 처리방침을 둡니다.
+      이 사이트는 <strong>회원가입·로그인·결제가 없는</strong> 무료 정보 사이트이며, 문의를 보내실 때를 빼고는 이름·이메일 같은 개인정보를 받지 않습니다.</p>
+
+      <h2>1. 수집하는 정보와 수집 방법</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px;">
+        <tr><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">구분</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">항목</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">수집 방법</th></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">문의하기</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">필수: 이메일 주소, 제목, 문의 내용<br>선택: 이름 또는 닉네임</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">이용자가 <a href="/contact.html">문의 양식</a>에 직접 입력하고 수집·이용에 동의한 경우</td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">시세 조회 기록</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">조회한 종목 코드, 성공·실패 여부, 응답 상태 코드, 시각</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">미국 종목을 조회할 때 서버가 자동 기록. 이름·이메일·IP 주소 등 개인을 알아볼 수 있는 항목은 함께 저장하지 않습니다</td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">접속 로그</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">IP 주소, 브라우저 정보, 접속 시각, 요청 주소</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">호스팅 사업자(Vercel)가 서비스 제공 과정에서 자동 생성</td></tr>
+      </table>
+      </div>
+      <p>필요 없는 정보는 받지 않습니다. 문의에 답하는 데 필요한 것은 이메일 주소뿐이라 이름은 선택 항목으로 두었습니다.</p>
+
+      <h2>2. 이용 목적</h2>
       <ul>
-        <li><strong>문의 내용</strong>: 문의하기 폼에서 <strong>이름, 이메일 주소, 제목, 문의 내용</strong> 네 가지를 입력받습니다. 네 항목 모두 필수이며, 문의 답변 목적으로만 이용합니다. 별도의 데이터베이스에 저장하지 않고, 입력하신 내용을 그대로 담은 알림 메일을 운영자에게 보내는 데에만 사용합니다.</li>
-        <li><strong>사용 데이터</strong>: 미국 종목 시세를 조회할 때 <strong>조회한 종목 코드, 성공·실패 여부, 응답 상태 코드, 시각</strong>을 기록합니다. 이름·이메일·IP 주소 등 개인을 식별할 수 있는 항목은 함께 저장하지 않습니다.</li>
-        <li><strong>LocalStorage</strong>: 최근 조회 종목, 관심종목 목록 등을 <strong>이용자 브라우저 안에만</strong> 저장합니다. 이 값은 서버로 전송되지 않습니다.</li>
+        <li>문의 확인과 답변 (이메일 주소, 제목, 내용, 선택 입력한 이름)</li>
+        <li>서비스 오류 확인과 개선</li>
+        <li>외부 시세 API 사용량 관리 (종목 코드 단위의 익명 통계만 사용)</li>
       </ul>
+      <p>위 목적 외의 용도로 이용하지 않으며, 목적이 바뀌면 미리 이 페이지에 알리고 필요한 경우 다시 동의를 받습니다.</p>
 
-      <h2>2. 정보 이용 목적</h2>
+      <h2>3. 보유 기간과 파기</h2>
       <ul>
-        <li>문의 답변 (이름, 이메일 주소, 제목, 문의 내용)</li>
-        <li>서비스 개선 및 오류 수정</li>
-        <li>API 사용량 모니터링 (익명 통계만)</li>
+        <li><strong>문의 내용</strong>: 사이트 데이터베이스에 저장하지 않고 운영자 메일함으로만 전달됩니다. <strong>답변을 마친 뒤 지체 없이</strong> 해당 메일을 영구 삭제하는 방식으로 파기합니다.</li>
+        <li><strong>시세 조회 기록</strong>: 최대 90일 보유 후 자동 삭제합니다.</li>
+        <li><strong>접속 로그</strong>: 호스팅 사업자의 보관 정책에 따릅니다.</li>
       </ul>
+      <p style="font-size:13px; color:#566275;">메일 발송 대행 서비스(Resend)에도 발송 기록이 일정 기간 남을 수 있으며, 그 보관 기간은 해당 사업자의 정책을 따릅니다. 삭제를 원하시면 아래 10항의 연락처로 요청해 주세요.</p>
 
-      <h2>3. 정보 공유 및 제3자 서비스 이용</h2>
-      <p>수집된 개인정보는 제3자에게 판매하거나 공유하지 않습니다. 다만 법률에 의한 요청이 있는 경우 제공할 수 있습니다.</p>
-      <p style="margin-top:8px;">문의 접수 알림 메일 발송을 위해 이메일 발송 대행 서비스인 <strong>Resend</strong>(resend.com)를 이용합니다. 이때 문의하기 폼에 입력하신 <strong>이름·이메일 주소·제목·문의 내용이 메일 본문에 담겨</strong> 이 서비스를 거쳐 운영자에게 전달됩니다. 회신을 받으실 수 있도록 입력하신 이메일 주소가 해당 메일의 회신 주소(Reply-To)로 설정됩니다. 이 목적 외에는 사용하지 않습니다.</p>
-      <p style="margin-top:8px;">이 밖에 본 사이트는 다음 제3자 서비스를 이용하며, 각 서비스가 자체적으로 쿠키나 접속 정보를 수집할 수 있습니다. 해당 정보의 처리는 각 사업자의 개인정보 처리방침을 따릅니다.</p>
-      <ul>
-        <li><strong>Google AdSense</strong> — 광고 게재. 자세한 사항은 아래 7항에 따로 적었습니다.</li>
-        <li><strong>Vercel</strong> — 사이트 호스팅. 서비스 제공 과정에서 접속 로그가 생성됩니다.</li>
-        <li><strong>TradingView</strong> — 홈페이지에서 사용자가 "TradingView 차트 로드" 버튼을 직접 누른 경우에만 차트가 삽입되며, 그때 해당 서비스로 연결됩니다.</li>
-      </ul>
+      <h2>4. 제3자 제공</h2>
+      <p>수집한 개인정보를 제3자에게 판매하거나 제공하지 않습니다. 다만 법령에 따라 수사기관 등이 적법한 절차로 요청하는 경우는 예외입니다.</p>
 
-      <h2>4. 정보 보유 기간</h2>
-      <p>문의 내용(이름·이메일 주소·제목·내용)은 운영자 메일함에 수신되며, 답변이 끝나면 해당 메일을 삭제하는 방식으로 파기합니다. 시세 조회 기록은 최대 90일간 보유 후 삭제합니다.</p>
-      <p style="margin-top:8px; font-size:13px; color:#718096;">메일 발송 대행 서비스(Resend)에도 발송 기록이 일정 기간 남을 수 있으며, 그 보관 기간은 해당 사업자의 정책을 따릅니다. 삭제를 원하시면 아래 연락처로 요청해 주세요.</p>
+      <h2>5. 처리 위탁과 국외 이전</h2>
+      <p>사이트 운영을 위해 아래 사업자에게 개인정보 처리 업무를 맡기고 있으며, 이 사업자들의 서버는 국외에 있습니다.</p>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px;">
+        <tr><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">수탁 사업자</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">위탁 업무</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">이전 항목</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">이전 국가·방법</th></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">Resend (resend.com)</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">문의 접수 알림 메일 발송</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">문의 양식에 입력한 이메일 주소·제목·내용·이름(입력 시)</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">미국 · 문의를 보낼 때 네트워크로 전송</td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">Vercel Inc. (vercel.com)</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">웹사이트 호스팅, 서버 기능 실행</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">접속 로그, 문의 양식 입력값(전달 과정에서만)</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">미국 등 Vercel 데이터센터 · 접속할 때 네트워크로 전송</td></tr>
+      </table>
+      </div>
+      <p>문의 양식 대신 이메일로 직접 연락하시면 문의 내용이 Resend·Vercel 을 거치지 않습니다.</p>
 
-      <h2>5. 사용자 권리</h2>
-      <ul>
-        <li>수집된 정보에 대한 열람 및 수정 요청</li>
-        <li>문의 페이지 또는 이메일을 통한 개인정보 삭제 요청</li>
-      </ul>
+      <h2>6. 사이트에 포함된 외부 서비스(SDK)</h2>
+      <p>아래 서비스는 사이트 화면에 포함되어 있어, 이용자의 브라우저가 해당 사업자 서버에 직접 접속합니다. 이때 각 사업자가 IP 주소·브라우저 정보를 받거나 쿠키를 쓸 수 있으며, 그 처리는 각 사업자의 방침을 따릅니다.</p>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px;">
+        <tr><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">서비스</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">쓰는 곳</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">용도</th></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">Google AdSense</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">모든 페이지</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">광고 게재 (아래 8항)</td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">jsDelivr CDN</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">홈, 섹터 RS, 공포·탐욕 지수</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">차트 라이브러리(Chart.js) 파일 전송. 쿠키를 쓰지 않습니다</td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">TradingView</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">홈</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">이용자가 "TradingView 차트 로드" 버튼을 직접 누른 경우에만 차트를 불러옵니다</td></tr>
+      </table>
+      </div>
+      <p>시세 데이터를 받아 오는 Twelve Data·네이버 금융·CNN 은 사이트 서버나 자동 갱신 작업이 접속하며, 이용자의 브라우저나 개인정보가 전달되지 않습니다.</p>
 
-      <h2>6. 쿠키 및 LocalStorage</h2>
-      <p>이 사이트는 로그인 없이 사용 가능하며, 사용자 편의를 위해 마지막 조회 종목과 관심종목 목록을 브라우저 LocalStorage에 저장합니다. 이는 서버에 전송되지 않습니다.</p>
+      <h2 id="cookies">7. 쿠키 정책</h2>
+      <p>사이트 자체는 쿠키를 만들지 않습니다. 편의 기능을 위해 아래 값을 <strong>이용자 브라우저의 LocalStorage에만</strong> 저장하며, 서버로 보내지 않습니다.</p>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 12px;">
+        <tr><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">저장 위치</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">이름</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">내용</th><th scope="col" style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; background:#f7fafc; white-space:nowrap;">삭제 방법</th></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">LocalStorage</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;"><code>td_last_ticker</code></td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">마지막으로 조회한 종목</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;" rowspan="2">브라우저 설정에서 사이트 데이터 삭제</td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">LocalStorage</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;"><code>mdd_favorites</code></td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">관심종목 목록</td></tr>
+        <tr><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">제3자 쿠키</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">Google 광고 쿠키 등</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">광고 게재·측정 (아래 8항)</td><td style="padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; text-align:left;">아래 8항의 거부 방법</td></tr>
+      </table>
+      </div>
+      <p>브라우저에서 쿠키를 거부하셔도 계산기 등 사이트의 주요 기능은 그대로 쓰실 수 있습니다. 쿠키 거부는 브라우저 설정(예: Chrome 설정 &gt; 개인정보 보호 및 보안 &gt; 서드 파티 쿠키, Safari 설정 &gt; 개인정보 보호)에서 할 수 있습니다.</p>
 
-      <h2>7. 광고 게재 및 제3자 쿠키</h2>
+      <h2>8. 광고 게재 및 제3자 쿠키</h2>
       <p>본 사이트는 <strong>Google AdSense</strong>를 통해 광고를 게재하며, 이와 관련하여 다음 사항을 안내합니다.</p>
       <ul>
         <li>Google을 포함한 제3자 광고 사업자는 쿠키를 사용하여 사용자가 본 사이트 또는 다른 웹사이트를 방문한 기록을 바탕으로 광고를 게재합니다.</li>
@@ -123,16 +153,44 @@
       </ul>
       <p>Google의 데이터 처리 방식에 관한 자세한 내용은 <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener nofollow">Google 파트너 사이트에서의 데이터 사용</a> 및 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener nofollow">Google 개인정보처리방침</a>을 참고하시기 바랍니다.</p>
 
-      <h2>8. 만 14세 미만 아동의 개인정보</h2>
-      <p>본 사이트는 만 14세 미만 아동을 대상으로 하지 않으며, 아동의 개인정보를 의도적으로 수집하지 않습니다. 만 14세 미만 아동의 개인정보가 수집된 사실을 인지한 경우 지체 없이 해당 정보를 삭제합니다.</p>
+      <h2>9. 만 14세 미만 아동의 개인정보</h2>
+      <p>본 사이트는 만 14세 미만 아동을 대상으로 하지 않으며, 아동의 개인정보를 의도적으로 수집하지 않습니다. 문의 양식은 "만 14세 이상" 확인란에 체크해야만 보낼 수 있습니다.
+      만 14세 미만 아동의 개인정보가 수집된 사실을 알게 되면 지체 없이 삭제합니다. 보호자께서 확인하신 경우 아래 10항의 연락처로 알려 주세요.</p>
 
-      <h2>9. 방침 변경</h2>
+      <h2>10. 이용자의 권리와 행사 방법 (개인정보 삭제 요청)</h2>
+      <p>이용자는 언제든지 자신의 개인정보에 대해 <strong>열람, 정정, 삭제, 처리 정지</strong>를 요청할 수 있습니다.</p>
+      <ol style="padding-left:20px;">
+        <li><a href="/contact.html">문의 페이지</a>에서 문의 유형을 <strong>"개인정보 열람 · 정정 · 삭제 요청"</strong>으로 고르거나, 아래 이메일로 보내 주세요.</li>
+        <li>본인 확인을 위해 문의할 때 쓰신 이메일 주소에서 보내 주시거나, 그 주소를 적어 주세요.</li>
+        <li><strong>접수한 날부터 10일 안에</strong> 처리하고, 결과를 요청하신 이메일로 회신합니다. 삭제한 정보는 복구할 수 없습니다.</li>
+      </ol>
+
+      <h2>11. 개인정보의 안전성 확보 조치</h2>
+      <ul>
+        <li>모든 페이지와 문의 전송은 암호화된 연결(HTTPS)로만 이루어집니다.</li>
+        <li>문의 내용은 사이트 데이터베이스에 저장하지 않으며, 운영자 메일함에만 전달됩니다.</li>
+        <li>시세 조회 기록 데이터베이스와 메일함에는 운영자만 접근할 수 있으며, 접근 비밀번호는 코드에 넣지 않고 호스팅 환경 설정에만 둡니다.</li>
+      </ul>
+
+      <h2>12. 개인정보 보호책임자</h2>
+      <p>개인정보 처리에 관한 업무를 총괄하고, 관련 문의·불만·피해 구제를 처리하는 책임자는 다음과 같습니다.</p>
+      <ul>
+        <li><strong>개인정보 보호책임자</strong>: MDD 분석기 운영자 (개인 운영)</li>
+        <li><strong>연락처</strong>: <a href="mailto:gktgkt2309@gmail.com" style="color:#2b6cb0; font-weight:700;">gktgkt2309@gmail.com</a></li>
+      </ul>
+
+      <h2>13. 권익 침해 구제 방법</h2>
+      <p>개인정보 침해에 대한 신고나 상담이 필요하시면 아래 기관에 문의하실 수 있습니다.</p>
+      <ul>
+        <li>개인정보침해신고센터 (한국인터넷진흥원): privacy.kisa.or.kr / 국번 없이 118</li>
+        <li>개인정보분쟁조정위원회: www.kopico.go.kr / 1833-6972</li>
+        <li>대검찰청 사이버수사과: www.spo.go.kr / 국번 없이 1301</li>
+        <li>경찰청 사이버수사국: ecrm.police.go.kr / 국번 없이 182</li>
+      </ul>
+
+      <h2>14. 방침 변경</h2>
       <p>본 개인정보 처리방침은 법령 및 서비스 변경사항을 반영하기 위해 수정될 수 있으며, 변경 시 본 페이지에 게시하고 상단의 최종 업데이트 날짜를 갱신합니다.</p>
-
-      <h2>10. 문의</h2>
-      <p>개인정보 처리에 관한 문의, 열람·정정·삭제 요청은 아래 이메일 또는 <a href="/contact.html" onclick="navigate('contact'); return false;">문의 페이지</a>로 연락해 주세요.</p>
-      <p style="font-size:15px;"><strong>이메일:</strong> <a href="mailto:gktgkt2309@gmail.com" style="color:#2b6cb0; font-weight:700;">gktgkt2309@gmail.com</a></p>
-      <p style="font-size:13px; color:#718096;">개인정보 관련 요청은 접수 후 지체 없이 처리하며, 처리 결과를 요청하신 이메일로 회신드립니다.</p>
+      <p style="font-size:13px; color:#566275;">2026-10-30 변경: 문의 양식의 이름을 선택 항목으로 바꾸고 수집·이용 동의 절차를 추가했습니다. 처리 위탁·국외 이전, 외부 서비스, 쿠키 목록, 권리 행사 절차, 보호책임자, 권익 침해 구제 방법을 보탰습니다.</p>
     </div>
   </div>
 </div>

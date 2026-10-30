@@ -20,10 +20,17 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { name, email, subject, message } = req.body || {};
+    const { type, email, subject, message, agree } = req.body || {};
+    // 이름은 선택 항목입니다. 답변에 필요한 것은 이메일뿐이라, 필요 없는 정보는 받지 않습니다.
+    const name = String((req.body && req.body.name) || '').trim() || '(미입력)';
 
-    if (!name || !email || !subject || !message) {
-      res.status(400).json({ error: '모든 항목을 입력해주세요.' });
+    if (!email || !subject || !message) {
+      res.status(400).json({ error: '이메일·제목·내용을 입력해주세요.' });
+      return;
+    }
+    // 수집·이용 동의 없이 들어온 요청은 받지 않습니다(옛 페이지 캐시, 직접 호출 등).
+    if (agree !== true) {
+      res.status(400).json({ error: `개인정보 수집·이용에 동의해 주셔야 양식으로 접수할 수 있습니다. 동의하지 않으시면 ${FALLBACK_EMAIL} 로 직접 보내주세요.` });
       return;
     }
     if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
@@ -35,6 +42,9 @@ module.exports = async function handler(req, res) {
       res.status(400).json({ error: '입력이 너무 깁니다. 제목 200자, 내용 5000자 이내로 부탁드립니다.' });
       return;
     }
+
+    const TYPE_LABELS = { general: '일반 문의', bug: '오류 신고', privacy: '개인정보 열람·정정·삭제 요청' };
+    const typeLabel = TYPE_LABELS[type] || TYPE_LABELS.general;
 
     const resendKey = process.env.RESEND_API_KEY;
     const notifyTo = process.env.CONTACT_NOTIFY_EMAIL;
@@ -53,8 +63,8 @@ module.exports = async function handler(req, res) {
         from: 'MDD 분석기 <alerts@mddcalc.com>',
         to: notifyTo,
         replyTo: email,
-        subject: `[MDD 분석기] 새 문의: ${subject}`,
-        text: `이름: ${name}\n이메일: ${email}\n제목: ${subject}\n\n내용:\n${message}`,
+        subject: `[MDD 분석기] ${typeLabel}: ${subject}`,
+        text: `유형: ${typeLabel}\n이름: ${name}\n이메일: ${email}\n제목: ${subject}\n수집·이용 동의: 예\n\n내용:\n${message}`,
       });
       // Resend SDK 는 실패를 예외 대신 { error } 로 돌려주는 경우가 있습니다.
       if (sent && sent.error) throw new Error(sent.error.message || String(sent.error));
