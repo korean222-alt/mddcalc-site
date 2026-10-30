@@ -1153,15 +1153,539 @@ const BLOG_POSTS = [
       <p>처음 투자하는 해에 세울 만한 현실적인 목표는 "얼마를 벌겠다"가 아니라 <strong>"시장이 빠질 때 내가 어떻게 반응하는지 관찰하겠다"</strong>입니다. -10%가 왔을 때 잠이 안 오는지, -20%에서 팔고 싶어지는지는 실제로 겪어봐야 알 수 있습니다. 그리고 그 데이터가 앞으로 자신에게 맞는 자산 배분을 정할 때 참고할 수 있는 중요한 근거 중 하나가 됩니다.</p>
       <p>그래서 첫 투자는 감당 가능한 소액으로 시작하는 편이 좋습니다. 큰 금액으로 시작해 첫 하락장에서 크게 다치면, 시장을 떠나게 되어 이후 몇십 년의 기회까지 함께 잃을 수 있기 때문입니다.</p>
     `
+  },
+  {
+    id: 26,
+    tag: '시장 데이터',
+    emoji: '📅',
+    bg: '#ebf8ff',
+    title: '코스피 6,000거래일 중 최고치에 있던 날은 5%뿐이었다',
+    excerpt: '2002년부터 코스피·코스닥의 매 거래일이 고점에서 얼마나 떨어져 있었는지 전부 세어 봤습니다. 고점 대비 −10%는 예외가 아니라 일상이었습니다.',
+    date: '2026-10-30',
+    readTime: '6분',
+    content: `
+      <h1>코스피 6,000거래일 중 최고치에 있던 날은 5%뿐이었다</h1>
+      <div class="article-meta">📅 2026년 10월 30일 &nbsp;&bull;&nbsp; ⏱ 6분 읽기</div>
+      <p>MDD 계산기에 종목을 넣으면 맨 위에 "현재 고점 대비 −○○%"가 나옵니다. 그런데 이 숫자를 보고 바로 드는 질문이 있습니다.
+      <strong>이 정도 하락은 흔한가, 드문가?</strong> 하락률 하나만으로는 판단이 서지 않습니다. 비교할 기준이 필요합니다.</p>
+      <p>그래서 이 사이트가 매 거래일 갱신하는 코스피 데이터로 직접 세어 봤습니다.
+      2002년 7월부터 2026년 10월까지 <strong>6,000거래일 하루하루가 그날까지의 최고 종가에서 얼마나 떨어져 있었는지</strong>를 전부 계산해 구간별로 나눈 결과입니다.</p>
+
+      <h2>코스피: 고점 근처에 있던 날은 다섯 날 중 하루</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">그날 종가의 위치</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">거래일 수</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">비중</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">데이터 기간 최고치 (신고가)</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">309일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">고점 대비 0 ~ −5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">983일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">16.4%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−5 ~ −10%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1,149일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">19.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−10 ~ −20%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2,114일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">35.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−20 ~ −30%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1,135일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.9%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−30 ~ −40%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">194일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">3.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−40 ~ −50%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">100일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.7%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−50% 보다 깊음</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">16일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.3%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="highlight-box"><p>📊 <strong>고점에서 5% 안쪽에 있던 날은 전체의 21.5%</strong>뿐이었고,
+      <strong>고점 대비 −20%보다 깊이 빠져 있던 날이 24.1%</strong>로 오히려 더 많았습니다.
+      하루를 무작위로 골랐을 때 고점 대비 하락률의 중앙값은 <strong>−11.9%</strong>입니다.</p></div>
+      <p>다시 말해 코스피에 투자하고 있는 사람은 기간의 대부분을 "고점보다 아래"에서 보냅니다.
+      −10% 안팎의 하락은 시장이 이상해진 신호라기보다 <strong>평소 상태</strong>에 가깝습니다.</p>
+
+      <h2>신고가가 한 번도 없었던 해가 절반</h2>
+      <p>연도별로 보면 더 분명해집니다. 2002~2026년 25개 연도 가운데 <strong>코스피가 종가 기준 신고가를 단 하루도 기록하지 못한 해가 12개</strong>였습니다
+      (2008, 2009, 2010, 2012, 2013, 2014, 2015, 2016, 2019, 2022, 2023, 2024). 특히 2012~2016년은 5년 연속으로 신고가가 없었습니다.
+      2011년 5월 고점(종가)을 다시 넘은 것은 2017년 5월이었습니다.</p>
+      <p>"장기적으로 우상향한다"는 말 자체는 이 데이터와 어긋나지 않습니다. 다만 그 우상향은 <strong>몇 년씩 이어지는 횡보와 하락을 포함한</strong> 우상향입니다.</p>
+
+      <h2>코스닥은 더 극단적이다</h2>
+      <p>같은 기간 코스닥으로 똑같이 계산하면 그림이 크게 달라집니다.</p>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">그날 종가의 위치</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">거래일 수</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">비중</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">데이터 기간 최고치 (신고가)</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">69일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">고점 대비 0 ~ −5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">360일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">6.0%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−5 ~ −10%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">390일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">6.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−10 ~ −20%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1,192일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">19.9%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−20 ~ −30%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1,461일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">24.3%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−30 ~ −40%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1,777일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">29.6%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−40 ~ −50%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">622일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">10.4%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−50% 보다 깊음</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">129일</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.1%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>코스닥이 데이터 기간 최고치를 기록한 날은 <strong>69일(1.1%)</strong>, 고점에서 5% 안쪽에 있던 날도 7.1%에 그쳤습니다.
+      반대로 <strong>−20%보다 깊었던 날이 66.5%</strong>로 기간의 3분의 2를 차지합니다. 하락률 중앙값은 <strong>−26.4%</strong>입니다.
+      2008년부터 2017년까지는 10년 동안 신고가가 없었습니다.</p>
+      <p>여기서 "최고치"는 이 데이터가 시작하는 2002년 7월 이후의 최고치입니다. 코스닥은 2000년 IT 버블 때 이보다 훨씬 높은 2,800선까지 올랐던 적이 있으므로,
+      그 고점을 기준으로 하면 지금도 그보다 한참 아래에 있습니다.</p>
+
+      <h2>지금은 어디쯤인가</h2>
+      <p>2026-10-29 종가 기준으로 코스피는 2026-06-22의 최고 종가 9,114.55에서 <strong>-34.9%</strong> 내려와 있습니다.
+      지난 6,000거래일 가운데 이만큼 또는 이보다 더 깊었던 날은 <strong>2.6%</strong>였습니다.
+      코스닥은 2026-04-27 최고치 1,226.18에서 <strong>-38.6%</strong>이고, 이 정도 이상 깊었던 날은 16.5%였습니다.</p>
+      <p>이 비율은 "지금이 역사적으로 얼마나 깊은 자리인가"를 보여줄 뿐, 여기서 더 내려갈지 올라갈지를 알려주지는 않습니다.
+      위 표에서 보듯 −40%보다 깊었던 날도 실제로 있었습니다.</p>
+
+      <h2>이 숫자를 어떻게 쓸 수 있나</h2>
+      <ul>
+        <li><strong>기대치 조정</strong>: 지수에 투자한다면 "고점에서 10~20% 아래에 있는 기간이 가장 길다"는 것을 미리 알고 시작하는 편이 계획을 지키기 쉽습니다.</li>
+        <li><strong>개별 종목과 비교</strong>: <a href="/">MDD 계산기</a>에서 관심 종목의 현재 하락률을 확인한 뒤 위 표와 견줘 보면, 그 하락이 시장 전체의 평범한 흔들림 수준인지 그보다 훨씬 깊은지 감을 잡을 수 있습니다.</li>
+        <li><strong>시장 간 차이</strong>: 같은 "지수 투자"라도 코스피와 코스닥은 고점 아래에서 보내는 시간이 전혀 다릅니다.</li>
+      </ul>
+      <p class="muted" style="font-size:13px; color:#566275;">계산 방법: 코스피(KS11)·코스닥(KQ11) 일별 종가, 2002-07-05 ~ 2026-10-29. 각 거래일의 종가를 그날까지의 최고 종가와 비교했습니다.
+      데이터가 2002년 7월에 시작하므로 그 이전 고점은 반영되지 않습니다. 배당을 포함하지 않은 가격 지수 기준입니다.
+      계산 방식은 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 정리해 두었습니다. 이 글은 과거 데이터를 정리한 것이며 투자 권유가 아닙니다.</p>`
+  },
+  {
+    id: 27,
+    tag: '시장 데이터',
+    emoji: '⚡',
+    bg: '#fff5f5',
+    title: '코스피가 하루 3% 넘게 빠진 날, 그다음은 어땠나: 급락일 144번 분석',
+    excerpt: '"급락 다음엔 반등한다"는 말을 코스피 24년치로 확인했습니다. 평균은 반등 쪽이었지만, 조용하던 시장의 첫 급락만 따로 보면 이야기가 달라집니다.',
+    date: '2026-10-30',
+    readTime: '7분',
+    content: `
+      <h1>코스피가 하루 3% 넘게 빠진 날, 그다음은 어땠나: 급락일 144번 분석</h1>
+      <div class="article-meta">📅 2026년 10월 30일 &nbsp;&bull;&nbsp; ⏱ 7분 읽기</div>
+      <p>지수가 하루에 3% 넘게 빠지면 두 가지 말이 동시에 나옵니다. "공포에 사라, 급락 다음엔 반등한다"와 "떨어지는 칼날은 잡지 마라"입니다.
+      둘 중 어느 쪽이 데이터에 더 가까웠는지 코스피 2002~2026년 일별 종가 6,000거래일로 직접 세어 봤습니다.</p>
+
+      <h2>급락일은 몇 번, 언제 있었나</h2>
+      <p>종가 기준으로 전날보다 <strong>3% 이상 떨어진 날은 144번</strong>, 5% 이상 떨어진 날은 40번이었습니다.
+      고르게 흩어져 있지 않습니다. 2008년 21번, 2020년 13번, 2026년 36번으로
+      <strong>세 해에만 70번, 전체의 절반</strong>이 몰려 있습니다. 반대로 2005년, 2013~2015년, 2017년, 2023년에는 한 번도 없었습니다.</p>
+      <p>급락은 몰려서 옵니다. −3% 급락일 144번 가운데 <strong>103번(72%)은 직전 20거래일 안에 또 다른 −3% 급락이 있었던 날</strong>이었습니다.</p>
+
+      <h2>평균으로 보면: 급락 뒤가 오히려 좋았다</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">출발점</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">기간</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">수익률 중앙값</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">오른 비율</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">최악</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">표본</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">모든 거래일</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">5거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+0.36%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">56%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-21.6%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5,994</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">20거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+0.96%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">58%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-37.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5,979</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">60거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+2.12%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">62%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-40.1%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5,939</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">250거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+6.96%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">67%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-52.4%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5,749</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−3% 이상 급락일</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">5거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+1.87%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">60%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-20.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">144</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">20거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+3.78%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">68%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-28.7%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">139</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">60거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+6.90%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">67%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-27.2%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">133</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">250거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+25.03%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">80%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-50.3%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">105</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−5% 이상 급락일</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">5거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+3.75%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">65%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-14.6%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">40</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">20거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+4.57%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">66%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-19.7%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">38</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">60거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+4.84%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">58%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-18.1%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">36</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;"></td><td style="padding:8px; border-bottom:1px solid #edf2f7;">250거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+34.20%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">95%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-11.2%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">19</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>표만 보면 "급락일에 샀다면 평소보다 나았다"는 결론이 나옵니다. 급락 다음 날 오른 비율도 64%로 평소(54%)보다 높았습니다.
+      하지만 이 평균에는 함정이 두 개 있습니다.</p>
+      <ul>
+        <li><strong>표본이 소수의 위기에 쏠려 있습니다.</strong> 250거래일 뒤 수익률을 계산할 수 있는 105번 중 34번이 2008년과 2020년입니다.
+        두 해 모두 바닥 이후 1년 동안 크게 반등했습니다. 이 두 번의 반등이 평균을 끌어올립니다.</li>
+        <li><strong>최악의 경우는 평소보다 나쁘지 않았지만, 결코 가볍지 않았습니다.</strong> −3% 급락일 뒤 1년 수익률의 최악은 -50.3%였습니다.
+        2007년 10월 22일, 금융위기 하락장이 시작되기 직전의 급락일이 여기에 해당합니다. 그날에는 그 급락이 하락장의 시작인지 일시적 흔들림인지 알 수 없었습니다.</li>
+      </ul>
+
+      <h2>조용하던 시장의 "첫 급락"만 따로 보면</h2>
+      <p>평균이 위기의 한가운데에 끌려간다면, 실제로 판단을 내려야 하는 순간은 언제일까요. 대개는 <strong>한동안 잠잠하다가 처음 크게 빠진 날</strong>입니다.
+      그래서 직전 60거래일(약 3개월) 동안 −3% 급락이 없었는데 처음 −3% 이상 빠진 날만 골라 봤습니다. 24번입니다.</p>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">기간</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">수익률 중앙값</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">오른 비율</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">최악</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">표본</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">5거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">−0.43%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">42%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">−7.7%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">24</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">20거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+1.12%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">63%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">−9.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">24</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">60거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+4.50%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">58%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">−18.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">24</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">250거래일 뒤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+10.90%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">61%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">−18.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">23</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="highlight-box"><p>📊 첫 급락 뒤 <strong>일주일 동안은 오히려 더 내린 경우가 많았습니다</strong>(오른 비율 42%, 중앙값 −0.43%).
+      이후 60거래일 안에 급락일 종가보다 <strong>5% 넘게 더 내려간 경우가 24번 중 10번(42%)</strong>이었고,
+      24번 중 12번은 60거래일 안에 또 다른 −3% 급락이 따라왔습니다.</p></div>
+      <p>1년 뒤 성과도 모든 급락일을 섞었을 때(+25.0%)보다 훨씬 평범한 +10.9%로, 아무 날이나 고른 경우(+7.0%)와 크게 다르지 않았습니다.
+      즉 "급락 뒤 큰 반등"은 대부분 <strong>이미 급락이 여러 번 이어진 위기의 한복판</strong>에서 나온 결과였고, 그 한복판이 어디인지는 지나고 나서야 알 수 있었습니다.</p>
+
+      <h2>역대 가장 크게 빠진 10일</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">날짜</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">그날 등락</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">20거래일 뒤</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">250거래일 뒤</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-03-04</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-12.1%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+7.6%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-07-28</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-10.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+13.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-24</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-10.6%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+6.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+76.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-06-23</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-10.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-17.1%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-16</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-9.4%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-10.3%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+34.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-07-13</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-8.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-6.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2024-08-05</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-8.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+9.1%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+29.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-8.4%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+31.3%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+106.4%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-06-08</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-8.3%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">+7.6%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-07-02</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-7.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-13.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>10일 중 6일이 2026년에 몰려 있다는 점이 눈에 띕니다. 20거래일 뒤 결과도 크게 엇갈립니다. 같은 −10% 안팎의 급락이라도
+      한 달 뒤 +13%인 날과 −17%인 날이 함께 있습니다. 하루의 하락폭만으로는 그다음을 가늠할 수 없다는 뜻입니다.</p>
+
+      <h2>정리</h2>
+      <ul>
+        <li>급락일 전체의 평균만 보면 그 뒤 성과가 평소보다 좋았지만, 이는 2008·2020년 같은 소수 위기의 반등이 끌어올린 결과입니다.</li>
+        <li>조용하던 시장의 첫 급락 뒤에는 단기적으로 추가 하락이 더 흔했습니다.</li>
+        <li>어느 경우든 결과의 폭이 넓습니다. 급락 자체가 매수나 매도의 신호가 된다는 근거는 이 데이터에서 찾기 어렵습니다.</li>
+      </ul>
+      <p class="muted" style="font-size:13px; color:#566275;">계산 방법: 코스피(KS11) 일별 종가, 2002-07-05 ~ 2026-10-29. 등락률은 전 거래일 종가 대비, 이후 수익률은 급락일 종가 대비 N거래일 뒤 종가입니다.
+      기간이 겹치는 표본이 있어 서로 독립적이지 않습니다. 배당·거래비용은 반영하지 않았습니다. 과거 데이터를 정리한 것이며 투자 권유가 아닙니다.
+      계산 방식은 <a href="/methodology.html">숫자는 어떻게 계산하나</a>에 있습니다.</p>`
+  },
+  {
+    id: 28,
+    tag: '시장 데이터',
+    emoji: '⚖️',
+    bg: '#faf5ff',
+    title: '코스피 vs 코스닥: 같은 위기에서 얼마나 더 빠지고, 얼마나 늦게 회복했나',
+    excerpt: '2002년 이후 −20%가 넘은 하락장을 코스피와 코스닥 양쪽에서 모두 뽑아 나란히 놓았습니다. 2008년 하락에서 코스닥이 전고점을 되찾는 데는 10년이 걸렸습니다.',
+    date: '2026-10-30',
+    readTime: '6분',
+    content: `
+      <h1>코스피 vs 코스닥: 같은 위기에서 얼마나 더 빠지고, 얼마나 늦게 회복했나</h1>
+      <div class="article-meta">📅 2026년 10월 30일 &nbsp;&bull;&nbsp; ⏱ 6분 읽기</div>
+      <p>"코스닥은 코스피보다 변동성이 크다"는 말은 누구나 압니다. 그런데 그 차이가 실제로 얼마인지, 특히 <strong>하락의 깊이와 회복에 걸린 시간</strong>으로 따져 본 자료는 드뭅니다.
+      이 사이트의 코스피·코스닥 일별 데이터(2002년 7월 ~ 2026년 10월)에서 <strong>종가 기준 −20% 이상 빠진 구간</strong>을 양쪽 모두 뽑아 비교했습니다.</p>
+
+      <h2>코스피의 −20% 이상 하락장</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">저점</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">낙폭</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">전고점 회복</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점→회복</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-07-09</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-03-17</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-35.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-11-05</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">1.3년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2004-04-23</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2004-08-02</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-23.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2005-02-07</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">0.8년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10-31</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-24</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-54.5%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-01-03</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">3.2년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-05-02</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-09-26</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-25.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2017-05-04</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">5.9년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-01-29</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-43.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-11-23</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2.8년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-07-06</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2022-09-30</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-34.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2025-09-10</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">4.1년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-06-22</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-10-26</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-40.0%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">아직 회복 전</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">현재 -34.9%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <h2>코스닥의 −20% 이상 하락장</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">저점</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">낙폭</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">전고점 회복</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점→회복</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-07-10</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2004-08-04</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-51.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2005-11-23</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">3.3년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-01-16</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-10-09</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-28.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-06-07</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">1.4년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07-12</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-27</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-68.5%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-01-08</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">10.4년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-01-29</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-53.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-12-11</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2.8년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-08-09</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2024-12-09</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-40.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-01-26</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">4.4년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-04-27</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-07-30</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-47.4%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">아직 회복 전</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">현재 -38.6%</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>같은 위기, 다른 결과</h2>
+      <p>두 표에서 시기가 겹치는 구간을 맞대어 보면 차이가 분명합니다.</p>
+      <ul>
+        <li><strong>2008년 금융위기</strong>: 코스피 −54.5%, 코스닥 −68.5%. 코스피는 3.2년 만에 전고점을 되찾았지만 <strong>코스닥은 10.4년</strong>(2007년 7월 → 2018년 1월)이 걸렸습니다.
+        −68.5%에서 원래 자리로 돌아오려면 +217%가 필요합니다. −54.5%는 +120%입니다.</li>
+        <li><strong>2018~2020년</strong>: 코스피 −43.9%, 코스닥 −53.8%. 이번에는 둘 다 고점에서 약 2.8년 만에 회복했습니다. 2020년 3월 바닥 이후 반등이 양쪽 모두 빨랐기 때문입니다.</li>
+        <li><strong>2021~2024년</strong>: 코스피 −34.8%(4.1년), 코스닥 −40.8%(4.4년). 깊이는 코스닥이 더 깊었고 시간은 비슷했습니다.</li>
+        <li><strong>2026년</strong>: 두 지수 모두 상반기에 최고치를 찍은 뒤 크게 빠졌습니다. 저점까지 코스피 −40.0%, 코스닥 −47.4%였고, 10월 29일 기준으로 각각 고점 대비 −34.9%, −38.6%입니다.</li>
+      </ul>
+      <div class="highlight-box"><p>📊 위기마다 <strong>코스닥이 코스피보다 6~14%p 더 깊이</strong> 빠졌습니다.
+      회복 시간은 대체로 비슷했지만, 한 번(2008년)은 코스닥 쪽이 세 배 넘게 길었습니다. 깊이 차이는 꾸준했고, 시간 차이는 들쭉날쭉했다는 뜻입니다.</p></div>
+
+      <h2>고점 아래에서 보낸 시간</h2>
+      <p>같은 24년 동안 <strong>고점 대비 −20%보다 깊이 빠져 있던 날의 비중은 코스피 24.1%, 코스닥 66.5%</strong>였습니다.
+      코스닥 투자자는 기간의 3분의 2를 "고점에서 20% 넘게 내려온 상태"로 보냈다는 뜻입니다.
+      날짜별 분포는 <a href="/blog/26.html">코스피 6,000거래일 중 최고치에 있던 날은 5%뿐이었다</a>에 따로 정리했습니다.</p>
+
+      <h2>왜 이렇게 다를까</h2>
+      <p>숫자가 원인을 말해 주지는 않지만, 흔히 거론되는 이유는 이렇습니다. 코스닥은 성장주·중소형주 비중이 높아 실적 기대가 꺾일 때 가격이 크게 조정되고,
+      개인 투자자 비중이 높아 같은 뉴스에도 쏠림이 강하게 나타나는 편입니다. 또 지수 구성 종목이 자주 바뀌어, 2008년 이전에 지수를 끌어올렸던 종목들이 회복하지 못한 채 빠져나간 영향도 있습니다.</p>
+
+      <h2>이 비교에서 가져갈 것</h2>
+      <ul>
+        <li>코스닥 종목이나 코스닥 지수 ETF를 볼 때는 코스피 기준의 "보통 하락폭"을 그대로 적용하기 어렵습니다.</li>
+        <li>같은 −30%라도 코스피에서는 드문 깊이(전체 거래일의 약 5%)이고, 코스닥에서는 기간의 40% 넘게 그보다 깊었습니다.</li>
+        <li>관심 종목이 어느 시장에 속하는지에 따라 <a href="/">MDD 계산기</a>로 본 현재 하락률을 읽는 기준도 달라져야 합니다.</li>
+      </ul>
+      <p class="muted" style="font-size:13px; color:#566275;">계산 방법: 코스피(KS11)·코스닥(KQ11) 일별 종가, 2002-07-05 ~ 2026-10-29. 하락 구간은 종가가 직전 최고 종가를 다시 넘는 날까지를 하나로 봤고,
+      그 사이 최저 종가가 −20% 이하였던 구간만 표에 넣었습니다. 데이터 시작 이전(2000년 IT 버블 등)의 고점은 반영되지 않습니다.
+      과거 데이터를 정리한 것이며 투자 권유가 아닙니다.</p>`
+  },
+  {
+    id: 29,
+    tag: '종목 데이터',
+    emoji: '🏢',
+    bg: '#fffaf0',
+    title: '한국 대형주 46종목의 MDD: 2002년 이후 최대 낙폭과 지금 위치',
+    excerpt: '삼성전자부터 HMM까지, 2002년부터 데이터가 있는 대형주 46종목의 최대 낙폭·회복 여부·현재 하락률을 한 표에 모았습니다. 중앙값은 −82%였습니다.',
+    date: '2026-10-30',
+    readTime: '8분',
+    content: `
+      <h1>한국 대형주 46종목의 MDD: 2002년 이후 최대 낙폭과 지금 위치</h1>
+      <div class="article-meta">📅 2026년 10월 30일 &nbsp;&bull;&nbsp; ⏱ 8분 읽기</div>
+      <p>"대형주는 안전하다"는 말을 MDD로 확인해 봤습니다. 이 사이트가 매 거래일 시세를 받아 두는 한국 종목 가운데
+      <strong>2002년 7월부터 약 6,000거래일 데이터가 모두 있는 46종목</strong>의 최대 낙폭(MDD)을 종가 기준으로 계산했습니다.
+      코스피 지수 자체의 같은 기간 MDD는 −54.5%(2007년 10월 → 2008년 10월)입니다.</p>
+
+      <h2>한눈에 보는 결과</h2>
+      <div class="highlight-box"><p>📊 46종목 중 <strong>45종목이 한 번 이상 −50%보다 깊이 빠졌고</strong>, 26종목은 −80%보다 깊었습니다.
+      최대 낙폭의 중앙값은 <strong>-82.1%</strong>로, 같은 기간 코스피(−54.5%)보다 훨씬 깊습니다.
+      −50%를 넘지 않은 종목은 삼성전자(−46.7%) 하나였습니다.</p></div>
+      <p>지수는 수백 종목의 평균이라 개별 종목의 극단적인 하락이 서로 상쇄됩니다. 지수의 MDD를 보고 "대형주도 이 정도겠지"라고 짐작하면 개별 종목의 위험을 크게 과소평가하게 됩니다.</p>
+
+      <h2>종목별 표 (최대 낙폭이 깊은 순)</h2>
+      <p>"회복"은 최대 낙폭이 시작된 고점의 종가를 다시 넘어선 시점까지 걸린 기간입니다. "현재"는 2026년 10월 29일 종가가 데이터 기간 최고 종가에서 얼마나 떨어져 있는지입니다.</p>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">종목</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">최대 낙폭</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점 → 저점</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">회복까지</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">현재 고점 대비</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">HMM</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-99.3%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-05 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-93.0%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">두산에너빌리티</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-98.4%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-11 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-59.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">한화오션</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-96.5%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">에스엠</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-95.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2005-07 → 2008-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5.2년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-50.7%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">대우건설</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-93.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.5년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-69.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">GS건설</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-93.0%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10 → 2023-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-84.0%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성중공업</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-92.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-60.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">현대제철</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-91.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-04 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">더존비즈온</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-90.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-06 → 2008-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">15.4년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-5.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">롯데케미칼</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-89.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-03 → 2026-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-89.6%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">HD현대미포</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-89.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">17.4년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-9.9%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">DB하이텍</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-89.0%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2005-03 → 2008-12</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">14.7년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-55.6%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">미래에셋증권</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-88.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-68.4%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">한화에어로스페이스</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-87.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2010-09 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">12.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-51.9%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">HD한국조선해양</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-86.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-04 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-53.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">SK하이닉스</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-85.4%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-09 → 2008-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">7.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-48.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">대한항공</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-85.3%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-11 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-55.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">금호석유</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-85.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10 → 2008-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">3.2년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-63.9%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">안랩</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-84.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-01 → 2008-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-43.7%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">현대건설</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-83.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-09 → 2004-05</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">3.1년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-51.7%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">카카오</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-06 → 2026-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.6%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">한글과컴퓨터</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-07 → 2008-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">9.4년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-55.7%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">LG화학</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.3%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-02 → 2025-05</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-77.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">POSCO홀딩스</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.0%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-64.0%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성증권</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-80.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-11 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.0년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-44.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">고려아연</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-80.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07 → 2008-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-57.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성SDI</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-80.0%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-08 → 2025-05</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-32.6%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">기아</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-79.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-01 → 2008-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">4.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-47.3%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">기업은행</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-76.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07 → 2009-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-32.6%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">LS ELECTRIC</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-75.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-07 → 2003-05</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.5년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-50.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">현대차</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-75.5%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2012-04 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">11.9년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-61.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">LG전자</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-75.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-05 → 2015-08</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">12.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-60.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성전기</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-74.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2010-07 → 2014-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">7.9년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-43.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">이오테크닉스</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-74.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2015-02 → 2019-01</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">8.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-32.7%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">한국전력</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-74.3%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2016-05 → 2023-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">9.5년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-58.3%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">현대모비스</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-68.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-07 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">14.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-53.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">KT</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-68.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-09 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">22.5년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-33.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">LG유플러스</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-68.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-06 → 2011-08</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">7.1년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-23.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">신한지주</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-67.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07 → 2009-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">17.7년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-22.3%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">리노공업</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-65.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-05 → 2008-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">3.8년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-51.6%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성화재</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-61.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2015-11 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">8.1년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-10.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">LG</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-60.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-11 → 2008-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.8년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-39.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">유한양행</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-59.4%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2024-10 → 2026-06</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">미회복</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-54.3%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">SK텔레콤</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-56.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-07 → 2012-05</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">12.1년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-38.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">KT&G</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-53.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2016-07 → 2020-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">8.9년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-0.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성전자</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-46.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-05 → 2008-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-36.4%</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>표에서 읽히는 것</h2>
+      <ul>
+        <li><strong>업종이 겹친다</strong>: 최대 낙폭 상위에는 조선(한화오션·삼성중공업·HD한국조선해양), 해운(HMM), 건설(GS건설·대우건설), 철강·소재(현대제철·POSCO홀딩스)가 몰려 있습니다.
+        대부분 2007년 전후 경기 호황의 고점에서 출발해 2020년 3월에 바닥을 찍은 하락입니다.</li>
+        <li><strong>14종목은 최대 낙폭의 출발점이었던 고점을 아직 되찾지 못했습니다.</strong> 이 가운데 9종목(HMM, 두산에너빌리티, 한화오션, GS건설, 삼성중공업, 현대제철, HD한국조선해양, 대한항공, POSCO홀딩스)은 데이터 기간 최고가가 2015년 이전, 대부분 2007년 무렵입니다.</li>
+        <li><strong>회복에 10년이 넘게 걸린 경우가 흔합니다.</strong> KT는 2002년 고점을 2025년에야 넘었습니다(22.5년). 증권·은행·건설주 다수가 2007년 고점을 2025~2026년에 회복했습니다.</li>
+        <li><strong>지금은 대부분 고점에서 멀리 있습니다.</strong> 2026년 하반기 급락 이후 46종목 중 28종목이 최고가 대비 −50%보다 아래에 있고, 고점 10% 이내인 종목은 3개뿐입니다(중앙값 -52.5%).
+        25종목이 2026년에 최고가를 찍은 직후라는 점도 함께 봐야 합니다.</li>
+      </ul>
+
+      <h2>주의할 점: 이 표는 "살아남은 대형주"만 담았다</h2>
+      <p>이 46종목은 <strong>지금 대형주인 회사들</strong>입니다. 2002년 이후 크게 빠진 뒤 상장폐지되거나 존재감이 사라진 회사는 애초에 이 목록에 없습니다.
+      그래서 이 표의 회복 사례들은 실제보다 낙관적으로 보입니다. "결국 회복했다"는 결과만 보고 개별 종목의 깊은 하락을 견디면 된다고 결론 내리면, 살아남지 못한 종목들을 빼먹은 셈입니다.</p>
+      <p>또 두 종목(JYP Ent.·HLB)은 표에서 뺐습니다. 같은 종목코드에 우회상장·사업 전환 이전 회사의 주가가 이어져 있어 지금 회사의 하락으로 보기 어렵기 때문입니다.
+      엔씨소프트·셀트리온은 하루 등락이 가격제한폭을 넘는 값이 있어(수정주가 반영 차이로 보임) 계산에서 제외했습니다.</p>
+      <p class="muted" style="font-size:13px; color:#566275;">계산 방법: 네이버 금융 일별 수정 종가, 2002-07-05 ~ 2026-10-29. 배당을 포함하지 않은 가격 기준입니다. 2002년 7월 이전의 고점은 반영되지 않습니다.
+      각 종목은 <a href="/">MDD 계산기</a>에 종목명이나 6자리 코드를 넣으면 같은 데이터로 기간을 바꿔 가며 볼 수 있습니다.
+      과거 데이터를 정리한 것이며 특정 종목의 매수·매도를 권하지 않습니다.</p>`
+  },
+  {
+    id: 30,
+    tag: 'MDD 데이터',
+    emoji: '🔄',
+    bg: '#f0fff4',
+    title: '반토막 난 대형주는 얼마나 돌아왔나: −50% 하락 106번의 결말',
+    excerpt: '한국 대형주가 고점 대비 −50% 넘게 빠진 106번의 사례를 끝까지 추적했습니다. 87번은 전고점을 되찾았지만, 걸린 시간의 중앙값은 3.9년이었습니다.',
+    date: '2026-10-30',
+    readTime: '7분',
+    content: `
+      <h1>반토막 난 대형주는 얼마나 돌아왔나: −50% 하락 106번의 결말</h1>
+      <div class="article-meta">📅 2026년 10월 30일 &nbsp;&bull;&nbsp; ⏱ 7분 읽기</div>
+      <p>MDD에서 가장 많이 인용되는 사실은 이것입니다. <strong>−50%가 되면 원금으로 돌아오는 데 +100%가 필요하다.</strong>
+      산수로는 분명하지만, 정작 궁금한 것은 그다음입니다. 실제로 반토막 난 종목들은 그 +100%를 해냈을까, 해냈다면 얼마나 걸렸을까.</p>
+      <p>이 사이트의 한국 대형주 데이터(2002년 7월부터 6,000거래일이 모두 있는 종목)에서 <strong>종가가 직전 고점 대비 −50%보다 깊이 빠진 사례를 모두 찾아</strong>, 그 고점을 다시 넘었는지 추적했습니다.
+      2026년에 시작된 하락은 결말을 판단하기에 이르므로 뺐습니다.</p>
+
+      <h2>결과: 다섯 번 중 네 번은 돌아왔지만, 보통 4년 가까이 걸렸다</h2>
+      <div class="highlight-box"><p>📊 −50% 이상 하락 <strong>106번</strong>(45종목) 중 <strong>87번(82%)</strong>이 전고점을 되찾았습니다.
+      고점에서 회복까지 걸린 시간의 중앙값은 <strong>3.9년</strong>, 바닥에서 회복까지는 1.7년이었습니다.
+      회복까지 걸린 시간은 0~2년 19번, 2~5년 28번, 5~10년 23번, 10년 이상 17번으로 넓게 퍼져 있습니다.</p></div>
+
+      <h2>깊이별로 나누면</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점 대비 낙폭</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">회복에 필요한 상승률</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">사례</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">회복</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점→회복 중앙값</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">바닥→회복 중앙값</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−50 ~ −60%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">+100 ~ +150%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">28</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">26 (93%)</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.1년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.9년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−60 ~ −70%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">+150 ~ +233%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">22</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">21 (95%)</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">3.8년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.2년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−70 ~ −80%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">+233 ~ +400%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">26</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">22 (85%)</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">7.5년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.2년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">−80%보다 깊음</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">+400% 이상</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">30</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18 (60%)</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">9.4년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">3.2년</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>−50~−70% 구간은 10번 중 9번 넘게 돌아왔고 걸린 시간도 2~4년 수준이었습니다. 그러나 <strong>−80%를 넘어서면 회복률이 60%로 떨어지고</strong>, 회복한 경우에도 고점에서 9년 넘게 걸렸습니다.
+      −80%에서 원래 자리로 돌아오려면 +400%, −90%면 +900%가 필요합니다. 숫자 자체가 회복을 어렵게 만듭니다.</p>
+
+      <h2>가장 오래 걸린 회복</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">종목</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">최대 낙폭</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">회복</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">걸린 시간</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">KT</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-09</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-68.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2025-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">22.5년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">대우건설</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-93.1%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-04</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.5년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">기업은행</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-76.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-02</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.3년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">미래에셋증권</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-88.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-01</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.3년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성증권</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-80.8%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-02</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.0년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">현대건설</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-81.0%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-01</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">18.0년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">신한지주</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-67.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2025-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">17.7년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">HD현대미포</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-89.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2025-06</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">17.4년</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>2007년 고점에서 출발한 증권·은행·건설주가 2025~2026년에야 원래 자리로 돌아왔습니다. 결과만 보면 "결국 회복했다"지만, 그 사이 17~18년은 한 사람의 투자 기간 대부분에 해당합니다.</p>
+
+      <h2>15년 넘게 돌아오지 못한 종목</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">종목</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">최대 낙폭</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">지금 그 고점 대비</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">HMM</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-05</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-99.3%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-93.0%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">두산에너빌리티</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-98.4%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-59.5%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">한화오션</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-96.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">GS건설</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-93.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-84.0%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">삼성중공업</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-92.7%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-60.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">현대제철</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-04</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-91.1%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.2%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">HD한국조선해양</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-04</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-86.7%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-53.1%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">대한항공</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-11</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-85.3%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-55.8%</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">POSCO홀딩스</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-82.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-64.0%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>조선·해운·철강·항공처럼 2007~2011년 경기 고점에 함께 정점을 찍은 업종이 대부분입니다. 이 종목들은 15년이 넘도록 그 고점을 넘지 못했습니다.
+      산업 전체의 환경이 바뀐 경우, 개별 회사의 노력과 무관하게 이전 가격대가 다시 정당화되지 않을 수 있습니다.</p>
+
+      <h2>이 숫자가 과장된 쪽으로 기운 이유</h2>
+      <p>여기 나온 82%는 <strong>실제보다 높게 나온 값</strong>일 가능성이 큽니다. 분석 대상이 "지금도 대형주로 남아 있는 회사"이기 때문입니다.
+      2002년 이후 반토막이 난 뒤 상장폐지되거나 소형주로 밀려난 회사들은 처음부터 이 목록에 없습니다. 살아남은 회사만 세면 회복률은 당연히 높게 나옵니다.</p>
+      <p>그래서 이 데이터가 말해 주는 것은 "−50%는 결국 회복된다"가 아니라 다음에 가깝습니다.</p>
+      <ul>
+        <li>살아남은 대형주조차 반토막 이후 회복에 <strong>보통 수년</strong>이 걸렸습니다.</li>
+        <li>하락이 −80%를 넘으면 살아남은 회사들 사이에서도 회복은 확률의 문제가 됐습니다.</li>
+        <li>업종 전체가 함께 꺾인 경우 회복 기간이 특히 길었습니다.</li>
+      </ul>
+      <p>관심 종목이 지금 고점 대비 어디에 있는지는 <a href="/">MDD 계산기</a>에서, 대형주별 최대 낙폭은 <a href="/blog/29.html">한국 대형주 46종목의 MDD</a> 글에서 확인할 수 있습니다.</p>
+      <p class="muted" style="font-size:13px; color:#566275;">계산 방법: 네이버 금융 일별 수정 종가, 2002-07-05 ~ 2026-10-29. 하락 사례는 종가가 직전 최고 종가를 다시 넘기 전까지를 하나로 보고, 그 사이 최저 종가가 −50% 이하인 경우만 셌습니다.
+      JYP Ent.·HLB(우회상장·사업 전환 이전 주가 포함), 엔씨소프트·셀트리온(가격제한폭을 넘는 일간 변동 포함)은 제외했습니다. 배당 미포함 가격 기준이며, 과거 데이터를 정리한 것으로 투자 권유가 아닙니다.</p>`
+  },
+  {
+    id: 31,
+    tag: '종목 데이터',
+    emoji: '💾',
+    bg: '#ebf8ff',
+    title: '삼성전자와 SK하이닉스, 반도체 사이클이 만든 하락과 회복 (2002~2026)',
+    excerpt: '같은 반도체 사이클을 겪었는데 삼성전자는 24년간 −47%를 넘지 않았고, SK하이닉스는 −85%까지 빠졌습니다. −30% 이상 하락 19번을 모두 정리했습니다.',
+    date: '2026-10-30',
+    readTime: '7분',
+    content: `
+      <h1>삼성전자와 SK하이닉스, 반도체 사이클이 만든 하락과 회복 (2002~2026)</h1>
+      <div class="article-meta">📅 2026년 10월 30일 &nbsp;&bull;&nbsp; ⏱ 7분 읽기</div>
+      <p>한국 증시에서 가장 많이 조회되는 두 종목은 같은 메모리 반도체 업황을 따라 움직입니다. 그런데 하락의 모양은 놀라울 만큼 다릅니다.
+      이 사이트의 일별 데이터(2002년 7월 ~ 2026년 10월, 종가 기준)에서 두 종목이 <strong>고점 대비 −30% 이상 빠진 구간</strong>을 모두 뽑았습니다.</p>
+
+      <h2>삼성전자: 10번, 가장 깊었던 하락이 −46.7%</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">저점</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">낙폭</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">전고점 회복</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점→회복</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">바닥→회복</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-12-03</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-02-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-31.4%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-07-08</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.4년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2004-04-23</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2004-12-13</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-36.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2005-12-07</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.0년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-01-31</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10-25</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-31.5%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-05-06</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.2년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.5년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-05-15</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-24</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-46.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2009-08-24</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.3년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.8년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-01-28</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-08-19</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-32.7%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2011-12-01</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.8년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.3년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2013-01-02</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2015-08-26</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-32.3%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2016-08-18</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">3.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.0년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2017-11-01</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2019-01-04</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-34.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-01-09</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.1년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.0년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-01-20</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-23</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-31.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-11-13</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.8년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.6년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-01-11</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2024-11-14</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-45.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2025-10-10</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">4.7년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.9년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-06-18</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-07-30</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-42.9%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">아직 회복 전</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">현재 -36.4%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>24년 동안 −30%를 넘는 하락이 10번 있었지만 <strong>−50%에 닿은 적은 한 번도 없습니다.</strong> 가장 깊었던 2008년 금융위기 때도 −46.7%였습니다.
+      더 눈에 띄는 것은 회복 속도입니다. 회복한 9번 모두 <strong>바닥에서 1년 안팎</strong>에 전고점을 다시 넘었습니다.
+      가장 길었던 것은 2021년 1월 고점에서 시작된 하락으로, 바닥(2024년 11월)까지 내려가는 데만 4년 가까이 걸렸고 전고점 회복까지 모두 4.7년이 걸렸습니다.</p>
+
+      <h2>SK하이닉스: 9번, −80%를 두 번 넘었다</h2>
+      <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:14px; margin:12px 0;">
+        <thead><tr style="background:#f7fafc;"><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">저점</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">낙폭</th><th style="text-align:left; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">전고점 회복</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">고점→회복</th><th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0; white-space:nowrap;">바닥→회복</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-07-19</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-03-26</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-81.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2005-02-14</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.5년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.9년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-01-13</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-06-22</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-31.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-09-13</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.7년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.2년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2006-09-18</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-11-24</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-85.4%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2014-04-23</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">7.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">5.4년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2014-07-08</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2016-05-09</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-50.4%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2017-01-26</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.5년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.7년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-05-23</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2019-01-03</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-39.5%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2019-12-27</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.6년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.0년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-02-17</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-34.3%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-12-02</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.8년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.7년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-02-25</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2022-12-29</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-49.5%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2024-02-13</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">2.9년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">1.1년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2024-07-11</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2024-09-19</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-36.6%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2025-06-16</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.9년</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">0.7년</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-06-22</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2026-10-20</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">-59.2%</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">아직 회복 전</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">현재 -48.1%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7; white-space:nowrap;">—</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>SK하이닉스는 2002~2003년(−81.6%)과 2006~2008년(−85.4%) 두 번 −80%를 넘었습니다. 두 번째 하락은 회복에 <strong>7.6년</strong>이 걸렸습니다.
+      −85.4%에서 원래 자리로 돌아오려면 약 +585%가 필요했습니다. 2010년대 이후로는 하락이 −50% 안팎에서 멈췄고 고점에서 회복까지도 1~3년으로 짧아졌습니다.
+      2026년 6월 고점 이후의 하락은 저점까지 −59.2%로, 2008년 이후 가장 깊습니다.</p>
+
+      <h2>무엇이 달랐나</h2>
+      <ul>
+        <li><strong>사업 구성</strong>: 삼성전자는 메모리 외에도 스마트폰·가전·파운드리 등 매출원이 넓어 메모리 불황의 충격이 회사 전체로는 희석됩니다. SK하이닉스는 메모리 비중이 절대적이라 업황이 그대로 실적과 주가에 반영됩니다.</li>
+        <li><strong>재무 체력</strong>: 2000년대 초 SK하이닉스는 채권단 관리를 받던 시기가 있었습니다. 위기 때 버틸 여력이 주가 하락의 깊이에 반영됐다고 볼 수 있습니다.</li>
+        <li><strong>시대의 변화</strong>: 2012년 SK그룹 편입 이후 SK하이닉스의 하락 폭이 눈에 띄게 얕아졌습니다. 같은 종목코드라도 회사의 처지가 바뀌면 과거의 MDD가 앞으로를 그대로 말해 주지 않습니다.</li>
+      </ul>
+      <div class="highlight-box"><p>📊 같은 업황을 겪어도 <strong>회사 구조에 따라 하락 깊이가 두 배 가까이</strong> 달랐습니다.
+      "반도체주는 원래 이 정도 빠진다"는 식으로 업종 평균을 적용하기보다, 종목마다 자기 과거를 따로 보는 편이 정확합니다.</p></div>
+
+      <h2>지금은</h2>
+      <p>2026년 10월 29일 종가 기준으로 삼성전자는 6월 18일 최고 종가 대비 <strong>-36.4%</strong>,
+      SK하이닉스는 6월 22일 최고 종가 대비 <strong>-48.1%</strong>입니다.
+      두 종목 모두 아직 이번 하락의 결말이 나지 않았습니다. 과거의 회복 기간이 이번에도 반복된다는 보장은 없습니다.</p>
+      <p>두 종목의 오늘 하락률과 회복 패턴은 <a href="/?ticker=005930">삼성전자</a>, <a href="/?ticker=000660">SK하이닉스</a>를 MDD 계산기에서 바로 열어 볼 수 있습니다.
+      다른 대형주와의 비교는 <a href="/blog/29.html">한국 대형주 46종목의 MDD</a>에 있습니다.</p>
+      <p class="muted" style="font-size:13px; color:#566275;">계산 방법: 네이버 금융 일별 수정 종가, 2002-07-05 ~ 2026-10-29. 하락 구간은 종가가 직전 최고 종가를 다시 넘는 날까지를 하나로 봤고, 그 사이 최저 종가가 −30% 이하였던 구간만 넣었습니다.
+      배당을 포함하지 않은 가격 기준입니다. 과거 데이터를 정리한 것이며 특정 종목의 매수·매도를 권하지 않습니다.</p>`
   }
 ];
 
 const RELATED_POSTS = {
-  1:[15,4,11], 2:[12,9,20], 3:[17,1,15], 4:[7,24,14], 5:[3,10,19],
+  1:[26,4,15], 2:[12,9,20], 3:[17,1,27], 4:[28,24,1], 5:[3,10,19],
   6:[11,24,19], 7:[23,16,13], 8:[22,21,10], 9:[2,12,20], 10:[8,3,22],
-  11:[24,6,13], 12:[2,9,20], 13:[7,23,11], 14:[4,3,24], 15:[1,21,25],
+  11:[24,6,13], 12:[31,2,9], 13:[7,23,11], 14:[4,3,24], 15:[1,21,25],
   16:[7,23,13], 17:[3,6,11], 18:[19,25,21], 19:[18,6,17], 20:[2,12,9],
-  21:[15,25,10], 22:[8,10,3], 23:[7,16,13], 24:[11,6,13], 25:[1,15,21]
+  21:[15,25,10], 22:[8,10,3], 23:[7,16,13], 24:[11,6,13], 25:[1,15,21],
+  26:[28,1,29], 27:[26,3,30], 28:[26,1,27], 29:[30,31,26], 30:[29,31,1], 31:[29,30,12]
 };
 
 const CTA_MAP = {
@@ -1189,7 +1713,13 @@ const CTA_MAP = {
   22:{type:'home', label:'감정 대신 데이터로 확인해보기'},
   23:{type:'ticker', value:'VTI', label:'VTI MDD 지금 확인하기'},
   24:{type:'page', value:'compound', label:'복리 계산기로 장기 수익 확인하기'},
-  25:{type:'ticker', value:'SPY', label:'첫 종목 SPY로 시작해보기'}
+  25:{type:'ticker', value:'SPY', label:'첫 종목 SPY로 시작해보기'},
+  26:{type:'ticker', value:'KS11', label:'코스피 지금 고점 대비 위치 확인하기'},
+  27:{type:'ticker', value:'KS11', label:'코스피 하락률 직접 확인하기'},
+  28:{type:'ticker', value:'KQ11', label:'코스닥 MDD 지금 확인하기'},
+  29:{type:'home', label:'관심 종목 MDD 직접 확인해보기'},
+  30:{type:'home', label:'내 종목이 고점 대비 어디인지 확인하기'},
+  31:{type:'ticker', value:'000660', label:'SK하이닉스 MDD 지금 확인하기'}
 };
 
 // 티커 실데이터 리포트(/stock/*.html)와 이 글이 서로 링크할 때 쓰는 매핑.

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// 공포·탐욕 지수 계산 회귀 테스트 (한국 지수).   실행: node scripts/test-fear-greed.js
+// 공포·탐욕 지수 계산 회귀 테스트 (한국·미국 공통 산식).   실행: node scripts/test-fear-greed.js
 //
-// 미국은 CNN 공식 값을 그대로 쓰므로 여기가 아니라 scripts/test-cnn-parse.js 가 지킵니다.
 //
 // 이 파일이 있는 이유:
 //   0~100 짜리 심리 지표는 틀려도 화면에서 티가 나지 않습니다. 바늘이 어디를 가리키든

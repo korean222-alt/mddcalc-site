@@ -2901,15 +2901,12 @@ function renderFearGreed() {
 
   rsRenderRefresh('fgUpdate', FGP.data);
 
-  // 같은 화면의 두 탭이 서로 다른 곳에서 온 숫자입니다. 어느 쪽인지 반드시 밝힙니다 —
-  // 밝히지 않으면 미국 값은 "CNN 을 베낀 것"으로, 한국 값은 "CNN 이 만든 것"으로 오해됩니다.
+  // 두 탭 모두 이 사이트가 직접 계산한 값입니다. CNN 이 발표하는 숫자와 다를 수 있다는 걸 밝혀 둡니다.
   const inScore = m.components.filter(c => c.inScore !== false);
-  document.getElementById('fgMeta').innerHTML = m.source === 'cnn'
-    ? `기준일 <b>${rsEsc(m.updated)}</b> · 출처 <b><a href="${rsEsc(m.sourceUrl || 'https://www.cnn.com/markets/fear-and-greed')}" target="_blank" rel="noopener nofollow">` +
-      `${rsEsc(m.sourceName || 'CNN Business Fear & Greed Index')}</a></b> — CNN 이 발표하는 값을 그대로 보여줍니다 · 구성 지표 ${inScore.length}개`
-    : `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> · ` +
-      (m.universeCount ? `수록 ${m.universeCount}종목 · ` : '') +
-      `구성 지표 ${inScore.length}개 — <b>CNN 과 같은 방식</b>으로 직접 계산했습니다`;
+  document.getElementById('fgMeta').innerHTML =
+    `기준일 <b>${rsEsc(m.updated)}</b> (전일 종가 기준) · 벤치마크 <b>${rsEsc(m.benchmark.name)}</b> · ` +
+    (m.universeCount ? `수록 ${m.universeCount}종목 · ` : '') +
+    `구성 지표 ${inScore.length}개 — CNN 의 구성 방식을 참고해 <b>직접 계산한 자체 지수</b>입니다 (CNN 발표값과 다를 수 있습니다)`;
 
   document.getElementById('fgGauge').innerHTML = fgGaugeSvg(m.score);
   document.getElementById('fgScore').innerHTML =
@@ -2939,10 +2936,7 @@ function renderFearGreed() {
         `</div>` +
       `</div>` +
       `<div class="bar-container" style="margin:8px 0 6px;"><div class="bar-fill${c.score != null && c.score < 50 ? ' zero' : ''}" style="width:${width}%;"></div></div>` +
-      // 근거 줄. 값이 없는 경우가 두 가지인데 뜻이 완전히 다릅니다.
-      //   점수도 없다  → 우리가 계산하지 못한 것 (데이터 부족)
-      //   점수는 있는데 근거 값이 없다 → CNN 이 지표별 원본 값은 공개하지 않는 것
-      // 후자에까지 "데이터가 모자랍니다"를 적으면, 멀쩡히 나온 CNN 점수가 고장 난 것처럼 보입니다.
+      // 근거 줄. 점수가 없으면 계산에 필요한 데이터가 모자란 것입니다.
       (c.note
         ? `<div style="font-size:12px; color:#4a5568;">${rsEsc(c.note)}</div>`
         : (c.score == null
