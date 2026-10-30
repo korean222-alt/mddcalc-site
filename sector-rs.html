@@ -92,7 +92,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -122,7 +122,7 @@
       <label style="margin-left:8px;">기간</label>
       <div id="rsPeriodBtns" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
     </div>
-    <div id="rsMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
+    <div id="rsMeta" style="font-size:12px; color:#566275; margin-top:10px;"></div>
     <!-- 갱신 시각·주기. 문구는 assets/site.js 가 data/sectors.json 의 schedule 로 만듭니다
          (워크플로우 cron 을 고치면 여기 안내도 같이 바뀝니다) -->
     <div id="rsUpdate" style="font-size:12px; color:#4a5568; margin-top:6px; padding-top:8px; border-top:1px solid #edf2f7;"></div>
@@ -139,7 +139,7 @@
 
     <div class="card">
       <h2 class="section">📋 섹터 순위</h2>
-      <div style="font-size:12px; color:#718096; margin-bottom:10px;">
+      <div style="font-size:12px; color:#566275; margin-bottom:10px;">
         행을 누르면 그 섹터의 RS 흐름과 구성 종목이 펼쳐집니다. 열 제목을 누르면 정렬됩니다.
       </div>
       <div style="overflow-x:auto;">
@@ -152,11 +152,11 @@
 
     <div class="card hidden" id="rsDetail">
       <h2 class="section" id="rsDetailTitle"></h2>
-      <div style="font-size:12px; color:#718096; margin-bottom:10px;">
+      <div style="font-size:12px; color:#566275; margin-bottom:10px;">
         RS 선은 <b>섹터지수 ÷ 벤치마크</b>를 1년 전 = 100 으로 맞춘 값입니다.
         선이 올라가면 벤치마크보다 강해지는 중, 내려가면 약해지는 중입니다.
       </div>
-      <div class="chart-wrap" id="rsChartWrap"><canvas id="rsChart"></canvas></div>
+      <div class="chart-wrap" id="rsChartWrap"><canvas id="rsChart" role="img" aria-label="섹터별 상대강도(RS) 추이 차트"></canvas></div>
       <div id="rsMembers" style="margin-top:16px;"></div>
     </div>
   </div>
@@ -168,7 +168,7 @@
       <div style="overflow-x:auto;"><table style="font-size:12.5px;"><thead><tr><th style="text-align:left;">한국 상위 5개 섹터</th><th>RS 점수</th><th>3개월 등락률</th><th>거래대금 비중</th></tr></thead><tbody><tr><td style="text-align:left;">반도체 소부장</td><td>99</td><td>+39.5%</td><td>2.7%</td></tr><tr><td style="text-align:left;">전자부품·가전</td><td>94</td><td>+25.5%</td><td>6.0%</td></tr><tr><td style="text-align:left;">반도체·메모리</td><td>89</td><td>+22.6%</td><td>60.0%</td></tr><tr><td style="text-align:left;">로봇</td><td>84</td><td>+22.0%</td><td>0.8%</td></tr><tr><td style="text-align:left;">건설·기계</td><td>79</td><td>+16.2%</td><td>2.1%</td></tr></tbody></table></div>
       <p style="font-size:14px; color:#4a5568; line-height:1.9; margin:14px 0 8px;">🇺🇸 <b>미국</b> 3개월 기준 가장 강한 섹터는 <b>에너지</b>(RS 99, +17.8%)이고, 가장 약한 섹터는 <b>반도체 장비</b>(RS 1, -16.5%)입니다. 벤치마크는 S&amp;P 500 +0.1%입니다.</p>
       <div style="overflow-x:auto;"><table style="font-size:12.5px;"><thead><tr><th style="text-align:left;">미국 상위 5개 섹터</th><th>RS 점수</th><th>3개월 등락률</th><th>거래대금 비중</th></tr></thead><tbody><tr><td style="text-align:left;">에너지</td><td>99</td><td>+17.8%</td><td>2.1%</td></tr><tr><td style="text-align:left;">바이오텍</td><td>94</td><td>+13.1%</td><td>1.2%</td></tr><tr><td style="text-align:left;">사이버보안</td><td>89</td><td>+12.5%</td><td>2.0%</td></tr><tr><td style="text-align:left;">소프트웨어</td><td>84</td><td>+11.3%</td><td>9.5%</td></tr><tr><td style="text-align:left;">헬스케어·제약</td><td>78</td><td>+9.8%</td><td>3.1%</td></tr></tbody></table></div>
-      <p style="font-size:11px; color:#a0aec0; margin-top:10px;">이 요약은 매 거래일 자동으로 갱신됩니다. 위 화면은 같은 데이터를 기간·시장을 바꿔가며 보여줍니다.</p>
+      <p style="font-size:11px; color:#5f6e82; margin-top:10px;">이 요약은 매 거래일 자동으로 갱신됩니다. 위 화면은 같은 데이터를 기간·시장을 바꿔가며 보여줍니다.</p>
     </section>
     <!-- RS_SUMMARY_END -->
 
@@ -187,27 +187,27 @@
       <div class="stat-box">
         <div class="label">RS 점수</div>
         <div class="value">1 ~ 99</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">같은 기간 섹터들 사이의 순위. 99면 그 시장에서 가장 강했다는 뜻입니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">같은 기간 섹터들 사이의 순위. 99면 그 시장에서 가장 강했다는 뜻입니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">벤치마크 대비</div>
         <div class="value">%p</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">섹터 수익률에서 코스피(또는 S&amp;P 500) 수익률을 뺀 값. 양수면 시장을 이겼습니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">섹터 수익률에서 코스피(또는 S&amp;P 500) 수익률을 뺀 값. 양수면 시장을 이겼습니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">순위 변화</div>
         <div class="value">▲ ▼</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">한 달 전 같은 기준으로 매긴 순위와의 차이. 올라가는 중인지 식는 중인지가 여기서 드러납니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">한 달 전 같은 기준으로 매긴 순위와의 차이. 올라가는 중인지 식는 중인지가 여기서 드러납니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">거래대금 비중</div>
         <div class="value">수급</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">수록 종목 전체 거래대금에서 그 섹터가 차지하는 몫. <b>다른 섹터가 조용해지기만 해도 올라갑니다</b> — 배율과 같이 보세요.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">수록 종목 전체 거래대금에서 그 섹터가 차지하는 몫. <b>다른 섹터가 조용해지기만 해도 올라갑니다</b> — 배율과 같이 보세요.</div>
       </div>
       <div class="stat-box">
         <div class="label">거래대금 배율</div>
         <div class="value">평소 대비</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">절대 금액이 직전 1년 하루 평균의 몇 배인가. 2.0배면 평소의 두 배가 오갔다는 뜻입니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">절대 금액이 직전 1년 하루 평균의 몇 배인가. 2.0배면 평소의 두 배가 오갔다는 뜻입니다.</div>
       </div>
     </div>
   </div>

@@ -51,7 +51,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -78,22 +78,22 @@
     <h2 class="section">🧮 복리 계산기</h2>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:520px; margin-bottom:16px;">
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">초기 투자금 (원)</label>
+        <label for="cpInit" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">초기 투자금 (원)</label>
         <input type="number" id="cpInit" value="1000000" min="0" step="10000" oninput="calcCompound()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:15px;">
       </div>
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매월 추가 납입액 (원)</label>
+        <label for="cpMonthly" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매월 추가 납입액 (원)</label>
         <input type="number" id="cpMonthly" value="300000" min="0" step="10000" oninput="calcCompound()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:15px;">
       </div>
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">예상 연 수익률 (%)</label>
+        <label for="cpRate" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">예상 연 수익률 (%)</label>
         <input type="number" id="cpRate" value="8" step="0.1" oninput="calcCompound()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:15px;">
       </div>
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">투자 기간 (년)</label>
+        <label for="cpYears" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">투자 기간 (년)</label>
         <input type="number" id="cpYears" value="10" min="1" max="50" step="1" oninput="calcCompound()"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:15px;">
       </div>
@@ -108,7 +108,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-top:12px;">
       대략적인 감을 잡는 데 <strong>72의 법칙</strong>이 유용해요. "72 ÷ 연 수익률"을 계산하면 원금이 2배가 되는 데 걸리는 대략적인 연수가 나옵니다. 예를 들어 연 8% 수익률이면 72÷8=<strong>9년</strong> 만에 원금이 2배가 돼요. 이 계산기에서 초기 투자금 100만원, 매월 추가 납입 없이, 연 8%로 9년을 넣어보면 실제로 원금의 약 2배 근처 금액이 나오는 걸 확인할 수 있어요.
     </p>
-    <p style="font-size:13px; color:#718096; margin-top:12px; line-height:1.7;">⚠️ 이 계산기는 입력한 수익률이 매년 동일하게 유지된다고 가정한 단순 추정치이며, 실제 투자 수익률은 매년 달라질 수 있습니다. 투자 결정 전 반드시 신중히 검토하는 데 참고할 수 있습니다.</p>
+    <p style="font-size:13px; color:#566275; margin-top:12px; line-height:1.7;">⚠️ 이 계산기는 입력한 수익률이 매년 동일하게 유지된다고 가정한 단순 추정치이며, 실제 투자 수익률은 매년 달라질 수 있습니다. 투자 결정 전 반드시 신중히 검토하는 데 참고할 수 있습니다.</p>
   </div>
 </div>
 
@@ -132,14 +132,14 @@
     <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
       <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">초기 투자금 1,000만원, 매월 50만원 추가 납입, 연 수익률 7%, 투자 기간 10년으로 넣은 결과입니다.</p>
       <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
-        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">값</th></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">총 납입 원금</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>70,000,000원 (초기 1,000만 + 매월 50만 × 120개월)</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">10년 후 예상 평가금액</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>106,639,017원</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">투자 수익</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>+36,639,017원</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">수익률</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>+52.3%</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">5년 차 시점 평가금액</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>49,972,703원 (납입 원금 4,000만원)</strong></td></tr>
       </table>
-      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">5년 차까지 수익은 약 1,000만원인데 10년 차에는 3,660만원이 됩니다. 뒤로 갈수록 불어나는 속도가 빨라지는 것이 복리이고, 그래서 기간이 수익률만큼이나 중요합니다.</p>
+      <p style="font-size:12px; color:#566275; line-height:1.7; margin:10px 0 0;">5년 차까지 수익은 약 1,000만원인데 10년 차에는 3,660만원이 됩니다. 뒤로 갈수록 불어나는 속도가 빨라지는 것이 복리이고, 그래서 기간이 수익률만큼이나 중요합니다.</p>
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 수익률에는 어떤 값을 넣어야 하나요?</strong><br>정답은 없습니다. 과거 지수 평균(7~10%)을 참고하되, 보수적인 값(4~6%)으로도 함께 계산해 범위로 이해하는 방식을 권합니다.</p>
@@ -147,7 +147,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 연 수익률은 몇 %로 넣는 게 현실적인가요?</strong><br>정답은 없지만, S&P500의 장기 연평균 수익률이 배당 포함 7~10% 구간으로 알려져 있습니다. 다만 이건 <b>평균</b>이고 실제로는 −30%인 해와 +25%인 해가 섞여 나옵니다. 이 계산기는 매년 같은 수익률을 가정하므로 결과를 확정된 미래로 보시면 안 됩니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 물가상승률은 반영되나요?</strong><br>반영되지 않습니다. 결과는 명목 금액입니다. 물가를 감안한 실질 가치를 보고 싶으시면 예상 수익률에서 물가상승률을 뺀 값을 넣으시면 됩니다. 예를 들어 수익률 7%에 물가 3%를 가정한다면 4%를 입력하는 식입니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 세금과 수수료는 어떻게 되나요?</strong><br>포함되어 있지 않습니다. 실제로는 매매 수수료, 환전 비용, 국내 상장 ETF의 배당소득세, 해외 주식 양도소득세(연 250만원 공제 후 22%) 등이 결과를 낮춥니다. 이 계산기의 숫자는 비용을 빼기 전의 상한선으로 보시는 편이 안전합니다.</p>
-    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적의 시뮬레이션이며 투자 권유가 아닙니다.</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적의 시뮬레이션이며 투자 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->

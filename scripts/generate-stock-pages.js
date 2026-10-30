@@ -639,35 +639,35 @@ function buildPage(symbol, a, spyA, generatedDate) {
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
          background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.65; padding: 0; }
   .container { max-width: 760px; margin: 0 auto; padding: 0 16px; }
-  a { color: #4299e1; }
+  a { color: #2b6cb0; }
   .card { background: #fff; border-radius: 14px; padding: 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #718096; }
+  nav.crumbs { font-size: 13px; margin-bottom: 12px; color: #566275; }
   h1.ticker-name { font-size: 15px; font-weight: 700; color: #4a5568; letter-spacing: 0.3px; margin-bottom: 2px; }
   .hero { font-size: 46px; font-weight: 800; line-height: 1.1; margin: 6px 0 4px; }
-  .hero.neg { color: #e53e3e; } .hero.pos { color: #38a169; }
-  .hero-label { font-size: 13px; color: #718096; margin-bottom: 6px; }
-  .data-range { font-size: 12px; color: #a0aec0; margin-bottom: 14px; }
+  .hero.neg { color: #c53030; } .hero.pos { color: #287a4f; }
+  .hero-label { font-size: 13px; color: #566275; margin-bottom: 6px; }
+  .data-range { font-size: 12px; color: #5f6e82; margin-bottom: 14px; }
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 14px 0; }
   .stat { background: #f7fafc; border-radius: 10px; padding: 14px; }
-  .stat .label { font-size: 12px; color: #718096; margin-bottom: 4px; }
+  .stat .label { font-size: 12px; color: #566275; margin-bottom: 4px; }
   .stat .value { font-size: 17px; font-weight: 700; color: #2d3748; }
   h2 { font-size: 17px; margin-bottom: 10px; color: #2d3748; }
   p { font-size: 14px; color: #4a5568; margin-bottom: 10px; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; font-size: 11px; color: #a0aec0; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #edf2f7; }
+  th { text-align: left; font-size: 11px; color: #5f6e82; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #edf2f7; }
   td { padding: 8px; border-bottom: 1px solid #f7fafc; vertical-align: top; }
-  td.neg { color: #e53e3e; font-weight: 700; }
-  .muted { font-size: 11px; color: #a0aec0; }
-  .ongoing { color: #d69e2e; font-weight: 600; }
+  td.neg { color: #c53030; font-weight: 700; }
+  .muted { font-size: 11px; color: #5f6e82; }
+  .ongoing { color: #975a16; font-weight: 600; }
   .tool-cta { display: block; margin-top: 4px; padding: 14px 18px; background: #2b6cb0; color: #fff !important;
               border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; text-align: center; }
   .tool-cta:hover { background: #2c5282; }
   .related { margin-top: 4px; }
-  .related-title { font-size: 13px; color: #718096; margin-bottom: 8px; }
+  .related-title { font-size: 13px; color: #566275; margin-bottom: 8px; }
   .chip { display: inline-block; background: #edf2f7; color: #2d3748; padding: 6px 12px;
           border-radius: 20px; font-size: 13px; font-weight: 600; margin: 0 6px 6px 0; text-decoration: none; }
-  .freshness { font-size: 12px; color: #718096; background: #f7fafc; border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
-  .note { font-size: 12px; color: #a0aec0; margin-top: 16px; line-height: 1.7; }
+  .freshness { font-size: 12px; color: #566275; background: #f7fafc; border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
+  .note { font-size: 12px; color: #5f6e82; margin-top: 16px; line-height: 1.7; }
   .note-card { background: #fffdf7; border-left: 4px solid #d69e2e; }
   .note-card p { font-size: 14.5px; line-height: 1.85; color: #3d4852; margin-bottom: 0; }
 ${chromeCss()}

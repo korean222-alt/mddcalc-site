@@ -51,7 +51,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -79,24 +79,24 @@
     <div style="display:grid; gap:12px; max-width:560px; margin-bottom:16px;">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">총 예산 (USD)</label>
+          <label for="dcaBudget" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">총 예산 (USD)</label>
           <input type="number" id="dcaBudget" value="10000" min="100" step="100"
             style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
         </div>
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">현재 주가 (USD)</label>
+          <label for="dcaPrice" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">현재 주가 (USD)</label>
           <input type="number" id="dcaPrice" value="200" min="1" step="0.01"
             style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매수 횟수</label>
+          <label for="dcaRounds" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">매수 횟수</label>
           <input type="number" id="dcaRounds" value="5" min="2" max="20" step="1"
             style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
         </div>
         <div>
-          <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">전략</label>
+          <label for="dcaStrategy" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">전략</label>
           <select id="dcaStrategy" style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
             <option value="equal">균등 분할</option>
             <option value="staircase" selected>계단식 (하락시 더 많이)</option>
@@ -105,7 +105,7 @@
         </div>
       </div>
       <div>
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">목표 평균단가 (USD, 선택)</label>
+        <label for="dcaTargetAvg" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:6px;">목표 평균단가 (USD, 선택)</label>
         <input type="number" id="dcaTargetAvg" placeholder="예: 180 (미입력 시 현재가 95%로 설정)" step="0.01"
           style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px;">
       </div>
@@ -121,10 +121,10 @@
     </p>
     <div class="stats-grid" style="margin-top:12px;">
       <div class="stat-box"><div class="label">균등 분할</div><div class="value" style="font-size:13px; color:#4a5568;">매회 동일 금액. 방향을 모를 때 기본값</div></div>
-      <div class="stat-box"><div class="label">계단식</div><div class="value" style="font-size:13px; color:#38a169;">예상가가 쌀수록 더 많이 매수. 평균단가 ↓</div></div>
+      <div class="stat-box"><div class="label">계단식</div><div class="value" style="font-size:13px; color:#287a4f;">예상가가 쌀수록 더 많이 매수. 평균단가 ↓</div></div>
       <div class="stat-box"><div class="label">후반 집중</div><div class="value" style="font-size:13px; color:#3182ce;">뒤로 갈수록 크게 매수. 반등 확인 후 베팅</div></div>
     </div>
-    <p style="font-size:13px; color:#718096; margin-top:12px; line-height:1.7;">
+    <p style="font-size:13px; color:#566275; margin-top:12px; line-height:1.7;">
       💡 <strong>목표 평균단가</strong>는 "여기까지는 평균 매입가를 낮추고 싶다"는 나만의 기준선이에요. 목표를 너무 낮게 잡으면(예: 현재가보다 훨씬 낮게) 계획된 회차 안에 달성이 어렵다고 나올 수 있어요. 이때 <strong>총 예산을 늘려도 평균단가는 달라지지 않습니다</strong> — 회차별 매수금액과 매수 주수가 같은 비율로 커져서 평균단가(총매수금액 ÷ 총주수)는 그대로이기 때문이에요. 평균단가를 낮추려면 <strong>계단식 전략을 고르거나 매수 횟수를 늘려야</strong> 하며, 그마저도 이 시뮬레이션의 예상 주가 흐름이 정한 하한 밑으로는 내려가지 않습니다.<br>
       ⚠️ 여기서 만들어지는 예상 주가 흐름은 실제 시세가 아니라 시뮬레이션용 가상의 값입니다. 실제 매수 시점의 시세로 직접 판단하시고, 이 결과는 계획을 세우는 참고 자료로만 활용하세요.
     </p>
@@ -149,14 +149,14 @@
     <div style="background:#f7fafc; border-left:3px solid #4299e1; border-radius:8px; padding:14px 16px; margin:12px 0 16px;">
       <p style="font-size:14px; color:#2d3748; line-height:1.8; margin:0;">총 예산 $10,000, 현재 주가 $100, 5회에 나눠 사는 계단식 전략으로 계획을 짠 결과입니다.</p>
       <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;">
-        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#718096; font-weight:600;">값</th></tr>
+        <tr><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">항목</th><th style="text-align:left; padding:6px 8px; border-bottom:1px solid #e2e8f0; color:#566275; font-weight:600;">값</th></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">총 매수 주수</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>104.806주</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">예상 평균단가</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$95.41</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">1회차</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$3,333 투입 → 33.099주</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">3회차</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$2,000 투입 → 22.249주</strong></td></tr>
         <tr><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;">5회차</td><td style="padding:6px 8px; border-bottom:1px solid #edf2f7; color:#2d3748;"><strong>$667 투입 → 6.691주</strong></td></tr>
       </table>
-      <p style="font-size:12px; color:#718096; line-height:1.7; margin:10px 0 0;">한 번에 $10,000을 $100에 몰아 샀다면 100주입니다. 나눠 사면서 평균단가가 $95.41로 내려가 4.8주를 더 확보했습니다. 다만 이건 주가가 내렸다 올라오는 시나리오를 가정한 결과이고, 주가가 계속 오르기만 하면 나눠 사는 쪽이 불리합니다.</p>
+      <p style="font-size:12px; color:#566275; line-height:1.7; margin:10px 0 0;">한 번에 $10,000을 $100에 몰아 샀다면 100주입니다. 나눠 사면서 평균단가가 $95.41로 내려가 4.8주를 더 확보했습니다. 다만 이건 주가가 내렸다 올라오는 시나리오를 가정한 결과이고, 주가가 계속 오르기만 하면 나눠 사는 쪽이 불리합니다.</p>
     </div>
 <h3 style="font-size:15px; margin:16px 0 8px; color:#2d3748;">자주 묻는 질문</h3>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 몇 번에 나눠 사는 것이 좋나요?</strong><br>정답은 없지만, 너무 잘게 나누면 수수료 부담과 관리 피로가 커지고, 너무 크게 나누면 분할의 의미가 약해집니다. 3~12회 범위에서 본인의 투자금 규모와 기간에 맞게 정하는 경우가 많습니다.</p>
@@ -164,7 +164,7 @@
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 나눠 사면 항상 유리한가요?</strong><br>아닙니다. 주가가 매수 기간 내내 오르기만 하면 처음에 한 번에 사는 쪽이 유리합니다. 분할 매수의 목적은 수익 극대화가 아니라 <b>매수 시점을 잘못 골랐을 때의 타격을 줄이는 것</b>입니다. 상승장에서는 대가를 치르는 대신 하락장에서 덜 다칩니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 몇 회에 나누는 게 좋나요?</strong><br>회수를 늘릴수록 시점 위험은 줄지만 자금이 오래 놀고 매매 수수료가 늘어납니다. 실무적으로는 3~6회가 많이 쓰입니다. 이 계산기에서 회수를 바꿔 가며 평균단가가 얼마나 달라지는지 비교해 보시면 감을 잡기 쉽습니다.</p>
     <p style="font-size:14px; color:#4a5568; line-height:1.8; margin-bottom:10px;"><strong>Q. 계단식과 균등 분할은 뭐가 다른가요?</strong><br>균등 분할은 매 회차에 같은 금액을 넣습니다. 계단식은 뒤로 갈수록 금액을 줄이거나 늘려서, 특정 구간에 무게를 싣습니다. 위 예시처럼 앞쪽에 많이 넣는 방식은 자금을 빨리 투입하는 대신 초반 하락에 더 노출됩니다.</p>
-    <p style="font-size:12px; color:#a0aec0; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 특정 매매 전략의 권유가 아닙니다.</p>
+    <p style="font-size:12px; color:#5f6e82; margin-top:14px;">⚠️ 본 도구의 모든 결과는 교육·정보 제공 목적이며 특정 매매 전략의 권유가 아닙니다.</p>
   </section>
 
 </div><!-- end container -->

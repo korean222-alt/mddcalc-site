@@ -43,7 +43,10 @@ function chromeCss() {
   .site-footer .footer-col a:hover { color: #fff !important; }
   .site-footer .footer-col p { font-size: 12px; line-height: 1.6; color: #a0aec0; margin: 0; }
   .site-footer .footer-bottom { border-top: 1px solid #4a5568; padding-top: 16px; font-size: 12px; text-align: center; }
-  .site-footer .footer-disclaimer { font-size: 11px; color: #718096; margin-top: 8px; line-height: 1.5; }`;
+  .site-footer .footer-bottom p { color: #a0aec0; }
+  .site-footer .footer-disclaimer { font-size: 11px; color: #a0aec0; margin-top: 8px; line-height: 1.5; }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid #2b6cb0; outline-offset: 2px; }
+  .site-header a:focus-visible, .site-header button:focus-visible, .site-footer a:focus-visible { outline-color: #90cdf4; }`;
 }
 
 function headerHtml(activeId) {
@@ -54,7 +57,7 @@ function headerHtml(activeId) {
   return `<header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/">📊 MDD 분석기</a>
-    <button type="button" class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button type="button" class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
 ${links}
     </nav>
@@ -107,7 +110,10 @@ function chromeScript() {
   return `<script>
 function toggleNav() {
   var n = document.getElementById('siteNav');
-  if (n) n.classList.toggle('open');
+  if (!n) return;
+  var open = n.classList.toggle('open');
+  var b = document.querySelector('.nav-hamburger');
+  if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 </script>`;
 }

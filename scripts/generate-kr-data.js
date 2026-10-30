@@ -314,7 +314,7 @@ function syncSupportedList(okTickers) {
     '<!-- KR_SUPPORTED_START 이 블록은 scripts/generate-kr-data.js 가 자동으로 씁니다 -->\n' +
     '      <div class="body" style="font-size:12px; line-height:1.9;">\n' +
     html + '\n' +
-    '        <div style="margin-top:8px; color:#718096;">목록에 없는 종목도 6자리 코드로 요청해 주시면 추가합니다.</div>\n' +
+    '        <div style="margin-top:8px; color:#566275;">목록에 없는 종목도 6자리 코드로 요청해 주시면 추가합니다.</div>\n' +
     '      </div>\n' +
     '      <!-- KR_SUPPORTED_END -->';
 

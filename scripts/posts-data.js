@@ -57,11 +57,11 @@ const BLOG_POSTS = [
           <th style="text-align:right; padding:8px; border-bottom:2px solid #e2e8f0;">전고점 회복까지</th>
         </tr></thead>
         <tbody>
-          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10-31</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-24</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−54.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,160일 (약 3.2년)</td></tr>
-          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-04-18</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-03-17</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−45.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,026일 (약 2.8년)</td></tr>
-          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-01-29</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−43.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,029일 (약 2.8년)</td></tr>
-          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-07-06</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2022-09-30</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700; border-bottom:1px solid #edf2f7;">−34.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,527일 (약 4.2년)</td></tr>
-          <tr><td style="padding:8px;">2011-05-02</td><td style="padding:8px;">2011-09-26</td><td style="padding:8px; text-align:right; color:#e53e3e; font-weight:700;">−25.9%</td><td style="padding:8px; text-align:right;">2,194일 (약 6.0년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2007-10-31</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2008-10-24</td><td style="padding:8px; text-align:right; color:#c53030; font-weight:700; border-bottom:1px solid #edf2f7;">−54.5%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,160일 (약 3.2년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2002-04-18</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2003-03-17</td><td style="padding:8px; text-align:right; color:#c53030; font-weight:700; border-bottom:1px solid #edf2f7;">−45.0%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,026일 (약 2.8년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2018-01-29</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2020-03-19</td><td style="padding:8px; text-align:right; color:#c53030; font-weight:700; border-bottom:1px solid #edf2f7;">−43.9%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,029일 (약 2.8년)</td></tr>
+          <tr><td style="padding:8px; border-bottom:1px solid #edf2f7;">2021-07-06</td><td style="padding:8px; border-bottom:1px solid #edf2f7;">2022-09-30</td><td style="padding:8px; text-align:right; color:#c53030; font-weight:700; border-bottom:1px solid #edf2f7;">−34.8%</td><td style="padding:8px; text-align:right; border-bottom:1px solid #edf2f7;">1,527일 (약 4.2년)</td></tr>
+          <tr><td style="padding:8px;">2011-05-02</td><td style="padding:8px;">2011-09-26</td><td style="padding:8px; text-align:right; color:#c53030; font-weight:700;">−25.9%</td><td style="padding:8px; text-align:right;">2,194일 (약 6.0년)</td></tr>
         </tbody>
       </table>
       </div>
@@ -75,7 +75,7 @@ const BLOG_POSTS = [
       지수 기준으로도 한 번 빠지면 되돌아오는 데 평균 1년 반 이상이 걸렸다는 뜻입니다.
       개별 종목은 지수와 달리 사업이 무너지면 회복하지 못할 수도 있으므로, 이 숫자를 개별 종목에 그대로 적용할 수는 없습니다.</p>
 
-      <p class="muted" style="font-size:13px; color:#718096;">위 수치는 이 사이트가 보유한 코스피 일별 종가 데이터로 계산한 값입니다.
+      <p class="muted" style="font-size:13px; color:#566275;">위 수치는 이 사이트가 보유한 코스피 일별 종가 데이터로 계산한 값입니다.
       집계 방식(종가 기준 / 장중가 기준)과 데이터 출처에 따라 몇 %p 차이가 날 수 있습니다.
       본인이 관심 있는 종목의 같은 계산은 <a href="/">MDD 계산기</a>에서 직접 확인하실 수 있습니다.</p>
     `
@@ -227,7 +227,7 @@ const BLOG_POSTS = [
       </ul>
       <div class="highlight-box"><p>💡 <strong>RSI 다이버전스</strong>: 주가는 신저점을 기록하는데 RSI는 신저점을 기록하지 않거나, 주가는 신고점을 기록하는데 RSI는 신고점을 기록하지 못하는 경우를 다이버전스라고 합니다. 이는 추세 전환의 강력한 신호로 해석될 수 있습니다.</p></div>
       <h2>RSI 활용 전략</h2>
-      <p>RSI는 강력한 지표이지만, 단독으로 사용하기보다는 다른 기술적 분석 도구들과 함께 사용할 때 그 신뢰도가 더욱 높아집니다. 예를 들어, MDD(최대 낙폭), 거래량, 이동평균선, 볼린저 밴드 등과 결합하여 사용하면 보다 정확한 매매 신호를 포착할 수 있습니다.</p>
+      <p>RSI는 단독으로 보기보다 다른 지표와 함께 볼 때 해석의 폭이 넓어집니다. 예를 들어 MDD(최대 낙폭), 거래량, 이동평균선, 볼린저 밴드를 함께 보면 한 지표가 보여 주는 신호를 다른 지표로 교차 확인할 수 있습니다. 다만 어떤 조합도 매매 신호의 적중을 보장하지는 않습니다.</p>
       <ul>
         <li><strong>MDD와 결합</strong>: MDD 분석기를 통해 종목의 역사적 하락폭을 파악하고, RSI가 과매도 구간에 진입했을 때 매수를 고려하면 더욱 효과적인 저점 하락 대응 패턴을 세울 수 있습니다.</li>
         <li><strong>추세 확인</strong>: RSI가 과매수/과매도 구간에 있더라도, 전체적인 주가 추세가 강한 상승 또는 하락 추세라면 RSI 신호가 일시적으로 무력화될 수 있습니다. 따라서 추세 지표와 함께 확인하는 것이 중요합니다.</li>
@@ -273,7 +273,7 @@ const BLOG_POSTS = [
       그 다음에 무슨 일이 일어날지를 담고 있지는 않습니다.
       이 글 위쪽에서 설명한 다이버전스나 추세 확인 같은 보조적 활용이 강조되는 이유도 여기에 있습니다.</p>
 
-      <p class="muted" style="font-size:13px; color:#718096;">위 계산은 이 사이트가 보유한 코스피 일별 종가로 수행했습니다.
+      <p class="muted" style="font-size:13px; color:#566275;">위 계산은 이 사이트가 보유한 코스피 일별 종가로 수행했습니다.
       RSI는 Wilder 방식(지수 평활, 기간 14)을 따랐고, 수익률은 배당과 거래비용을 제외한 지수 가격 기준입니다.
       표본이 70회이므로 통계적으로 확정적인 결론을 내리기에는 부족하며, 다른 시장이나 개별 종목에서는 다른 결과가 나올 수 있습니다.
       같은 계산을 본인이 보는 종목으로 해보시려면 <a href="/rsi-calculator.html">RSI 계산기</a>에서 종목을 조회해 보세요.</p>
@@ -622,7 +622,7 @@ const BLOG_POSTS = [
         <li><strong>수축기 (Contraction)</strong>: 경기가 둔화되기 시작하고 기업 실적이 악화되는 단계입니다. 투자 심리가 위축되면서 주식 시장은 하락세로 전환되며, MDD가 급등하기 시작합니다. 이 시기에는 불필요한 손실을 피하기 위해 포트폴리오를 점검하고 위험 자산 비중을 줄이는 것을 고려해야 합니다.</li>
         <li><strong>침체기 (Trough)</strong>: 경기가 바닥을 찍고 가장 어려운 시기입니다. 기업 실적은 최악을 기록하고 투자 심리는 극도로 위축됩니다. 주식 시장은 저점을 형성하며, MDD는 최대 수준에 도달합니다. MDD 지표상으로는 이 시기가 하락폭이 가장 큰 국면에 해당합니다.</li>
       </ul>
-      <div class="highlight-box"><p>💡 <strong>취업률, 금리, 기업 실적, 소비자 물가지수(CPI) 등 다양한 거시 경제 지표를 MDD와 함께 분석하면 시장의 현재 위치를 파악하고 더 정확한 하락 및 회복 패턴을 잡는 데 도움이 됩니다.</strong></p></div>
+      <div class="highlight-box"><p>💡 <strong>취업률, 금리, 기업 실적, 소비자 물가지수(CPI) 등 다양한 거시 경제 지표를 MDD와 함께 분석하면 시장의 현재 위치를 여러 각도에서 살펴보는 데 도움이 됩니다. 다만 이런 지표가 앞으로의 하락이나 회복 시점을 알려 주지는 않습니다.</strong></p></div>
       <h2>MDD를 활용한 하락 및 회복 패턴 전략</h2>
       <p>경기 사이클과 MDD의 관계를 이해했다면, 이를 실제 투자 전략에 어떻게 적용할 수 있을까요?</p>
       <ul>
@@ -772,7 +772,7 @@ const BLOG_POSTS = [
       <p>정리하면, 분할매수는 <strong>기대 수익을 높이는 방법이라기보다 결과의 폭을 좁히는 방법</strong>이라고 보는 편이 데이터에 맞습니다.
       "평균적으로 더 번다"는 근거로 선택하면 위 숫자와 어긋나고, "최악을 피한다"는 근거로 선택하면 데이터와 맞습니다.</p>
 
-      <p class="muted" style="font-size:13px; color:#718096;">위 계산은 코스피 지수 일별 종가 기준이며, 배당·세금·거래비용을 반영하지 않았습니다.
+      <p class="muted" style="font-size:13px; color:#566275;">위 계산은 코스피 지수 일별 종가 기준이며, 배당·세금·거래비용을 반영하지 않았습니다.
       시장과 기간이 달라지면 결과도 달라집니다. 특히 장기간 하락한 시장에서는 반대 결과가 나옵니다.
       본인의 조건으로 직접 시뮬레이션해 보시려면 <a href="/dca-planner.html">분할매수 계획 계산기</a>를 이용하실 수 있습니다.</p>
 
@@ -1150,7 +1150,7 @@ const BLOG_POSTS = [
         <li><strong>세금</strong> — 해외 주식 매매 차익에는 연 250만 원 기본공제 후 22%(지방소득세 포함)의 양도소득세가, 배당에는 미국에서 15%가 원천징수되는 것이 일반적입니다. 세법은 개정될 수 있으니 신고 전에 최신 기준을 확인하세요.</li>
       </ul>
       <h2>첫 1년의 목표는 수익이 아닙니다</h2>
-      <p>처음 투자하는 해에 세울 만한 현실적인 목표는 "얼마를 벌겠다"가 아니라 <strong>"시장이 빠질 때 내가 어떻게 반응하는지 관찰하겠다"</strong>입니다. -10%가 왔을 때 잠이 안 오는지, -20%에서 팔고 싶어지는지는 실제로 겪어봐야 알 수 있습니다. 그리고 그 데이터가 앞으로 자신에게 맞는 자산 배분을 정하는 가장 정확한 근거가 됩니다.</p>
+      <p>처음 투자하는 해에 세울 만한 현실적인 목표는 "얼마를 벌겠다"가 아니라 <strong>"시장이 빠질 때 내가 어떻게 반응하는지 관찰하겠다"</strong>입니다. -10%가 왔을 때 잠이 안 오는지, -20%에서 팔고 싶어지는지는 실제로 겪어봐야 알 수 있습니다. 그리고 그 데이터가 앞으로 자신에게 맞는 자산 배분을 정할 때 참고할 수 있는 중요한 근거 중 하나가 됩니다.</p>
       <p>그래서 첫 투자는 감당 가능한 소액으로 시작하는 편이 좋습니다. 큰 금액으로 시작해 첫 하락장에서 크게 다치면, 시장을 떠나게 되어 이후 몇십 년의 기회까지 함께 잃을 수 있기 때문입니다.</p>
     `
   }

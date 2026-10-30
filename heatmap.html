@@ -90,7 +90,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -125,7 +125,7 @@
         <button type="button" data-size="equal" onclick="setHeatmapSize('equal')">균등</button>
       </div>
     </div>
-    <div id="hmMeta" style="font-size:12px; color:#718096; margin-top:10px;"></div>
+    <div id="hmMeta" style="font-size:12px; color:#566275; margin-top:10px;"></div>
     <!-- 갱신 시각·주기. sector-rs.html 과 같은 문구를 같은 함수가 만듭니다. -->
     <div id="hmUpdate" style="font-size:12px; color:#4a5568; margin-top:6px; padding-top:8px; border-top:1px solid #edf2f7;"></div>
   </div>
@@ -139,7 +139,7 @@
         칸에 마우스를 올리거나 터치하면 자세한 값이 여기에 나옵니다.
       </div>
       <div id="hmCanvas" style="position:relative; width:100%; height:560px; background:#f7fafc; border-radius:10px; overflow:hidden;"></div>
-      <div id="hmLegend" style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:11px; color:#718096; flex-wrap:wrap;"></div>
+      <div id="hmLegend" style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:11px; color:#566275; flex-wrap:wrap;"></div>
     </div>
   </div>
 
@@ -150,7 +150,7 @@
       <div style="overflow-x:auto;"><table style="font-size:12.5px;"><thead><tr><th style="text-align:left;">한국 1개월 상승 상위</th><th>등락률</th><th style="text-align:left;">하락 상위</th><th>등락률</th></tr></thead><tbody><tr><td style="text-align:left;">안랩</td><td>+30.1%</td><td style="text-align:left;">LIG넥스원</td><td>-37.8%</td></tr><tr><td style="text-align:left;">카카오게임즈</td><td>+18.6%</td><td style="text-align:left;">HD현대중공업</td><td>-36.9%</td></tr><tr><td style="text-align:left;">KT&amp;G</td><td>+9.7%</td><td style="text-align:left;">한화오션</td><td>-36.2%</td></tr><tr><td style="text-align:left;">HMM</td><td>+7.4%</td><td style="text-align:left;">HD현대일렉트릭</td><td>-36.0%</td></tr><tr><td style="text-align:left;">셀트리온</td><td>+6.5%</td><td style="text-align:left;">대우건설</td><td>-34.9%</td></tr></tbody></table></div>
       <p style="font-size:14px; color:#4a5568; line-height:1.9; margin:14px 0 8px;">🇺🇸 <b>미국</b> 1개월 기준 가장 많이 오른 종목은 <b>록히드마틴</b>(방산·우주, +23.7%), 가장 많이 빠진 종목은 <b>씨게이트</b>(메모리, -24.3%)입니다. 거래대금이 가장 많이 몰린 종목은 <b>마이크론</b>(비중 10.2%)입니다.</p>
       <div style="overflow-x:auto;"><table style="font-size:12.5px;"><thead><tr><th style="text-align:left;">미국 1개월 상승 상위</th><th>등락률</th><th style="text-align:left;">하락 상위</th><th>등락률</th></tr></thead><tbody><tr><td style="text-align:left;">록히드마틴</td><td>+23.7%</td><td style="text-align:left;">씨게이트</td><td>-24.3%</td></tr><tr><td style="text-align:left;">코노코필립스</td><td>+19.1%</td><td style="text-align:left;">램리서치</td><td>-22.7%</td></tr><tr><td style="text-align:left;">노스럽그러먼</td><td>+14.3%</td><td style="text-align:left;">인텔</td><td>-20.5%</td></tr><tr><td style="text-align:left;">월마트</td><td>+14.3%</td><td style="text-align:left;">어플라이드머티어리얼즈</td><td>-18.6%</td></tr><tr><td style="text-align:left;">테슬라</td><td>+13.9%</td><td style="text-align:left;">KLA</td><td>-18.6%</td></tr></tbody></table></div>
-      <p style="font-size:11px; color:#a0aec0; margin-top:10px;">이 요약은 매 거래일 자동으로 갱신됩니다. 위 화면은 같은 데이터를 기간·시장을 바꿔가며 보여줍니다.</p>
+      <p style="font-size:11px; color:#5f6e82; margin-top:10px;">이 요약은 매 거래일 자동으로 갱신됩니다. 위 화면은 같은 데이터를 기간·시장을 바꿔가며 보여줍니다.</p>
     </section>
     <!-- HM_SUMMARY_END -->
 
@@ -160,22 +160,22 @@
       <div class="stat-box">
         <div class="label">칸 크기</div>
         <div class="value">거래대금</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">고른 기간 동안 오간 돈의 양. 큰 칸일수록 그 종목에 돈이 많이 몰려 있습니다. 기본값은 <b>완만</b> — 순서는 그대로 두고 격차만 좁혀 그립니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">고른 기간 동안 오간 돈의 양. 큰 칸일수록 그 종목에 돈이 많이 몰려 있습니다. 기본값은 <b>완만</b> — 순서는 그대로 두고 격차만 좁혀 그립니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">색</div>
         <div class="value">등락률</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">초록이 상승, 빨강이 하락. 진할수록 폭이 큽니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">초록이 상승, 빨강이 하락. 진할수록 폭이 큽니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">묶음</div>
         <div class="value">섹터</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;">같은 테마끼리 붙어 있어, 섹터 전체가 초록인지 빨강인지가 바로 보입니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;">같은 테마끼리 붙어 있어, 섹터 전체가 초록인지 빨강인지가 바로 보입니다.</div>
       </div>
       <div class="stat-box">
         <div class="label">칸 크기 모드</div>
         <div class="value">3가지</div>
-        <div style="font-size:11px; color:#718096; margin-top:4px;"><b>완만</b>은 격차를 좁혀 그리고, <b>거래대금</b>은 실제 비중 그대로, <b>균등</b>은 전부 같은 크기입니다.</div>
+        <div style="font-size:11px; color:#566275; margin-top:4px;"><b>완만</b>은 격차를 좁혀 그리고, <b>거래대금</b>은 실제 비중 그대로, <b>균등</b>은 전부 같은 크기입니다.</div>
       </div>
     </div>
     <div class="info-banner" style="margin-top:12px;">

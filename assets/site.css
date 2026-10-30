@@ -8,7 +8,7 @@
          background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); color: #1a202c; line-height: 1.5; padding: 16px; }
   .container { max-width: 1200px; margin: 0 auto; }
   h1 { font-size: 28px; margin-bottom: 6px; color: #2d3748; }
-  .subtitle { color: #718096; margin-bottom: 20px; font-size: 14px; }
+  .subtitle { color: #566275; margin-bottom: 20px; font-size: 14px; }
 
   .card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px;
           box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -42,9 +42,12 @@
      유지하되, 마우스를 올렸을 때만 밑줄로 "눌리는 것"임을 알립니다. */
   a.fav-chip { text-decoration: none; }
   a.fav-chip:hover { text-decoration: underline; }
-  .fav-chip .fav-remove { background: none; border: none; color: #63b3ed; font-size: 15px; cursor: pointer;
+  .fav-chip .fav-load { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 3px solid #2b6cb0; outline-offset: 2px; }
+  .site-header a:focus-visible, .site-header button:focus-visible, .site-footer a:focus-visible { outline-color: #90cdf4; }
+  .fav-chip .fav-remove { background: none; border: none; color: #2b6cb0; font-size: 15px; cursor: pointer;
                            padding: 2px 6px; line-height: 1; border-radius: 50%; }
-  .fav-chip .fav-remove:hover { color: #e53e3e; background: rgba(255,255,255,0.6); }
+  .fav-chip .fav-remove:hover { color: #c53030; background: rgba(255,255,255,0.6); }
 
   /* 다른 화면으로 보내는 링크 칩 ("이어서 보기", 홈의 수급 카드).
      quick-chip 은 어두운 패널 위에서 흰 글씨로 쓰라고 만든 것이라, 밝은 카드 위에 두면
@@ -54,7 +57,7 @@
                border-radius: 20px; padding: 7px 14px; font-size: 13px; font-weight: 700;
                text-decoration: none; transition: background 0.2s, color 0.2s; }
   .link-chip:hover { background: #bee3f8; color: #1a365d; }
-  .fav-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #cbd5e0; padding: 0 4px;
+  .fav-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #5f6e82; padding: 0 4px;
              line-height: 1; transition: color 0.2s, transform 0.15s; vertical-align: middle; }
   .fav-btn:hover { transform: scale(1.15); }
   .fav-btn.active { color: #f6ad55; }
@@ -64,21 +67,21 @@
   .controls input[type=date] { padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; }
   .preset-btn { padding: 6px 12px; background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 6px;
                 cursor: pointer; font-size: 12px; }
-  .preset-btn.active { background: #4299e1; color: #fff; border-color: #4299e1; }
+  .preset-btn.active { background: #2b6cb0; color: #fff; border-color: #2b6cb0; }
   .mode-toggle { display: inline-flex; background: #edf2f7; border-radius: 8px; padding: 3px; }
   .mode-toggle button { padding: 6px 14px; border: none; background: transparent; cursor: pointer;
                         border-radius: 6px; font-size: 13px; font-weight: 600; }
-  .mode-toggle button.active { background: #4299e1; color: #fff; }
+  .mode-toggle button.active { background: #2b6cb0; color: #fff; }
 
   .hero { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center;
           text-align: center; padding: 24px 16px; }
-  .hero-box h3 { font-size: 12px; color: #718096; font-weight: 600; margin-bottom: 6px; }
+  .hero-box h3 { font-size: 12px; color: #566275; font-weight: 600; margin-bottom: 6px; }
   .hero-box .big { font-size: 28px; font-weight: 800; color: #2d3748; }
-  .hero-box .sub { font-size: 12px; color: #718096; margin-top: 4px; }
-  .hero .arrow { font-size: 24px; color: #a0aec0; }
-  .hero-dd { color: #e53e3e !important; }
-  .hero-dd.mild { color: #d69e2e !important; }
-  .hero-dd.small { color: #38a169 !important; }
+  .hero-box .sub { font-size: 12px; color: #566275; margin-top: 4px; }
+  .hero .arrow { font-size: 24px; color: #5f6e82; }
+  .hero-dd { color: #c53030 !important; }
+  .hero-dd.mild { color: #975a16 !important; }
+  .hero-dd.small { color: #287a4f !important; }
 
   .signal-card { padding: 20px; border-radius: 12px; text-align: center; margin-top: 14px; }
   .signal-strong { background: #fed7d7; border: 2px solid #e53e3e; }
@@ -91,7 +94,7 @@
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
   .stat-box { background: #f7fafc; padding: 14px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
-  .stat-box .label { font-size: 11px; color: #718096; margin-bottom: 4px; font-weight: 600; }
+  .stat-box .label { font-size: 11px; color: #566275; margin-bottom: 4px; font-weight: 600; }
   .stat-box .value { font-size: 18px; font-weight: 700; color: #2d3748; }
 
   .target-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
@@ -108,7 +111,7 @@
   th, td { padding: 10px; text-align: center; border-bottom: 1px solid #e2e8f0; }
   th { background: #f7fafc; font-size: 12px; color: #4a5568; font-weight: 700; }
   tr.current { background: #fefcbf !important; font-weight: 700; }
-  tr.never { color: #a0aec0; }
+  tr.never { color: #5f6e82; }
   .bar-container { background: #edf2f7; height: 14px; border-radius: 7px; overflow: hidden; }
   .bar-fill { height: 100%; background: linear-gradient(90deg, #4299e1, #3182ce); }
   .bar-fill.zero { background: #cbd5e0; }
@@ -122,7 +125,7 @@
 
   h2.section { font-size: 18px; margin-bottom: 12px; color: #2d3748; }
   .chart-wrap { position: relative; height: 320px; }
-  .loading { display: none; text-align: center; padding: 30px; color: #718096; }
+  .loading { display: none; text-align: center; padding: 30px; color: #566275; }
   .loading.show { display: block; }
   .hidden { display: none !important; }
 
@@ -168,7 +171,7 @@
   .footer-col a:hover { color: #fff; }
   .footer-col p { font-size: 12px; line-height: 1.6; }
   .footer-bottom { border-top: 1px solid #4a5568; padding-top: 16px; font-size: 12px; text-align: center; }
-  .footer-disclaimer { font-size: 11px; color: #718096; margin-top: 8px; line-height: 1.5; }
+  .footer-disclaimer { font-size: 11px; color: #a0aec0; margin-top: 8px; line-height: 1.5; }
 
   /* 페이지 콘텐츠 */
   .page { display: none; }
@@ -184,10 +187,10 @@
   .blog-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
   .blog-card-img { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
   .blog-card-body { padding: 16px; }
-  .blog-card-tag { font-size: 11px; font-weight: 700; color: #4299e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .blog-card-tag { font-size: 11px; font-weight: 700; color: #2b6cb0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .blog-card-title { font-size: 15px; font-weight: 700; color: #2d3748; margin-bottom: 8px; line-height: 1.4; }
-  .blog-card-excerpt { font-size: 12px; color: #718096; line-height: 1.6; }
-  .blog-card-meta { font-size: 11px; color: #a0aec0; margin-top: 10px; }
+  .blog-card-excerpt { font-size: 12px; color: #566275; line-height: 1.6; }
+  .blog-card-meta { font-size: 11px; color: #5f6e82; margin-top: 10px; }
 
   /* 블로그 상세 */
   .blog-article { max-width: 780px; margin: 0 auto; }
@@ -199,10 +202,10 @@
   .blog-article li { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 6px; }
   .blog-article .highlight-box { background: #ebf8ff; border-left: 4px solid #4299e1; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
   .blog-article .highlight-box p { margin: 0; }
-  .blog-article .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #4299e1; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+  .blog-article .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #2b6cb0; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
   .blog-article .back-btn:hover { color: #2b6cb0; }
   .blog-article table { margin: 16px 0; }
-  .blog-article .article-meta { font-size: 13px; color: #a0aec0; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+  .blog-article .article-meta { font-size: 13px; color: #5f6e82; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
 
   /* 관련 글 & CTA */
   .related-posts { max-width: 780px; margin: 40px auto 0; padding-top: 28px; border-top: 1px solid #e2e8f0; }
@@ -210,7 +213,7 @@
   .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
   .related-card { background: #f7fafc; border-radius: 10px; padding: 14px; cursor: pointer; transition: background 0.2s; }
   .related-card:hover { background: #edf2f7; }
-  .related-card-tag { font-size: 10px; font-weight: 700; color: #4299e1; text-transform: uppercase; margin-bottom: 6px; }
+  .related-card-tag { font-size: 10px; font-weight: 700; color: #2b6cb0; text-transform: uppercase; margin-bottom: 6px; }
   .related-card-title { font-size: 13px; font-weight: 600; color: #2d3748; line-height: 1.5; }
   .blog-cta { max-width: 780px; margin: 24px auto 0; background: linear-gradient(135deg, #4299e1, #3182ce); border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .blog-cta-text { color: #fff; font-size: 14px; font-weight: 600; }
@@ -223,7 +226,7 @@
   .tool-card:hover { transform: translateY(-2px); color: inherit; }
   .tool-card .tool-icon { font-size: 36px; margin-bottom: 12px; }
   .tool-card h3 { font-size: 16px; font-weight: 700; color: #2d3748; margin-bottom: 8px; }
-  .tool-card p { font-size: 13px; color: #718096; line-height: 1.6; }
+  .tool-card p { font-size: 13px; color: #566275; line-height: 1.6; }
   .tool-badge { display: inline-block; background: #c6f6d5; color: #276749; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-top: 10px; }
 
   /* About/Contact/Policy 페이지 */
@@ -235,5 +238,5 @@
   .prose li { font-size: 15px; color: #4a5568; line-height: 1.8; margin-bottom: 4px; }
   .contact-form input, .contact-form textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
   .contact-form textarea { height: 120px; resize: vertical; }
-  .contact-form .submit-btn { background: #4299e1; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .contact-form .submit-btn:hover { background: #3182ce; }
+  .contact-form .submit-btn { background: #2b6cb0; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .contact-form .submit-btn:hover { background: #2c5282; }

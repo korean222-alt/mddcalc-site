@@ -45,7 +45,7 @@
 <header class="site-header">
   <div class="header-inner">
     <a class="site-logo" href="/" onclick="navigate('home'); return false;">📊 MDD 분석기</a>
-    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴">☰</button>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="메뉴" aria-controls="siteNav" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
       <a href="/" onclick="navigate('home'); return false;" id="nav-home">🏠 홈</a>
       <a href="/sector-rs.html" onclick="navigate('sector'); return false;" id="nav-sector">📊 섹터 RS</a>
@@ -74,7 +74,7 @@
       <p style="font-size:15px; margin-bottom:8px;">
         <a href="mailto:gktgkt2309@gmail.com" style="color:#2b6cb0; font-weight:700;">gktgkt2309@gmail.com</a>
       </p>
-      <p style="font-size:13px; color:#718096;">
+      <p style="font-size:13px; color:#566275;">
         아래 문의 양식 대신 이메일로 보내주셔도 됩니다. 서비스 개선 제안, 버그 신고, 콘텐츠 오류 정정 요청, 개인정보 관련 문의 모두 받고 있습니다.
         보통 2~3일 이내에 답변드리며, 문의가 몰릴 경우 조금 늦어질 수 있습니다.
       </p>
@@ -89,7 +89,7 @@
         <li><strong>화면에 나온 값과 기대하신 값</strong> — "고점 대비 −32.9%로 나오는데 네이버는 −30%입니다" 처럼</li>
         <li><strong>설정</strong> — 화면 상단의 <em>ATH 기준</em>이 "장중 최고가"인지 "종가"인지, 그리고 조회 기간</li>
       </ul>
-      <p style="font-size:13px; color:#718096;">참고로 <strong>ATH 기준 설정만 바꿔도 수치가 달라집니다.</strong>
+      <p style="font-size:13px; color:#566275;">참고로 <strong>ATH 기준 설정만 바꿔도 수치가 달라집니다.</strong>
       장중 최고가 기준은 하루 중 가장 높았던 가격을 고점으로 보기 때문에 낙폭이 더 크게 나오고,
       종가 기준은 마감 가격만 쓰기 때문에 더 작게 나옵니다. 네이버·야후와 맞춰 보시려면 장중 최고가 기준이 가깝습니다.
       이 차이로 설명되지 않는 값이라면 알려주세요.</p>
@@ -103,23 +103,44 @@
         <li>계산식 문제인지, 원본 시세 데이터 문제인지 구분합니다. 원본 문제라면 그 사실을 페이지에 표시합니다.</li>
         <li>수정한 뒤 해당 페이지의 갱신 날짜를 바꾸고, 알려주신 분께 결과를 회신합니다.</li>
       </ol>
-      <p style="font-size:13px; color:#718096;">이 사이트의 계산 방식과 데이터 출처는 <a href="/about.html">소개 페이지</a>에 정리해 두었습니다.
+      <p style="font-size:13px; color:#566275;">이 사이트의 계산 방식과 데이터 출처는 <a href="/about.html">소개 페이지</a>에 정리해 두었습니다.
       투자 판단에 대한 상담이나 특정 종목에 대한 의견은 드리지 않습니다 —
       본 사이트 운영자는 투자자문업 등록 사업자가 아니며, 자세한 내용은 <a href="/disclaimer.html">면책조항</a>을 참고해 주세요.</p>
     </div>
     <div class="card">
       <h2>📬 문의 양식</h2>
       <div class="contact-form">
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">이름</label>
-        <input type="text" id="contactName" placeholder="이름을 입력하세요">
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">이메일</label>
-        <input type="email" id="contactEmail" placeholder="답변받을 이메일 주소">
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">제목</label>
-        <input type="text" id="contactSubject" placeholder="문의 제목">
-        <label style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">내용</label>
-        <textarea id="contactMessage" placeholder="문의 내용을 입력하세요"></textarea>
-        <button class="submit-btn" onclick="submitContact()">문의 보내기</button>
-        <div id="contactResult" style="margin-top:12px; font-size:13px;"></div>
+        <label for="contactType" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">문의 유형</label>
+        <select id="contactType" style="width:100%; padding:10px 14px; border:1px solid #cbd5e0; border-radius:8px; font-size:14px; margin-bottom:12px; font-family:inherit; background:#fff;">
+          <option value="general">일반 문의 · 개선 제안</option>
+          <option value="bug">수치 오류 · 버그 신고</option>
+          <option value="privacy">개인정보 열람 · 정정 · 삭제 요청</option>
+        </select>
+        <label for="contactName" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">이름 또는 닉네임 <span style="font-weight:400; color:#566275;">(선택)</span></label>
+        <input type="text" id="contactName" placeholder="비워 두셔도 됩니다" autocomplete="nickname">
+        <label for="contactEmail" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">이메일 <span style="font-weight:400; color:#566275;">(필수 · 답변 받을 주소)</span></label>
+        <input type="email" id="contactEmail" placeholder="답변받을 이메일 주소" autocomplete="email" required>
+        <label for="contactSubject" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">제목 <span style="font-weight:400; color:#566275;">(필수)</span></label>
+        <input type="text" id="contactSubject" placeholder="문의 제목" required>
+        <label for="contactMessage" style="font-size:13px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px;">내용 <span style="font-weight:400; color:#566275;">(필수)</span></label>
+        <textarea id="contactMessage" placeholder="문의 내용을 입력하세요. 개인정보 삭제 요청이라면 문의 때 쓰신 이메일 주소를 적어 주세요." required></textarea>
+        <div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; margin-bottom:12px; font-size:13px; color:#4a5568; line-height:1.7;">
+          <strong>개인정보 수집·이용 안내</strong>
+          <table style="width:100%; border-collapse:collapse; margin:8px 0; font-size:12px;">
+            <tr><th scope="row" style="text-align:left; padding:4px 8px 4px 0; vertical-align:top; white-space:nowrap;">수집 항목</th><td style="padding:4px 0; text-align:left;">이메일 주소, 제목, 내용 (선택: 이름 또는 닉네임)</td></tr>
+            <tr><th scope="row" style="text-align:left; padding:4px 8px 4px 0; vertical-align:top; white-space:nowrap;">이용 목적</th><td style="padding:4px 0; text-align:left;">문의 확인 및 답변</td></tr>
+            <tr><th scope="row" style="text-align:left; padding:4px 8px 4px 0; vertical-align:top; white-space:nowrap;">보유 기간</th><td style="padding:4px 0; text-align:left;"><strong>답변을 마친 뒤 지체 없이 파기</strong> (사이트 데이터베이스에는 저장하지 않습니다)</td></tr>
+          </table>
+          동의하지 않으셔도 되며, 이 경우 양식으로는 접수되지 않습니다. 대신 위 이메일 주소로 직접 문의하실 수 있습니다.
+          만 14세 미만은 보호자의 동의가 필요하므로 이 양식을 이용할 수 없습니다.
+          자세한 내용은 <a href="/privacy.html">개인정보 처리방침</a>에 있습니다.
+          <label for="contactAgree" style="display:flex; gap:8px; align-items:flex-start; margin-top:10px; font-weight:600; color:#2d3748; cursor:pointer;">
+            <input type="checkbox" id="contactAgree" style="width:auto; margin:4px 0 0; flex:none;">
+            <span>(필수) 만 14세 이상이며, 위 개인정보 수집·이용에 동의합니다.</span>
+          </label>
+        </div>
+        <button type="button" class="submit-btn" onclick="submitContact()">문의 보내기</button>
+        <div id="contactResult" role="status" aria-live="polite" style="margin-top:12px; font-size:13px;"></div>
       </div>
     </div>
     <div class="card" style="background:#f7fafc;">
@@ -143,6 +164,7 @@
       <details style="margin-bottom:10px;">
         <summary>제 문의 내용은 어떻게 처리되나요?</summary>
         <div class="body">남겨주신 이메일 주소는 답변 목적으로만 사용하고 답변이 끝나면 파기합니다. 문의 접수 알림 발송에는 이메일 발송 대행 서비스 Resend를 이용합니다.
+        이미 보낸 문의를 지우고 싶으시면 문의 유형에서 "개인정보 열람 · 정정 · 삭제 요청"을 고르거나 이메일로 알려 주세요. 접수한 날부터 10일 안에 처리하고 결과를 회신합니다.
         자세한 내용은 <a href="/privacy.html">개인정보 처리방침</a>을 참고해 주세요.</div>
       </details>
     </div>
