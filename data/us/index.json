@@ -1,13 +1,18 @@
 {
-  "updated": "2026-10-29",
-  "count": 208,
+  "updated": "2026-10-31",
+  "count": 209,
   "sources": {
-    "twelvedata": 208
+    "twelvedata": 209
   },
   "stocks": [
     {
       "code": "SPY",
       "name": "S&P 500",
+      "market": "US"
+    },
+    {
+      "code": "TLT",
+      "name": "미국 장기국채 ETF",
       "market": "US"
     },
     {

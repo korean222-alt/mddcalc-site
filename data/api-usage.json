@@ -1,25 +1,25 @@
 {
   "provider": "twelvedata",
-  "generatedAt": "2026-10-29T02:25:54.052Z",
-  "generatedAtKST": "2026-10-29 11:25 KST",
+  "generatedAt": "2026-10-31T02:15:49.889Z",
+  "generatedAtKST": "2026-10-31 11:15 KST",
   "producedBy": "scripts/generate-us-data.js",
   "consumedBy": [
     "data/us/*.json",
     "data/sectors.json (섹터 RS·히트맵)"
   ],
-  "symbols": 209,
-  "calls": 209,
-  "ok": 208,
+  "symbols": 210,
+  "calls": 210,
+  "ok": 209,
   "failed": 1,
-  "usable": 208,
+  "usable": 209,
   "sources": {
-    "twelvedata": 208
+    "twelvedata": 209
   },
   "usage": {
     "measured": true,
-    "before": 7,
-    "after": 217,
-    "delta": 210,
+    "before": 19,
+    "after": 230,
+    "delta": 211,
     "limit": 800
   },
   "failures": [
