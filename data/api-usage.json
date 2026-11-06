@@ -1,7 +1,7 @@
 {
   "provider": "twelvedata",
-  "generatedAt": "2026-11-05T03:11:35.504Z",
-  "generatedAtKST": "2026-11-05 12:11 KST",
+  "generatedAt": "2026-11-06T03:14:51.492Z",
+  "generatedAtKST": "2026-11-06 12:14 KST",
   "producedBy": "scripts/generate-us-data.js",
   "consumedBy": [
     "data/us/*.json",
@@ -9,27 +9,31 @@
   ],
   "symbols": 210,
   "calls": 210,
-  "ok": 207,
-  "failed": 3,
+  "ok": 206,
+  "failed": 4,
   "usable": 209,
   "sources": {
-    "twelvedata": 207
+    "twelvedata": 206
   },
   "usage": {
     "measured": true,
-    "before": 13,
-    "after": 227,
-    "delta": 214,
+    "before": 18,
+    "after": 234,
+    "delta": 216,
     "limit": 800
   },
   "failures": [
     {
-      "symbol": "NFLX",
+      "symbol": "LRCX",
       "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 9 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a higher"
     },
     {
-      "symbol": "AAPL",
+      "symbol": "KLAC",
       "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 10 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a highe"
+    },
+    {
+      "symbol": "NNE",
+      "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 9 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a higher"
     },
     {
       "symbol": "CFLT",
