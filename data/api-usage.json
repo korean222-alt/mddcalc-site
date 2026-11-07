@@ -1,7 +1,7 @@
 {
   "provider": "twelvedata",
-  "generatedAt": "2026-11-06T03:14:51.492Z",
-  "generatedAtKST": "2026-11-06 12:14 KST",
+  "generatedAt": "2026-11-07T02:42:13.359Z",
+  "generatedAtKST": "2026-11-07 11:42 KST",
   "producedBy": "scripts/generate-us-data.js",
   "consumedBy": [
     "data/us/*.json",
@@ -9,30 +9,22 @@
   ],
   "symbols": 210,
   "calls": 210,
-  "ok": 206,
-  "failed": 4,
+  "ok": 208,
+  "failed": 2,
   "usable": 209,
   "sources": {
-    "twelvedata": 206
+    "twelvedata": 208
   },
   "usage": {
     "measured": true,
-    "before": 18,
-    "after": 234,
-    "delta": 216,
+    "before": 8,
+    "after": 221,
+    "delta": 213,
     "limit": 800
   },
   "failures": [
     {
-      "symbol": "LRCX",
-      "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 9 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a higher"
-    },
-    {
-      "symbol": "KLAC",
-      "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 10 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a highe"
-    },
-    {
-      "symbol": "NNE",
+      "symbol": "ORCL",
       "reason": "fromTwelveData: HTTP 429 429 You have run out of API credits for the current minute. 9 API credits were used, with the current limit being 8. Wait for the next minute or consider switching to a higher"
     },
     {
