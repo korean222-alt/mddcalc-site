@@ -1,7 +1,7 @@
 {
   "provider": "twelvedata",
-  "generatedAt": "2026-11-17T05:13:10.875Z",
-  "generatedAtKST": "2026-11-17 14:13 KST",
+  "generatedAt": "2026-11-18T04:18:52.950Z",
+  "generatedAtKST": "2026-11-18 13:18 KST",
   "producedBy": "scripts/generate-us-data.js",
   "consumedBy": [
     "data/us/*.json",
@@ -17,8 +17,8 @@
   },
   "usage": {
     "measured": true,
-    "before": 43,
-    "after": 254,
+    "before": 29,
+    "after": 240,
     "delta": 211,
     "limit": 800
   },
